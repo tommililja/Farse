@@ -1,0 +1,16 @@
+﻿Error: Could not parse property 'prop'.
+Expected: Object, actual: Array.
+Array:
+[
+    1,
+    2,
+    3
+]
+Object:
+{
+    "prop": [
+        1,
+        2,
+        3
+    ]
+}

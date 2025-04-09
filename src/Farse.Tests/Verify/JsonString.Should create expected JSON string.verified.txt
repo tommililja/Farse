@@ -1,0 +1,15 @@
+﻿{
+  int: 123456789,
+  float: 123.12,
+  decimal: 123.12,
+  string: string,
+  bool: true,
+  object: {
+    string: string
+  },
+  array: [
+    string
+  ],
+  option: string,
+  nil: null
+}

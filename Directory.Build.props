@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarnOn>$(WarnOn);1182;3579</WarnOn>
+    </PropertyGroup>
+</Project>

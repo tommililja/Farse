@@ -1,0 +1,5 @@
+<Solution>
+    <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj" />
+    <Project Path="Farse.Tests/Farse.Tests.fsproj" />
+    <Project Path="Farse/Farse.fsproj" />
+</Solution>

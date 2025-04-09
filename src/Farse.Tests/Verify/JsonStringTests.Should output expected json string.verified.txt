@@ -1,0 +1,12 @@
+﻿{
+  email: name@domain.com,
+  age: 37,
+  location: null,
+  pets: [
+    {
+      name: Sheldon,
+      type: Cat
+    }
+  ],
+  verified: true
+}

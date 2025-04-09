@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>Farse</PackageId>
+        <Version>0.1.2-alpha</Version>
+        <Authors>Tommi Lilja</Authors>
+        <Copyright>Copyright © 2025</Copyright>
+        <RepositoryUrl>https://github.com/tommililja/Farse</RepositoryUrl>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <PackageReadMeFile>README.md</PackageReadMeFile>
+        <Description>Simple parsing library for F# using System.Text.Json</Description>
+        <PackageTags>fsharp;parsing;json</PackageTags>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="Extensions.fs"/>
+        <Compile Include="Error.fs" />
+        <Compile Include="Parser.fs"/>
+        <Compile Include="Parser.Builder.fs" />
+        <Compile Include="Parse.fs" />
+        <Compile Include="JsonString.fs"/>
+        <Compile Include="Operators.fs" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="../../README.md" Visible="false" Pack="true" PackagePath="\" />
+        <Content Include="../../LICENSE.md" Visible="false" Pack="true" PackagePath="\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FSharp.Core"/>
+        <PackageReference Include="System.Text.Json"/>
+    </ItemGroup>
+</Project>

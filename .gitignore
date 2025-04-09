@@ -1,0 +1,12 @@
+bin/
+obj/
+packages/
+riderModule.iml
+_ReSharper.Caches/
+.idea/
+BenchmarkDotNet.Artifacts/
+
+.DS_Store
+
+*.user
+*.received.*

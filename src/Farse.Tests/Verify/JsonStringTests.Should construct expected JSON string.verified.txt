@@ -1,0 +1,16 @@
+﻿{
+  int: 123456789,
+  single: 123.12,
+  double: 123.12,
+  decimal: 123.12,
+  string: string,
+  bool: true,
+  object: {
+    string: string
+  },
+  array: [
+    string
+  ],
+  optional: string,
+  nil: null
+}
