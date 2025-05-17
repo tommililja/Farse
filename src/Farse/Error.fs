@@ -12,32 +12,45 @@ module internal Error =
         |> String.concat "\n"
         |> Error
 
-    let couldNotParseJson =
-        "Error: Could not parse JSON string."
-
-    let nullOrEmpty =
-        "The string was null or empty."
-
-    let invalidJson (exn:exn) =
-        exn.Message
-
-    let jsonString str =
-        $"String: '%s{str}'."
-
-    let parsingProperty name =
-         $"Error: Could not parse property '%s{name}'."
-
     let couldNotParse (element:JsonElement) (expectedType:Type) =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let invalidElement (expected:JsonValueKind) (actual:JsonValueKind) =
         $"Expected: %s{string expected}, actual: %s{string actual}."
 
-    let nullProperty name =
-        $"Error: Required property '%s{name}' was null or not found."
-
     let element (element:JsonElement) =
         $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
 
-    let notObject (element:JsonElement) =
-        invalidElement JsonValueKind.Object element.ValueKind
+    // Errors
+
+    let notObject (e:JsonElement) =
+        create [
+            invalidElement JsonValueKind.Object e.ValueKind
+            element e
+        ]
+
+    let nullProperty name e =
+        create [
+            $"Error: Required property '%s{name}' was null or not found."
+            element e
+        ]
+
+    let parseError name msg e =
+        create [
+            $"Error: Could not parse property '%s{name}'."
+            msg
+            element e
+        ]
+
+    let nullOrEmptyJson () =
+        create [
+            "Error: Could not parse JSON string."
+            "The string was null or empty."
+        ]
+
+    let invalidJson str (exn:exn) =
+        create [
+            "Error: Could not parse JSON string."
+            exn.Message
+            $"String: '%s{str}'."
+        ]

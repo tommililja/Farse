@@ -15,35 +15,15 @@ module Parse =
             try
                 let prop = element.GetProperty(name)
                 match prop.ValueKind with
-                | JsonValueKind.Null ->
-                    Error.create [
-                        Error.nullProperty name
-                        Error.element element
-                    ]
+                | JsonValueKind.Null -> Error.nullProperty name element
                 | _ ->
                     match parser prop with
                     | Ok x -> Ok x
-                    | Error e ->
-                        Error.create [
-                            Error.parsingProperty name; e
-                            Error.element element
-                        ]
+                    | Error msg -> Error.parseError name msg element
             with
-                | :? ArrayException as exn ->
-                    Error.create [
-                        Error.parsingProperty name; exn.Error
-                        Error.element element
-                    ]
-                | :? KeyNotFoundException ->
-                    Error.create [
-                        Error.nullProperty name
-                        Error.element element
-                    ]
-                | :? InvalidOperationException ->
-                    Error.create [
-                        Error.notObject element
-                        Error.element element
-                    ]
+                | ArrayException msg -> Error.parseError name msg element
+                | :? KeyNotFoundException -> Error.nullProperty name element
+                | :? InvalidOperationException -> Error.notObject element
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="name">The name of the property.</param>
@@ -59,23 +39,11 @@ module Parse =
                     | _ ->
                         match parser prop with
                         | Ok x -> Ok <| Some x
-                        | Error e ->
-                            Error.create [
-                                Error.parsingProperty name; e
-                                Error.element element
-                            ]
+                        | Error msg -> Error.parseError name msg element
                 | false, _ -> Ok None
             with
-                | :? ArrayException as exn ->
-                    Error.create [
-                        Error.parsingProperty name; exn.Error
-                        Error.element element
-                    ]
-                | :? InvalidOperationException  ->
-                    Error.create [
-                        Error.notObject element
-                        Error.element element
-                    ]
+                | ArrayException msg -> Error.parseError name msg element
+                | :? InvalidOperationException -> Error.notObject element
 
     /// <summary>Parses an element as a Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element in the list.</param>

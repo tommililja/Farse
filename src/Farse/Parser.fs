@@ -28,18 +28,9 @@ module Parser =
     let parse (json:string) (parser:Parser<_>) =
         try
             match json with
-            | NullOrEmpty ->
-                Error.create [
-                    Error.couldNotParseJson
-                    Error.nullOrEmpty
-                ]
+            | NullOrEmpty -> Error.nullOrEmptyJson ()
             | String json ->
                 use document = JsonDocument.Parse(json)
                 parser document.RootElement
         with
-            | :? JsonException as exn ->
-                Error.create [
-                    Error.couldNotParseJson
-                    Error.invalidJson exn
-                    Error.jsonString json
-                ]
+            | :? JsonException as exn -> Error.invalidJson json exn
