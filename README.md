@@ -76,7 +76,44 @@ let (&=) = Parse.req
 let (?=) = Parse.opt
 ```
 
-We can parse the JSON string into the following types.
+We can parse the JSON string the following way.
+
+```fsharp
+module User =
+    open Parse
+
+    let parser =
+        parser {
+            let! id = "id" &= UserId.parser
+            let! name = "name" &= string
+            let! age = "age" ?= int
+            let! email = "email" &= Email.parser
+            let! groups = "groups" &= list GroupId.parser
+
+            let! subscription = "subscription" &= parser {
+                let! plan = "plan" &= Plan.parser
+                let! isCanceled = "isCanceled" &= bool
+                let! renewsAt = "renewsAt" ?= dateTime
+    
+                return {
+                    Plan = plan
+                    IsCanceled = isCanceled
+                    RenewsAt = renewsAt
+                }
+            }
+      
+            return {
+                Id = id
+                Name = name
+                Age = age
+                Email = email
+                Groups = groups
+                Subscription = subscription
+            }
+        }
+```
+
+Into the following types.
 
 ```fsharp
 open Farse
@@ -154,39 +191,6 @@ type User = {
     Groups: GroupId list
     Subscription: Subscription
 }
-
-module User =
-    open Parse
-
-    let parser =
-        parser {
-            let! id = "id" &= UserId.parser
-            let! name = "name" &= string
-            let! age = "age" ?= int
-            let! email = "email" &= Email.parser
-            let! groups = "groups" &= list GroupId.parser
-
-            let! subscription = "subscription" &= parser {
-                let! plan = "plan" &= Plan.parser
-                let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= dateTime
-    
-                return {
-                    Plan = plan
-                    IsCanceled = isCanceled
-                    RenewsAt = renewsAt
-                }
-            }
-      
-            return {
-                Id = id
-                Name = name
-                Age = age
-                Email = email
-                Groups = groups
-                Subscription = subscription
-            }
-        }
 ```
 
 Then we can just run the parser.
