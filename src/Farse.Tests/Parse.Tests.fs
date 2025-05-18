@@ -16,7 +16,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse value as double`` () =
+    let ``Should parse value as float`` () =
         let expected = 1.1
         let actual =
             Parse.req "prop" Parse.float
