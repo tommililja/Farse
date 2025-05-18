@@ -1,8 +1,0 @@
-﻿Error: Could not parse property 'prop1'.
-Expected: Array, actual: Object.
-Object:
-{
-    "prop1": {
-        "prop2": 1
-    }
-}

@@ -1,6 +1,0 @@
-﻿Error: Could not parse property 'prop'.
-The value '"1"' is not valid for System.Int32.
-Object:
-{
-    "prop": "1"
-}

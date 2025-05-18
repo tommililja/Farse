@@ -1,6 +1,0 @@
-﻿Error: Parsing property 'test'.
-Could not parse '"1"' as System.Int32.
-Object:
-{
-    "test": "1"
-}
