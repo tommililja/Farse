@@ -89,10 +89,10 @@ module Parse =
     /// Parses an element as System.Guid.
     let guid = getValue _.GetGuid()
 
-    /// Parses an element as System.DateTime.
+    /// Parses an element as System.DateTime (ISO 8601).
     let dateTime = getValue _.GetDateTime()
 
-    /// Parses an element as System.DateTime and converts it to UTC.
+    /// Parses an element as System.DateTime (ISO 8601) and converts it to UTC.
     let dateTimeUtc = getValue (_.GetDateTime() >> _.ToUniversalTime())
 
     /// Parses an element as System.DateTime with a specific format.
@@ -109,5 +109,5 @@ module Parse =
                     |> Error.couldNotParseDateTime element
                     |> Error
 
-    /// Parses an element as System.DateTimeOffset.
+    /// Parses an element as System.DateTimeOffset (ISO 8601).
     let dateTimeOffset = getValue _.GetDateTimeOffset()
