@@ -46,16 +46,13 @@ module Parse =
                 | ArrayException msg -> Error.parseError name msg element
                 | :? InvalidOperationException -> Error.notObject element
 
-    /// <summary>Parses an element as a Microsoft.FSharp.Collections.list.</summary>
-    /// <param name="parser">The parser used for every element in the list.</param>
-    /// <param name="element">The element to parse from. Must be an array.</param>
-    let list (parser:Parser<_>) : Parser<_> =
+    let private enumerable convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | JsonValueKind.Array ->
                 element.EnumerateArray()
                 |> Seq.map (parser >> Result.defaultWith (fun e -> raise <| ArrayException e))
-                |> Seq.toList
+                |> convert
                 |> Ok
             | _ ->
                 element.ValueKind
@@ -111,3 +108,13 @@ module Parse =
 
     /// Parses an element as System.DateTimeOffset (ISO 8601).
     let dateTimeOffset = getValue _.GetDateTimeOffset()
+
+    /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
+    /// <param name="parser">The parser used for every element in the list.</param>
+    let list (parser:Parser<_>) : Parser<_> =
+        enumerable Seq.toList parser
+
+    /// <summary>Parses an element as Microsoft.FSharp.Core.array.</summary>
+    /// <param name="parser">The parser used for every element in the array.</param>
+    let array (parser:Parser<_>) : Parser<_> =
+        enumerable Seq.toArray parser

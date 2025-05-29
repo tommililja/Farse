@@ -96,3 +96,21 @@ module Parse =
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45+02:00" }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse value as list`` () =
+        let expected = [ 1; 2; 3; 4; 5 ]
+        let actual =
+            Parse.req "prop" (Parse.list Parse.int)
+            |> Parser.parse """{ "prop": [ 1, 2, 3, 4, 5 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse value as array`` () =
+        let expected = [| 1; 2; 3; 4; 5 |]
+        let actual =
+            Parse.req "prop" (Parse.array Parse.int)
+            |> Parser.parse """{ "prop": [ 1, 2, 3, 4, 5 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
