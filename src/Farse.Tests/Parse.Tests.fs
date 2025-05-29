@@ -70,6 +70,24 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse value as datetime utc`` () =
+        let expected = DateTime.Parse("2025-05-13T15:28:45")
+        let actual =
+            Parse.req "prop" Parse.dateTimeUtc
+            |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse value as datetime exact`` () =
+        let expected = DateTime.Parse("2025-05-13 17:28")
+        let actual =
+            Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm")
+            |> Parser.parse """{ "prop": "2025-05-13 17:28" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse value as datetime offset`` () =
         let expected = DateTime.Parse("2025-05-13T17:28:45+02:00")
         let actual =

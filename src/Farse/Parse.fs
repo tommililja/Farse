@@ -2,6 +2,7 @@ namespace Farse
 
 open System
 open System.Collections.Generic
+open System.Globalization
 open System.Text.Json
 
 module Parse =
@@ -90,6 +91,23 @@ module Parse =
 
     /// Parses an element as System.DateTime.
     let dateTime = getValue _.GetDateTime()
+
+    /// Parses an element as System.DateTime and converts it to UTC.
+    let dateTimeUtc = getValue (_.GetDateTime() >> _.ToUniversalTime())
+
+    /// Parses an element as System.DateTime with a specific format.
+    let dateTimeExact (format:string) =
+        fun (element:JsonElement) ->
+            try
+                let str = element.GetString()
+                Ok <| DateTime.ParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+            with
+                | :? ArgumentNullException
+                | :? FormatException
+                | :? InvalidOperationException ->
+                    format
+                    |> Error.couldNotParseDateTime element
+                    |> Error
 
     /// Parses an element as System.DateTimeOffset.
     let dateTimeOffset = getValue _.GetDateTimeOffset()

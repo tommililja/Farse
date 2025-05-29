@@ -15,6 +15,9 @@ module internal Error =
     let couldNotParse (element:JsonElement) (expectedType:Type) =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
+    let couldNotParseDateTime (element:JsonElement) format =
+        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format %s{format}."
+
     let invalidElement (expected:JsonValueKind) (actual:JsonValueKind) =
         $"Expected: %s{string expected}, actual: %s{string actual}."
 
