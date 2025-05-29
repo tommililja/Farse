@@ -71,10 +71,11 @@ module Parse =
 
     [<Fact>]
     let ``Should parse value as datetime utc`` () =
-        let expected = DateTime.Parse("2025-05-13T15:28:45")
+        let now = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00))
+        let expected = now.ToUniversalTime()
         let actual =
             Parse.req "prop" Parse.dateTimeUtc
-            |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+            |> Parser.parse $$"""{ "prop": "%%s{{now.ToString("yyyy-MM-ddTHH:mm")}}" }"""
             |> Expect.ok
         Expect.equal actual expected
 
