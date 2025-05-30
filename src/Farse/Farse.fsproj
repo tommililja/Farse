@@ -3,7 +3,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>Farse</PackageId>
-        <Version>0.1.2-alpha</Version>
+        <Version>0.1.3-alpha</Version>
         <Authors>Tommi Lilja</Authors>
         <Copyright>Copyright © 2025</Copyright>
         <RepositoryUrl>https://github.com/tommililja/Farse</RepositoryUrl>
