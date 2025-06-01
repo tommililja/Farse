@@ -1,5 +1,5 @@
-﻿Error: Could not parse property 'prop'.
-Expected: Object, actual: Number.
+﻿Error: Could not parse property 'prop2'.
+Cannot read property from Number.
 Number:
 1
 Object:

@@ -98,3 +98,10 @@ module Error =
         |> Parser.parse """{ "prop": { "prop2": 1 }}"""
         |> Expect.error
         |> Verify.string
+
+    [<Fact>]
+    let ``Should return correct error message when parsing property from non-object`` () =
+        Parse.req "prop" (Parse.list Parse.string)
+        |> Parser.parse "[]"
+        |> Expect.error
+        |> Verify.string

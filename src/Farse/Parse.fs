@@ -22,7 +22,7 @@ module Parse =
                 | _ -> Error.nullProperty name element
             with
                 | ArrayException msg -> Error.parseError name msg element
-                | :? InvalidOperationException -> Error.notObject element
+                | :? InvalidOperationException -> Error.notObject name element
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="name">The name of the property.</param>
@@ -39,7 +39,7 @@ module Parse =
                 | _ -> Ok None
             with
                 | ArrayException msg -> Error.parseError name msg element
-                | :? InvalidOperationException -> Error.notObject element
+                | :? InvalidOperationException -> Error.notObject name element
 
     let private enumerable convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->

@@ -26,9 +26,10 @@ module internal Error =
 
     // Errors
 
-    let notObject (e:JsonElement) =
+    let notObject name (e:JsonElement) =
         create [
-            invalidElement JsonValueKind.Object e.ValueKind
+            $"Error: Could not parse property '%s{name}'."
+            $"Cannot read property from %s{string e.ValueKind}."
             element e
         ]
 
@@ -38,9 +39,12 @@ module internal Error =
             element e
         ]
 
-    let parseError name msg e =
+    let parseError name (msg:string) e =
         create [
-            $"Error: Could not parse property '%s{name}'."
+            // Quick ugly fix for nested parser errors.
+            if not <| msg.StartsWith("Error: Could not parse property") then
+                $"Error: Could not parse property '%s{name}'."
+
             msg
             element e
         ]
