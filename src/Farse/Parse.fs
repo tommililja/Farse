@@ -14,16 +14,14 @@ module Parse =
     let req (name:string) (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             try
-                let prop = element.GetProperty(name)
-                match prop.ValueKind with
-                | JsonValueKind.Null -> Error.nullProperty name element
-                | _ ->
+                match element.TryGetProperty(name) with
+                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                     match parser prop with
                     | Ok x -> Ok x
                     | Error msg -> Error.parseError name msg element
+                | _ -> Error.nullProperty name element
             with
                 | ArrayException msg -> Error.parseError name msg element
-                | :? KeyNotFoundException -> Error.nullProperty name element
                 | :? InvalidOperationException -> Error.notObject element
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
@@ -34,14 +32,11 @@ module Parse =
         fun (element:JsonElement) ->
             try
                 match element.TryGetProperty(name) with
-                | true, prop ->
-                    match prop.ValueKind with
-                    | JsonValueKind.Null -> Ok None
-                    | _ ->
-                        match parser prop with
-                        | Ok x -> Ok <| Some x
-                        | Error msg -> Error.parseError name msg element
-                | false, _ -> Ok None
+                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                    match parser prop with
+                    | Ok x -> Ok <| Some x
+                    | Error msg -> Error.parseError name msg element
+                | _ -> Ok None
             with
                 | ArrayException msg -> Error.parseError name msg element
                 | :? InvalidOperationException -> Error.notObject element
