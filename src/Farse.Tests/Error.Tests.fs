@@ -105,3 +105,188 @@ module Error =
         |> Parser.parse "[]"
         |> Expect.error
         |> Verify.string
+
+    module TraverseTests =
+
+        [<Fact>]
+        let ``Should return correct error message when value is incorrect`` () =
+            let json =
+                """
+                    {
+                        "prop": {
+                            "prop2": {
+                                "prop3": "1"
+                            }
+                        }
+                    }
+                """
+
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        [<Fact>]
+        let ``Should return correct error message when value is incorrect in array`` () =
+            let json =
+                """
+                    {
+                        "prop": {
+                            "prop2": {
+                                "prop3": [ "1" ]
+                            }
+                        }
+                    }
+                """
+
+            Parse.list Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        [<Fact>]
+        let ``Should return correct error message when prop is missing`` () =
+            let json =
+                """
+                    {
+                        "missing": null
+                    }
+                """
+
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        [<Fact>]
+        let ``Should return correct error message when prop is array`` () =
+            let json =
+                """
+                    {
+                        "prop": {
+                            "prop2": []
+                        }
+                    }
+                """
+
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        [<Fact>]
+        let ``Should return correct error message when object is array`` () =
+            let json = "[]"
+
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        [<Fact>]
+        let ``Should return correct error message when nested prop is missing`` () =
+            let json =
+                """
+                    {
+                        "prop": {
+                            "prop2": {
+                                "missing": "100"
+                            }
+                        }
+                    }
+                """
+
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        [<Fact>]
+        let ``Should return correct error message when prop is null`` () =
+            let json =
+                """
+                    {
+                        "prop": {
+                            "prop2": null
+                        }
+                    }
+                """
+
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.error
+            |> Verify.string
+
+        module TryTraverse =
+
+            [<Fact>]
+            let ``Should return correct error message when value is incorrect`` () =
+                let json =
+                    """
+                        {
+                            "prop": {
+                                "prop2": {
+                                    "prop3": "1"
+                                }
+                            }
+                        }
+                    """
+
+                Parse.int
+                |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+                |> Parser.parse json
+                |> Expect.error
+                |> Verify.string
+
+            [<Fact>]
+            let ``Should return correct error message when value is incorrect in array`` () =
+                let json =
+                    """
+                        {
+                            "prop": {
+                                "prop2": {
+                                    "prop3": [ "1" ]
+                                }
+                            }
+                        }
+                    """
+
+                Parse.list Parse.int
+                |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+                |> Parser.parse json
+                |> Expect.error
+                |> Verify.string
+
+            [<Fact>]
+            let ``Should return correct error message when prop is array`` () =
+                let json =
+                    """
+                        {
+                            "prop": {
+                                "prop2": []
+                            }
+                        }
+                    """
+
+                Parse.int
+                |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+                |> Parser.parse json
+                |> Expect.error
+                |> Verify.string
+
+            [<Fact>]
+            let ``Should return correct error message when object is array`` () =
+                let json = "[]"
+
+                Parse.int
+                |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+                |> Parser.parse json
+                |> Expect.error
+                |> Verify.string

@@ -22,6 +22,8 @@ module Expect =
 
     let ok x = Expect.wantOk x "Expected Ok"
 
+    let none x = Expect.isNone x "Expected None"
+
     let error x = Expect.wantError x "Expected Error"
 
     let equal actual expected =

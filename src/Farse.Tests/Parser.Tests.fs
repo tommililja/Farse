@@ -47,3 +47,75 @@ module Parser =
         let result = custom |> Parser.parse "1"
         let actual = Expect.error result
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse value from traversed object`` () =
+        let json =
+            """
+                {
+                    "prop": {
+                        "prop2": {
+                            "prop3": 100
+                        }
+                    }
+                }
+            """
+
+        let expected = 100
+        let actual =
+            Parse.int
+            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
+            |> Parser.parse json
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should return correct error message when parsing from traverse 2`` () =
+        let json =
+            """
+                {
+                    "missing": null
+                }
+            """
+
+        Parse.int
+        |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+        |> Parser.parse json
+        |> Expect.ok
+        |> Expect.none
+
+    [<Fact>]
+    let ``Should return correct error message when parsing from traverse 5`` () =
+        let json =
+            """
+                {
+                    "prop": {
+                        "prop2": {
+                            "missing": "100"
+                        }
+                    }
+                }
+            """
+
+        Parse.int
+        |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+        |> Parser.parse json
+        |> Expect.ok
+        |> Expect.none
+
+    [<Fact>]
+    let ``Should return correct error message when parsing from traverse 7`` () =
+        let json =
+            """
+                {
+                    "prop": {
+                        "prop2": null
+                    }
+                }
+            """
+
+        Parse.int
+        |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
+        |> Parser.parse json
+        |> Expect.ok
+        |> Expect.none
