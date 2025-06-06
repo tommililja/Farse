@@ -1,0 +1,6 @@
+﻿Error: Could not parse property 'prop'.
+Array is not a valid value for System.Int32.
+Object:
+{
+    "prop": []
+}

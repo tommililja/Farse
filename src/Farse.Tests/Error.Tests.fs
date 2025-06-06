@@ -35,6 +35,20 @@ module Error =
         |> Verify.string
 
     [<Fact>]
+    let ``Should return correct error message when parsing value from object`` () =
+        Parse.req "prop" Parse.int
+        |> Parser.parse """{ "prop": { "prop2": null } }"""
+        |> Expect.error
+        |> Verify.string
+
+    [<Fact>]
+    let ``Should return correct error message when parsing value from array`` () =
+        Parse.req "prop" Parse.int
+        |> Parser.parse """{ "prop": [] }"""
+        |> Expect.error
+        |> Verify.string
+
+    [<Fact>]
     let ``Should return correct error message when parsing datetime exact`` () =
         Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
         |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""

@@ -1,0 +1,8 @@
+﻿Error: Could not parse property 'prop'.
+Object is not a valid value for System.Int32.
+Object:
+{
+    "prop": {
+        "prop2": null
+    }
+}

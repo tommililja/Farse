@@ -13,7 +13,10 @@ module internal Error =
         |> Error
 
     let couldNotParse (element:JsonElement) (expectedType:Type) =
-        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
+        match element.ValueKind with
+        | JsonValueKind.Array
+        | JsonValueKind.Object -> $"%s{string element.ValueKind} is not a valid value for %s{expectedType.FullName}."
+        | _ -> $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let couldNotParseDateTime (element:JsonElement) format =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format %s{format}."
