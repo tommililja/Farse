@@ -10,8 +10,8 @@ module Parse =
     /// <param name="name">The name of the property.</param>
     /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
     let req (name:string) (parser:Parser<_>) : Parser<_> =
-        match name.Split(".") |> List.ofArray with
-        | [] | [_] ->
+        match name.Split(".") with
+        | [||] | [|_|] ->
             fun (element:JsonElement) ->
                 try
                     match element.TryGetProperty(name) with
@@ -29,8 +29,8 @@ module Parse =
     /// <param name="name">The name of the property.</param>
     /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
     let opt (name:string) (parser:Parser<_>) : Parser<_> =
-        match name.Split(".") |> List.ofArray with
-        | [] | [_] ->
+        match name.Split(".") with
+        | [||] | [|_|] ->
             fun (element:JsonElement) ->
                 try
                     match element.TryGetProperty(name) with

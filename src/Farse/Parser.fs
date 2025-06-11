@@ -27,12 +27,12 @@ module Parser =
     /// Traverses the JSON document to an element.
     /// <param name="list">The path to traverse.</param>
     /// <param name="parser">The parser used to parse the element.</param>
-    let traverse (path:string list) (parser:Parser<_>) : Parser<_> =
+    let traverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             let mutable object = element
             let element =
                 path
-                |> List.fold (fun (state:Result<JsonElement,_>, _) name ->
+                |> Array.fold (fun (state:Result<JsonElement,_>, _) name ->
                     match state with
                     | Ok state ->
                         if state.ValueKind = JsonValueKind.Object then
@@ -56,12 +56,12 @@ module Parser =
     /// Tries to traverse the JSON document to an element.
     /// <param name="list">The path to traverse.</param>
     /// <param name="parser">The parser used to parse the element.</param>
-    let tryTraverse (path:string list) (parser:Parser<_>) : Parser<_> =
+    let tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             let mutable object = element
             let element =
                 path
-                |> List.fold (fun (state:Result<JsonElement option,_>, _) name ->
+                |> Array.fold (fun (state:Result<JsonElement option,_>, _) name ->
                     match state with
                     | Ok None -> Ok None, name
                     | Ok (Some state) ->
