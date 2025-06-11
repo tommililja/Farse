@@ -1,4 +1,0 @@
-﻿Error: Could not parse property 'prop'.
-Cannot read property from Array.
-Array:
-[]

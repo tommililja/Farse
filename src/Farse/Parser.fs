@@ -7,7 +7,8 @@ type Parser<'a> = JsonElement -> Result<'a, string>
 
 module Parser =
 
-    let from x : Parser<_> = fun _ -> Ok x
+    let from x : Parser<_> =
+        fun _ -> Ok x
 
     let bind (fn:_ -> Parser<_>) (parser:Parser<_>) =
         fun element ->
@@ -77,7 +78,7 @@ module Parser =
             | Ok (Some x), name ->
                 try
                     match parser x with
-                    | Ok x -> Ok (Some x)
+                    | Ok x -> Ok <| Some x
                     | Error msg -> Error.parseError name msg object
                 with ArrayException msg -> Error.parseError name msg object
             | Ok None, _ -> Ok None
@@ -86,12 +87,35 @@ module Parser =
     /// <summary>Parses a JSON string using the supplied parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
     /// <param name="parser">The parser used to parse the JSON string.</param>
-    let parse (json:string) (parser:Parser<_>) =
+    /// <param name="path">The path to parse from.</param>
+    let parse (json:string) path (parser:Parser<_>) =
         try
             match json with
             | NullOrEmpty -> Error.nullOrEmptyJson ()
             | String json ->
                 use document = JsonDocument.Parse(json)
+                let parser =
+                    match path with
+                    | [] -> parser
+                    | path -> traverse path parser
+                parser document.RootElement
+        with
+            | :? JsonException as exn -> Error.invalidJson json exn
+
+    /// <summary>Tries to parse a JSON string using the supplied parser.</summary>
+    /// <param name="json">The JSON string to parse.</param>
+    /// <param name="parser">The parser used to parse the JSON string.</param>
+    /// <param name="path">The path to parse from.</param>
+    let tryParse (json:string) path (parser:Parser<_>) =
+        try
+            match json with
+            | NullOrEmpty -> Error.nullOrEmptyJson ()
+            | String json ->
+                use document = JsonDocument.Parse(json)
+                let parser =
+                    match path with
+                    | [] -> parser >> Result.map Some
+                    | path -> tryTraverse path parser
                 parser document.RootElement
         with
             | :? JsonException as exn -> Error.invalidJson json exn

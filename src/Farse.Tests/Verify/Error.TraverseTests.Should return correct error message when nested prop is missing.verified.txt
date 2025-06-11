@@ -1,5 +1,0 @@
-﻿Error: Required property 'prop3' was null or not found.
-Object:
-{
-    "missing": "100"
-}

@@ -6,50 +6,57 @@ open Farse
 module Parser =
 
     [<Fact>]
-    let ``Should return expected value`` () =
+    let ``Should lift and return expected value`` () =
         let expected = ()
-        let parser = Parser.from expected |> Parser.parse "1"
-        let actual = Expect.ok parser
+        let actual =
+            expected
+            |> Parser.from
+            |> Parser.parse "1" []
+            |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should bind values and return expected value`` () =
+    let ``Should bind parsers and return expected value`` () =
         let expected = 2
-        let result =
+        let actual =
             Parse.int
-            |> Parser.bind (fun x -> Parse.int >> Result.map ((+)x))
-            |> Parser.parse "1"
-        let actual = Expect.ok result
+            |> Parser.bind (fun x -> Parser.from (x + 1))
+            |> Parser.parse "1" []
+            |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should map value and return expected value`` () =
+    let ``Should map parser and return expected value`` () =
         let expected = "1"
-        let result =
+        let actual =
             Parse.int
             |> Parser.map string
-            |> Parser.parse "1"
-        let actual = Expect.ok result
+            |> Parser.parse "1" []
+            |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return Ok with expected value when validation succeeds`` () =
+    let ``Should return ok with expected value when validation succeeds`` () =
         let expected = 1
-        let custom = Parse.int |> Parser.validate Ok
-        let result = custom |> Parser.parse "1"
-        let actual = Expect.ok result
+        let actual =
+            Parse.int
+            |> Parser.validate Ok
+            |> Parser.parse "1" []
+            |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return Error with expected value when validation fails`` () =
+    let ``Should return error with expected value when validation fails`` () =
         let expected = "Error"
-        let custom = Parse.int |> Parser.validate (fun _ -> Error expected)
-        let result = custom |> Parser.parse "1"
-        let actual = Expect.error result
+        let actual =
+            Parse.int
+            |> Parser.validate (fun _ -> Error expected)
+            |> Parser.parse "1" []
+            |> Expect.error
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse value from traversed object`` () =
+    let ``Should parse value from nested object`` () =
         let json =
             """
                 {
@@ -64,58 +71,66 @@ module Parser =
         let expected = 100
         let actual =
             Parse.int
-            |> Parser.traverse [ "prop"; "prop2"; "prop3" ]
-            |> Parser.parse json
+            |> Parser.parse json [ "prop"; "prop2"; "prop3" ]
             |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return correct error message when parsing from traverse 2`` () =
-        let json =
-            """
-                {
-                    "missing": null
-                }
-            """
-
-        Parse.int
-        |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
-        |> Parser.parse json
-        |> Expect.ok
-        |> Expect.none
-
-    [<Fact>]
-    let ``Should return correct error message when parsing from traverse 5`` () =
+    let ``Should try parse value from nested object`` () =
         let json =
             """
                 {
                     "prop": {
                         "prop2": {
-                            "missing": "100"
+                            "prop3": null
                         }
                     }
                 }
             """
 
-        Parse.int
-        |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
-        |> Parser.parse json
-        |> Expect.ok
-        |> Expect.none
+        let expected = None
+        let actual =
+            Parse.int
+            |> Parser.tryParse json [ "prop"; "prop2"; "prop3" ]
+            |> Expect.ok
+        Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return correct error message when parsing from traverse 7`` () =
+    let ``Should parse required value from nested object`` () =
         let json =
             """
                 {
                     "prop": {
-                        "prop2": null
+                        "prop2": {
+                            "prop3": 100
+                        }
                     }
                 }
             """
 
-        Parse.int
-        |> Parser.tryTraverse [ "prop"; "prop2"; "prop3" ]
-        |> Parser.parse json
-        |> Expect.ok
-        |> Expect.none
+        let expected = 100
+        let actual =
+            Parse.req "prop3" Parse.int
+            |> Parser.parse json [ "prop"; "prop2" ]
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse optional value from nested object`` () =
+        let json =
+            """
+                {
+                    "prop": {
+                        "prop2": {
+                            "prop3": null
+                        }
+                    }
+                }
+            """
+
+        let expected = None
+        let actual =
+            Parse.opt "prop3" Parse.int
+            |> Parser.parse json [ "prop"; "prop2" ]
+            |> Expect.ok
+        Expect.equal actual expected

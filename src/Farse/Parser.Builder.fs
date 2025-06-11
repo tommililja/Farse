@@ -10,7 +10,7 @@ module ParserBuilder =
 
         member _.ReturnFrom(x) : Parser<_> = x
 
-        member _.Bind(x:Parser<_>, (fn:_ -> Parser<_>)) : Parser<_> = bind fn x
+        member _.Bind(x:Parser<_>, fn:_ -> Parser<_>) : Parser<_> = bind fn x
 
         member _.Zero() : Parser<_> = from ()
 
