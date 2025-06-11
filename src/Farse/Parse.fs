@@ -9,36 +9,40 @@ module Parse =
     /// <summary>Parses a required property with the supplied parser.</summary>
     /// <param name="name">The name of the property.</param>
     /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
-    /// <param name="element">The element to parse from. Must be an object.</param>
     let req (name:string) (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
-            try
-                match element.TryGetProperty(name) with
-                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                    match parser prop with
-                    | Ok x -> Ok x
-                    | Error msg -> Error.parseError name msg element
-                | _ -> Error.nullProperty name element
-            with
-                | ArrayException msg -> Error.parseError name msg element
-                | :? InvalidOperationException -> Error.notObject name element
+        match name.Split(".") |> List.ofArray with
+        | [] | [_] ->
+            fun (element:JsonElement) ->
+                try
+                    match element.TryGetProperty(name) with
+                    | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                        match parser prop with
+                        | Ok x -> Ok x
+                        | Error msg -> Error.parseError name msg element
+                    | _ -> Error.nullProperty name element
+                with
+                    | ArrayException msg -> Error.parseError name msg element
+                    | :? InvalidOperationException -> Error.notObject name element
+        | list -> Parser.traverse list parser
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="name">The name of the property.</param>
     /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
-    /// <param name="element">The element to parse from. Must be an object.</param>
     let opt (name:string) (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
-            try
-                match element.TryGetProperty(name) with
-                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                    match parser prop with
-                    | Ok x -> Ok <| Some x
-                    | Error msg -> Error.parseError name msg element
-                | _ -> Ok None
-            with
-                | ArrayException msg -> Error.parseError name msg element
-                | :? InvalidOperationException -> Error.notObject name element
+        match name.Split(".") |> List.ofArray with
+        | [] | [_] ->
+            fun (element:JsonElement) ->
+                try
+                    match element.TryGetProperty(name) with
+                    | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                        match parser prop with
+                        | Ok x -> Ok <| Some x
+                        | Error msg -> Error.parseError name msg element
+                    | _ -> Ok None
+                with
+                    | ArrayException msg -> Error.parseError name msg element
+                    | :? InvalidOperationException -> Error.notObject name element
+        | list -> Parser.tryTraverse list parser
 
     let private enumerable convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->

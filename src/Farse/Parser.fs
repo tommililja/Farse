@@ -87,35 +87,12 @@ module Parser =
     /// <summary>Parses a JSON string using the supplied parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
     /// <param name="parser">The parser used to parse the JSON string.</param>
-    /// <param name="path">The path to parse from.</param>
-    let parse (json:string) path (parser:Parser<_>) =
+    let parse (json:string) (parser:Parser<_>) =
         try
             match json with
             | NullOrEmpty -> Error.nullOrEmptyJson ()
             | String json ->
                 use document = JsonDocument.Parse(json)
-                let parser =
-                    match path with
-                    | [] -> parser
-                    | path -> traverse path parser
-                parser document.RootElement
-        with
-            | :? JsonException as exn -> Error.invalidJson json exn
-
-    /// <summary>Tries to parse a JSON string using the supplied parser.</summary>
-    /// <param name="json">The JSON string to parse.</param>
-    /// <param name="parser">The parser used to parse the JSON string.</param>
-    /// <param name="path">The path to parse from.</param>
-    let tryParse (json:string) path (parser:Parser<_>) =
-        try
-            match json with
-            | NullOrEmpty -> Error.nullOrEmptyJson ()
-            | String json ->
-                use document = JsonDocument.Parse(json)
-                let parser =
-                    match path with
-                    | [] -> parser >> Result.map Some
-                    | path -> tryTraverse path parser
                 parser document.RootElement
         with
             | :? JsonException as exn -> Error.invalidJson json exn

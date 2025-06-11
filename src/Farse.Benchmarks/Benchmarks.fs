@@ -182,7 +182,7 @@ type Benchmarks() =
 
             return ()
         }
-        |> Parser.parse json []
+        |> Parser.parse json
         |> Result.defaultWith failwith
 
 let config =

@@ -11,7 +11,7 @@ module Parser =
         let actual =
             expected
             |> Parser.from
-            |> Parser.parse "1" []
+            |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
 
@@ -21,7 +21,7 @@ module Parser =
         let actual =
             Parse.int
             |> Parser.bind (fun x -> Parser.from (x + 1))
-            |> Parser.parse "1" []
+            |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
 
@@ -31,7 +31,7 @@ module Parser =
         let actual =
             Parse.int
             |> Parser.map string
-            |> Parser.parse "1" []
+            |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
 
@@ -41,7 +41,7 @@ module Parser =
         let actual =
             Parse.int
             |> Parser.validate Ok
-            |> Parser.parse "1" []
+            |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
 
@@ -51,7 +51,7 @@ module Parser =
         let actual =
             Parse.int
             |> Parser.validate (fun _ -> Error expected)
-            |> Parser.parse "1" []
+            |> Parser.parse "1"
             |> Expect.error
         Expect.equal actual expected
 
@@ -70,8 +70,8 @@ module Parser =
 
         let expected = 100
         let actual =
-            Parse.int
-            |> Parser.parse json [ "prop"; "prop2"; "prop3" ]
+            Parse.req "prop.prop2.prop3" Parse.int
+            |> Parser.parse json
             |> Expect.ok
         Expect.equal actual expected
 
@@ -90,8 +90,8 @@ module Parser =
 
         let expected = None
         let actual =
-            Parse.int
-            |> Parser.tryParse json [ "prop"; "prop2"; "prop3" ]
+            Parse.opt "prop.prop2.prop3" Parse.int
+            |> Parser.parse json
             |> Expect.ok
         Expect.equal actual expected
 
@@ -110,8 +110,8 @@ module Parser =
 
         let expected = 100
         let actual =
-            Parse.req "prop3" Parse.int
-            |> Parser.parse json [ "prop"; "prop2" ]
+            Parse.req "prop.prop2.prop3" Parse.int
+            |> Parser.parse json
             |> Expect.ok
         Expect.equal actual expected
 
@@ -130,7 +130,7 @@ module Parser =
 
         let expected = None
         let actual =
-            Parse.opt "prop3" Parse.int
-            |> Parser.parse json [ "prop"; "prop2" ]
+            Parse.opt "prop.prop2.prop3" Parse.int
+            |> Parser.parse json
             |> Expect.ok
         Expect.equal actual expected
