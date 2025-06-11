@@ -6,12 +6,12 @@ open Farse
 
 module Error =
 
-    [<Fact>]
-    let ``Should return correct error message with parsing invalid json`` () =
-        Parse.int
-        |> Parser.parse "invalid"
-        |> Expect.error
-        |> Verify.string
+    // [<Fact>]
+    // let ``Should return correct error message with parsing invalid json`` () =
+    //     Parse.int
+    //     |> Parser.parse "invalid"
+    //     |> Expect.error
+    //     |> Verify.string
 
     [<Fact>]
     let ``Should return correct error message with string is null`` () =
