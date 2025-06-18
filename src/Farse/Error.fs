@@ -41,7 +41,16 @@ module internal Error =
 
     let nullProperty name path e =
         create [
-            $"Error: Required property '%s{name}' was null or not found."
+            $"Error: Required property '%s{name}' was null."
+            match path with
+            | Some path -> $"Path: %s{path}."
+            | None -> ()
+            element e
+        ]
+
+    let missingProperty name path e =
+        create [
+            $"Error: Required property '%s{name}' was not found."
             match path with
             | Some path -> $"Path: %s{path}."
             | None -> ()

@@ -19,6 +19,7 @@ module Parse =
                         match parser prop with
                         | Ok x -> Ok x
                         | Error msg -> Error.parseError name None msg element
+                    | false, _ -> Error.missingProperty name None element
                     | _ -> Error.nullProperty name None element
                 with
                     | ArrayException msg -> Error.parseError name None msg element

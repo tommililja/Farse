@@ -40,7 +40,8 @@ module Parser =
                             object <- state
                             match state.TryGetProperty(name) with
                             | true, prop when prop.ValueKind <> JsonValueKind.Null -> Ok prop, name, newPath
-                            | _ -> Error.nullProperty name (Some path) state, name, newPath
+                            | false, _ -> Error.missingProperty name (Some path) state, name, newPath
+                            | _ -> Error.nullProperty name (Some newPath) state, name, newPath
                         else Error.notObject name (Some path) state, name, newPath
                     | Error e -> Error e, name, newPath
                 ) (Ok element, String.Empty, String.Empty)

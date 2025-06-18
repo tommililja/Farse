@@ -1,4 +1,4 @@
-﻿Error: Required property 'prop' was null or not found.
+﻿Error: Required property 'prop' was null.
 Object:
 {
     "prop": null
