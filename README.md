@@ -79,6 +79,9 @@ let (?=) = Parse.opt
 We can create the following parser.
 
 ```fsharp
+open Farse
+open Farse.Operators
+
 module User =
     open Parse
 
