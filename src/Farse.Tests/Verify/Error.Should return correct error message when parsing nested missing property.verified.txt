@@ -1,4 +1,5 @@
 ﻿Error: Required property 'missing' was null or not found.
+Path: prop.prop2.
 Object:
 {
     "prop3": "100"

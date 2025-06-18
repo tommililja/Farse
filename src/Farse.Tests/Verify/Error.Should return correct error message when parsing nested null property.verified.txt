@@ -1,4 +1,5 @@
 ﻿Error: Required property 'prop2' was null or not found.
+Path: prop.
 Object:
 {
     "prop2": null

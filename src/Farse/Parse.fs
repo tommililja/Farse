@@ -10,7 +10,7 @@ module Parse =
     /// <param name="name">The name of the property.</param>
     /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
     let req (name:string) (parser:Parser<_>) : Parser<_> =
-        match name.Split(".") with
+        match name.Split(".", StringSplitOptions.RemoveEmptyEntries) with
         | [||] | [|_|] ->
             fun (element:JsonElement) ->
                 try
@@ -18,18 +18,18 @@ module Parse =
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok x
-                        | Error msg -> Error.parseError name msg element
-                    | _ -> Error.nullProperty name element
+                        | Error msg -> Error.parseError name None msg element
+                    | _ -> Error.nullProperty name None element
                 with
-                    | ArrayException msg -> Error.parseError name msg element
-                    | :? InvalidOperationException -> Error.notObject name element
+                    | ArrayException msg -> Error.parseError name None msg element
+                    | :? InvalidOperationException -> Error.notObject name None element
         | list -> Parser.traverse list parser
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="name">The name of the property.</param>
     /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
     let opt (name:string) (parser:Parser<_>) : Parser<_> =
-        match name.Split(".") with
+        match name.Split(".", StringSplitOptions.RemoveEmptyEntries) with
         | [||] | [|_|] ->
             fun (element:JsonElement) ->
                 try
@@ -37,11 +37,11 @@ module Parse =
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok <| Some x
-                        | Error msg -> Error.parseError name msg element
+                        | Error msg -> Error.parseError name None msg element
                     | _ -> Ok None
                 with
-                    | ArrayException msg -> Error.parseError name msg element
-                    | :? InvalidOperationException -> Error.notObject name element
+                    | ArrayException msg -> Error.parseError name None msg element
+                    | :? InvalidOperationException -> Error.notObject name None element
         | list -> Parser.tryTraverse list parser
 
     let private enumerable convert (parser:Parser<_>) : Parser<_> =

@@ -29,26 +29,35 @@ module internal Error =
 
     // Errors
 
-    let notObject name (e:JsonElement) =
+    let notObject name path (e:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
             $"Cannot read property from %s{string e.ValueKind}."
+            match path with
+            | Some path -> $"Path: %s{path}."
+            | None -> ()
             element e
         ]
 
-    let nullProperty name e =
+    let nullProperty name path e =
         create [
             $"Error: Required property '%s{name}' was null or not found."
+            match path with
+            | Some path -> $"Path: %s{path}."
+            | None -> ()
             element e
         ]
 
-    let parseError name (msg:string) e =
+    let parseError name path (msg:string) e =
         create [
             // Quick ugly fix for nested parser errors.
             if not <| msg.StartsWith("Error: Could not parse property") then
                 $"Error: Could not parse property '%s{name}'."
 
             msg
+            match path with
+            | Some path -> $"Path: %s{path}."
+            | None -> ()
             element e
         ]
 

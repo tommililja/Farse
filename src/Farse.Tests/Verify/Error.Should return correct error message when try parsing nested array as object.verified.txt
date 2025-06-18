@@ -1,4 +1,5 @@
 ﻿Error: Could not parse property 'prop3'.
 Cannot read property from Array.
+Path: prop.prop2.
 Array:
 []
