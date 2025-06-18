@@ -124,7 +124,6 @@ With the following types.
 
 ```fsharp
 open Farse
-open Farse.Operators
 
 type UserId = UserId of Guid
 
