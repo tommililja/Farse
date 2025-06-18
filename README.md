@@ -5,7 +5,7 @@
 
 >Simple parsing library for F# using System.Text.Json.
 
-Heavily inspired by Thoth.Json.Net and its composability. Farse uses a slightly different syntax, includes a computational expression and a few custom operators that simplify parsing. It also tries to keep a low overhead while still providing utility and acceptable error messages.
+Heavily inspired by Thoth.Json.Net and its composability; Farse uses a slightly different syntax, includes a computational expression and a few custom operators that simplify parsing. It also tries to keep a low overhead while still providing utility and acceptable error messages.
 
 ## Installation
 
@@ -20,9 +20,9 @@ dotnet add package Farse --prerelease
 There are some initial benchmarks [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.14.0, macOS Sequoia 15.4.1 (24E263) [Darwin 24.4.0]  
-Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores  
-.NET SDK 9.0.203  
+BenchmarkDotNet v0.15.2, macOS Sequoia 15.5 (24F74) [Darwin 24.5.0]
+Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
+.NET SDK 9.0.203
   [Host]     : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD DEBUG
   DefaultJob : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD
 ```
@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                    | Mean      | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
 |-------------------------- |----------:|------:|-------:|-------:|----------:|------------:|
-| 'System.Text.Json (Auto)' |  3.646 us |  0.72 | 0.4082 | 0.0076 |    2562 B |        0.64 |
-| System.Text.Json          |  3.667 us |  0.72 | 0.1106 |      - |     696 B |        0.17 |
-| Farse                     |  5.089 us |  1.00 | 0.6332 |      - |    4016 B |        1.00 |
-| 'Newtonsoft.Json (Auto)'  |  6.301 us |  1.24 | 1.5182 | 0.0229 |    9544 B |        2.38 |
-| Thoth.System.Text.Json    |  8.176 us |  1.61 | 1.5869 | 0.0305 |    9944 B |        2.48 |
-| Newtonsoft.Json           |  8.522 us |  1.67 | 2.8229 | 0.1526 |   17720 B |        4.41 |
-| Thoth.Json.Net            | 10.036 us |  1.97 | 3.3569 | 0.1526 |   21136 B |        5.26 |
+| System.Text.Json          |  3.674 us |  0.72 | 0.1106 |      - |     696 B |        0.17 |
+| 'System.Text.Json (Auto)' |  3.683 us |  0.72 | 0.4082 | 0.0076 |    2562 B |        0.64 |
+| Farse                     |  5.105 us |  1.00 | 0.6409 |      - |    4024 B |        1.00 |
+| 'Newtonsoft.Json (Auto)'  |  6.240 us |  1.22 | 1.5182 | 0.0229 |    9544 B |        2.37 |
+| Thoth.System.Text.Json    |  8.239 us |  1.61 | 1.5869 | 0.0305 |    9944 B |        2.47 |
+| Newtonsoft.Json           |  8.910 us |  1.75 | 2.8229 | 0.1373 |   17720 B |        4.40 |
+| Thoth.Json.Net            | 10.510 us |  2.06 | 3.3569 | 0.1526 |   21136 B |        5.25 |
 ```
 
 ## Example
@@ -62,7 +62,7 @@ Given the following JSON string.
 }
 ```
 
-And the following (optional) operators.
+And the two (optional) operators.
 
 ```fsharp
 /// <summary>
@@ -76,7 +76,7 @@ let (&=) = Parse.req
 let (?=) = Parse.opt
 ```
 
-We can parse the JSON string the following way.
+We can create the following parser.
 
 ```fsharp
 module User =
@@ -101,6 +101,10 @@ module User =
                     RenewsAt = renewsAt
                 }
             }
+
+            // Simple "path" support, which can be very useful
+            // when we just want to parse a (few) nested value(s).
+            let! isCanceled = "subscription.isCanceled" &= bool
       
             return {
                 Id = id
@@ -113,7 +117,7 @@ module User =
         }
 ```
 
-Into the following types.
+With the following types.
 
 ```fsharp
 open Farse
@@ -204,7 +208,7 @@ let user =
 printfn "%s" user.Name
 ```
 
-We can also convert types back into a JSON string.
+We can also construct JSON strings.
 
 ```fsharp
 let jsonString =
