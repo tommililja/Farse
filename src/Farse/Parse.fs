@@ -7,42 +7,42 @@ open System.Text.Json
 module Parse =
 
     /// <summary>Parses a required property with the supplied parser.</summary>
-    /// <param name="name">The name of the property.</param>
-    /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
-    let req (name:string) (parser:Parser<_>) : Parser<_> =
-        match name.Split(".", StringSplitOptions.RemoveEmptyEntries) with
+    /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
+    /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
+    let req (path:string) (parser:Parser<_>) : Parser<_> =
+        match path.Split(".", StringSplitOptions.RemoveEmptyEntries) with
         | [||] | [|_|] ->
             fun (element:JsonElement) ->
                 try
-                    match element.TryGetProperty(name) with
+                    match element.TryGetProperty(path) with
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok x
-                        | Error msg -> Error.parseError name None msg element
-                    | false, _ -> Error.missingProperty name None element
-                    | _ -> Error.nullProperty name None element
+                        | Error msg -> Error.parseError path None msg element
+                    | false, _ -> Error.missingProperty path None element
+                    | _ -> Error.nullProperty path None element
                 with
-                    | ArrayException msg -> Error.parseError name None msg element
-                    | :? InvalidOperationException -> Error.notObject name None element
+                    | ArrayException msg -> Error.parseError path None msg element
+                    | :? InvalidOperationException -> Error.notObject path None element
         | list -> Parser.traverse list parser
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
-    /// <param name="name">The name of the property.</param>
-    /// <param name="parser">The parser used for the property value. For example, Parse.int.</param>
-    let opt (name:string) (parser:Parser<_>) : Parser<_> =
-        match name.Split(".", StringSplitOptions.RemoveEmptyEntries) with
+    /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
+    /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
+    let opt (path:string) (parser:Parser<_>) : Parser<_> =
+        match path.Split(".", StringSplitOptions.RemoveEmptyEntries) with
         | [||] | [|_|] ->
             fun (element:JsonElement) ->
                 try
-                    match element.TryGetProperty(name) with
+                    match element.TryGetProperty(path) with
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok <| Some x
-                        | Error msg -> Error.parseError name None msg element
+                        | Error msg -> Error.parseError path None msg element
                     | _ -> Ok None
                 with
-                    | ArrayException msg -> Error.parseError name None msg element
-                    | :? InvalidOperationException -> Error.notObject name None element
+                    | ArrayException msg -> Error.parseError path None msg element
+                    | :? InvalidOperationException -> Error.notObject path None element
         | list -> Parser.tryTraverse list parser
 
     let private enumerable convert (parser:Parser<_>) : Parser<_> =

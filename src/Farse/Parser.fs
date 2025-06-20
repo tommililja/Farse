@@ -24,11 +24,11 @@ module Parser =
 
     let map fn x : Parser<_> = bind (fn >> from) x
 
-    let internal traverse (pathArr:string array) (parser:Parser<_>) : Parser<_> =
+    let internal traverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             let mutable object = element
             let element =
-                pathArr
+                path
                 |> Array.fold (fun (state:Result<JsonElement,_>, _, path) name ->
                     let newPath =
                         if path = String.Empty
@@ -55,11 +55,11 @@ module Parser =
                 with ArrayException msg -> Error.parseError name (Some path) msg object
             | Error e, _, _ -> Error e
 
-    let internal tryTraverse (pathArr:string array) (parser:Parser<_>) : Parser<_> =
+    let internal tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             let mutable object = element
             let element =
-                pathArr
+                path
                 |> Array.fold (fun (state:Result<JsonElement option,_>, _, path) name ->
                     let newPath =
                         if path = String.Empty

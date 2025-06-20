@@ -66,12 +66,12 @@ And the two (optional) operators.
 
 ```fsharp
 /// <summary>
-/// Parses a required field.
+/// Parses a required property.
 /// </summary>
 let (&=) = Parse.req
 
 /// <summary>
-/// Parses an optional field.
+/// Parses an optional property.
 /// </summary>
 let (?=) = Parse.opt
 ```

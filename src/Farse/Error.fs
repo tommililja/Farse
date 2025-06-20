@@ -24,53 +24,51 @@ module internal Error =
     let invalidElement (expected:JsonValueKind) (actual:JsonValueKind) =
         $"Expected: %s{string expected}, actual: %s{string actual}."
 
-    let element (element:JsonElement) =
+    let printElement (element:JsonElement) =
         $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
 
     // Errors
 
-    let notObject name path (e:JsonElement) =
+    let notObject name path (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
-            $"Cannot read property from %s{string e.ValueKind}."
+            $"Cannot read property from %s{string element.ValueKind}."
             match path with
             | Some path -> $"Path: %s{path}."
             | None -> ()
-            element e
+            printElement element
         ]
 
-    let nullProperty name path e =
+    let nullProperty name path element =
         create [
             $"Error: Required property '%s{name}' was null."
             match path with
             | Some path -> $"Path: %s{path}."
             | None -> ()
-            element e
+            printElement element
         ]
 
-    let missingProperty name path e =
+    let missingProperty name path element =
         create [
             $"Error: Required property '%s{name}' was not found."
             match path with
             | Some path -> $"Path: %s{path}."
             | None -> ()
-            element e
+            printElement element
         ]
 
-    let parseError name path (msg:string) e =
+    let parseError name path (msg:string) element =
         // Quick ugly fix for nested parser errors.
         if msg.StartsWith("Error:")
         then create [ msg ]
         else
             create [
                 $"Error: Could not parse property '%s{name}'."
-
                 msg
                 match path with
                 | Some path -> $"Path: %s{path}."
                 | None -> ()
-
-                element e
+                printElement element
             ]
 
     let nullOrEmptyJson () =

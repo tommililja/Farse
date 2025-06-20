@@ -7,11 +7,11 @@ module Operators =
     open Parse
 
     /// <summary>
-    /// Parses a required field.
+    /// Parses a required property.
     /// </summary>
     let (&=) = req
 
     /// <summary>
-    /// Parses an optional field.
+    /// Parses an optional property.
     /// </summary>
     let (?=) = opt
