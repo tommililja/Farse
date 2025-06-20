@@ -3,6 +3,7 @@ namespace Farse.Tests
 open System
 open Xunit
 open Farse
+open Farse.Operators
 
 module Error =
 
@@ -288,6 +289,31 @@ module Error =
             """
 
         Parse.req "prop.prop2.missing" Parse.int
+        |> Parser.parse json
+        |> Expect.error
+        |> Verify.string
+
+    [<Fact>]
+    let ``Should return correct error message for nested parsers`` () =
+        let json =
+            """
+                {
+                    "prop": {
+                        "prop2": {
+                            "prop3": null
+                        }
+                    }
+                }
+            """
+
+        parser {
+            let! _ = "prop" &= parser {
+                return! "prop2" &= parser {
+                    return! "prop3" &= Parse.int
+                }
+            }
+            return ()
+        }
         |> Parser.parse json
         |> Expect.error
         |> Verify.string

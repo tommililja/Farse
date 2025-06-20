@@ -58,17 +58,20 @@ module internal Error =
         ]
 
     let parseError name path (msg:string) e =
-        create [
-            // Quick ugly fix for nested parser errors.
-            if not <| msg.StartsWith("Error: Could not parse property") then
+        // Quick ugly fix for nested parser errors.
+        if msg.StartsWith("Error:")
+        then create [ msg ]
+        else
+            create [
                 $"Error: Could not parse property '%s{name}'."
 
-            msg
-            match path with
-            | Some path -> $"Path: %s{path}."
-            | None -> ()
-            element e
-        ]
+                msg
+                match path with
+                | Some path -> $"Path: %s{path}."
+                | None -> ()
+
+                element e
+            ]
 
     let nullOrEmptyJson () =
         create [
