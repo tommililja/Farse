@@ -168,7 +168,7 @@ type Benchmarks() =
                 let! _ = "decimal" &= Parse.decimal
                 let! _ = "string" &= Parse.string
                 let! _ = "bool" &= Parse.bool
-                let! _ = "guid" &= Parse.string
+                let! _ = "guid" &= Parse.guid
                 let! _ = "dateTime" &= Parse.dateTime
 
                 return ()
