@@ -17,12 +17,12 @@ module Parse =
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok x
-                        | Error msg -> Error.parseError path None msg element
-                    | false, _ -> Error.missingProperty path None element
-                    | _ -> Error.nullProperty path None element
+                        | Error e -> Error.parseError path e element
+                    | false, _ -> Error.missingProperty path element
+                    | _ -> Error.nullProperty path element
                 with
-                    | ArrayException msg -> Error.parseError path None msg element
-                    | :? InvalidOperationException -> Error.notObject path None element
+                    | ArrayException e -> Error.parseError path e element
+                    | :? InvalidOperationException -> Error.notObject path element
         else
             Parser.traverse path parser
 
@@ -37,11 +37,11 @@ module Parse =
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok <| Some x
-                        | Error msg -> Error.parseError path None msg element
+                        | Error e -> Error.parseError path e element
                     | _ -> Ok None
                 with
-                    | ArrayException msg -> Error.parseError path None msg element
-                    | :? InvalidOperationException -> Error.notObject path None element
+                    | ArrayException e -> Error.parseError path e element
+                    | :? InvalidOperationException -> Error.notObject path element
         else
             Parser.tryTraverse path parser
 

@@ -1,6 +1,5 @@
 ﻿Error: Could not parse property 'prop2'.
 Cannot read property from Array.
-Path: prop.
 Array:
 [
     1,

@@ -3,7 +3,14 @@ namespace Farse
 open System
 open System.Text.Json
 
-exception private ArrayException of Error:string
+exception private NotObjectException of
+    Name:string * Element:JsonElement
+
+exception private NullPropertyException of
+    Name:string * Element:JsonElement
+
+exception private ArrayException of
+    Error:string
 
 module internal Error =
 
@@ -29,35 +36,26 @@ module internal Error =
 
     // Errors
 
-    let notObject name path (element:JsonElement) =
+    let notObject name (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
             $"Cannot read property from %s{string element.ValueKind}."
-            match path with
-            | Some path -> $"Path: %s{path}."
-            | None -> ()
             printElement element
         ]
 
-    let nullProperty name path element =
+    let nullProperty name element =
         create [
             $"Error: Required property '%s{name}' was null."
-            match path with
-            | Some path -> $"Path: %s{path}."
-            | None -> ()
             printElement element
         ]
 
-    let missingProperty name path element =
+    let missingProperty name element =
         create [
             $"Error: Required property '%s{name}' was not found."
-            match path with
-            | Some path -> $"Path: %s{path}."
-            | None -> ()
             printElement element
         ]
 
-    let parseError name path (msg:string) element =
+    let parseError name (msg:string) element =
         // Quick ugly fix for nested parser errors.
         if msg.StartsWith("Error:")
         then create [ msg ]
@@ -65,9 +63,6 @@ module internal Error =
             create [
                 $"Error: Could not parse property '%s{name}'."
                 msg
-                match path with
-                | Some path -> $"Path: %s{path}."
-                | None -> ()
                 printElement element
             ]
 

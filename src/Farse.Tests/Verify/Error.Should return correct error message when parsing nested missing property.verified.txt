@@ -1,5 +1,4 @@
 ﻿Error: Required property 'missing' was not found.
-Path: prop.prop2.
 Object:
 {
     "prop3": "100"
