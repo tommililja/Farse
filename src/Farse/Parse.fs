@@ -10,8 +10,7 @@ module Parse =
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
     let req (path:string) (parser:Parser<_>) : Parser<_> =
-        match path.Split(".", StringSplitOptions.RemoveEmptyEntries) with
-        | [||] | [|_|] ->
+        if not <| path.Contains(".") then
             fun (element:JsonElement) ->
                 try
                     match element.TryGetProperty(path) with
@@ -24,14 +23,14 @@ module Parse =
                 with
                     | ArrayException msg -> Error.parseError path None msg element
                     | :? InvalidOperationException -> Error.notObject path None element
-        | list -> Parser.traverse list parser
+        else
+            Parser.traverse path parser
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
     let opt (path:string) (parser:Parser<_>) : Parser<_> =
-        match path.Split(".", StringSplitOptions.RemoveEmptyEntries) with
-        | [||] | [|_|] ->
+        if not <| path.Contains(".") then
             fun (element:JsonElement) ->
                 try
                     match element.TryGetProperty(path) with
@@ -43,7 +42,8 @@ module Parse =
                 with
                     | ArrayException msg -> Error.parseError path None msg element
                     | :? InvalidOperationException -> Error.notObject path None element
-        | list -> Parser.tryTraverse list parser
+        else
+            Parser.tryTraverse path parser
 
     let private enumerable convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
