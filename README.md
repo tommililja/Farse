@@ -25,18 +25,17 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 .NET SDK 9.0.203
   [Host]     : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD DEBUG
   DefaultJob : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD
-```
 
-```shell
+
 | Method                    | Mean      | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
 |-------------------------- |----------:|------:|-------:|-------:|----------:|------------:|
-| System.Text.Json          |  3.674 us |  0.72 | 0.1106 |      - |     696 B |        0.17 |
-| 'System.Text.Json (Auto)' |  3.683 us |  0.72 | 0.4082 | 0.0076 |    2562 B |        0.64 |
-| Farse                     |  5.105 us |  1.00 | 0.6409 |      - |    4024 B |        1.00 |
-| 'Newtonsoft.Json (Auto)'  |  6.240 us |  1.22 | 1.5182 | 0.0229 |    9544 B |        2.37 |
-| Thoth.System.Text.Json    |  8.239 us |  1.61 | 1.5869 | 0.0305 |    9944 B |        2.47 |
-| Newtonsoft.Json           |  8.910 us |  1.75 | 2.8229 | 0.1373 |   17720 B |        4.40 |
-| Thoth.Json.Net            | 10.510 us |  2.06 | 3.3569 | 0.1526 |   21136 B |        5.25 |
+| System.Text.Json          |  3.659 us |  0.74 | 0.1106 |      - |     696 B |        0.21 |
+| 'System.Text.Json (Auto)' |  3.679 us |  0.74 | 0.4082 | 0.0076 |    2562 B |        0.77 |
+| Farse                     |  4.960 us |  1.00 | 0.5264 |      - |    3320 B |        1.00 |
+| 'Newtonsoft.Json (Auto)'  |  6.259 us |  1.26 | 1.5182 | 0.0229 |    9544 B |        2.87 |
+| Thoth.System.Text.Json    |  8.304 us |  1.67 | 1.5869 | 0.0305 |    9944 B |        3.00 |
+| Newtonsoft.Json           |  8.678 us |  1.75 | 2.8229 | 0.1373 |   17720 B |        5.34 |
+| Thoth.Json.Net            | 10.120 us |  2.04 | 3.3569 | 0.1526 |   21136 B |        6.37 |
 ```
 
 ## Example
