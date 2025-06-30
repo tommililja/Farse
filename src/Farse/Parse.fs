@@ -10,39 +10,41 @@ module Parse =
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
     let req (path:string) (parser:Parser<_>) : Parser<_> =
-        if not <| path.Contains(".") then
+        match path with
+        | Flat name ->
             fun (element:JsonElement) ->
                 try
-                    match element.TryGetProperty(path) with
+                    match element.TryGetProperty(name) with
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok x
-                        | Error e -> Error.parseError path e element
-                    | false, _ -> Error.missingProperty path element
-                    | _ -> Error.nullProperty path element
+                        | Error e -> Error.parseError name e element
+                    | false, _ -> Error.missingProperty name element
+                    | _ -> Error.nullProperty name element
                 with
-                    | ArrayException e -> Error.parseError path e element
-                    | :? InvalidOperationException -> Error.notObject path element
-        else
+                    | ArrayException e -> Error.parseError name e element
+                    | :? InvalidOperationException -> Error.notObject name element
+        | Nested path ->
             Parser.traverse path parser
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
     let opt (path:string) (parser:Parser<_>) : Parser<_> =
-        if not <| path.Contains(".") then
+        match path with
+        | Flat name ->
             fun (element:JsonElement) ->
                 try
-                    match element.TryGetProperty(path) with
+                    match element.TryGetProperty(name) with
                     | true, prop when prop.ValueKind <> JsonValueKind.Null ->
                         match parser prop with
                         | Ok x -> Ok <| Some x
-                        | Error e -> Error.parseError path e element
+                        | Error e -> Error.parseError name e element
                     | _ -> Ok None
                 with
-                    | ArrayException e -> Error.parseError path e element
-                    | :? InvalidOperationException -> Error.notObject path element
-        else
+                    | ArrayException e -> Error.parseError name e element
+                    | :? InvalidOperationException -> Error.notObject name element
+        | Nested path ->
             Parser.tryTraverse path parser
 
     let private enumerable convert (parser:Parser<_>) : Parser<_> =

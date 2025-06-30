@@ -21,3 +21,8 @@ module internal ActivePatterns =
         if String.IsNullOrEmpty str
         then NullOrEmpty
         else String str
+
+    let (|Nested|Flat|) (str:string) =
+        if str.Contains(".")
+        then Nested str
+        else Flat str
