@@ -43,7 +43,7 @@ type Benchmarks() =
     member _.Setup() =
         json <- File.ReadAllText("Benchmarks.json")
 
-    [<Benchmark(Description = "Newtonsoft.Json (Auto)")>]
+    [<Benchmark(Description = "Newtonsoft.Json*")>]
     member _.NewtonsoftJsonSerialization() =
         JsonConvert.DeserializeObject<Benchmark>(json)
 
@@ -101,7 +101,7 @@ type Benchmarks() =
 
         ()
 
-    [<Benchmark(Description = "System.Text.Json (Auto)")>]
+    [<Benchmark(Description = "System.Text.Json*")>]
     member _.SystemTextJsonSerialization() =
         System.Text.Json.JsonSerializer.Deserialize<Benchmark>(
             json, JsonSerializerOptions(PropertyNameCaseInsensitive = true))
