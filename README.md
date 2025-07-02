@@ -36,7 +36,7 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 | Newtonsoft.Json*       |  6.257 us |  1.28 | 1.5182 | 0.0229 |    9544 B |        2.87 |
 | Thoth.System.Text.Json |  8.195 us |  1.68 | 1.5869 | 0.0305 |    9944 B |        3.00 |
 | Newtonsoft.Json        |  8.461 us |  1.73 | 2.8229 | 0.1373 |   17720 B |        5.34 |
-| Thoth.Json.Net         | 10.340 us |  2.12 | 3.3569 | 0.1526 |   21136 B |        6.37 |        6.37 |
+| Thoth.Json.Net         | 10.340 us |  2.12 | 3.3569 | 0.1526 |   21136 B |        6.37 |
 ```
 
 \* Serialization
