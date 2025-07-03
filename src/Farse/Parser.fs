@@ -51,7 +51,7 @@ module Parser =
             with
                 | NotObjectException (name, element) -> Error.notObject name element
                 | NullPropertyException (name, element) -> Error.nullProperty name element
-                | ArrayException msg -> Error.parseError lastName msg lastElement
+                | ArrayException e -> Error.parseError lastName e lastElement
                 | :? KeyNotFoundException -> Error.missingProperty lastName lastElement
                 | :? InvalidOperationException -> Error.notObject lastName lastElement
 
@@ -86,7 +86,7 @@ module Parser =
                 | None -> Ok None
             with
                 | NotObjectException (name, element) -> Error.notObject name element
-                | ArrayException msg -> Error.parseError lastName msg lastElement
+                | ArrayException e -> Error.parseError lastName e lastElement
                 | :? InvalidOperationException -> Error.notObject lastName lastElement
 
     /// <summary>Parses a JSON string using the supplied parser.</summary>
@@ -99,5 +99,4 @@ module Parser =
             | String json ->
                 use document = JsonDocument.Parse(json)
                 parser document.RootElement
-        with
-            | :? JsonException as exn -> Error.invalidJson json exn
+        with :? JsonException as exn -> Error.invalidJson json exn
