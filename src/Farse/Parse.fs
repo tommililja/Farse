@@ -14,16 +14,17 @@ module Parse =
         | Flat name ->
             fun (element:JsonElement) ->
                 try
-                    match element.TryGetProperty(name) with
-                    | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                        match parser prop with
-                        | Ok x -> Ok x
-                        | Error e -> Error.parseError name e element
-                    | false, _ -> Error.missingProperty name element
-                    | _ -> Error.nullProperty name element
-                with
-                    | ArrayException e -> Error.parseError name e element
-                    | :? InvalidOperationException -> Error.notObject name element
+                    match element.ValueKind with
+                    | JsonValueKind.Object ->
+                        match element.TryGetProperty(name) with
+                        | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                            match parser prop with
+                            | Ok x -> Ok x
+                            | Error e -> Error.parseError name e element
+                        | false, _ -> Error.missingProperty name element
+                        | _ -> Error.nullProperty name element
+                    | _ -> Error.notObject name element
+                with ArrayException e -> Error.parseError name e element
         | Nested path ->
             Parser.traverse path parser
 
@@ -35,15 +36,16 @@ module Parse =
         | Flat name ->
             fun (element:JsonElement) ->
                 try
-                    match element.TryGetProperty(name) with
-                    | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                        match parser prop with
-                        | Ok x -> Ok <| Some x
-                        | Error e -> Error.parseError name e element
-                    | _ -> Ok None
-                with
-                    | ArrayException e -> Error.parseError name e element
-                    | :? InvalidOperationException -> Error.notObject name element
+                    match element.ValueKind with
+                    | JsonValueKind.Object ->
+                        match element.TryGetProperty(name) with
+                        | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                            match parser prop with
+                            | Ok x -> Ok <| Some x
+                            | Error e -> Error.parseError name e element
+                        | _ -> Ok None
+                    | _ -> Error.notObject name element
+                with ArrayException e -> Error.parseError name e element
         | Nested path ->
             Parser.tryTraverse path parser
 
