@@ -11,6 +11,9 @@
         <Content Include="Benchmarks.100.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <Content Include="Benchmarks.Nested.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
         <Compile Include="Benchmarks.fs" />
     </ItemGroup>
     <ItemGroup>

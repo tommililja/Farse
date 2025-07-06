@@ -35,6 +35,45 @@ type Benchmark = {
 
 [<MemoryDiagnoser(true)>]
 [<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
+type BenchmarksNested() =
+
+    let mutable json = String.Empty
+
+    [<GlobalSetup>]
+    member _.Setup() =
+        json <- File.ReadAllText("Benchmarks.Nested.json")
+
+    [<Benchmark(Description = "Farse: Path")>]
+    member _.FarsePath() =
+        parser {
+            let! _ = "object.object.string" &= Parse.string
+            // let! _ = "object.object.int" &= Parse.int
+            // let! _ = "object.object.guid" &= Parse.guid
+
+            return ()
+        }
+        |> Parser.parse json
+        |> Result.defaultWith failwith
+
+    [<Benchmark(Description = "Farse: Objects", Baseline = true)>]
+    member _.FarseObjects() =
+        parser {
+            let! _ = "object" &= parser {
+                 return! "object" &= parser {
+                    let! _ = "string" &= Parse.string
+                    // let! _ = "int" &= Parse.int
+                    // let! _ = "guid" &= Parse.guid
+                    return ()
+                }
+            }
+
+            return ()
+        }
+        |> Parser.parse json
+        |> Result.defaultWith failwith
+
+[<MemoryDiagnoser(true)>]
+[<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type Benchmarks() =
 
     let mutable json = String.Empty
