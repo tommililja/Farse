@@ -34,14 +34,13 @@ module Parser =
                     path.Split(".", StringSplitOptions.RemoveEmptyEntries)
                     |> Array.fold (fun (state:JsonElement) name ->
                         match state.ValueKind with
-                        | JsonValueKind.Null -> raise <| NullPropertyException (lastName, lastElement)
                         | JsonValueKind.Object ->
                             lastName <- name
                             lastElement <- state
 
                             match state.GetProperty(name) with
                             | prop when prop.ValueKind <> JsonValueKind.Null -> prop
-                            | _ -> raise <| NullPropertyException (lastName, lastElement)
+                            | _ -> raise <| NullPropertyException (name, state)
                         | _ -> raise <| NotObjectException (name, state)
                     ) element
 
@@ -66,7 +65,6 @@ module Parser =
                         state
                         |> Option.bind (fun state ->
                             match state.ValueKind with
-                            | JsonValueKind.Null -> None
                             | JsonValueKind.Object ->
                                 lastName <- name
                                 lastElement <- state
