@@ -8,32 +8,28 @@ module Parse =
 
     let private parse (name:string) parser =
         fun (element:JsonElement) ->
-            try
-                match element.ValueKind with
-                | JsonValueKind.Object ->
-                    match element.TryGetProperty(name) with
-                    | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                        match parser prop with
-                        | Ok x -> Ok x
-                        | Error e -> Error.parseError name e element
-                    | false, _ -> Error.missingProperty name element
-                    | _ -> Error.nullProperty name element
-                | _ -> Error.notObject name element
-            with ArrayException e -> Error.parseError name e element
+            match element.ValueKind with
+            | JsonValueKind.Object ->
+                match element.TryGetProperty(name) with
+                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                    match parser prop with
+                    | Ok x -> Ok x
+                    | Error e -> Error.parseError name e element
+                | false, _ -> Error.missingProperty name element
+                | _ -> Error.nullProperty name element
+            | _ -> Error.notObject name element
 
     let private tryParse (name:string) parser =
         fun (element:JsonElement) ->
-            try
-                match element.ValueKind with
-                | JsonValueKind.Object ->
-                    match element.TryGetProperty(name) with
-                    | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                        match parser prop with
-                        | Ok x -> Ok <| Some x
-                        | Error e -> Error.parseError name e element
-                    | _ -> Ok None
-                | _ -> Error.notObject name element
-            with ArrayException e -> Error.parseError name e element
+            match element.ValueKind with
+            | JsonValueKind.Object ->
+                match element.TryGetProperty(name) with
+                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
+                    match parser prop with
+                    | Ok x -> Ok <| Some x
+                    | Error e -> Error.parseError name e element
+                | _ -> Ok None
+            | _ -> Error.notObject name element
 
     /// <summary>Parses a required property with the supplied parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
@@ -62,14 +58,25 @@ module Parse =
                 | Error e -> Error e
             ) (path.Split('.', StringSplitOptions.RemoveEmptyEntries))
 
-    let private enumerable convert (parser:Parser<_>) : Parser<_> =
+    let private seq convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | JsonValueKind.Array ->
                 element.EnumerateArray()
-                |> Seq.map (parser >> Result.defaultWith (fun e -> raise <| ArrayException e))
-                |> convert
-                |> Ok
+                |> Seq.map parser
+                |> fun seq ->
+                    let array = ResizeArray<'a>()
+                    let mutable error = None
+
+                    use e = seq.GetEnumerator()
+                    while error.IsNone && e.MoveNext() do
+                        match e.Current with
+                        | Ok x -> array.Add x
+                        | Error e -> error <- Some e
+
+                    match error with
+                    | Some e -> Error e
+                    | None -> Ok <| convert array
             | _ ->
                 element.ValueKind
                 |> Error.invalidElement JsonValueKind.Array
@@ -128,9 +135,9 @@ module Parse =
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element in the list.</param>
     let list (parser:Parser<_>) : Parser<_> =
-        enumerable Seq.toList parser
+        seq Seq.toList parser
 
     /// <summary>Parses an element as Microsoft.FSharp.Core.array.</summary>
     /// <param name="parser">The parser used for every element in the array.</param>
     let array (parser:Parser<_>) : Parser<_> =
-        enumerable Seq.toArray parser
+        seq Seq.toArray parser

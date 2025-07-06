@@ -3,15 +3,6 @@ namespace Farse
 open System
 open System.Text.Json
 
-exception private NotObjectException of
-    Name:string * Element:JsonElement
-
-exception private NullPropertyException of
-    Name:string * Element:JsonElement
-
-exception private ArrayException of
-    Error:string
-
 module internal Error =
 
     let create list =
