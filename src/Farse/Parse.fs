@@ -53,7 +53,7 @@ module Parse =
             |> Parser.map Some
             |> Array.foldBack (fun name parser element ->
                 match tryParse name parser element with
-                | Ok (Some v) -> Ok v
+                | Ok (Some x) -> Ok x
                 | Ok None -> Ok None
                 | Error e -> Error e
             ) (path.Split('.', StringSplitOptions.RemoveEmptyEntries))
@@ -82,55 +82,71 @@ module Parse =
                 |> Error.invalidElement JsonValueKind.Array
                 |> Error
 
-    let private getValue (parse:JsonElement -> 'a) : Parser<_> =
+    let private getValue (tryParse:JsonElement -> bool * 'a) validateKind : Parser<_> =
         fun element ->
-            try Ok <| parse element with
-            | :? FormatException
-            | :? InvalidOperationException ->
+            if validateKind element then
+                match tryParse element with
+                | true, x -> Ok x
+                | _ ->
+                    typeof<'a>
+                    |> Error.couldNotParse element
+                    |> Error
+            else // TODO: Show different error message.
                 typeof<'a>
                 |> Error.couldNotParse element
                 |> Error
 
+    let private isString (e:JsonElement) =
+        e.ValueKind = JsonValueKind.String
+
+    let private isNumber (e:JsonElement) =
+        e.ValueKind = JsonValueKind.Number
+
+    let private isBool (e:JsonElement) =
+        e.ValueKind = JsonValueKind.True || e.ValueKind = JsonValueKind.False
+
     /// Parses an element as System.Int32.
-    let int = getValue _.GetInt32()
+    let int = getValue _.TryGetInt32() isNumber
 
     /// Parses an element as System.Double.
-    let float = getValue _.GetDouble()
+    let float = getValue _.TryGetDouble() isNumber
 
     /// Parses an element as System.Decimal.
-    let decimal = getValue _.GetDecimal()
+    let decimal = getValue _.TryGetDecimal() isNumber
 
     /// Parses an element as System.String.
-    let string = getValue _.GetString()
+    let string = getValue _.TryGetString() isString
 
     /// Parses an element as System.Boolean.
-    let bool = getValue _.GetBoolean()
+    let bool = getValue _.TryGetBoolean() isBool
 
     /// Parses an element as System.Guid.
-    let guid = getValue _.GetGuid()
+    let guid = getValue _.TryGetGuid() isString
 
     /// Parses an element as System.DateTime (ISO 8601).
-    let dateTime = getValue _.GetDateTime()
+    let dateTime = getValue _.TryGetDateTime() isString
 
     /// Parses an element as System.DateTime (ISO 8601) and converts it to UTC.
-    let dateTimeUtc = getValue (_.GetDateTime() >> _.ToUniversalTime())
+    let dateTimeUtc = getValue _.TryGetDateTimeUtc() isString
+
+    /// Parses an element as System.DateTimeOffset (ISO 8601).
+    let dateTimeOffset = getValue _.TryGetDateTimeOffset() isString
 
     /// Parses an element as System.DateTime with a specific format.
     let dateTimeExact (format:string) =
         fun (element:JsonElement) ->
-            try
+            if isString element then
                 let str = element.GetString()
-                Ok <| DateTime.ParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
-            with
-                | :? ArgumentNullException
-                | :? FormatException
-                | :? InvalidOperationException ->
+                match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | true, date -> Ok date
+                | _ ->
                     format
                     |> Error.couldNotParseDateTime element
                     |> Error
-
-    /// Parses an element as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = getValue _.GetDateTimeOffset()
+            else
+                element.ValueKind
+                |> Error.invalidElement JsonValueKind.String
+                |> Error
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element in the list.</param>

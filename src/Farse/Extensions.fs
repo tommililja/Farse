@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Runtime.CompilerServices
 open System.Text.Json
 
 module internal JsonElement =
@@ -13,6 +14,21 @@ module internal JsonElement =
         use document = JsonDocument.Parse(json)
         let settings = JsonSerializerOptions(IndentSize = 4, WriteIndented = true)
         JsonSerializer.Serialize(document.RootElement, settings)
+
+type internal JsonElementExtensions() =
+
+    [<Extension>]
+    static member TryGetString (e:JsonElement) =
+        true, e.GetString()
+
+    [<Extension>]
+    static member TryGetBoolean (e:JsonElement) =
+        true, e.GetBoolean()
+
+    [<Extension>]
+    static member TryGetDateTimeUtc (e:JsonElement) =
+        e.TryGetDateTime()
+        |> fun (bool, dateTime) -> bool, dateTime.ToUniversalTime()
 
 [<AutoOpen>]
 module internal ActivePatterns =
