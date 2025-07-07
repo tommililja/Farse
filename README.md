@@ -5,7 +5,10 @@
 
 >Simple parsing library for F# using System.Text.Json.
 
-Heavily inspired by [Thoth.Json.Net](https://github.com/thoth-org/Thoth.Json.Net) and its composability; Farse uses a slightly different syntax, includes a computational expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while still providing utility and acceptable error messages.
+Inspired by [Thoth.Json.Net](https://github.com/thoth-org/Thoth.Json.Net) and its composability.
+
+Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing.\
+It also tries to keep a low overhead while still providing utility and acceptable error messages.
 
 ## Installation
 
@@ -39,7 +42,7 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 | Thoth.Json.Net         | 10.139 us |  2.02 | 3.3569 | 0.1526 |   21136 B |        6.14 |
 ```
 
-\* Serialization
+\* _Serialization_
 
 ## Example
 
@@ -51,7 +54,7 @@ Given the following JSON string.
     "name": "Alice",
     "age": null,
     "email": "alice@domain.com",
-    "groups": [
+    "profiles": [
         "01458283-b6e3-4ae7-ae54-a68eb587cdc0",
         "bf00d1e2-ee53-4969-9507-86bed7e96432",
         "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
@@ -93,7 +96,7 @@ module User =
             let! name = "name" &= string
             let! age = "age" ?= int
             let! email = "email" &= Email.parser
-            let! groups = "groups" &= list GroupId.parser
+            let! profiles = "profiles" &= list ProfileId.parser
 
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
@@ -116,7 +119,7 @@ module User =
                 Name = name
                 Age = age
                 Email = email
-                Groups = groups
+                Profiles = profiles
                 Subscription = subscription
             }
         }
@@ -152,16 +155,16 @@ module Email =
         Parse.string
         |> Parser.validate fromString
 
-type GroupId = GroupId of Guid
+type ProfileId = ProfileId of Guid
 
-module GroupId =
+module ProfileId =
 
-    let asString (GroupId x) =
+    let asString (ProfileId x) =
         string x
 
     let parser =
         Parse.guid
-        |> Parser.map GroupId
+        |> Parser.map ProfileId
 
 type Plan =
     | Pro
@@ -196,7 +199,7 @@ type User = {
     Name: string
     Age: int option
     Email: Email
-    Groups: GroupId list
+    Profiles: ProfileId list
     Subscription: Subscription
 }
 ```
@@ -217,20 +220,20 @@ We can also construct JSON strings.
 ```fsharp
 let jsonString =
     JsonString.create [
-        "id", JStr (UserId.asString user.Id)
+        "id", JStr <| UserId.asString user.Id
         "name", JStr user.Name
         "age",
             user.Age
             |> Option.map (Int >> JNum)
             |> JOpt
-        "email", JStr (Email.asString user.Email)
-        "groups",
-            user.Groups
-            |> List.map (GroupId.asString >> JStr)
+        "email", JStr <| Email.asString user.Email
+        "profiles",
+            user.Profiles
+            |> List.map (ProfileId.asString >> JStr)
             |> JArr
         "subscription",
             JObj [
-                "plan", JStr (Plan.asString user.Subscription.Plan)
+                "plan", JStr <| Plan.asString user.Subscription.Plan
                 "isCanceled", JBit user.Subscription.IsCanceled
                 "renewsAt",
                     user.Subscription.RenewsAt
@@ -250,4 +253,4 @@ printfn "%s" json
 
 Example error messages can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
-Internally, Farse does not throw exceptions. It only catches _JsonException_ that is thrown when supplying invalid JSON.
+Internally, Farse does not throw exceptions and it only catches 'JsonException' that is thrown when supplying invalid JSON.
