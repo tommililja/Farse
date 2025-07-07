@@ -7,7 +7,7 @@ open Farse
 module Error =
 
     [<Fact>]
-    let ``Should return correct error message with parsing invalid json test`` () =
+    let ``Should return correct error message with parsing invalid JSON`` () =
         Parse.int
         |> Parser.parse "invalid"
         |> Expect.error
