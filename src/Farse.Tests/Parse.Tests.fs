@@ -141,3 +141,12 @@ module Parse =
             |> Parser.parse """{ "prop": [ 1, 2, 3, 4, 5 ] }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse value as set`` () =
+        let expected = set [ 1; 2; 3; 4; 5 ]
+        let actual =
+            Parse.req "prop" (Parse.set Parse.int)
+            |> Parser.parse """{ "prop": [ 1, 2, 3, 4, 5 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected

@@ -127,6 +127,13 @@ module Error =
         |> Verify.string
 
     [<Fact>]
+    let ``Should return correct error message when parsing set`` () =
+        Parse.req "prop" (Parse.set Parse.string)
+        |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+        |> Expect.error
+        |> Verify.string
+
+    [<Fact>]
     let ``Should return correct error message when parsing array as list`` () =
         Parse.req "prop" (Parse.list Parse.string)
         |> Parser.parse """{ "prop": { "prop2": 1 } }"""

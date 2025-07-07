@@ -157,3 +157,8 @@ module Parse =
     /// <param name="parser">The parser used for every element in the array.</param>
     let array (parser:Parser<_>) : Parser<_> =
         seq Seq.toArray parser
+
+    /// <summary>Parses an element as Microsoft.FSharp.Collections.Set.</summary>
+    /// <param name="parser">The parser used for every element in the set.</param>
+    let set (parser:Parser<_>) : Parser<_> =
+        seq Set.ofSeq parser
