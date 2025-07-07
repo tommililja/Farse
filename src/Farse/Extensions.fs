@@ -27,18 +27,19 @@ type internal JsonElementExtensions() =
 
     [<Extension>]
     static member TryGetDateTimeUtc (e:JsonElement) =
-        e.TryGetDateTime()
-        |> fun (bool, dateTime) -> bool, dateTime.ToUniversalTime()
+        match e.TryGetDateTime() with
+        | true, dateTime -> true, dateTime.ToUniversalTime()
+        | false, invalid -> false, invalid
 
 [<AutoOpen>]
 module internal ActivePatterns =
 
-    let (|NullOrEmpty|String|) (str:string) =
+    let (|String|Invalid|) (str:string) =
         if String.IsNullOrEmpty str
-        then NullOrEmpty
+        then Invalid
         else String str
 
-    let (|Nested|Flat|) (str:string) =
+    let (|Flat|Nested|) (str:string) =
         if str.Contains(".")
         then Nested str
         else Flat str

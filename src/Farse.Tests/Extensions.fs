@@ -13,7 +13,7 @@ module Verify =
         settings
 
     let json (actual:string) =
-        Verifier.VerifyJson(actual, settings = settings).ToTask()
+        Verifier.VerifyJson(actual, settings).ToTask()
 
     let string (actual:string) =
         Verifier.Verify(actual, settings).ToTask()

@@ -9,10 +9,10 @@ module Parser =
     let from x : Parser<_> =
         fun _ -> Ok x
 
-    let bind (fn:_ -> Parser<_>) (parser:Parser<_>) =
+    let bind (fn:_ -> Parser<_>) (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
-            | Ok x -> fn x <| element
+            | Ok x -> element |> fn x
             | Error e -> Error e
 
     let validate fn (parser:Parser<_>) : Parser<_> =
@@ -21,7 +21,8 @@ module Parser =
             | Ok x -> fn x
             | Error e -> Error e
 
-    let map fn x : Parser<_> = bind (fn >> from) x
+    let map fn (x:Parser<_>) : Parser<_> =
+        bind (fn >> from) x
 
     /// <summary>Parses a JSON string using the supplied parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
@@ -29,7 +30,7 @@ module Parser =
     let parse (json:string) (parser:Parser<_>) =
         try
             match json with
-            | NullOrEmpty -> Error.nullOrEmptyJson ()
+            | Invalid -> Error.invalidString ()
             | String json ->
                 use document = JsonDocument.Parse(json)
                 parser document.RootElement

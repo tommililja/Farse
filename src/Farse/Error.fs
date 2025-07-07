@@ -22,26 +22,28 @@ module internal Error =
     let invalidElement (expected:JsonValueKind) (actual:JsonValueKind) =
         $"Expected: %s{string expected}, actual: %s{string actual}."
 
-    let printElement (element:JsonElement) =
-        $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
+    let print (element:JsonElement) =
+        match element.ValueKind with
+        | JsonValueKind.Null -> String.Empty
+        | _ -> $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
 
     let notObject name (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
             $"Cannot read property from %s{string element.ValueKind}."
-            printElement element
+            print element
         ]
 
     let nullProperty name element =
         create [
             $"Error: Required property '%s{name}' was null."
-            printElement element
+            print element
         ]
 
     let missingProperty name element =
         create [
             $"Error: Required property '%s{name}' was not found."
-            printElement element
+            print element
         ]
 
     let parseError name (error:string) element =
@@ -52,10 +54,10 @@ module internal Error =
             create [
                 $"Error: Could not parse property '%s{name}'."
                 error
-                printElement element
+                print element
             ]
 
-    let nullOrEmptyJson () =
+    let invalidString () =
         create [
             "Error: Could not parse JSON string."
             "The string was null or empty."
@@ -65,5 +67,5 @@ module internal Error =
         create [
             "Error: Could not parse JSON string."
             exn.Message
-            $"String: '%s{str}'."
+            $"JSON: '%s{str}'."
         ]

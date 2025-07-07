@@ -3,16 +3,15 @@ namespace Farse.Tests
 open System
 open Xunit
 open Farse
-open Farse.Operators
 
 module Error =
 
-    // [<Fact>]
-    // let ``Should return correct error message with parsing invalid json`` () =
-    //     Parse.int
-    //     |> Parser.parse "invalid"
-    //     |> Expect.error
-    //     |> Verify.string
+    [<Fact>]
+    let ``Should return correct error message with parsing invalid json`` () =
+        Parse.int
+        |> Parser.parse "invalid"
+        |> Expect.error
+        |> Verify.string
 
     [<Fact>]
     let ``Should return correct error message with string is null`` () =
@@ -306,14 +305,7 @@ module Error =
                 }
             """
 
-        parser {
-            let! _ = "prop" &= parser {
-                return! "prop2" &= parser {
-                    return! "prop3" &= Parse.int
-                }
-            }
-            return ()
-        }
+        Parse.req "prop.prop2.prop3" Parse.int
         |> Parser.parse json
         |> Expect.error
         |> Verify.string
