@@ -97,6 +97,7 @@ module User =
             let! email = "email" &= Email.parser
             let! profiles = "profiles" &= set ProfileId.parser
 
+            // Inlined parser example.
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
