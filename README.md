@@ -245,3 +245,9 @@ let json =
 
 printfn "%s" json
 ```
+
+## Errors
+
+Example error messages can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
+
+Internally, Farse does not throw exceptions. It only catches _JsonException_ that is thrown when supplying invalid JSON.
