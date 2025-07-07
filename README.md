@@ -96,7 +96,7 @@ module User =
             let! name = "name" &= string
             let! age = "age" ?= int
             let! email = "email" &= Email.parser
-            let! profiles = "profiles" &= list ProfileId.parser
+            let! profiles = "profiles" &= set ProfileId.parser
 
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
@@ -199,7 +199,7 @@ type User = {
     Name: string
     Age: int option
     Email: Email
-    Profiles: ProfileId list
+    Profiles: ProfileId Set
     Subscription: Subscription
 }
 ```
@@ -229,6 +229,7 @@ let jsonString =
         "email", JStr <| Email.asString user.Email
         "profiles",
             user.Profiles
+            |> List.ofSeq
             |> List.map (ProfileId.asString >> JStr)
             |> JArr
         "subscription",
