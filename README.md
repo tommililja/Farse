@@ -254,4 +254,4 @@ printfn "%s" json
 
 Example error messages can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
-Internally, Farse does not throw exceptions and it only catches 'JsonException' that is thrown when supplying invalid JSON.
+Internally, Farse does not throw exceptions and it only catches _JsonException_, that is thrown when supplying invalid JSON.
