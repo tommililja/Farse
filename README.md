@@ -7,8 +7,7 @@
 
 Inspired by [Thoth.Json.Net](https://github.com/thoth-org/Thoth.Json.Net) and its composability.
 
-Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing.\
-It also tries to keep a low overhead while still providing utility and acceptable error messages.
+Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while still providing utility and acceptable error messages.
 
 ## Installation
 
