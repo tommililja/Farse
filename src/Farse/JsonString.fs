@@ -13,8 +13,8 @@ type JValue =
     | JStr of string
     | JNum of JNumber
     | JBit of bool
-    | JObj of (string * JValue) list
-    | JArr of JValue list
+    | JObj of (string * JValue) seq
+    | JArr of JValue seq
     | JOpt of JValue option
     | JNil
 
@@ -33,7 +33,7 @@ module internal JValue =
         | JBit bit -> createValue bit
         | JObj obj ->
             obj
-            |> List.map (fun (key, value) ->
+            |> Seq.map (fun (key, value) ->
                 let node = getJsonNode value
                 KeyValuePair(key, node)
             )
@@ -41,8 +41,8 @@ module internal JValue =
             |> _.Root
         | JArr arr ->
             arr
-            |> List.map getJsonNode
-            |> List.toArray
+            |> Seq.map getJsonNode
+            |> Seq.toArray
             |> JsonArray
             |> _.Root
         | JOpt opt ->
