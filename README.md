@@ -39,9 +39,9 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 | Thoth.System.Text.Json |  8.185 us |  1.63 | 1.5869 | 0.0305 |    9944 B |        2.89 |
 | Newtonsoft.Json        |  8.792 us |  1.75 | 2.8229 | 0.1373 |   17720 B |        5.15 |
 | Thoth.Json.Net         | 10.139 us |  2.02 | 3.3569 | 0.1526 |   21136 B |        6.14 |
-```
 
-\* _Serialization_
+* Serialization
+```
 
 ## Example
 
@@ -215,6 +215,8 @@ let user =
 printfn "%s" user.Name
 ```
 
+## Constructing
+
 We can also construct JSON strings.
 
 ```fsharp
@@ -252,6 +254,15 @@ printfn "%s" json
 
 ## Errors
 
-Example error messages can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
+More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
-Internally, Farse does not throw exceptions and it only catches _JsonException_, that is thrown when supplying invalid JSON.
+```code
+Error: Could not parse property 'prop'.
+The value '"1"' is not valid for System.Int32.
+Object:
+{
+    "prop": "1"
+}
+```
+
+>Farse does not throw exceptions and it only catches **JsonException**, that is thrown when supplying invalid JSON.
