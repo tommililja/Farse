@@ -82,70 +82,70 @@ module Parse =
                 |> Error.invalidElement JsonValueKind.Array
                 |> Error
 
-    let private getValue (tryParse:JsonElement -> bool * 'a) validateKind : Parser<_> =
+    let private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
-            if validateKind element then
+            let isExpectedKind =
+                match expectedKind with
+                | JsonValueKind.True -> element.ValueKind = JsonValueKind.True || element.ValueKind = JsonValueKind.False
+                | _ -> element.ValueKind = expectedKind
+
+            if isExpectedKind then
                 match tryParse element with
                 | true, x -> Ok x
                 | _ ->
                     typeof<'a>
                     |> Error.couldNotParse element
                     |> Error
-            else // TODO: Show different error message.
-                typeof<'a>
-                |> Error.couldNotParse element
+            else
+                element.ValueKind
+                |> Error.invalidElement expectedKind
                 |> Error
 
-    let private isString (e:JsonElement) =
-        e.ValueKind = JsonValueKind.String
-
-    let private isNumber (e:JsonElement) =
-        e.ValueKind = JsonValueKind.Number
-
-    let private isBool (e:JsonElement) =
-        e.ValueKind = JsonValueKind.True || e.ValueKind = JsonValueKind.False
+    let private String = JsonValueKind.String
+    let private Number = JsonValueKind.Number
+    let private Bool = JsonValueKind.True
 
     /// Parses an element as System.Int32.
-    let int = getValue _.TryGetInt32() isNumber
+    let int = getValue _.TryGetInt32() Number
 
     /// Parses an element as System.Double.
-    let float = getValue _.TryGetDouble() isNumber
+    let float = getValue _.TryGetDouble() Number
 
     /// Parses an element as System.Decimal.
-    let decimal = getValue _.TryGetDecimal() isNumber
+    let decimal = getValue _.TryGetDecimal() Number
 
     /// Parses an element as System.String.
-    let string = getValue _.TryGetString() isString
+    let string = getValue _.TryGetString() String
 
     /// Parses an element as System.Boolean.
-    let bool = getValue _.TryGetBoolean() isBool
+    let bool = getValue _.TryGetBoolean() Bool
 
     /// Parses an element as System.Guid.
-    let guid = getValue _.TryGetGuid() isString
+    let guid = getValue _.TryGetGuid() String
 
     /// Parses an element as System.DateTime (ISO 8601).
-    let dateTime = getValue _.TryGetDateTime() isString
+    let dateTime = getValue _.TryGetDateTime() String
 
     /// Parses an element as System.DateTime (ISO 8601) and converts it to UTC.
-    let dateTimeUtc = getValue _.TryGetDateTimeUtc() isString
+    let dateTimeUtc = getValue _.TryGetDateTimeUtc() String
 
     /// Parses an element as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = getValue _.TryGetDateTimeOffset() isString
+    let dateTimeOffset = getValue _.TryGetDateTimeOffset() String
 
     /// Parses an element as System.DateTime with a specific format.
     let dateTimeExact (format:string) =
         fun (element:JsonElement) ->
-            if isString element then
-                let str = element.GetString()
-                match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            if element.ValueKind = String then
+                let dateString = element.GetString()
+                match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
                 | true, date -> Ok date
                 | _ ->
-                    format
-                    |> Error.couldNotParseDateTime element
+                    element
+                    |> Error.couldNotParseDateTime format
                     |> Error
             else
                 element.ValueKind
-                |> Error.invalidElement JsonValueKind.String
+                |> Error.invalidElement String
                 |> Error
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>

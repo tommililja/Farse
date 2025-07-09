@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Object is not a valid value for System.Int32.
+Expected: Number, actual: Object.
 Object:
 {
     "prop": {

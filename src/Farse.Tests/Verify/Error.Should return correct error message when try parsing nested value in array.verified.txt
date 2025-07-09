@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop3'.
-The value '"1"' is not valid for System.Int32.
+Expected: Number, actual: String.
 Object:
 {
     "prop3": [

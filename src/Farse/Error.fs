@@ -16,11 +16,16 @@ module internal Error =
         | JsonValueKind.Object -> $"%s{string element.ValueKind} is not a valid value for %s{expectedType.FullName}."
         | _ -> $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
-    let couldNotParseDateTime (element:JsonElement) format =
+    let couldNotParseDateTime format (element:JsonElement) =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format %s{format}."
 
     let invalidElement (expected:JsonValueKind) (actual:JsonValueKind) =
-        $"Expected: %s{string expected}, actual: %s{string actual}."
+        let expected =
+            match expected with
+            | JsonValueKind.True | JsonValueKind.False -> "Bool"
+            | kind -> string kind
+
+        $"Expected: %s{expected}, actual: %s{string actual}."
 
     let print (element:JsonElement) =
         match element.ValueKind with
