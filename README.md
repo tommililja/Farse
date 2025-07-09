@@ -215,9 +215,9 @@ let user =
 printfn "%s" user.Name
 ```
 
-## Constructing
+## JsonString
 
-We can also construct JSON strings.
+We can also create JSON strings.
 
 ```fsharp
 let jsonString =
@@ -257,8 +257,8 @@ printfn "%s" json
 More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
 ```code
-Error: Could not parse property 'prop'.
-The value '"1"' is not valid for System.Int32.
+﻿Error: Could not parse property 'prop'.
+Expected: Number, actual: String.
 Object:
 {
     "prop": "1"
