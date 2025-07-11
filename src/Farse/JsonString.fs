@@ -55,9 +55,6 @@ type JsonString = JsonString of JsonObject
 
 module JsonString =
 
-    let private defaultOptions =
-        JsonSerializerOptions(IndentSize = 4, WriteIndented = true)
-
     let create list =
         list
         |> List.map (fun (key, value) ->
@@ -68,4 +65,4 @@ module JsonString =
         |> JsonString
 
     let asString (JsonString x) =
-        x.ToJsonString(defaultOptions)
+        x.ToJsonString(JsonSerializerOptions.preset)

@@ -4,16 +4,17 @@ open System
 open System.Runtime.CompilerServices
 open System.Text.Json
 
+module internal JsonSerializerOptions =
+
+    let preset = JsonSerializerOptions(IndentSize = 4, WriteIndented = true)
+
 module internal JsonElement =
 
     let getRawText (element:JsonElement) =
         element.GetRawText()
 
     let getJson (element:JsonElement) =
-        let json = element.GetRawText()
-        use document = JsonDocument.Parse(json)
-        let settings = JsonSerializerOptions(IndentSize = 4, WriteIndented = true)
-        JsonSerializer.Serialize(document.RootElement, settings)
+        JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
 
 type internal JsonElementExtensions() =
 
