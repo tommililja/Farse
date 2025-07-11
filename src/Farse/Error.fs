@@ -54,7 +54,7 @@ module internal Error =
     let parseError name (error:string) element =
         // Quick ugly fix for nested parser errors.
         if error.StartsWith("Error:")
-        then create [ error ]
+        then Error error
         else
             create [
                 $"Error: Could not parse property '%s{name}'."
