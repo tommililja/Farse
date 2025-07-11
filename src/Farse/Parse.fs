@@ -62,21 +62,19 @@ module Parse =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | JsonValueKind.Array ->
-                element.EnumerateArray()
-                |> Seq.map parser
-                |> fun seq ->
-                    let array = ResizeArray<'a>()
-                    let mutable error = None
+                let arrayLength = element.GetArrayLength()
+                let array = ResizeArray(arrayLength)
+                let mutable error = None
+                let mutable enumerator = element.EnumerateArray()
 
-                    use e = seq.GetEnumerator()
-                    while error.IsNone && e.MoveNext() do
-                        match e.Current with
-                        | Ok x -> array.Add x
-                        | Error e -> error <- Some e
+                while error.IsNone && enumerator.MoveNext() do
+                    match parser enumerator.Current with
+                    | Ok x -> array.Add x
+                    | Error e -> error <- Some e
 
-                    match error with
-                    | Some e -> Error e
-                    | None -> Ok <| convert array
+                match error with
+                | Some e -> Error e
+                | None -> Ok <| convert array
             | _ ->
                 element.ValueKind
                 |> Error.invalidElement JsonValueKind.Array
