@@ -43,26 +43,53 @@ type BenchmarksNested() =
     member _.Setup() =
         json <- File.ReadAllText("Benchmarks.Nested.json")
 
-    [<Benchmark(Description = "Farse: Path")>]
-    member _.FarsePath() =
+    [<Benchmark(Description = "Farse: Path / Single")>]
+    member _.FarsePathSingle() =
         parser {
             let! _ = "object.object.string" &= Parse.string
-            // let! _ = "object.object.int" &= Parse.int
-            // let! _ = "object.object.guid" &= Parse.guid
 
             return ()
         }
         |> Parser.parse json
         |> Result.defaultWith failwith
 
-    [<Benchmark(Description = "Farse: Objects", Baseline = true)>]
-    member _.FarseObjects() =
+    [<Benchmark(Description = "Farse: Path / Multiple")>]
+    member _.FarsePathMultiple() =
+        parser {
+            let! _ = "object.object.string" &= Parse.string
+            let! _ = "object.object.int" &= Parse.int
+            let! _ = "object.object.guid" &= Parse.guid
+
+            return ()
+        }
+        |> Parser.parse json
+        |> Result.defaultWith failwith
+
+    [<Benchmark(Description = "Farse: Objects / Single")>]
+    member _.FarseObjectsSingle() =
         parser {
             let! _ = "object" &= parser {
                  return! "object" &= parser {
                     let! _ = "string" &= Parse.string
-                    // let! _ = "int" &= Parse.int
-                    // let! _ = "guid" &= Parse.guid
+
+                    return ()
+                }
+            }
+
+            return ()
+        }
+        |> Parser.parse json
+        |> Result.defaultWith failwith
+
+    [<Benchmark(Description = "Farse: Objects / Multiple")>]
+    member _.FarseObjectsMany() =
+        parser {
+            let! _ = "object" &= parser {
+                 return! "object" &= parser {
+                    let! _ = "string" &= Parse.string
+                    let! _ = "int" &= Parse.int
+                    let! _ = "guid" &= Parse.guid
+
                     return ()
                 }
             }
@@ -230,4 +257,4 @@ let config =
         .WithSummaryStyle(SummaryStyle.Default)
         .HideColumns("Error", "StdDev", "RatioSD")
 
-let summary = BenchmarkRunner.Run<Benchmarks>(config)
+let summary = BenchmarkRunner.Run<BenchmarksNested>(config)
