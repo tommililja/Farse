@@ -147,16 +147,16 @@ module Parse =
                 |> Error
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
-    /// <param name="parser">The parser used for every element in the list.</param>
+    /// <param name="parser">The parser used for every element.</param>
     let list (parser:Parser<_>) : Parser<_> =
         seq Seq.toList parser
 
     /// <summary>Parses an element as Microsoft.FSharp.Core.array.</summary>
-    /// <param name="parser">The parser used for every element in the array.</param>
+    /// <param name="parser">The parser used for every element.</param>
     let array (parser:Parser<_>) : Parser<_> =
         seq Seq.toArray parser
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.Set.</summary>
-    /// <param name="parser">The parser used for every element in the set.</param>
+    /// <param name="parser">The parser used for every element.</param>
     let set (parser:Parser<_>) : Parser<_> =
         seq Set.ofSeq parser
