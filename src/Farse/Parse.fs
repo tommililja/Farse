@@ -145,8 +145,8 @@ module Parse =
                 match tryParse element with
                 | true, x -> Ok x
                 | _ ->
-                    typeof<'a>
-                    |> Error.couldNotParse element
+                    element
+                    |> Error.couldNotParse typeof<'a>
                     |> Error
             else
                 element.ValueKind

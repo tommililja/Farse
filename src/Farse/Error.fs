@@ -10,10 +10,8 @@ module internal Error =
         |> String.concat "\n"
         |> Error
 
-    let couldNotParse (element:JsonElement) (expectedType:Type) =
-        match element.ValueKind with
-        | Kind.Array | Kind.Object -> $"%s{string element.ValueKind} is not a valid value for %s{expectedType.FullName}."
-        | _ -> $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
+    let couldNotParse (expectedType:Type) (element:JsonElement) =
+        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let couldNotParseDateTime format (element:JsonElement) =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format %s{format}."
@@ -27,9 +25,7 @@ module internal Error =
         $"Expected: %s{expected}, actual: %s{string actual}."
 
     let print (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.Null -> String.Empty
-        | _ -> $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
+        $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
 
     let notObject name (element:JsonElement) =
         create [
