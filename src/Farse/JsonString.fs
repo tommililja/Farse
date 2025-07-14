@@ -1,6 +1,5 @@
 namespace Farse
 
-open System.Text.Json
 open System.Text.Json.Nodes
 open System.Collections.Generic
 
@@ -20,7 +19,7 @@ type JValue =
 
 module internal JValue =
 
-    let private createValue<'a> x =
+    let private createValue x =
         JsonValue.Create<'a>(x).Root
 
     let rec internal getJsonNode = function
