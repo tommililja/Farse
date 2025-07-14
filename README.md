@@ -110,7 +110,7 @@ module User =
                 }
             }
 
-            // Simple "path" support, which can be very useful
+            // Simple "path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
             let! isCanceled = "subscription.isCanceled" &= bool
       
@@ -212,7 +212,7 @@ let user =
     |> Parser.parse json
     |> Result.defaultWith failwith
 
-printfn "%s" user.Name
+printf "%s" user.Name
 ```
 
 ## JsonString
@@ -249,7 +249,7 @@ let json =
     jsonString
     |> JsonString.asString
 
-printfn "%s" json
+printf "%s" json
 ```
 
 ## Errors
