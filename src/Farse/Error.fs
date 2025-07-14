@@ -12,24 +12,23 @@ module internal Error =
 
     let couldNotParse (element:JsonElement) (expectedType:Type) =
         match element.ValueKind with
-        | JsonValueKind.Array
-        | JsonValueKind.Object -> $"%s{string element.ValueKind} is not a valid value for %s{expectedType.FullName}."
+        | Kind.Array | Kind.Object -> $"%s{string element.ValueKind} is not a valid value for %s{expectedType.FullName}."
         | _ -> $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let couldNotParseDateTime format (element:JsonElement) =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format %s{format}."
 
-    let invalidElement (expected:JsonValueKind) (actual:JsonValueKind) =
+    let invalidElement (expected:Kind) (actual:Kind) =
         let expected =
             match expected with
-            | JsonValueKind.True | JsonValueKind.False -> "Bool"
+            | Kind.True | Kind.False -> "Bool"
             | kind -> string kind
 
         $"Expected: %s{expected}, actual: %s{string actual}."
 
     let print (element:JsonElement) =
         match element.ValueKind with
-        | JsonValueKind.Null -> String.Empty
+        | Kind.Null -> String.Empty
         | _ -> $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
 
     let notObject name (element:JsonElement) =
@@ -51,16 +50,12 @@ module internal Error =
             print element
         ]
 
-    let parseError name (error:string) element =
-        // Quick ugly fix for nested parser errors.
-        if error.StartsWith("Error:")
-        then Error error
-        else
-            create [
-                $"Error: Could not parse property '%s{name}'."
-                error
-                print element
-            ]
+    let parseError name msg element =
+        create [
+            $"Error: Could not parse property '%s{name}'."
+            msg
+            print element
+        ]
 
     let invalidString () =
         create [

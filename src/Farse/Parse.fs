@@ -6,30 +6,94 @@ open System.Text.Json
 
 module Parse =
 
-    let private parse (name:string) parser =
-        fun (element:JsonElement) ->
-            match element.ValueKind with
-            | JsonValueKind.Object ->
-                match element.TryGetProperty(name) with
-                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                    match parser prop with
-                    | Ok x -> Ok x
-                    | Error e -> Error.parseError name e element
-                | false, _ -> Error.missingProperty name element
-                | _ -> Error.nullProperty name element
-            | _ -> Error.notObject name element
+    let private getProperty (name:string) (element:JsonElement) =
+        match element.ValueKind with
+        | Kind.Object ->
+            match element.TryGetProperty(name) with
+            | true, prop when prop.ValueKind <> Kind.Null -> Ok prop
+            | false, _ -> Error.missingProperty name element
+            | _ -> Error.nullProperty name element
+        | _ -> Error.notObject name element
+
+    let private tryGetProperty (name:string) (element:JsonElement) =
+        match element.ValueKind with
+        | Kind.Object ->
+            match element.TryGetProperty(name) with
+            | true, prop when prop.ValueKind <> Kind.Null -> Ok <| Some prop
+            | false, _ -> Ok None
+            | _ -> Ok None
+        | _ -> Error.notObject name element
 
     let private tryParse (name:string) parser =
         fun (element:JsonElement) ->
-            match element.ValueKind with
-            | JsonValueKind.Object ->
-                match element.TryGetProperty(name) with
-                | true, prop when prop.ValueKind <> JsonValueKind.Null ->
-                    match parser prop with
-                    | Ok x -> Ok <| Some x
-                    | Error e -> Error.parseError name e element
-                | _ -> Ok None
-            | _ -> Error.notObject name element
+            match tryGetProperty name element with
+            | Ok (Some prop) ->
+                match parser prop with
+                | Ok x -> Ok <| Some x
+                | Error msg when String.startsWith "Error" msg -> Error msg
+                | Error msg -> Error.parseError name msg element
+            | Ok None -> Ok None
+            | Error e -> Error e
+
+    let private parse (name:string) parser =
+        fun (element:JsonElement) ->
+            match getProperty name element with
+            | Ok prop ->
+                match parser prop with
+                | Ok x -> Ok x
+                | Error msg when String.startsWith "Error" msg -> Error msg
+                | Error msg -> Error.parseError name msg element
+            | Error e -> Error e
+
+    let private splitPath (path:string) =
+        path.Split('.', StringSplitOptions.RemoveEmptyEntries)
+
+    let private trav (path:string) parser =
+        fun element ->
+            let mutable last = Ok element
+            let mutable previous = element
+
+            let names = splitPath path
+            for name in names do
+                match last with
+                | Ok element ->
+                    last <- getProperty name element
+                    previous <- element
+                | Error _ -> ()
+
+            match last with
+            | Ok prop ->
+                match parser prop with
+                | Ok x -> Ok x
+                | Error msg when String.startsWith "Error" msg -> Error msg
+                | Error msg ->
+                    let name = Array.last names
+                    Error.parseError name msg previous
+            | Error e -> Error e
+
+    let tryTrav (path:string) parser =
+        fun element ->
+            let mutable last = Ok <| Some element
+            let mutable previous = element
+
+            let names = splitPath path
+            for name in names do
+                match last with
+                | Ok (Some element) ->
+                    last <- tryGetProperty name element
+                    previous <- element
+                | _ -> ()
+
+            match last with
+            | Ok (Some prop) ->
+                match parser prop with
+                | Ok x -> Ok <| Some x
+                | Error msg when String.startsWith "Error" msg -> Error msg
+                | Error msg ->
+                    let name = Array.last names
+                    Error.parseError name msg previous
+            | Ok None -> Ok None
+            | Error e -> Error e
 
     /// <summary>Parses a required property with the supplied parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
@@ -37,10 +101,7 @@ module Parse =
     let req (path:string) (parser:Parser<_>) : Parser<_> =
         match path with
         | Flat name -> parse name parser
-        | Nested path ->
-            parser
-            |> Array.foldBack (fun name parser -> parse name parser)
-                (path.Split('.', StringSplitOptions.RemoveEmptyEntries))
+        | Nested path -> trav path parser
 
     /// <summary>Parses an optional property with the supplied parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
@@ -48,43 +109,36 @@ module Parse =
     let opt (path:string) (parser:Parser<_>) : Parser<_> =
         match path with
         | Flat name -> tryParse name parser
-        | Nested path ->
-            parser
-            |> Parser.map Some
-            |> Array.foldBack (fun name parser element ->
-                match tryParse name parser element with
-                | Ok (Some x) -> Ok x
-                | Ok None -> Ok None
-                | Error e -> Error e
-            ) (path.Split('.', StringSplitOptions.RemoveEmptyEntries))
+        | Nested path -> tryTrav path parser
 
     let private seq convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
-            | JsonValueKind.Array ->
+            | Kind.Array ->
                 let arrayLength = element.GetArrayLength()
                 let array = ResizeArray(arrayLength)
                 let mutable error = None
-                let mutable enumerator = element.EnumerateArray()
 
-                while error.IsNone && enumerator.MoveNext() do
-                    match parser enumerator.Current with
-                    | Ok x -> array.Add x
-                    | Error e -> error <- Some e
+                let elements = element.EnumerateArray()
+                for element in elements do
+                    if error.IsNone then
+                        match parser element with
+                        | Ok x -> array.Add x
+                        | Error e -> error <- Some e
 
                 match error with
                 | Some e -> Error e
                 | None -> Ok <| convert array
             | _ ->
                 element.ValueKind
-                |> Error.invalidElement JsonValueKind.Array
+                |> Error.invalidElement Kind.Array
                 |> Error
 
     let private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
-                if expectedKind = JsonValueKind.True
-                then element.ValueKind = JsonValueKind.True || element.ValueKind = JsonValueKind.False
+                if expectedKind = Kind.True
+                then element.ValueKind = Kind.True || element.ValueKind = Kind.False
                 else element.ValueKind = expectedKind
 
             if isExpectedKind then
@@ -99,41 +153,37 @@ module Parse =
                 |> Error.invalidElement expectedKind
                 |> Error
 
-    let private String = JsonValueKind.String
-    let private Number = JsonValueKind.Number
-    let private Bool = JsonValueKind.True
-
     /// Parses an element as System.Int32.
-    let int = getValue _.TryGetInt32() Number
+    let int = getValue _.TryGetInt32() Kind.Number
 
     /// Parses an element as System.Double.
-    let float = getValue _.TryGetDouble() Number
+    let float = getValue _.TryGetDouble() Kind.Number
 
     /// Parses an element as System.Decimal.
-    let decimal = getValue _.TryGetDecimal() Number
+    let decimal = getValue _.TryGetDecimal() Kind.Number
 
     /// Parses an element as System.String.
-    let string = getValue _.TryGetString() String
+    let string = getValue _.TryGetString() Kind.String
 
     /// Parses an element as System.Boolean.
-    let bool = getValue _.TryGetBoolean() Bool
+    let bool = getValue _.TryGetBoolean() Kind.True
 
     /// Parses an element as System.Guid.
-    let guid = getValue _.TryGetGuid() String
+    let guid = getValue _.TryGetGuid() Kind.String
 
     /// Parses an element as System.DateTime (ISO 8601).
-    let dateTime = getValue _.TryGetDateTime() String
+    let dateTime = getValue _.TryGetDateTime() Kind.String
 
     /// Parses an element as System.DateTime (ISO 8601) and converts it to UTC.
-    let dateTimeUtc = getValue _.TryGetDateTimeUtc() String
+    let dateTimeUtc = getValue _.TryGetDateTimeUtc() Kind.String
 
     /// Parses an element as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = getValue _.TryGetDateTimeOffset() String
+    let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
 
     /// Parses an element as System.DateTime with a specific format.
     let dateTimeExact (format:string) =
         fun (element:JsonElement) ->
-            if element.ValueKind = String then
+            if element.ValueKind = Kind.String then
                 let dateString = element.GetString()
                 match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
                 | true, date -> Ok date
@@ -143,7 +193,7 @@ module Parse =
                     |> Error
             else
                 element.ValueKind
-                |> Error.invalidElement String
+                |> Error.invalidElement Kind.String
                 |> Error
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
