@@ -41,6 +41,6 @@ module internal ActivePatterns =
         else String str
 
     let (|Flat|Nested|) (str:string) =
-        if str.Contains(".")
+        if str.Contains('.')
         then Nested str
         else Flat str
