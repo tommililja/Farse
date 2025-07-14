@@ -257,4 +257,4 @@ let config =
         .WithSummaryStyle(SummaryStyle.Default)
         .HideColumns("Error", "StdDev", "RatioSD")
 
-let summary = BenchmarkRunner.Run<BenchmarksNested>(config)
+let summary = BenchmarkRunner.Run<Benchmarks>(config)
