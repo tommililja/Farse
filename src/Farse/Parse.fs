@@ -24,7 +24,7 @@ module Parse =
             | _ -> Ok None
         | _ -> Error.notObject name element
 
-    let private tryParse (name:string) parser =
+    let private tryParse name parser =
         fun (element:JsonElement) ->
             match tryGetProperty name element with
             | Ok (Some prop) ->
@@ -35,7 +35,7 @@ module Parse =
             | Ok None -> Ok None
             | Error e -> Error e
 
-    let private parse (name:string) parser =
+    let private parse name parser =
         fun (element:JsonElement) ->
             match getProperty name element with
             | Ok prop ->
