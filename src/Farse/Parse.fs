@@ -19,7 +19,7 @@ module Parse =
         match element.ValueKind with
         | Kind.Object ->
             match element.TryGetProperty(name) with
-            | true, prop when prop.ValueKind <> Kind.Null -> Ok <| Some prop
+            | true, prop when prop.ValueKind <> Kind.Null -> Ok (Some prop)
             | false, _ -> Ok None
             | _ -> Ok None
         | _ -> Error.notObject name element
@@ -29,7 +29,7 @@ module Parse =
             match tryGetProperty name element with
             | Ok (Some prop) ->
                 match parser prop with
-                | Ok x -> Ok <| Some x
+                | Ok x -> Ok (Some x)
                 | Error msg when String.startsWith "Error" msg -> Error msg
                 | Error msg -> Error.parseError name msg element
             | Ok None -> Ok None
@@ -69,7 +69,7 @@ module Parse =
 
     let tryTrav (path:string array) parser =
         fun element ->
-            let mutable last = Ok <| Some element
+            let mutable last = Ok (Some element)
             let mutable previous = element
 
             for name in path do
@@ -82,7 +82,7 @@ module Parse =
             match last with
             | Ok (Some prop) ->
                 match parser prop with
-                | Ok x -> Ok <| Some x
+                | Ok x -> Ok (Some x)
                 | Error msg when String.startsWith "Error" msg -> Error msg
                 | Error msg ->
                     let name = Array.last path
@@ -123,7 +123,7 @@ module Parse =
 
                 match error with
                 | Some e -> Error e
-                | None -> Ok <| convert array
+                | None -> Ok (convert array)
             | _ ->
                 element.ValueKind
                 |> Error.invalidElement Kind.Array
