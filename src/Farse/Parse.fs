@@ -110,12 +110,12 @@ module Parse =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Array ->
-                let arrayLength = element.GetArrayLength()
-                let array = ResizeArray(arrayLength)
                 let mutable error = None
+                let array =
+                    element.GetArrayLength()
+                    |> ResizeArray
 
-                let elements = element.EnumerateArray()
-                for element in elements do
+                for element in element.EnumerateArray() do
                     if error.IsNone then
                         match parser element with
                         | Ok x -> array.Add x
