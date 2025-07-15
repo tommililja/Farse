@@ -49,5 +49,5 @@ module internal ActivePatterns =
 
     let (|Flat|Nested|) (str:string) =
         if str.Contains('.')
-        then Nested str
+        then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
         else Flat str

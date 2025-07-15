@@ -45,16 +45,12 @@ module Parse =
                 | Error msg -> Error.parseError name msg element
             | Error e -> Error e
 
-    let private splitPath (path:string) =
-        path.Split('.', StringSplitOptions.RemoveEmptyEntries)
-
-    let private trav (path:string) parser =
+    let private trav (path:string array) parser =
         fun element ->
             let mutable last = Ok element
             let mutable previous = element
 
-            let names = splitPath path
-            for name in names do
+            for name in path do
                 match last with
                 | Ok element ->
                     last <- getProperty name element
@@ -67,17 +63,16 @@ module Parse =
                 | Ok x -> Ok x
                 | Error msg when String.startsWith "Error" msg -> Error msg
                 | Error msg ->
-                    let name = Array.last names
+                    let name = Array.last path
                     Error.parseError name msg previous
             | Error e -> Error e
 
-    let tryTrav (path:string) parser =
+    let tryTrav (path:string array) parser =
         fun element ->
             let mutable last = Ok <| Some element
             let mutable previous = element
 
-            let names = splitPath path
-            for name in names do
+            for name in path do
                 match last with
                 | Ok (Some element) ->
                     last <- tryGetProperty name element
@@ -90,7 +85,7 @@ module Parse =
                 | Ok x -> Ok <| Some x
                 | Error msg when String.startsWith "Error" msg -> Error msg
                 | Error msg ->
-                    let name = Array.last names
+                    let name = Array.last path
                     Error.parseError name msg previous
             | Ok None -> Ok None
             | Error e -> Error e
