@@ -67,7 +67,7 @@ module Parse =
                     Error.parseError name msg previous
             | Error e -> Error e
 
-    let tryTrav (path:string array) parser =
+    let private tryTrav (path:string array) parser =
         fun element ->
             let mutable last = Ok (Some element)
             let mutable previous = element
