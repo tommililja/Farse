@@ -4,7 +4,7 @@ open System
 open System.Runtime.CompilerServices
 open System.Text.Json
 
-type Kind = JsonValueKind
+type internal Kind = JsonValueKind
 
 module internal JsonSerializerOptions =
 
