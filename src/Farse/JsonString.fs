@@ -20,10 +20,10 @@ type JValue =
 
 module internal JValue =
 
-    let private createValue x =
+    let createValue x =
         JsonValue.Create<'a>(x).Root
 
-    let rec internal getJsonNode = function
+    let rec getJsonNode = function
         | JStr str -> createValue str
         | JNum num ->
             match num with

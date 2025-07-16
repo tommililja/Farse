@@ -21,36 +21,36 @@ module internal JsonElement =
 type internal JsonElementExtensions() =
 
     [<Extension>]
-    static member TryGetChar(e:JsonElement) =
-        match e.GetString() with
+    static member TryGetChar(element:JsonElement) =
+        match element.GetString() with
         | str when str.Length = 1 -> true, str[0]
         | _ -> false, Char.MinValue
 
     [<Extension>]
-    static member TryGetDateTimeUtc(e:JsonElement) =
-        match e.TryGetDateTime() with
+    static member TryGetDateTimeUtc(element:JsonElement) =
+        match element.TryGetDateTime() with
         | true, dateTime -> true, dateTime.ToUniversalTime()
         | false, invalid -> false, invalid
 
     [<Extension>]
-    static member TryGetString(e:JsonElement) =
-        true, e.GetString()
+    static member TryGetString(element:JsonElement) =
+        true, element.GetString()
 
     [<Extension>]
-    static member TryGetBoolean(e:JsonElement) =
-        true, e.GetBoolean()
+    static member TryGetBoolean(element:JsonElement) =
+        true, element.GetBoolean()
 
     [<Extension>]
-    static member TryGetPropertyCount(e:JsonElement) =
-        true, e.GetPropertyCount()
+    static member TryGetPropertyCount(element:JsonElement) =
+        true, element.GetPropertyCount()
 
     [<Extension>]
-    static member TryGetArrayLength(e:JsonElement) =
-        true, e.GetArrayLength()
+    static member TryGetArrayLength(element:JsonElement) =
+        true, element.GetArrayLength()
 
     [<Extension>]
-    static member TryGetKind(e:JsonElement) =
-        true, e.ValueKind
+    static member TryGetKind(element:JsonElement) =
+        true, element.ValueKind
 
 module internal String =
 
@@ -61,7 +61,7 @@ module internal String =
 module internal ActivePatterns =
 
     let (|String|Invalid|) (str:string) =
-        if String.IsNullOrEmpty str
+        if String.IsNullOrEmpty(str)
         then Invalid
         else String str
 

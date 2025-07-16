@@ -5,8 +5,8 @@ open System.Text.Json
 
 module internal Error =
 
-    let create list =
-        list
+    let create strings =
+        strings
         |> String.concat "\n"
         |> Error
 
@@ -14,7 +14,7 @@ module internal Error =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let couldNotParseDateTime format (element:JsonElement) =
-        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format %s{format}."
+        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format '%s{format}'."
 
     let invalidElement (expected:Kind) (actual:Kind) =
         let expected =
