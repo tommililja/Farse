@@ -12,6 +12,7 @@ module JsonString =
                 "int", JNum <| Int 123456789
                 "float", JNum <| Float 123.12
                 "decimal", JNum <| Decimal 123.12m
+                "byte", JNum <| Byte 128uy
                 "string", JStr "string"
                 "bool", JBit true
                 "object",

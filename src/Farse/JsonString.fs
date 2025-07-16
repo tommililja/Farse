@@ -7,6 +7,7 @@ type JNumber =
     | Int of int
     | Float of float
     | Decimal of decimal
+    | Byte of byte
 
 type JValue =
     | JStr of string
@@ -29,6 +30,7 @@ module internal JValue =
             | Int int -> createValue int
             | Float float -> createValue float
             | Decimal decimal -> createValue decimal
+            | Byte byte -> createValue byte
         | JBit bit -> createValue bit
         | JObj obj ->
             obj
