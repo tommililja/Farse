@@ -21,6 +21,18 @@ module internal JsonElement =
 type internal JsonElementExtensions() =
 
     [<Extension>]
+    static member TryGetChar(e:JsonElement) =
+        match e.GetString() with
+        | str when str.Length = 1 -> true, str[0]
+        | _ -> false, Char.MinValue
+
+    [<Extension>]
+    static member TryGetDateTimeUtc(e:JsonElement) =
+        match e.TryGetDateTime() with
+        | true, dateTime -> true, dateTime.ToUniversalTime()
+        | false, invalid -> false, invalid
+
+    [<Extension>]
     static member TryGetString(e:JsonElement) =
         true, e.GetString()
 
@@ -29,10 +41,16 @@ type internal JsonElementExtensions() =
         true, e.GetBoolean()
 
     [<Extension>]
-    static member TryGetDateTimeUtc(e:JsonElement) =
-        match e.TryGetDateTime() with
-        | true, dateTime -> true, dateTime.ToUniversalTime()
-        | false, invalid -> false, invalid
+    static member TryGetPropertyCount(e:JsonElement) =
+        true, e.GetPropertyCount()
+
+    [<Extension>]
+    static member TryGetArrayLength(e:JsonElement) =
+        true, e.GetArrayLength()
+
+    [<Extension>]
+    static member TryGetKind(e:JsonElement) =
+        true, e.ValueKind
 
 module internal String =
 

@@ -132,8 +132,8 @@ module Parse =
     let private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
-                if expectedKind = Kind.True
-                then element.ValueKind = Kind.True || element.ValueKind = Kind.False
+                if expectedKind = Kind.True then element.ValueKind = Kind.True || element.ValueKind = Kind.False
+                else if expectedKind = Kind.Undefined then true
                 else element.ValueKind = expectedKind
 
             if isExpectedKind then
@@ -151,11 +151,38 @@ module Parse =
     /// Parses an element as System.Int32.
     let int = getValue _.TryGetInt32() Kind.Number
 
+    /// Parses an element as System.Int16.
+    let int16 = getValue _.TryGetInt16() Kind.Number
+
+    /// Parses an element as System.Int64.
+    let int64 = getValue _.TryGetInt64() Kind.Number
+
+    /// Parses an element as System.UInt16.
+    let uint16 = getValue _.TryGetUInt16() Kind.Number
+
+    /// Parses an element as System.UInt32.
+    let uint32 = getValue _.TryGetUInt32() Kind.Number
+
+    /// Parses an element as System.UInt64.
+    let uint64 = getValue _.TryGetUInt64() Kind.Number
+
     /// Parses an element as System.Double.
     let float = getValue _.TryGetDouble() Kind.Number
 
+    /// Parses an element as System.Single.
+    let float32 = getValue _.TryGetSingle() Kind.Number
+
     /// Parses an element as System.Decimal.
     let decimal = getValue _.TryGetDecimal() Kind.Number
+
+    /// Parses an element as System.Byte.
+    let byte = getValue _.TryGetByte() Kind.Number
+
+    /// Parses an element as System.SByte.
+    let sbyte = getValue _.TryGetSByte() Kind.Number
+
+    /// Parses an element as System.Char.
+    let char = getValue _.TryGetChar() Kind.String
 
     /// Parses an element as System.String.
     let string = getValue _.TryGetString() Kind.String
@@ -165,6 +192,8 @@ module Parse =
 
     /// Parses an element as System.Guid.
     let guid = getValue _.TryGetGuid() Kind.String
+
+    // Dates
 
     /// Parses an element as System.DateTime (ISO 8601).
     let dateTime = getValue _.TryGetDateTime() Kind.String
@@ -176,6 +205,7 @@ module Parse =
     let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
 
     /// Parses an element as System.DateTime with a specific format.
+    /// <param name="format">The required format.</param>
     let dateTimeExact (format:string) =
         fun (element:JsonElement) ->
             if element.ValueKind = Kind.String then
@@ -191,6 +221,8 @@ module Parse =
                 |> Error.invalidElement Kind.String
                 |> Error
 
+    // Sequences
+
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let list (parser:Parser<_>) : Parser<_> =
@@ -205,3 +237,14 @@ module Parse =
     /// <param name="parser">The parser used for every element.</param>
     let set (parser:Parser<_>) : Parser<_> =
         seq Set.ofSeq parser
+
+    // Misc
+
+    /// Parses an element's property count as System.Int32.
+    let propertyCount = getValue _.TryGetPropertyCount() Kind.Object
+
+    /// Parses an element's array length as System.Int32.
+    let arrayLength = getValue _.TryGetArrayLength() Kind.Array
+
+    /// Parses an element's kind as System.Text.Json.JsonValueKind.
+    let kind = getValue _.TryGetKind() Kind.Undefined
