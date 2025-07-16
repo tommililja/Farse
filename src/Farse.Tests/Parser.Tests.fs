@@ -36,6 +36,16 @@ module Parser =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should ignore parser value`` () =
+        let expected = ()
+        let actual =
+            Parse.int
+            |> Parser.ignore
+            |> Parser.parse "1"
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should return ok with expected value when validation succeeds`` () =
         let expected = 1
         let actual =

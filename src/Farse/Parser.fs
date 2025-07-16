@@ -24,6 +24,9 @@ module Parser =
     let map fn (x:Parser<_>) : Parser<_> =
         bind (fn >> from) x
 
+    let ignore (x:Parser<_>) : Parser<_> =
+        map ignore x
+
     /// <summary>Parses a JSON string using the supplied parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
     /// <param name="parser">The parser used to parse the JSON string.</param>
