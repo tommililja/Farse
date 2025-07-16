@@ -7,9 +7,9 @@ module Operators =
     open Parse
 
     /// Parses a required property.
-    let (&=) name parser =
-        req name parser
+    let (&=) path parser =
+        req path parser
 
     /// Parses an optional property.
-    let (?=) name parser =
-        opt name parser
+    let (?=) path parser =
+        opt path parser
