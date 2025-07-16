@@ -93,7 +93,7 @@ module User =
         parser {
             let! id = "id" &= UserId.parser
             let! name = "name" &= string
-            let! age = "age" ?= int
+            let! age = "age" ?= Age.parser
             let! email = "email" &= Email.parser
             let! profiles = "profiles" &= set ProfileId.parser
 
@@ -140,6 +140,21 @@ module UserId =
     let parser =
         Parse.guid
         |> Parser.map UserId
+
+type Age = Age of byte
+
+module Age =
+
+    let asByte (Age x) = x
+
+    let fromByte age =
+        match age with
+        | age when age >= 12uy -> Ok (Age age)
+        | age -> Error $"Invalid age: %u{age}."
+
+    let parser =
+        Parse.byte
+        |> Parser.validate fromByte
 
 type Email = Email of string
 
@@ -197,7 +212,7 @@ type Subscription = {
 type User = {
     Id: UserId
     Name: string
-    Age: int option
+    Age: Age option
     Email: Email
     Profiles: ProfileId Set
     Subscription: Subscription
@@ -226,7 +241,7 @@ let jsonString =
         "name", JStr user.Name
         "age",
             user.Age
-            |> Option.map (Int >> JNum)
+            |> Option.map (Age.asByte >> Byte >> JNum)
             |> JOpt
         "email", JStr <| Email.asString user.Email
         "profiles",
