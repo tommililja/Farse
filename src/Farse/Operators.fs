@@ -6,12 +6,10 @@ open Farse
 module Operators =
     open Parse
 
-    /// <summary>
     /// Parses a required property.
-    /// </summary>
-    let (&=) = req
+    let (&=) name parser =
+        req name parser
 
-    /// <summary>
     /// Parses an optional property.
-    /// </summary>
-    let (?=) = opt
+    let (?=) name parser =
+        opt name parser

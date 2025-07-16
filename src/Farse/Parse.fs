@@ -90,7 +90,7 @@ module Parse =
             | Ok None -> Ok None
             | Error e -> Error e
 
-    /// <summary>Parses a required property with the supplied parser.</summary>
+    /// <summary>Parses a required property with the given parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
     let req (path:string) (parser:Parser<_>) : Parser<_> =
@@ -98,7 +98,7 @@ module Parse =
         | Flat name -> parse name parser
         | Nested path -> trav path parser
 
-    /// <summary>Parses an optional property with the supplied parser.</summary>
+    /// <summary>Parses an optional property with the given parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
     let opt (path:string) (parser:Parser<_>) : Parser<_> =
@@ -204,7 +204,7 @@ module Parse =
     /// Parses an element as System.DateTimeOffset (ISO 8601).
     let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
 
-    /// Parses an element as System.DateTime with a specific format.
+    /// <summary>Parses an element as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
     let dateTimeExact (format:string) =
         fun (element:JsonElement) ->

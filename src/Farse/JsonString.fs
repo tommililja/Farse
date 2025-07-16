@@ -56,8 +56,11 @@ type JsonString = JsonString of JsonObject
 
 module JsonString =
 
-    let create list =
-        list
+    /// <summary>Creates a JsonString from a list of properties.</summary>
+    /// <example>JsonString.create [ "prop", JStr "text" ]</example>
+    /// <param name="props">The list of properties.</param>
+    let create props =
+        props
         |> List.map (fun (key, value) ->
             let node = JValue.getJsonNode value
             KeyValuePair(key, node)
@@ -65,5 +68,8 @@ module JsonString =
         |> JsonObject
         |> JsonString
 
+    /// <summary>Converts the JsonString to a formatted string.</summary>
+    /// <remarks>IndentSize = 4, WriteIndented = true.</remarks>
+    /// <typeparam name="JsonString">The JsonString to convert.</typeparam>
     let asString (JsonString x) =
         x.ToJsonString(JsonSerializerOptions.preset)
