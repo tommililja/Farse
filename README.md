@@ -69,14 +69,10 @@ Given the following JSON string.
 And the two (optional) operators.
 
 ```fsharp
-/// <summary>
-/// Parses a required property.
-/// </summary>
+// Parses a required property.
 let (&=) = Parse.req
 
-/// <summary>
-/// Parses an optional property.
-/// </summary>
+// Parses an optional property.
 let (?=) = Parse.opt
 ```
 
