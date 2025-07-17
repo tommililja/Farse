@@ -11,7 +11,7 @@ module Parser =
     let from x : Parser<_> =
         fun _ -> Ok x
 
-    /// <summary>Binds the given parser with the parser returned by the given function.</summary>
+    /// <summary>Binds the parsed value with the given function.</summary>
     /// <param name="fn">The binder function.</param>
     /// <param name="parser">The parser to bind.</param>
     let bind (fn:_ -> Parser<_>) (parser:Parser<_>) : Parser<_> =
