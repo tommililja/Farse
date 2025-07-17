@@ -206,20 +206,7 @@ module Parse =
 
     /// <summary>Parses an element as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeExact (format:string) =
-        fun (element:JsonElement) ->
-            if element.ValueKind = Kind.String then
-                let dateString = element.GetString()
-                match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | true, date -> Ok date
-                | _ ->
-                    element
-                    |> Error.couldNotParseDateTime format
-                    |> Error
-            else
-                element.ValueKind
-                |> Error.invalidElement Kind.String
-                |> Error
+    let dateTimeExact (format:string) = getValue _.TryGetDateTimeExact(format) Kind.String
 
     // Sequences
 

@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Globalization
 open System.Runtime.CompilerServices
 open System.Text.Json
 
@@ -31,6 +32,13 @@ type internal JsonElementExtensions() =
         match element.TryGetDateTime() with
         | true, dateTime -> true, dateTime.ToUniversalTime()
         | false, invalid -> false, invalid
+
+    [<Extension>]
+    static member TryGetDateTimeExact(element:JsonElement, format:string) =
+        let dateString = element.GetString()
+        match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, date -> true, date
+        | _ -> false, DateTime.MinValue
 
     [<Extension>]
     static member TryGetString(element:JsonElement) =
