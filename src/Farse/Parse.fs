@@ -22,76 +22,72 @@ module Parse =
             | _ -> Ok None
         | _ -> Error.notObject name element
 
-    let private tryParse name parser =
-        fun (element:JsonElement) ->
-            match tryGetProperty name element with
-            | Ok (Some prop) ->
-                match parser prop with
-                | Ok x -> Ok (Some x)
-                | Error msg when String.startsWith "Error" msg -> Error msg
-                | Error msg -> Error.parseError name msg element
-            | Ok None -> Ok None
-            | Error e -> Error e
+    let private tryParse name parser element =
+        match tryGetProperty name element with
+        | Ok (Some prop) ->
+            match parser prop with
+            | Ok x -> Ok (Some x)
+            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error msg -> Error.parseError name msg element
+        | Ok None -> Ok None
+        | Error e -> Error e
 
-    let private parse name parser =
-        fun (element:JsonElement) ->
-            match getProperty name element with
-            | Ok prop ->
-                match parser prop with
-                | Ok x -> Ok x
-                | Error msg when String.startsWith "Error" msg -> Error msg
-                | Error msg -> Error.parseError name msg element
-            | Error e -> Error e
+    let private parse name parser element =
+        match getProperty name element with
+        | Ok prop ->
+            match parser prop with
+            | Ok x -> Ok x
+            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error msg -> Error.parseError name msg element
+        | Error e -> Error e
 
-    let private trav (path:string array) parser =
-        fun element ->
-            let mutable last = Ok element
-            let mutable previous = element
+    let private trav (path:string array) parser element =
+        let mutable last = Ok element
+        let mutable previous = element
 
-            for name in path do
-                match last with
-                | Ok element ->
-                    last <- getProperty name element
-                    previous <- element
-                | Error _ -> ()
-
+        for name in path do
             match last with
-            | Ok prop ->
-                match parser prop with
-                | Ok x -> Ok x
-                | Error msg when String.startsWith "Error" msg -> Error msg
-                | Error msg ->
-                    let name = Array.last path
-                    Error.parseError name msg previous
-            | Error e -> Error e
+            | Ok element ->
+                last <- getProperty name element
+                previous <- element
+            | Error _ -> ()
 
-    let private tryTrav (path:string array) parser =
-        fun element ->
-            let mutable last = Ok (Some element)
-            let mutable previous = element
+        match last with
+        | Ok prop ->
+            match parser prop with
+            | Ok x -> Ok x
+            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error msg ->
+                let name = Array.last path
+                Error.parseError name msg previous
+        | Error e -> Error e
 
-            for name in path do
-                match last with
-                | Ok (Some element) ->
-                    last <- tryGetProperty name element
-                    previous <- element
-                | _ -> ()
+    let private tryTrav (path:string array) parser element =
+        let mutable last = Ok (Some element)
+        let mutable previous = element
 
+        for name in path do
             match last with
-            | Ok (Some prop) ->
-                match parser prop with
-                | Ok x -> Ok (Some x)
-                | Error msg when String.startsWith "Error" msg -> Error msg
-                | Error msg ->
-                    let name = Array.last path
-                    Error.parseError name msg previous
-            | Ok None -> Ok None
-            | Error e -> Error e
+            | Ok (Some element) ->
+                last <- tryGetProperty name element
+                previous <- element
+            | _ -> ()
+
+        match last with
+        | Ok (Some prop) ->
+            match parser prop with
+            | Ok x -> Ok (Some x)
+            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error msg ->
+                let name = Array.last path
+                Error.parseError name msg previous
+        | Ok None -> Ok None
+        | Error e -> Error e
 
     /// <summary>Parses a required property with the given parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
-    let req (path:string) (parser:Parser<_>) : Parser<_> =
+    let req path (parser:Parser<_>) : Parser<_> =
         match path with
         | Flat name -> parse name parser
         | Nested path -> trav path parser
@@ -99,7 +95,7 @@ module Parse =
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
-    let opt (path:string) (parser:Parser<_>) : Parser<_> =
+    let opt path (parser:Parser<_>) : Parser<_> =
         match path with
         | Flat name -> tryParse name parser
         | Nested path -> tryTrav path parser
@@ -210,17 +206,17 @@ module Parse =
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let list (parser:Parser<_>) : Parser<_> =
+    let list parser =
         seq Seq.toList parser
 
     /// <summary>Parses an element as Microsoft.FSharp.Core.array.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let array (parser:Parser<_>) : Parser<_> =
+    let array parser =
         seq Seq.toArray parser
 
     /// <summary>Parses an element as Microsoft.FSharp.Collections.Set.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let set (parser:Parser<_>) : Parser<_> =
+    let set parser =
         seq Set.ofSeq parser
 
     // Misc
