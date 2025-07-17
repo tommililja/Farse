@@ -2,8 +2,6 @@ namespace Farse
 
 open System.Text.Json
 
-type Parser<'a> = JsonElement -> Result<'a, string>
-
 module Parser =
 
     /// <summary>Returns a parser with the given value.</summary>
