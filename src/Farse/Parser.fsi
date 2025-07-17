@@ -1,6 +1,6 @@
 namespace Farse
 
-// This seems to solve some type alias problems, but not all.
+// This seems to solve most type alias problems, but not all.
 
 module Parser =
 
