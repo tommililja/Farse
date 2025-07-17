@@ -1,7 +1,5 @@
 namespace Farse
 
-open System
-open System.Globalization
 open System.Text.Json
 
 module Parse =
