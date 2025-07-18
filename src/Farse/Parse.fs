@@ -126,9 +126,9 @@ module Parse =
     let private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
-                if expectedKind = Kind.True then element.ValueKind = Kind.True || element.ValueKind = Kind.False
-                else if expectedKind = Kind.Undefined then true
-                else element.ValueKind = expectedKind
+                if element.ValueKind = expectedKind then true
+                else if expectedKind = Kind.True then element.ValueKind = Kind.False
+                else expectedKind = Kind.Undefined
 
             if isExpectedKind then
                 match tryParse element with
