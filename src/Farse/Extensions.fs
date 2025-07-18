@@ -29,14 +29,12 @@ type internal JsonElementExtensions() =
     static member TryGetDateTimeUtc(element:JsonElement) =
         match element.TryGetDateTime() with
         | true, dateTime -> true, dateTime.ToUniversalTime()
-        | false, invalid -> false, invalid
+        | invalid -> invalid
 
     [<Extension>]
     static member TryGetDateTimeExact(element:JsonElement, format:string) =
         let dateString = element.GetString()
-        match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-        | true, date -> true, date
-        | _ -> false, DateTime.MinValue
+        DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
 
     [<Extension>]
     static member TryGetString(element:JsonElement) =
