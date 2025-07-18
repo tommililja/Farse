@@ -18,7 +18,6 @@ module Parse =
         | Kind.Object ->
             match element.TryGetProperty(name) with
             | true, prop when prop.ValueKind <> Kind.Null -> Ok (Some prop)
-            | false, _ -> Ok None
             | _ -> Ok None
         | _ -> Error.notObject name element
 
