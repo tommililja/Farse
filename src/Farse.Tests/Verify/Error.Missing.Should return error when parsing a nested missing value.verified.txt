@@ -1,4 +1,5 @@
-﻿Error: Property 'missing' was not found.
+﻿Error: Could not parse property 'missing'.
+Expected: Number, actual: Undefined.
 Object:
 {
     "prop2": 1

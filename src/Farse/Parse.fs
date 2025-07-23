@@ -6,10 +6,7 @@ module Parse =
 
     let private getProperty (name:string) (element:JsonElement) =
         match element.ValueKind with
-        | Kind.Object ->
-            match element.TryGetProperty(name) with
-            | true, prop -> Ok prop
-            | _ -> Error.missingProperty name element
+        | Kind.Object -> Ok (snd (element.TryGetProperty(name)))
         | _ -> Error.notObject name element
 
     let private tryGetProperty (name:string) (element:JsonElement) =
@@ -51,14 +48,10 @@ module Parse =
                 last <- getProperty path[i] element
                 previous <- element
                 previousName <- path[i]
-            | Ok element when element.ValueKind = Kind.Null ->
+            | Ok element when element.ValueKind = Kind.Null || element.ValueKind = Kind.Undefined ->
                 if i = path.Length
                 then last <- Ok element
-                else last <- Error.nullProperty previousName previous
-            | Ok element when element.ValueKind = Kind.Undefined ->
-                if i = path.Length
-                then last <- Ok element
-                else last <- Error.missingProperty previousName previous
+                else last <- Error.notObjectTrav previousName previous element
             | Ok element -> last <- Error.notObject path[i] element
             | _ -> ()
 
@@ -66,6 +59,14 @@ module Parse =
         | Ok prop ->
             match parser prop with
             | Ok x -> Ok x
+            | Error msg when String.startsWith "Error: Could not read" msg ->
+                let name = Array.last path
+                let expected =
+                    if prop.ValueKind = Kind.Array
+                    then prop.Item 0
+                    else prop
+
+                Error.notObjectTrav name previous expected
             | Error msg when String.startsWith "Error" msg -> Error msg
             | Error msg -> Error.parseError previousName msg previous
         | Error e -> Error e

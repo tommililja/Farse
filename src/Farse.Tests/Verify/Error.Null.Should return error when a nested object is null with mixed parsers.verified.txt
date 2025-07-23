@@ -1,2 +1,6 @@
-﻿Error: Could not read property 'prop3'.
+﻿Error: Could not parse property 'prop2'.
 Expected: Object, actual: Null.
+Object:
+{
+    "prop2": null
+}

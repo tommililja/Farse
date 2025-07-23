@@ -33,16 +33,11 @@ module internal Error =
             print element
         ]
 
-    let missingProperty name element =
+    let notObjectTrav name (previous:JsonElement) (element:JsonElement) =
         create [
-            $"Error: Property '%s{name}' was not found."
-            print element
-        ]
-
-    let nullProperty name element =
-        create [
-            $"Error: Property '%s{name}' was null."
-            print element
+            $"Error: Could not parse property '%s{name}'."
+            invalidElement Kind.Object element.ValueKind
+            print previous
         ]
 
     let parseError name msg element =

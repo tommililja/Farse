@@ -1,4 +1,5 @@
-﻿Error: Property 'prop' was null.
+﻿Error: Could not parse property 'prop'.
+Expected: Object, actual: Null.
 Object:
 {
     "prop": null
