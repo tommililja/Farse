@@ -7,7 +7,7 @@
 
 Inspired by [Thoth.Json.Net](https://github.com/thoth-org/Thoth.Json.Net) and its composability.
 
-Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while still providing utility and acceptable error messages.
+Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while still providing acceptable error messages.
 
 ## Installation
 
@@ -145,7 +145,7 @@ module Age =
 
     let fromByte age =
         match age with
-        | age when age >= 12uy -> Ok (Age age)
+        | age when age >= 12uy -> Ok <| Age age
         | age -> Error $"Invalid age: %u{age}."
 
     let parser =
@@ -160,7 +160,7 @@ module Email =
 
     let fromString str =
         // Some validation
-        Ok (Email str)
+        Ok <| Email str
 
     let parser =
         Parse.string
@@ -276,4 +276,4 @@ Object:
 }
 ```
 
->Farse does not throw exceptions and it only catches **JsonException**, that is thrown when supplying invalid JSON.
+>Farse does not throw exceptions and it only catches **JsonException**, that is thrown when parsing invalid JSON.
