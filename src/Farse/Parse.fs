@@ -228,3 +228,6 @@ module Parse =
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
     let kind = getValue _.TryGetKind() Kind.Undefined
+
+    /// Does not parse element and returns FSharp.Core.Unit.
+    let none = Parser.from ()

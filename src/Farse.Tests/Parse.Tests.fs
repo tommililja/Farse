@@ -250,3 +250,12 @@ module Parse =
             |> Parser.parse """{ "prop": 100 }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should not parse element and return unit`` () =
+        let expected = ()
+        let actual =
+            Parse.req "prop" Parse.none
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
