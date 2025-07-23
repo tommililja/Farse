@@ -141,89 +141,89 @@ module Parse =
                 |> Error.invalidElement expectedKind
                 |> Error
 
-    /// Parses an element as System.Int32.
+    /// Parses a number as System.Int32.
     let int = getValue _.TryGetInt32() Kind.Number
 
-    /// Parses an element as System.Int16.
+    /// Parses a number as System.Int16.
     let int16 = getValue _.TryGetInt16() Kind.Number
 
-    /// Parses an element as System.Int64.
+    /// Parses a number as System.Int64.
     let int64 = getValue _.TryGetInt64() Kind.Number
 
-    /// Parses an element as System.UInt16.
+    /// Parses a number as System.UInt16.
     let uint16 = getValue _.TryGetUInt16() Kind.Number
 
-    /// Parses an element as System.UInt32.
+    /// Parses a number as System.UInt32.
     let uint32 = getValue _.TryGetUInt32() Kind.Number
 
-    /// Parses an element as System.UInt64.
+    /// Parses a number as System.UInt64.
     let uint64 = getValue _.TryGetUInt64() Kind.Number
 
-    /// Parses an element as System.Double.
+    /// Parses a number as System.Double.
     let float = getValue _.TryGetDouble() Kind.Number
 
-    /// Parses an element as System.Single.
+    /// Parses a number as System.Single.
     let float32 = getValue _.TryGetSingle() Kind.Number
 
-    /// Parses an element as System.Decimal.
+    /// Parses a number as System.Decimal.
     let decimal = getValue _.TryGetDecimal() Kind.Number
 
-    /// Parses an element as System.Byte.
+    /// Parses a number as System.Byte.
     let byte = getValue _.TryGetByte() Kind.Number
 
-    /// Parses an element as System.SByte.
+    /// Parses a number as System.SByte.
     let sbyte = getValue _.TryGetSByte() Kind.Number
 
-    /// Parses an element as System.Char.
+    /// Parses a string as System.Char.
     let char = getValue _.TryGetChar() Kind.String
 
-    /// Parses an element as System.String.
+    /// Parses a string as System.String.
     let string = getValue _.TryGetString() Kind.String
 
-    /// Parses an element as System.Boolean.
+    /// Parses a bool as System.Boolean.
     let bool = getValue _.TryGetBoolean() Kind.True
 
-    /// Parses an element as System.Guid.
+    /// Parses a string as System.Guid.
     let guid = getValue _.TryGetGuid() Kind.String
 
     // Dates
 
-    /// Parses an element as System.DateTime (ISO 8601).
+    /// Parses a string as System.DateTime (ISO 8601).
     let dateTime = getValue _.TryGetDateTime() Kind.String
 
-    /// Parses an element as System.DateTime (ISO 8601) and converts it to UTC.
+    /// Parses a string as System.DateTime (ISO 8601) and converts it to UTC.
     let dateTimeUtc = getValue _.TryGetDateTimeUtc() Kind.String
 
-    /// Parses an element as System.DateTimeOffset (ISO 8601).
+    /// Parses a string as System.DateTimeOffset (ISO 8601).
     let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
 
-    /// <summary>Parses an element as System.DateTime with a specific format.</summary>
+    /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
     let dateTimeExact (format:string) = getValue _.TryGetDateTimeExact(format) Kind.String
 
     // Sequences
 
-    /// <summary>Parses an element as Microsoft.FSharp.Collections.list.</summary>
+    /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let list parser =
         seq Seq.toList parser
 
-    /// <summary>Parses an element as Microsoft.FSharp.Core.array.</summary>
+    /// <summary>Parses an array as Microsoft.FSharp.Core.array.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let array parser =
         seq Seq.toArray parser
 
-    /// <summary>Parses an element as Microsoft.FSharp.Collections.Set.</summary>
+    /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let set parser =
         seq Set.ofSeq parser
 
     // Misc
 
-    /// Parses an element's property count as System.Int32.
+    /// Parses an object's property count as System.Int32.
     let propertyCount = getValue _.TryGetPropertyCount() Kind.Object
 
-    /// Parses an element's array length as System.Int32.
+    /// Parses an array's length as System.Int32.
     let arrayLength = getValue _.TryGetArrayLength() Kind.Array
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.

@@ -57,7 +57,7 @@ type JsonString = JsonString of JsonObject
 module JsonString =
 
     /// <summary>Creates a JsonString from a list of properties.</summary>
-    /// <example>JsonString.create [ "prop", JStr "text" ]</example>
+    /// <code>JsonString.create [ "prop", JStr "text" ]</code>
     /// <param name="props">The list of properties.</param>
     let create props =
         props
