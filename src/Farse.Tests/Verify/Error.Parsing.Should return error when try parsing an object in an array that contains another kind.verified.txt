@@ -1,0 +1,4 @@
+﻿Error: Could not read property 'prop2'.
+Expected: Object, actual: Number.
+Number:
+1

@@ -1,5 +1,0 @@
-﻿Error: Required property 'prop2' was null.
-Object:
-{
-    "prop2": null
-}

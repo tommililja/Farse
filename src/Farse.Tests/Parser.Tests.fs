@@ -6,7 +6,7 @@ open Farse
 module Parser =
 
     [<Fact>]
-    let ``Should lift and return expected value`` () =
+    let ``Should create parser and return expected value`` () =
         let expected = ()
         let actual =
             expected
@@ -36,7 +36,7 @@ module Parser =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should ignore parser value`` () =
+    let ``Should ignore parser value and return unit`` () =
         let expected = ()
         let actual =
             Parse.int
@@ -56,91 +56,11 @@ module Parser =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return error with expected value when validation fails`` () =
+    let ``Should return expected error when validation fails`` () =
         let expected = "Error"
         let actual =
             Parse.int
             |> Parser.validate (fun _ -> Error expected)
             |> Parser.parse "1"
             |> Expect.error
-        Expect.equal actual expected
-
-    [<Fact>]
-    let ``Should parse value from nested object`` () =
-        let json =
-            """
-                {
-                    "prop": {
-                        "prop2": {
-                            "prop3": 100
-                        }
-                    }
-                }
-            """
-
-        let expected = 100
-        let actual =
-            Parse.req "prop.prop2.prop3" Parse.int
-            |> Parser.parse json
-            |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
-    let ``Should try parse value from nested object`` () =
-        let json =
-            """
-                {
-                    "prop": {
-                        "prop2": {
-                            "prop3": null
-                        }
-                    }
-                }
-            """
-
-        let expected = None
-        let actual =
-            Parse.opt "prop.prop2.prop3" Parse.int
-            |> Parser.parse json
-            |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
-    let ``Should parse required value from nested object`` () =
-        let json =
-            """
-                {
-                    "prop": {
-                        "prop2": {
-                            "prop3": 100
-                        }
-                    }
-                }
-            """
-
-        let expected = 100
-        let actual =
-            Parse.req "prop.prop2.prop3" Parse.int
-            |> Parser.parse json
-            |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
-    let ``Should parse optional value from nested object`` () =
-        let json =
-            """
-                {
-                    "prop": {
-                        "prop2": {
-                            "prop3": null
-                        }
-                    }
-                }
-            """
-
-        let expected = None
-        let actual =
-            Parse.opt "prop.prop2.prop3" Parse.int
-            |> Parser.parse json
-            |> Expect.ok
         Expect.equal actual expected

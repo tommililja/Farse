@@ -1,5 +1,6 @@
 namespace Farse.Tests
 
+open System
 open Expecto
 open VerifyTests
 open VerifyXunit
@@ -20,11 +21,13 @@ module Verify =
 
 module Expect =
 
-    let ok x = Expect.wantOk x "Expected Ok"
+    let ok x = Expect.wantOk x String.Empty
 
-    let none x = Expect.isNone x "Expected None"
+    let none x = Expect.isNone x String.Empty
 
-    let error x = Expect.wantError x "Expected Error"
+    let error x = Expect.wantError x String.Empty
+
+    let errorString x = error x |> Verify.string
 
     let equal actual expected =
-        Expect.equal actual expected "Expected values to be equal"
+        Expect.equal actual expected String.Empty

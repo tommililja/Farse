@@ -1,0 +1,10 @@
+﻿Error: Could not parse property 'prop2'.
+Expected: String, actual: Number.
+Object:
+{
+    "prop2": [
+        1,
+        2,
+        3
+    ]
+}

@@ -13,9 +13,6 @@ module internal Error =
     let couldNotParse (expectedType:Type) (element:JsonElement) =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
-    let couldNotParseDateTime format (element:JsonElement) =
-        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{typeof<DateTime>.FullName} with format '%s{format}'."
-
     let invalidElement (expected:Kind) (actual:Kind) =
         let expected =
             match expected with
@@ -25,24 +22,26 @@ module internal Error =
         $"Expected: %s{expected}, actual: %s{string actual}."
 
     let print (element:JsonElement) =
-        $"%s{string element.ValueKind}:\n%s{JsonElement.getJson element}"
+        match element.ValueKind with
+        | Kind.Null | Kind.Undefined -> String.Empty
+        | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
 
     let notObject name (element:JsonElement) =
         create [
-            $"Error: Could not parse property '%s{name}'."
-            $"Cannot read property from %s{string element.ValueKind}."
-            print element
-        ]
-
-    let nullProperty name element =
-        create [
-            $"Error: Required property '%s{name}' was null."
+            $"Error: Could not read property '%s{name}'."
+            invalidElement Kind.Object element.ValueKind
             print element
         ]
 
     let missingProperty name element =
         create [
-            $"Error: Required property '%s{name}' was not found."
+            $"Error: Property '%s{name}' was not found."
+            print element
+        ]
+
+    let nullProperty name element =
+        create [
+            $"Error: Property '%s{name}' was null."
             print element
         ]
 

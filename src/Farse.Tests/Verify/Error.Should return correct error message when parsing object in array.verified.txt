@@ -1,4 +1,0 @@
-﻿Error: Could not parse property 'prop2'.
-Cannot read property from Number.
-Number:
-1

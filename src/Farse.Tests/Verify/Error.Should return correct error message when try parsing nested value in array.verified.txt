@@ -1,8 +1,0 @@
-﻿Error: Could not parse property 'prop3'.
-Expected: Number, actual: String.
-Object:
-{
-    "prop3": [
-        "1"
-    ]
-}

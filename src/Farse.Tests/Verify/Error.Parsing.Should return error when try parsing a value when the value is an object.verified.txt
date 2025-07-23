@@ -1,8 +1,8 @@
 ﻿Error: Could not parse property 'prop'.
-Expected: Array, actual: Object.
+Expected: Number, actual: Object.
 Object:
 {
     "prop": {
-        "prop2": 1
+        "prop2": null
     }
 }

@@ -1,0 +1,6 @@
+﻿Error: Could not parse property 'prop'.
+Expected: String, actual: Number.
+Object:
+{
+    "prop": 1
+}

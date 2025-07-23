@@ -1,0 +1,2 @@
+﻿Error: Could not read property 'prop3'.
+Expected: Object, actual: Null.

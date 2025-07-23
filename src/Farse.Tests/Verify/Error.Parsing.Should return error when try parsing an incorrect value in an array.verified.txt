@@ -2,5 +2,9 @@
 Expected: String, actual: Number.
 Object:
 {
-    "prop": 100
+    "prop": [
+        1,
+        2,
+        3
+    ]
 }

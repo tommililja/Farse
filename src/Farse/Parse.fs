@@ -8,9 +8,8 @@ module Parse =
         match element.ValueKind with
         | Kind.Object ->
             match element.TryGetProperty(name) with
-            | true, prop when prop.ValueKind <> Kind.Null -> Ok prop
-            | false, _ -> Error.missingProperty name element
-            | _ -> Error.nullProperty name element
+            | true, prop -> Ok prop
+            | _ -> Error.missingProperty name element
         | _ -> Error.notObject name element
 
     let private tryGetProperty (name:string) (element:JsonElement) =
@@ -43,33 +42,47 @@ module Parse =
     let private trav (path:string array) parser element =
         let mutable last = Ok element
         let mutable previous = element
+        let mutable previousName = path[0]
 
-        for name in path do
+        // Pretty rowdy, but it works.
+        for i in 0 .. path.Length - 1 do
             match last with
-            | Ok element ->
-                last <- getProperty name element
+            | Ok (element:JsonElement) when element.ValueKind = Kind.Object ->
+                last <- getProperty path[i] element
                 previous <- element
-            | Error _ -> ()
+                previousName <- path[i]
+            | Ok element when element.ValueKind = Kind.Null ->
+                if i = path.Length
+                then last <- Ok element
+                else last <- Error.nullProperty previousName previous
+            | Ok element when element.ValueKind = Kind.Undefined ->
+                if i = path.Length
+                then last <- Ok element
+                else last <- Error.missingProperty previousName previous
+            | Ok element -> last <- Error.notObject path[i] element
+            | _ -> ()
 
         match last with
         | Ok prop ->
             match parser prop with
             | Ok x -> Ok x
             | Error msg when String.startsWith "Error" msg -> Error msg
-            | Error msg ->
-                let name = Array.last path
-                Error.parseError name msg previous
+            | Error msg -> Error.parseError previousName msg previous
         | Error e -> Error e
 
     let private tryTrav (path:string array) parser element =
         let mutable last = Ok (Some element)
         let mutable previous = element
+        let mutable previousName = path[0]
 
-        for name in path do
+        // Pretty rowdy, but it works.
+        for i in 0 .. path.Length - 1 do
             match last with
-            | Ok (Some element) ->
-                last <- tryGetProperty name element
+            | Ok (Some (element:JsonElement)) when element.ValueKind = Kind.Object ->
+                last <- tryGetProperty path[i] element
                 previous <- element
+                previousName <- path[i]
+            | Ok (Some element) -> last <- Error.notObject path[i] element
             | _ -> ()
 
         match last with
@@ -77,9 +90,7 @@ module Parse =
             match parser prop with
             | Ok x -> Ok (Some x)
             | Error msg when String.startsWith "Error" msg -> Error msg
-            | Error msg ->
-                let name = Array.last path
-                Error.parseError name msg previous
+            | Error msg -> Error.parseError previousName msg previous
         | Ok None -> Ok None
         | Error e -> Error e
 

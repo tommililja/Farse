@@ -1,6 +1,6 @@
 ﻿Error: Could not parse property 'prop3'.
-Expected: Number, actual: String.
+Expected: Number, actual: Null.
 Object:
 {
-    "prop3": "1"
+    "prop3": null
 }

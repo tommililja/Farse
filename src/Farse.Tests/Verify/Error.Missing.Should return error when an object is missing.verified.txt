@@ -1,0 +1,7 @@
+﻿Error: Property 'missing' was not found.
+Object:
+{
+    "prop": {
+        "prop2": 1
+    }
+}
