@@ -90,6 +90,14 @@ module Parse =
         | Ok (Some prop) ->
             match parser prop with
             | Ok x -> Ok (Some x)
+            | Error msg when String.startsWith "Error: Could not read" msg ->
+                let name = Array.last path
+                let expected =
+                    if prop.ValueKind = Kind.Array
+                    then prop.Item 0
+                    else prop
+
+                Error.notObjectTrav name previous expected
             | Error msg when String.startsWith "Error" msg -> Error msg
             | Error msg -> Error.parseError previousName msg previous
         | Ok None -> Ok None
