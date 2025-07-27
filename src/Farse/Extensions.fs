@@ -25,6 +25,30 @@ type internal JsonElementExtensions() =
         | str when str.Length = 1 -> true, str[0]
         | _ -> false, Char.MinValue
 
+    #if NET8_0_OR_GREATER
+
+    [<Extension>]
+    static member TryGetTimeOnly(element:JsonElement) =
+        let timeString = element.GetString()
+        TimeOnly.TryParse(timeString, CultureInfo.InvariantCulture)
+
+    [<Extension>]
+    static member TryGetTimeOnlyExact(element:JsonElement, format:string) =
+        let timeString = element.GetString()
+        TimeOnly.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    [<Extension>]
+    static member TryGetDateOnly(element:JsonElement) =
+        let dateString = element.GetString()
+        DateOnly.TryParse(dateString, CultureInfo.InvariantCulture)
+
+    [<Extension>]
+    static member TryGetDateOnlyExact (element:JsonElement, format:string) =
+        let dateString = element.GetString()
+        DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    #endif
+
     [<Extension>]
     static member TryGetDateTimeUtc(element:JsonElement) =
         match element.TryGetDateTime() with
@@ -37,12 +61,21 @@ type internal JsonElementExtensions() =
         DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
 
     [<Extension>]
+    static member TryGetDateTimeOffsetExact(element:JsonElement, format:string) =
+        let dateString = element.GetString()
+        DateTimeOffset.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    [<Extension>]
     static member TryGetString(element:JsonElement) =
         true, element.GetString()
 
     [<Extension>]
     static member TryGetBoolean(element:JsonElement) =
         true, element.GetBoolean()
+
+    [<Extension>]
+    static member TryGetUnit(element:JsonElement) =
+        element.ValueKind = Kind.Null, ()
 
     [<Extension>]
     static member TryGetPropertyCount(element:JsonElement) =

@@ -206,7 +206,28 @@ module Parse =
     /// Parses a string as System.Guid.
     let guid = getValue _.TryGetGuid() Kind.String
 
+    /// Parses null as FSharp.Core.Unit.
+    let unit = getValue _.TryGetUnit() Kind.Null
+
     // Dates
+
+    #if NET8_0_OR_GREATER
+
+    /// Parses a string as System.TimeOnly.
+    let timeOnly = getValue _.TryGetTimeOnly() Kind.String
+
+    /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let timeOnlyExact (format:string) = getValue _.TryGetTimeOnlyExact(format) Kind.String
+
+    /// Parses a string as System.DateOnly (ISO 8601).
+    let dateOnly = getValue _.TryGetDateOnly() Kind.String
+
+    /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let dateOnlyExact (format:string) = getValue _.TryGetDateOnlyExact(format) Kind.String
+
+    #endif
 
     /// Parses a string as System.DateTime (ISO 8601).
     let dateTime = getValue _.TryGetDateTime() Kind.String
@@ -214,12 +235,16 @@ module Parse =
     /// Parses a string as System.DateTime (ISO 8601) and converts it to UTC.
     let dateTimeUtc = getValue _.TryGetDateTimeUtc() Kind.String
 
-    /// Parses a string as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
-
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
     let dateTimeExact (format:string) = getValue _.TryGetDateTimeExact(format) Kind.String
+
+    /// Parses a string as System.DateTimeOffset (ISO 8601).
+    let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
+
+    /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let dateTimeOffsetExact (format:string) = getValue _.TryGetDateTimeOffsetExact(format) Kind.String
 
     // Sequences
 

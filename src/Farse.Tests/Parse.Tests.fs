@@ -8,7 +8,7 @@ open Farse
 module Parse =
 
     [<Fact>]
-    let ``Should parse number as some int`` () =
+    let ``Should parse number as Some int`` () =
         let expected = Some 1
         let actual =
             Parse.opt "prop" Parse.int
@@ -17,7 +17,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse null as none`` () =
+    let ``Should parse null as None`` () =
         let expected = None
         let actual =
             Parse.opt "prop" Parse.int
@@ -45,7 +45,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse nested null as none with optional parsers`` () =
+    let ``Should parse nested null as None with optional parsers`` () =
         let expected = Some None
         let actual =
             let parser = Parse.opt "prop3" Parse.int
@@ -55,7 +55,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse nested number as some int with mixed parsers`` () =
+    let ``Should parse nested number as Some int with mixed parsers`` () =
         let expected = Some 1
         let actual =
             let parser = Parse.req "prop3" Parse.int
@@ -65,7 +65,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse nested null as none``() =
+    let ``Should parse nested null as None``() =
         let expected = None
         let actual =
             Parse.opt "prop.prop2.prop3" Parse.int
@@ -74,7 +74,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse nested null object as none`` () =
+    let ``Should parse nested null object as None`` () =
         let expected = None
         let actual =
             Parse.opt "prop.prop2.prop3" Parse.int
@@ -83,7 +83,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse nested null object as none with mixed parsers`` () =
+    let ``Should parse nested null object as None with mixed parsers`` () =
         let expected = None
         let actual =
             let parser = Parse.req "prop3" Parse.int
@@ -219,7 +219,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse string as guid`` () =
+    let ``Should parse string as Guid`` () =
         let expected = Guid.Empty
         let actual =
             Parse.req "prop" Parse.guid
@@ -228,7 +228,52 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse string as datetime`` () =
+    let ``Should parse null as unit`` () =
+        let expected = ()
+        let actual =
+            Parse.req "prop" Parse.unit
+            |> Parser.parse """{ "prop": null }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as TimeOnly`` () =
+        let expected = TimeOnly.Parse("17:28:45")
+        let actual =
+            Parse.req "prop" Parse.timeOnly
+            |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as TimeOnly exact`` () =
+        let expected = TimeOnly.Parse("17:28:45")
+        let actual =
+            Parse.req "prop" (Parse.timeOnlyExact "HHmmss")
+            |> Parser.parse """{ "prop": "172845" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as DateOnly`` () =
+        let expected = DateOnly.Parse("2025-05-13")
+        let actual =
+            Parse.req "prop" Parse.dateOnly
+            |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as DateOnly exact`` () =
+        let expected = DateOnly.Parse("2025-05-13")
+        let actual =
+            Parse.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
+            |> Parser.parse """{ "prop": "20250513" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as DateTime`` () =
         let expected = DateTime.Parse("2025-05-13T17:28:45")
         let actual =
             Parse.req "prop" Parse.dateTime
@@ -237,7 +282,7 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse string as datetime utc`` () =
+    let ``Should parse string as DateTime utc`` () =
         let now = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00))
         let expected = now.ToUniversalTime()
         let actual =
@@ -247,20 +292,29 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse string as datetime exact`` () =
-        let expected = DateTime.Parse("2025-05-13 17:28")
+    let ``Should parse string as DateTime exact`` () =
+        let expected = DateTime.Parse("2025-05-13T17:28:45")
         let actual =
-            Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm")
-            |> Parser.parse """{ "prop": "2025-05-13 17:28" }"""
+            Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
+            |> Parser.parse """{ "prop": "2025-05-13 17:28:45" }"""
             |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse string as datetime offset`` () =
+    let ``Should parse string as DateTimeOffset`` () =
         let expected = DateTime.Parse("2025-05-13T17:28:45+02:00")
         let actual =
             Parse.req "prop" Parse.dateTime
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45+02:00" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as DateTimeOffset exact`` () =
+        let expected = DateTimeOffset.Parse("2025-05-13T17:28:00+02:00")
+        let actual =
+            Parse.req "prop" (Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz")
+            |> Parser.parse """{ "prop": "2025-05-13 17:28 +02:00" }"""
             |> Expect.ok
         Expect.equal actual expected
 
