@@ -36,15 +36,24 @@ module Parse =
             | Error msg -> Error.parseError name msg element
         | Error e -> Error e
 
+    let private rewriteError (current:JsonElement) previous path =
+        let name = Array.last path
+        let expected =
+            if current.ValueKind = Kind.Array
+            then current.Item 0
+            else current
+
+        Error.notObjectTrav name previous expected
+
+    // Pretty rowdy, but it works.
     let private trav (path:string array) parser element =
         let mutable last = Ok element
         let mutable previous = element
         let mutable previousName = path[0]
 
-        // Pretty rowdy, but it works.
         for i in 0 .. path.Length - 1 do
             match last with
-            | Ok (element:JsonElement) when element.ValueKind = Kind.Object ->
+            | Ok element when JsonElement.getKind element = Kind.Object ->
                 last <- getProperty path[i] element
                 previous <- element
                 previousName <- path[i]
@@ -58,46 +67,35 @@ module Parse =
         | Ok prop ->
             match parser prop with
             | Ok x -> Ok x
-            | Error e when String.startsWith "Error: Could not read" e ->
-                let name = Array.last path
-                let expected =
-                    if prop.ValueKind = Kind.Array
-                    then prop.Item 0
-                    else prop
-
-                Error.notObjectTrav name previous expected
+            | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop previous path
             | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.parseError previousName msg previous
         | Error e -> Error e
 
+    // Pretty rowdy, but it works.
     let private tryTrav (path:string array) parser element =
         let mutable last = Ok (Some element)
         let mutable previous = element
         let mutable previousName = path[0]
 
-        // Pretty rowdy, but it works.
         for i in 0 .. path.Length - 1 do
             match last with
-            | Ok (Some (element:JsonElement)) when element.ValueKind = Kind.Object ->
+            | Ok (Some element) when JsonElement.getKind element = Kind.Object ->
                 last <- tryGetProperty path[i] element
                 previous <- element
                 previousName <- path[i]
-            | Ok (Some element) -> last <- Error.notObject path[i] element
+            | Ok (Some element) ->
+                if i = path.Length
+                then last <- Ok (Some element)
+                else last <- Error.notObjectTrav previousName previous element
             | _ -> ()
 
         match last with
         | Ok (Some prop) ->
             match parser prop with
             | Ok x -> Ok (Some x)
-            | Error msg when String.startsWith "Error: Could not read" msg ->
-                let name = Array.last path
-                let expected =
-                    if prop.ValueKind = Kind.Array
-                    then prop.Item 0
-                    else prop
-
-                Error.notObjectTrav name previous expected
-            | Error e when String.startsWith "Error" e -> Error e
+            | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop previous path
+            | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.parseError previousName msg previous
         | Ok None -> Ok None
         | Error e -> Error e

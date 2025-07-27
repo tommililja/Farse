@@ -1,4 +1,6 @@
-﻿Error: Could not read property 'prop2'.
+﻿Error: Could not parse property 'prop'.
 Expected: Object, actual: Array.
-Array:
-[]
+Object:
+{
+    "prop": []
+}

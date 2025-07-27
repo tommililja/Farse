@@ -11,6 +11,9 @@ module internal JsonSerializerOptions =
 
 module internal JsonElement =
 
+    let getKind (element:JsonElement) =
+        element.ValueKind
+
     let getRawText (element:JsonElement) =
         element.GetRawText()
 
