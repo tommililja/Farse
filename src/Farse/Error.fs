@@ -10,7 +10,7 @@ module internal Error =
         |> String.concat "\n"
         |> Error
 
-    let couldNotParse (expectedType:Type) (element:JsonElement) =
+    let couldNotParse (expectedType:Type) element =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let invalidElement (expected:Kind) (actual:Kind) =
@@ -53,9 +53,9 @@ module internal Error =
             "The string was null or empty."
         ]
 
-    let invalidJson str (exn:exn) =
+    let invalidJson json (exn:exn) =
         create [
             "Error: Could not parse JSON string."
             exn.Message
-            $"JSON: '%s{str}'."
+            $"JSON: '%s{json}'."
         ]

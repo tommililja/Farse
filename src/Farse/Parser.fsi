@@ -1,7 +1,7 @@
 namespace Farse
 
 // This seems to solve most type alias problems, but not all.
-// For some reason also increases memory allocations...
+// For some reason it also increases memory allocations...
 
 module Parser =
 

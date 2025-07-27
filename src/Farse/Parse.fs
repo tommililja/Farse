@@ -22,7 +22,7 @@ module Parse =
         | Ok (Some prop) ->
             match parser prop with
             | Ok x -> Ok (Some x)
-            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.parseError name msg element
         | Ok None -> Ok None
         | Error e -> Error e
@@ -32,7 +32,7 @@ module Parse =
         | Ok prop ->
             match parser prop with
             | Ok x -> Ok x
-            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.parseError name msg element
         | Error e -> Error e
 
@@ -59,7 +59,7 @@ module Parse =
         | Ok prop ->
             match parser prop with
             | Ok x -> Ok x
-            | Error msg when String.startsWith "Error: Could not read" msg ->
+            | Error e when String.startsWith "Error: Could not read" e ->
                 let name = Array.last path
                 let expected =
                     if prop.ValueKind = Kind.Array
@@ -67,7 +67,7 @@ module Parse =
                     else prop
 
                 Error.notObjectTrav name previous expected
-            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.parseError previousName msg previous
         | Error e -> Error e
 
@@ -98,7 +98,7 @@ module Parse =
                     else prop
 
                 Error.notObjectTrav name previous expected
-            | Error msg when String.startsWith "Error" msg -> Error msg
+            | Error e when String.startsWith "Error" e -> Error e
             | Error msg -> Error.parseError previousName msg previous
         | Ok None -> Ok None
         | Error e -> Error e
@@ -274,5 +274,5 @@ module Parse =
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
     let kind = getValue _.TryGetKind() Kind.Undefined
 
-    /// Does not parse element and returns FSharp.Core.Unit.
+    /// Does not parse an element and returns FSharp.Core.Unit.
     let none = Parser.from ()
