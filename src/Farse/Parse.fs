@@ -48,11 +48,10 @@ module Parse =
                 last <- getProperty path[i] element
                 previous <- element
                 previousName <- path[i]
-            | Ok element when element.ValueKind = Kind.Null || element.ValueKind = Kind.Undefined ->
+            | Ok element ->
                 if i = path.Length
                 then last <- Ok element
                 else last <- Error.notObjectTrav previousName previous element
-            | Ok element -> last <- Error.notObject path[i] element
             | _ -> ()
 
         match last with
