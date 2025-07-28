@@ -10,7 +10,7 @@ module internal Error =
         |> String.concat "\n"
         |> Error
 
-    let couldNotParse (expectedType:Type) element =
+    let invalidType (expectedType:Type) element =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
     let invalidElement (expected:Kind) (actual:Kind) =
@@ -40,7 +40,7 @@ module internal Error =
             print previous
         ]
 
-    let parseError name msg element =
+    let couldNotParse name msg element =
         create [
             $"Error: Could not parse property '%s{name}'."
             msg

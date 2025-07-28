@@ -4,37 +4,29 @@ open System.Text.Json
 
 module Parse =
 
-    let private getProperty (name:string) (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.Object -> Ok (snd (element.TryGetProperty(name)))
-        | _ -> Error.couldNotRead name element
+    let private parse name parser =
+        fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Object ->
+                let prop = JsonElement.getProperty name element
+                match parser prop with
+                | Ok x -> Ok x
+                | Error e when String.startsWith "Error:" e -> Error e
+                | Error msg -> Error.couldNotParse name msg element
+            | _ -> Error.couldNotRead name element
 
-    let private tryGetProperty (name:string) (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.Object ->
-            match element.TryGetProperty(name) with
-            | true, prop when prop.ValueKind <> Kind.Null -> Ok (Some prop)
-            | _ -> Ok None
-        | _ -> Error.couldNotRead name element
-
-    let private tryParse name parser element =
-        match tryGetProperty name element with
-        | Ok (Some prop) ->
-            match parser prop with
-            | Ok x -> Ok (Some x)
-            | Error e when String.startsWith "Error:" e -> Error e
-            | Error msg -> Error.parseError name msg element
-        | Ok None -> Ok None
-        | Error e -> Error e
-
-    let private parse name parser element =
-        match getProperty name element with
-        | Ok prop ->
-            match parser prop with
-            | Ok x -> Ok x
-            | Error e when String.startsWith "Error:" e -> Error e
-            | Error msg -> Error.parseError name msg element
-        | Error e -> Error e
+    let private tryParse name parser =
+        fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Object ->
+                match JsonElement.tryGetProperty name element with
+                | Some prop ->
+                    match parser prop with
+                    | Ok x -> Ok <| Some x
+                    | Error e when String.startsWith "Error:" e -> Error e
+                    | Error msg -> Error.couldNotParse name msg element
+                | None -> Ok None
+            | _ -> Error.couldNotRead name element
 
     let private rewriteError (current:JsonElement) previous path =
         let name = Array.last path
@@ -54,7 +46,7 @@ module Parse =
         for i in 0 .. path.Length - 1 do
             match last with
             | Ok element when JsonElement.getKind element = Kind.Object ->
-                last <- getProperty path[i] element
+                last <- Ok <| JsonElement.getProperty path[i] element
                 previous <- element
                 previousName <- path[i]
             | Ok element ->
@@ -69,7 +61,7 @@ module Parse =
             | Ok x -> Ok x
             | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop previous path
             | Error e when String.startsWith "Error:" e -> Error e
-            | Error msg -> Error.parseError previousName msg previous
+            | Error msg -> Error.couldNotParse previousName msg previous
         | Error e -> Error e
 
     // Pretty rowdy, but it works.
@@ -81,22 +73,22 @@ module Parse =
         for i in 0 .. path.Length - 1 do
             match last with
             | Ok (Some element) when JsonElement.getKind element = Kind.Object ->
-                last <- tryGetProperty path[i] element
+                last <- Ok <| JsonElement.tryGetProperty path[i] element
                 previous <- element
                 previousName <- path[i]
             | Ok (Some element) ->
                 if i = path.Length
-                then last <- Ok (Some element)
+                then last <- Ok <| Some element
                 else last <- Error.notObject previousName previous element
             | _ -> ()
 
         match last with
         | Ok (Some prop) ->
             match parser prop with
-            | Ok x -> Ok (Some x)
+            | Ok x -> Ok <| Some x
             | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop previous path
             | Error e when String.startsWith "Error:" e -> Error e
-            | Error msg -> Error.parseError previousName msg previous
+            | Error msg -> Error.couldNotParse previousName msg previous
         | Ok None -> Ok None
         | Error e -> Error e
 
@@ -133,7 +125,7 @@ module Parse =
 
                 match error with
                 | Some e -> Error e
-                | None -> Ok (convert array)
+                | None -> Ok <| convert array
             | _ ->
                 element.ValueKind
                 |> Error.invalidElement Kind.Array
@@ -151,7 +143,7 @@ module Parse =
                 | true, x -> Ok x
                 | _ ->
                     element
-                    |> Error.couldNotParse typeof<'a>
+                    |> Error.invalidType typeof<'a>
                     |> Error
             else
                 element.ValueKind

@@ -15,7 +15,7 @@ module Parser =
     let bind (fn:_ -> Parser<_>) (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
-            | Ok x -> (fn x) element
+            | Ok x -> element |> fn x
             | Error e -> Error e
 
     /// <summary>Maps the parsed value with the given function.</summary>
