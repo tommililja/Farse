@@ -26,14 +26,14 @@ module internal Error =
         | Kind.Null | Kind.Undefined -> String.Empty
         | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
 
-    let notObject name (element:JsonElement) =
+    let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."
             invalidElement Kind.Object element.ValueKind
             print element
         ]
 
-    let notObjectTrav name (previous:JsonElement) (element:JsonElement) =
+    let notObject name (previous:JsonElement) (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
             invalidElement Kind.Object element.ValueKind

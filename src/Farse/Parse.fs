@@ -7,7 +7,7 @@ module Parse =
     let private getProperty (name:string) (element:JsonElement) =
         match element.ValueKind with
         | Kind.Object -> Ok (snd (element.TryGetProperty(name)))
-        | _ -> Error.notObject name element
+        | _ -> Error.couldNotRead name element
 
     let private tryGetProperty (name:string) (element:JsonElement) =
         match element.ValueKind with
@@ -15,7 +15,7 @@ module Parse =
             match element.TryGetProperty(name) with
             | true, prop when prop.ValueKind <> Kind.Null -> Ok (Some prop)
             | _ -> Ok None
-        | _ -> Error.notObject name element
+        | _ -> Error.couldNotRead name element
 
     let private tryParse name parser element =
         match tryGetProperty name element with
@@ -43,7 +43,7 @@ module Parse =
             then current.Item 0
             else current
 
-        Error.notObjectTrav name previous expected
+        Error.notObject name previous expected
 
     // Pretty rowdy, but it works.
     let private trav (path:string array) parser element =
@@ -60,7 +60,7 @@ module Parse =
             | Ok element ->
                 if i = path.Length
                 then last <- Ok element
-                else last <- Error.notObjectTrav previousName previous element
+                else last <- Error.notObject previousName previous element
             | _ -> ()
 
         match last with
@@ -87,7 +87,7 @@ module Parse =
             | Ok (Some element) ->
                 if i = path.Length
                 then last <- Ok (Some element)
-                else last <- Error.notObjectTrav previousName previous element
+                else last <- Error.notObject previousName previous element
             | _ -> ()
 
         match last with
