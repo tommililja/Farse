@@ -2,5 +2,5 @@
 Expected: Object, actual: Array.
 Object:
 {
-    "prop": []
+  "prop": []
 }

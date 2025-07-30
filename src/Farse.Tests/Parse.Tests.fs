@@ -346,15 +346,6 @@ module Parse =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse object property count as int`` () =
-        let expected = 2
-        let actual =
-            Parse.req "prop" Parse.propertyCount
-            |> Parser.parse """{ "prop": { "prop2": 1, "prop": 2 } }"""
-            |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
     let ``Should parse array length as int`` () =
         let expected = 3
         let actual =

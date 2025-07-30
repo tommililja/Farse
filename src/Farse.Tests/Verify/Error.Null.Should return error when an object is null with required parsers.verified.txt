@@ -2,5 +2,5 @@
 Expected: Object, actual: Null.
 Object:
 {
-    "prop": null
+  "prop": null
 }

@@ -200,7 +200,7 @@ module Parse =
 
     // Dates
 
-    #if NET8_0_OR_GREATER
+    #if NET7_0_OR_GREATER
 
     /// Parses a string as System.TimeOnly.
     let timeOnly = getValue _.TryGetTimeOnly() Kind.String
@@ -253,9 +253,6 @@ module Parse =
         seq Set.ofSeq parser
 
     // Misc
-
-    /// Parses an object's property count as System.Int32.
-    let propertyCount = getValue _.TryGetPropertyCount() Kind.Object
 
     /// Parses an array's length as System.Int32.
     let arrayLength = getValue _.TryGetArrayLength() Kind.Array

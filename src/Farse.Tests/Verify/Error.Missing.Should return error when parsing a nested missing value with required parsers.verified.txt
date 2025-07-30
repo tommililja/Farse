@@ -2,5 +2,5 @@
 Expected: Number, actual: Undefined.
 Object:
 {
-    "prop3": 1
+  "prop3": 1
 }

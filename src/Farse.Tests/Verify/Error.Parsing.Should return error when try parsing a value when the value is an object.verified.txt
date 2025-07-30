@@ -2,7 +2,7 @@
 Expected: Number, actual: Object.
 Object:
 {
-    "prop": {
-        "prop2": null
-    }
+  "prop": {
+    "prop2": null
+  }
 }

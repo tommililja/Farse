@@ -7,7 +7,7 @@ open System.Text.Json
 
 module internal JsonSerializerOptions =
 
-    let preset = JsonSerializerOptions(IndentSize = 4, WriteIndented = true)
+    let preset = JsonSerializerOptions(WriteIndented = true)
 
 module internal JsonElement =
 
@@ -36,7 +36,7 @@ type internal JsonElementExtensions() =
         | str when str.Length = 1 -> true, str[0]
         | _ -> false, Char.MinValue
 
-    #if NET8_0_OR_GREATER
+    #if NET7_0_OR_GREATER
 
     [<Extension>]
     static member TryGetTimeOnly(element:JsonElement) =
@@ -87,10 +87,6 @@ type internal JsonElementExtensions() =
     [<Extension>]
     static member TryGetUnit(element:JsonElement) =
         element.ValueKind = Kind.Null, ()
-
-    [<Extension>]
-    static member TryGetPropertyCount(element:JsonElement) =
-        true, element.GetPropertyCount()
 
     [<Extension>]
     static member TryGetArrayLength(element:JsonElement) =

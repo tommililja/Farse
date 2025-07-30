@@ -2,9 +2,9 @@
 Expected: String, actual: Number.
 Object:
 {
-    "prop2": [
-        1,
-        2,
-        3
-    ]
+  "prop2": [
+    1,
+    2,
+    3
+  ]
 }
