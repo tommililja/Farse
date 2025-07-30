@@ -71,7 +71,7 @@ module JsonString =
         |> JsonString
 
     /// <summary>Converts the JsonString to a formatted string.</summary>
-    /// <remarks>IndentSize = 4, WriteIndented = true.</remarks>
+    /// <remarks>WriteIndented = true.</remarks>
     /// <typeparam name="JsonString">The JsonString to convert.</typeparam>
     let asString (JsonString x) =
         x.ToJsonString(JsonSerializerOptions.preset)
