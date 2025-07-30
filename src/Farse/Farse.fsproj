@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Farse</AssemblyName>
         <Authors>Tommi Lilja</Authors>
@@ -39,7 +39,7 @@
         <Content Include="../../LICENSE.md" Visible="false" Pack="true" PackagePath="\" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="FSharp.Core"/>
-        <PackageReference Include="System.Text.Json"/>
+        <PackageReference Include="System.Text.Json" Version="9.0.7"/>
+        <PackageReference Update="FSharp.Core" Version="6.0.0" />
     </ItemGroup>
 </Project>

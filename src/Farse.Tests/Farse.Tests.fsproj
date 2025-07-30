@@ -12,19 +12,18 @@
         <Compile Include="JsonString.Tests.fs" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="coverlet.collector">
+        <PackageReference Include="coverlet.collector" Version="6.0.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Expecto" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="Verify.XunitV3" />
-        <PackageReference Include="xunit.runner.visualstudio">
+        <PackageReference Include="Expecto" Version="10.2.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
+        <PackageReference Include="Verify.XunitV3" Version="30.5.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FSharp.Core"/>
-        <PackageReference Include="xunit.v3" />
+        <PackageReference Include="xunit.v3" Version="3.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Farse\Farse.fsproj"/>
