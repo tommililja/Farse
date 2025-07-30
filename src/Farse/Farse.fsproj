@@ -1,17 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Farse</AssemblyName> 
-        <TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
+        <Authors>Tommi Lilja</Authors>
+        <Copyright>Copyright © Tommi Lilja 2025</Copyright>
+        <Description>Simple parsing library for F# using System.Text.Json</Description>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>Farse</PackageId>
-        <Version>0.1.9-alpha</Version>
-        <Authors>Tommi Lilja</Authors>
-        <Copyright>Copyright © 2025</Copyright>
-        <RepositoryUrl>https://github.com/tommililja/Farse</RepositoryUrl>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <PackageLicenseUrl>https://github.com/tommililja/Farse/blob/main/LICENSE.md</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/tommililja/Farse</PackageProjectUrl>
         <PackageReadMeFile>README.md</PackageReadMeFile>
-        <Description>Simple parsing library for F# using System.Text.Json</Description>
         <PackageTags>fsharp;parsing;json</PackageTags>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryUrl>https://github.com/tommililja/Farse</RepositoryUrl>
+        <TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
+        <Title>Farse</Title>
+        <Version>0.1.9-alpha</Version>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Types.fs" />
