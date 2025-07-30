@@ -9,6 +9,7 @@ type JNumber =
     | Decimal of decimal
     | Byte of byte
 
+[<NoComparison>]
 type JValue =
     | JStr of string
     | JNum of JNumber
@@ -52,6 +53,7 @@ module internal JValue =
             |> Option.defaultValue null
         | JNil -> null
 
+[<NoComparison>]
 type JsonString = JsonString of JsonObject
 
 module JsonString =
