@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Farse</AssemblyName>
         <Authors>Tommi Lilja</Authors>
@@ -21,7 +21,7 @@
         <RootNamespace>Farse</RootNamespace>
         <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
         <Title>Farse</Title>
-        <Version>0.1.9-alpha</Version>
+        <Version>0.2.0</Version>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Types.fs" />
