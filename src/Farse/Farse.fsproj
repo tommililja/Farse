@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Farse</AssemblyName>
         <Authors>Tommi Lilja</Authors>
-        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild> 
+        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <Copyright>Copyright © Tommi Lilja 2025</Copyright>
-        <DebugType>embedded</DebugType> 
+        <DebugType>embedded</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json</Description>
         <Deterministic>true</Deterministic>
         <EmbedAllSources>true</EmbedAllSources>
@@ -16,7 +16,7 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageTags>fsharp;parsing;json</PackageTags>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <RepositoryType>git</RepositoryType> 
+        <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/tommililja/Farse</RepositoryUrl>
         <RootNamespace>Farse</RootNamespace>
         <TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
