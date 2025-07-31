@@ -4,8 +4,8 @@ namespace Farse
 
 open System.Text.Json
 
-// The type alias does not work in some function signatures and
-// fixing it increases memory allocations, so leaving it for now.
+// The type alias does not work in some function signatures.
+// Fixing it increases memory allocations, so leaving it for now.
 
 module Parser =
 
