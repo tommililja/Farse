@@ -1,5 +1,7 @@
 namespace Farse
 
+#nowarn "3390"
+
 open System.Text.Json
 
 module Parser =
