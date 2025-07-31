@@ -11,10 +11,8 @@ Farse uses a slightly different syntax, includes a computation expression, and a
 
 ## Installation
 
-Things are still changing but a pre-release version is available.
-
 ```shell
-dotnet add package Farse --prerelease
+dotnet add package Farse
 ```
 
 ## Benchmarks
