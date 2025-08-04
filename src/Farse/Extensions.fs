@@ -4,6 +4,7 @@ open System
 open System.Globalization
 open System.Runtime.CompilerServices
 open System.Text.Json
+open System.Text.Json.Nodes
 
 type internal Kind = JsonValueKind
 
@@ -29,6 +30,13 @@ module internal JsonElement =
 
     let getJson (element:JsonElement) =
         JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
+
+module internal JsonNode =
+
+    let create x = JsonValue.Create<'a>(x).Root
+
+    let asString (node:JsonNode) =
+        node.ToJsonString(JsonSerializerOptions.preset)
 
 type internal JsonElementExtensions() =
 

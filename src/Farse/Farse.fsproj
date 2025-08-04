@@ -30,7 +30,7 @@
         <Compile Include="Parser.fs"/>
         <Compile Include="Parser.Builder.fs" />
         <Compile Include="Parse.fs" />
-        <Compile Include="JsonString.fs"/>
+        <Compile Include="Json.fs" />
         <Compile Include="Operators.fs" />
     </ItemGroup>
     <ItemGroup>
