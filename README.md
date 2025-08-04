@@ -254,7 +254,7 @@ JObj [
 ]
 ```
 
-> This creates an object but you can create any other type and convert it with **Json.asString**.
+> This creates an object, but you can create any other type and convert it with Json.asString.
 
 ## Errors
 
