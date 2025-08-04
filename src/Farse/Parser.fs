@@ -6,6 +6,7 @@ open System.Text.Json
 
 // The type alias does not work in some function signatures.
 // Fixing it increases memory allocations, so leaving it for now.
+type Parser<'a> = JsonElement -> Result<'a, string>
 
 module Parser =
 

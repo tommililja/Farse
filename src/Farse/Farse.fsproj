@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Farse</AssemblyName>
         <Authors>Tommi Lilja</Authors>
@@ -25,7 +25,6 @@
         <Version>0.2.0</Version>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Types.fs" />
         <Compile Include="Extensions.fs"/>
         <Compile Include="Error.fs" />
         <Compile Include="Parser.fs"/>

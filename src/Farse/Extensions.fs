@@ -5,6 +5,8 @@ open System.Globalization
 open System.Runtime.CompilerServices
 open System.Text.Json
 
+type internal Kind = JsonValueKind
+
 module internal JsonSerializerOptions =
 
     let preset = JsonSerializerOptions(WriteIndented = true)
