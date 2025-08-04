@@ -226,7 +226,7 @@ printf "%s" user.Name
 
 ## Creating JSON
 
-We can also create JSON strings with the **Json** type.
+We can also create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
 ```fsharp
 JObj [
@@ -242,15 +242,14 @@ JObj [
         |> List.ofSeq
         |> List.map (ProfileId.asString >> JStr)
         |> JArr
-    "subscription",
-        JObj [
-            "plan", JStr <| Plan.asString user.Subscription.Plan
-            "isCanceled", JBit user.Subscription.IsCanceled
-            "renewsAt",
-                user.Subscription.RenewsAt
-                |> Option.map (DateTime.asString >> JStr)
-                |> JOpt
-        ]
+    "subscription", JObj [
+        "plan", JStr <| Plan.asString user.Subscription.Plan
+        "isCanceled", JBit user.Subscription.IsCanceled
+        "renewsAt",
+            user.Subscription.RenewsAt
+            |> Option.map (DateTime.asString >> JStr)
+            |> JOpt
+    ]
 ]
 ```
 
