@@ -5,7 +5,7 @@
 
 >Simple parsing library for F# using System.Text.Json.
 
-Inspired by [Thoth.Json.Net](https://github.com/thoth-org/Thoth.Json.Net) and its composability.
+Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
 Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while still producing acceptable error messages.
 
@@ -74,7 +74,7 @@ let (&=) = Parse.req
 let (?=) = Parse.opt
 ```
 
-We can create the following parser.
+We can create a parser.
 
 ```fsharp
 open Farse
@@ -106,7 +106,7 @@ module User =
 
             // Simple "path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
-            let! isCanceled = "subscription.isCanceled" &= bool
+            let! _isCanceled = "subscription.isCanceled" &= bool
       
             return {
                 Id = id
@@ -224,42 +224,37 @@ let user =
 printf "%s" user.Name
 ```
 
-## JsonString
+## Creating JSON
 
-We can also create JSON strings.
+We can also create JSON strings with the **Json** type.
 
 ```fsharp
-let jsonString =
-    JsonString.create [
-        "id", JStr <| UserId.asString user.Id
-        "name", JStr user.Name
-        "age",
-            user.Age
-            |> Option.map (Age.asByte >> Byte >> JNum)
-            |> JOpt
-        "email", JStr <| Email.asString user.Email
-        "profiles",
-            user.Profiles
-            |> List.ofSeq
-            |> List.map (ProfileId.asString >> JStr)
-            |> JArr
-        "subscription",
-            JObj [
-                "plan", JStr <| Plan.asString user.Subscription.Plan
-                "isCanceled", JBit user.Subscription.IsCanceled
-                "renewsAt",
-                    user.Subscription.RenewsAt
-                    |> Option.map (DateTime.asString >> JStr)
-                    |> JOpt
-            ]
-    ]
-
-let json =
-    jsonString
-    |> JsonString.asString
-
-printf "%s" json
+JObj [
+    "id", JStr <| UserId.asString user.Id
+    "name", JStr user.Name
+    "age",
+        user.Age
+        |> Option.map (Age.asByte >> Byte >> JNum)
+        |> JOpt
+    "email", JStr <| Email.asString user.Email
+    "profiles",
+        user.Profiles
+        |> List.ofSeq
+        |> List.map (ProfileId.asString >> JStr)
+        |> JArr
+    "subscription",
+        JObj [
+            "plan", JStr <| Plan.asString user.Subscription.Plan
+            "isCanceled", JBit user.Subscription.IsCanceled
+            "renewsAt",
+                user.Subscription.RenewsAt
+                |> Option.map (DateTime.asString >> JStr)
+                |> JOpt
+        ]
+]
 ```
+
+> This creates an object but you can create any other type and convert it with **Json.asString**.
 
 ## Errors
 
@@ -270,8 +265,8 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 Expected: Number, actual: String.
 Object:
 {
-    "prop": "1"
+  "prop": "1"
 }
 ```
 
->Farse doesn't throw exceptions and only catches **JsonException**, that is thrown when parsing invalid JSON.
+> Farse doesn't throw exceptions and only catches **JsonException**, that is thrown when parsing invalid JSON.
