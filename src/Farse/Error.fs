@@ -33,7 +33,7 @@ module internal Error =
             print element
         ]
 
-    let notObject name (previous:JsonElement) (element:JsonElement) =
+    let notObject name previous (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
             invalidElement Kind.Object element.ValueKind
