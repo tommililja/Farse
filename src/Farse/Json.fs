@@ -14,8 +14,8 @@ type Json =
     | JStr of string
     | JNum of JNum
     | JBit of bool
-    | JObj of JsonProperty list
-    | JArr of Json list
+    | JObj of JsonProperty seq
+    | JArr of Json seq
     | JOpt of Json option
     | JNil
 
