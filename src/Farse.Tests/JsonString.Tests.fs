@@ -8,10 +8,10 @@ module JsonString =
     [<Fact>]
     let ``Should create expected JSON object`` () =
         JObj [
-            "int", JNum <| Int 123456789
-            "float", JNum <| Float 123.12
-            "decimal", JNum <| Decimal 123.12m
-            "byte", JNum <| Byte 128uy
+            "int", JNum 123
+            "float", JNum 123.12
+            "decimal", JNum 123.12m
+            "byte", JNum 123uy
             "string", JStr "string"
             "bool", JBit true
             "object", JObj [
@@ -20,8 +20,8 @@ module JsonString =
             "array", JArr [
                 JStr "string"
             ]
-            "option", JOpt <| Some (JStr "string")
-            "nil", JNil
+            "some", JNil <| Some (JStr "string")
+            "none", JNil None
         ]
         |> Json.asString
         |> Expect.string

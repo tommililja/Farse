@@ -1,8 +1,8 @@
 ﻿{
-  "int": 123456789,
+  "int": 123,
   "float": 123.12,
   "decimal": 123.12,
-  "byte": 128,
+  "byte": 123,
   "string": "string",
   "bool": true,
   "object": {
@@ -11,6 +11,6 @@
   "array": [
     "string"
   ],
-  "option": "string",
-  "nil": null
+  "some": "string",
+  "none": null
 }
