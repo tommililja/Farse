@@ -5,6 +5,7 @@
         <GenerateProgramFile>false</GenerateProgramFile>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Examples.fs" />
         <Compile Include="Extensions.fs" />
         <Compile Include="Error.Tests.fs" />
         <Compile Include="Parse.Tests.fs" />
