@@ -239,15 +239,14 @@ JObj [
     "email", JStr <| Email.asString user.Email
     "profiles",
         user.Profiles
-        |> List.ofSeq
-        |> List.map (ProfileId.asString >> JStr)
+        |> Seq.map (ProfileId.asString >> JStr)
         |> JArr
     "subscription", JObj [
         "plan", JStr <| Plan.asString user.Subscription.Plan
         "isCanceled", JBit user.Subscription.IsCanceled
         "renewsAt",
             user.Subscription.RenewsAt
-            |> Option.map (DateTime.asString >> JStr)
+            |> Option.map (_.ToString() >> JStr)
             |> JOpt
     ]
 ]
