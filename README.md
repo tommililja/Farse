@@ -157,7 +157,7 @@ module Email =
     let asString (Email x) = x
 
     let fromString str =
-        // Some validation
+        // Some validation.
         Ok <| Email str
 
     let parser =
@@ -228,14 +228,16 @@ printf "%s" user.Name
 
 We can also create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
+> Note: JNum has overloads. Use JNum.int if you want to be more explicit.
+
 ```fsharp
 JObj [
     "id", JStr <| UserId.asString user.Id
     "name", JStr user.Name
     "age",
         user.Age
-        |> Option.map (Age.asByte >> Byte >> JNum)
-        |> JOpt
+        |> Option.map (Age.asByte >> JNum)
+        |> JNil
     "email", JStr <| Email.asString user.Email
     "profiles",
         user.Profiles
@@ -247,12 +249,12 @@ JObj [
         "renewsAt",
             user.Subscription.RenewsAt
             |> Option.map (_.ToString() >> JStr)
-            |> JOpt
+            |> JNil
     ]
 ]
 ```
 
-> This creates an object, but you can create any other type and convert it with Json.asString.
+> This creates an object, but you can create any type and convert it with Json.asString.
 
 ## Errors
 
