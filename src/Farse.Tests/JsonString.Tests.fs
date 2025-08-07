@@ -19,9 +19,11 @@ module JsonString =
             ]
             "array", JArr [
                 JStr "string"
+                JNon
             ]
             "some", JNil <| Some (JStr "string")
             "none", JNil None
+            "missing", JNon
         ]
         |> Json.asString
         |> Expect.string

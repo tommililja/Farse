@@ -33,10 +33,14 @@ module internal JsonElement =
 
 module internal JsonNode =
 
-    let create x = JsonValue.Create<'a>(x).Root
+    let create x =
+        JsonValue.Create<'a>(x)
+            .Root
 
     let asString (node:JsonNode) =
-        node.ToJsonString(JsonSerializerOptions.preset)
+        if node = null
+        then "null"
+        else node.ToJsonString(JsonSerializerOptions.preset)
 
 type internal JsonElementExtensions() =
 
