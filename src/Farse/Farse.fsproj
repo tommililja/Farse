@@ -6,8 +6,8 @@
         <Copyright>Copyright © Tommi Lilja 2025</Copyright>
         <DebugType>embedded</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json</Description>
-        <Deterministic>true</Deterministic>
-        <DeterministicSourcePaths>true</DeterministicSourcePaths>
+        <Deterministic Condition="'$(Configuration)' == 'Release'">true</Deterministic>
+        <DeterministicSourcePaths Condition="'$(Configuration)' == 'Release'">true</DeterministicSourcePaths>
         <EmbedAllSources>true</EmbedAllSources>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
