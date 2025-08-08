@@ -209,6 +209,18 @@ module Error =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return error when parsing a null value with composed parsers`` () =
+            Parse.req "prop" (Parse.req "prop2" Parse.string)
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return error when try parsing a null value with composed parsers`` () =
+            Parse.opt "prop" (Parse.req "prop2" Parse.string)
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return error when parsing a nested null value`` () =
             Parse.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": null } }"""
@@ -261,6 +273,18 @@ module Error =
         let ``Should return error when parsing a missing value`` () =
             Parse.req "missing" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return error when parsing a missing value with composed parsers`` () =
+            Parse.req "prop" (Parse.req "missing" Parse.string)
+            |> Parser.parse """{ "prop": { "prop2": "1" } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return error when try parsing a missing value with composed parsers`` () =
+            Parse.opt "prop" (Parse.req "missing" Parse.string)
+            |> Parser.parse """{ "prop": { "prop2": "1" } }"""
             |> Expect.errorString
 
         [<Fact>]

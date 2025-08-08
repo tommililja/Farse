@@ -4,6 +4,15 @@ open System.Text.Json
 
 module Parse =
 
+    let private rewriteError (current:JsonElement) previous path =
+        let name = Array.last path
+        let expected =
+            if current.ValueKind = Kind.Array
+            then current.Item 0
+            else current
+
+        Error.notObject name previous expected
+
     let private parse name parser =
         fun (element:JsonElement) ->
             match element.ValueKind with
@@ -11,6 +20,7 @@ module Parse =
                 let prop = JsonElement.getProperty name element
                 match parser prop with
                 | Ok x -> Ok x
+                | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop element [| name |]
                 | Error e when String.startsWith "Error:" e -> Error e
                 | Error msg -> Error.couldNotParse name msg element
             | _ -> Error.couldNotRead name element
@@ -23,19 +33,11 @@ module Parse =
                 | Some prop ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
+                    | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop element [| name |]
                     | Error e when String.startsWith "Error:" e -> Error e
                     | Error msg -> Error.couldNotParse name msg element
                 | None -> Ok None
             | _ -> Error.couldNotRead name element
-
-    let private rewriteError (current:JsonElement) previous path =
-        let name = Array.last path
-        let expected =
-            if current.ValueKind = Kind.Array
-            then current.Item 0
-            else current
-
-        Error.notObject name previous expected
 
     // Pretty rowdy, but it works.
     let private trav (path:string array) parser element =
