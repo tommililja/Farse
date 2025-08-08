@@ -3,7 +3,9 @@ Expected: Object, actual: Number.
 Object:
 {
   "prop2": [
-    1,
+    {
+      "prop3": "1"
+    },
     2,
     3
   ]

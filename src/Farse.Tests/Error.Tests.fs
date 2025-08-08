@@ -152,28 +152,28 @@ module Error =
         let ``Should return error when parsing an object in an array that contains another kind`` () =
             let parser = Parse.req "prop2" Parse.string
             Parse.req "prop" (Parse.list parser)
-            |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+            |> Parser.parse """{ "prop": [ { "prop2": "1" }, 2, 3 ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return error when parsing a nested object in an array that contains another kind`` () =
             let parser = Parse.req "prop3" Parse.string
             Parse.req "prop.prop2" (Parse.list parser)
-            |> Parser.parse """{ "prop": { "prop2": [ 1, 2, 3 ] } }"""
+            |> Parser.parse """{ "prop": { "prop2": [ { "prop3": "1" }, 2, 3 ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return error when try parsing an object in an array that contains another kind`` () =
             let parser = Parse.opt "prop2" Parse.string
             Parse.opt "prop" (Parse.list parser)
-            |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+            |> Parser.parse """{ "prop": [ { "prop2": "1" }, 2, 3 ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return error when try parsing a nested object in an array that contains another kind`` () =
             let parser = Parse.req "prop3" Parse.string
             Parse.opt "prop.prop2" (Parse.list parser)
-            |> Parser.parse """{ "prop": { "prop2": [ 1, 2, 3 ] } }"""
+            |> Parser.parse """{ "prop": { "prop2": [ { "prop3": "1" }, 2, 3 ] } }"""
             |> Expect.errorString
 
         [<Fact>]

@@ -4,14 +4,13 @@ open System.Text.Json
 
 module Parse =
 
-    let private rewriteError (current:JsonElement) previous path =
+    let private rewriteError (e:string) (current:JsonElement) previous path =
         let name = Array.last path
-        let expected =
-            if current.ValueKind = Kind.Array
-            then current.Item 0
-            else current
-
-        Error.notObject name previous expected
+        if current.ValueKind = Kind.Array
+        then
+            let msg = e.Split("\n")[1]
+            Error.couldNotParse name msg previous
+        else Error.notObject name previous  current
 
     let private parse name parser =
         fun (element:JsonElement) ->
@@ -20,7 +19,7 @@ module Parse =
                 let prop = JsonElement.getProperty name element
                 match parser prop with
                 | Ok x -> Ok x
-                | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop element [| name |]
+                | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop element [| name |]
                 | Error e when String.startsWith "Error:" e -> Error e
                 | Error msg -> Error.couldNotParse name msg element
             | _ -> Error.couldNotRead name element
@@ -33,7 +32,7 @@ module Parse =
                 | Some prop ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
-                    | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop element [| name |]
+                    | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop element [| name |]
                     | Error e when String.startsWith "Error:" e -> Error e
                     | Error msg -> Error.couldNotParse name msg element
                 | None -> Ok None
@@ -61,7 +60,7 @@ module Parse =
         | Ok prop ->
             match parser prop with
             | Ok x -> Ok x
-            | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop previous path
+            | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
             | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.couldNotParse previousName msg previous
         | Error e -> Error e
@@ -88,7 +87,7 @@ module Parse =
         | Ok (Some prop) ->
             match parser prop with
             | Ok x -> Ok <| Some x
-            | Error e when String.startsWith "Error: Could not read" e -> rewriteError prop previous path
+            | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
             | Error e when String.startsWith "Error:" e -> Error e
             | Error msg -> Error.couldNotParse previousName msg previous
         | Ok None -> Ok None
