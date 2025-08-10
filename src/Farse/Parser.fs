@@ -15,34 +15,52 @@ module Parser =
     let from x : Parser<_> =
         fun _ -> Ok x
 
-    /// <summary>Binds the parsed value with the given function.</summary>
-    /// <param name="fn">The binder function.</param>
-    /// <param name="parser">The parser to bind.</param>
-    let bind (fn:_ -> Parser<_>) (parser:Parser<_>) : Parser<_> =
+    let inline internal bindImpl fn (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> element |> fn x
             | Error e -> Error e
 
+    /// <summary>Binds the parsed value with the given function.</summary>
+    /// <param name="fn">The binder function.</param>
+    /// <param name="parser">The parser to bind.</param>
+    let inline bind fn parser =
+        bindImpl fn parser
+
+    let inline internal mapImpl fn (parser:Parser<_>) : Parser<_> =
+        fun element ->
+            match parser element with
+            | Ok x -> Ok <| fn x
+            | Error e -> Error e
+
     /// <summary>Maps the parsed value with the given function.</summary>
     /// <param name="fn">The mapping function.</param>
     /// <param name="parser">The parser to map.</param>
-    let map fn (parser:Parser<_>) : Parser<_> =
-        bind (fn >> from) parser
+    let inline map fn parser =
+        mapImpl fn parser
+
+    let inline internal ignoreImpl (parser:Parser<_>) : Parser<_> =
+        fun element ->
+            match parser element with
+            | Ok _ -> Ok ()
+            | Error e -> Error e
 
     /// <summary>Ignores the parsed value.</summary>
     /// <param name="parser">The parser whose value to ignore.</param>
-    let ignore (parser:Parser<_>) : Parser<_> =
-        map ignore parser
+    let inline ignore parser =
+        ignoreImpl parser
 
-    /// <summary>Validates the parsed value with the given function.</summary>
-    /// <param name="fn">The validation function.</param>
-    /// <param name="parser">The parser to validate.</param>
-    let validate fn (parser:Parser<_>) : Parser<_> =
+    let inline internal validateImpl fn (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> fn x
             | Error e -> Error e
+
+    /// <summary>Validates the parsed value with the given function.</summary>
+    /// <param name="fn">The validation function.</param>
+    /// <param name="parser">The parser to validate.</param>
+    let inline validate fn parser =
+        validateImpl fn parser
 
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>

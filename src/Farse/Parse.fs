@@ -12,7 +12,7 @@ module Parse =
             Error.couldNotParse name msg previous
         else Error.notObject name previous  current
 
-    let private parse name parser =
+    let private parse name (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -24,7 +24,7 @@ module Parse =
                 | Error msg -> Error.couldNotParse name msg element
             | _ -> Error.couldNotRead name element
 
-    let private tryParse name parser =
+    let private tryParse name (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -39,64 +39,66 @@ module Parse =
             | _ -> Error.couldNotRead name element
 
     // Pretty rowdy, but it works.
-    let private trav (path:string array) parser element =
-        let mutable last = Ok element
-        let mutable previous = element
-        let mutable previousName = path[0]
+    let private trav (path:string array) (parser:Parser<_>) : Parser<_> =
+        fun element ->
+            let mutable last = Ok element
+            let mutable previous = element
+            let mutable previousName = path[0]
 
-        for i in 0 .. path.Length - 1 do
+            for i in 0 .. path.Length - 1 do
+                match last with
+                | Ok element when JsonElement.getKind element = Kind.Object ->
+                    last <- Ok <| JsonElement.getProperty path[i] element
+                    previous <- element
+                    previousName <- path[i]
+                | Ok element ->
+                    if i = path.Length
+                    then last <- Ok element
+                    else last <- Error.notObject previousName previous element
+                | _ -> ()
+
             match last with
-            | Ok element when JsonElement.getKind element = Kind.Object ->
-                last <- Ok <| JsonElement.getProperty path[i] element
-                previous <- element
-                previousName <- path[i]
-            | Ok element ->
-                if i = path.Length
-                then last <- Ok element
-                else last <- Error.notObject previousName previous element
-            | _ -> ()
-
-        match last with
-        | Ok prop ->
-            match parser prop with
-            | Ok x -> Ok x
-            | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
-            | Error e when String.startsWith "Error:" e -> Error e
-            | Error msg -> Error.couldNotParse previousName msg previous
-        | Error e -> Error e
+            | Ok prop ->
+                match parser prop with
+                | Ok x -> Ok x
+                | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
+                | Error e when String.startsWith "Error:" e -> Error e
+                | Error msg -> Error.couldNotParse previousName msg previous
+            | Error e -> Error e
 
     // Pretty rowdy, but it works.
-    let private tryTrav (path:string array) parser element =
-        let mutable last = Ok (Some element)
-        let mutable previous = element
-        let mutable previousName = path[0]
+    let private tryTrav (path:string array) (parser:Parser<_>) : Parser<_> =
+        fun element ->
+            let mutable last = Ok (Some element)
+            let mutable previous = element
+            let mutable previousName = path[0]
 
-        for i in 0 .. path.Length - 1 do
+            for i in 0 .. path.Length - 1 do
+                match last with
+                | Ok (Some element) when JsonElement.getKind element = Kind.Object ->
+                    last <- Ok <| JsonElement.tryGetProperty path[i] element
+                    previous <- element
+                    previousName <- path[i]
+                | Ok (Some element) ->
+                    if i = path.Length
+                    then last <- Ok <| Some element
+                    else last <- Error.notObject previousName previous element
+                | _ -> ()
+
             match last with
-            | Ok (Some element) when JsonElement.getKind element = Kind.Object ->
-                last <- Ok <| JsonElement.tryGetProperty path[i] element
-                previous <- element
-                previousName <- path[i]
-            | Ok (Some element) ->
-                if i = path.Length
-                then last <- Ok <| Some element
-                else last <- Error.notObject previousName previous element
-            | _ -> ()
-
-        match last with
-        | Ok (Some prop) ->
-            match parser prop with
-            | Ok x -> Ok <| Some x
-            | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
-            | Error e when String.startsWith "Error:" e -> Error e
-            | Error msg -> Error.couldNotParse previousName msg previous
-        | Ok None -> Ok None
-        | Error e -> Error e
+            | Ok (Some prop) ->
+                match parser prop with
+                | Ok x -> Ok <| Some x
+                | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
+                | Error e when String.startsWith "Error:" e -> Error e
+                | Error msg -> Error.couldNotParse previousName msg previous
+            | Ok None -> Ok None
+            | Error e -> Error e
 
     /// <summary>Parses a required property with the given parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
-    let req path (parser:Parser<_>) : Parser<_> =
+    let req path parser =
         match path with
         | Flat name -> parse name parser
         | Nested path -> trav path parser
@@ -104,7 +106,7 @@ module Parse =
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
     /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
-    let opt path (parser:Parser<_>) : Parser<_> =
+    let opt path parser =
         match path with
         | Flat name -> tryParse name parser
         | Nested path -> tryTrav path parser
