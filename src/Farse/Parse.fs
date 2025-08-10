@@ -134,7 +134,7 @@ module Parse =
                 |> Error.invalidElement Kind.Array
                 |> Error
 
-    let private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
+    let inline private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 if element.ValueKind = expectedKind then true
