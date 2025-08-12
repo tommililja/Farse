@@ -16,6 +16,24 @@ module Parser =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should create parser and return ok`` () =
+        let expected = Ok ()
+        let actual =
+            expected
+            |> Parser.fromResult
+            |> Parser.parse "1"
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should create parser and return error`` () =
+        let expected = Error "Error"
+        let actual =
+            expected
+            |> Parser.fromResult
+            |> Parser.parse "1"
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should bind parsers and return expected value`` () =
         let expected = 2
         let actual =

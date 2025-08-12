@@ -15,6 +15,11 @@ module Parser =
     let from x : Parser<_> =
         fun _ -> Ok x
 
+    /// <summary>Returns a parser with the given result.</summary>
+    /// <param name="x">The result to return.</param>
+    let fromResult x : Parser<_> =
+        fun _ -> x
+
     let inline internal bindImpl fn (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
