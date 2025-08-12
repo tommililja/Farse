@@ -6,10 +6,24 @@ open Farse
 module Operators =
     open Parse
 
-    /// Parses a required property.
+    /// <summary>Parses a required property with the given parser.</summary>
+    /// <example>
+    /// <code>
+    /// "prop.prop2" &amp;= Parse.int
+    /// </code>
+    /// </example>
+    /// <param name="path">The path to the property.</param>
+    /// <param name="parser">The parser used to parse the property value.</param>
     let inline (&=) path parser =
         req path parser
 
-    /// Parses an optional property.
+    /// <summary>Parses an optional property with the given parser.</summary>
+    /// <example>
+    /// <code>
+    /// "prop.prop2" ?= Parse.int
+    /// </code>
+    /// </example>
+    /// <param name="path">The path to the property.</param>
+    /// <param name="parser">The parser used to parse the property value.</param>
     let inline (?=) path parser =
         opt path parser

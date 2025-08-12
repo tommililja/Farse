@@ -96,16 +96,26 @@ module Parse =
             | Error e -> Error e
 
     /// <summary>Parses a required property with the given parser.</summary>
-    /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
-    /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
+    /// <example>
+    /// <code>
+    /// "prop.prop2" &amp;= Parse.int
+    /// </code>
+    /// </example>
+    /// <param name="path">The path to the property.</param>
+    /// <param name="parser">The parser used to parse the property value.</param>
     let req path parser =
         match path with
         | Flat name -> parse name parser
         | Nested path -> trav path parser
 
     /// <summary>Parses an optional property with the given parser.</summary>
-    /// <param name="path">The path to the property. For example, "prop" or "prop.prop2".</param>
-    /// <param name="parser">The parser used to parse the property value. For example, Parse.int.</param>
+    /// <example>
+    /// <code>
+    /// "prop.prop2" ?= Parse.int
+    /// </code>
+    /// </example>
+    /// <param name="path">The path to the property.</param>
+    /// <param name="parser">The parser used to parse the property value.</param>
     let opt path parser =
         match path with
         | Flat name -> tryParse name parser
@@ -263,5 +273,5 @@ module Parse =
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
     let kind = getValue _.TryGetKind() Kind.Undefined
 
-    /// Does not parse an element and returns FSharp.Core.Unit.
+    /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
