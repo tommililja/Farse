@@ -1,7 +1,5 @@
 namespace Farse
 
-#nowarn "3390"
-
 open System.Text.Json
 
 // The type alias does not work in some function signatures.
