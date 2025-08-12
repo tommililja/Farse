@@ -24,7 +24,7 @@ module Parser =
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <param name="fn">The binder function.</param>
     /// <param name="parser">The parser to bind.</param>
-    let inline bind fn parser =
+    let bind fn parser =
         bindImpl fn parser
 
     let inline internal mapImpl fn (parser:Parser<_>) : Parser<_> =
@@ -36,7 +36,7 @@ module Parser =
     /// <summary>Maps the parsed value with the given function.</summary>
     /// <param name="fn">The mapping function.</param>
     /// <param name="parser">The parser to map.</param>
-    let inline map fn parser =
+    let map fn parser =
         mapImpl fn parser
 
     let inline internal ignoreImpl (parser:Parser<_>) : Parser<_> =
@@ -47,7 +47,7 @@ module Parser =
 
     /// <summary>Ignores the parsed value.</summary>
     /// <param name="parser">The parser whose value to ignore.</param>
-    let inline ignore parser =
+    let ignore parser =
         ignoreImpl parser
 
     let inline internal validateImpl fn (parser:Parser<_>) : Parser<_> =
@@ -59,7 +59,7 @@ module Parser =
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
-    let inline validate fn parser =
+    let validate fn parser =
         validateImpl fn parser
 
     /// <summary>Parses a JSON string with the given parser.</summary>
