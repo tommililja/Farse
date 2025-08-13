@@ -98,7 +98,7 @@ module Parse =
     /// <summary>Parses a required property with the given parser.</summary>
     /// <example>
     /// <code>
-    /// "prop.prop2" &amp;= Parse.int
+    /// Parse.req "prop.prop2" Parse.int
     /// </code>
     /// </example>
     /// <param name="path">The path to the property.</param>
@@ -111,7 +111,7 @@ module Parse =
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <example>
     /// <code>
-    /// "prop.prop2" ?= Parse.int
+    /// Parse.opt "prop.prop2" Parse.int
     /// </code>
     /// </example>
     /// <param name="path">The path to the property.</param>
