@@ -141,7 +141,7 @@ module Parse =
                 | None -> Ok <| convert array
             | _ ->
                 element.ValueKind
-                |> Error.invalidElement Kind.Array
+                |> Error.invalidKind Kind.Array
                 |> Error
 
     let inline private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
@@ -156,11 +156,11 @@ module Parse =
                 | true, x -> Ok x
                 | _ ->
                     element
-                    |> Error.invalidType typeof<'a>
+                    |> Error.invalidValue typeof<'a>
                     |> Error
             else
                 element.ValueKind
-                |> Error.invalidElement expectedKind
+                |> Error.invalidKind expectedKind
                 |> Error
 
     /// Parses a number as System.Int32.

@@ -5,15 +5,20 @@ open System.Text.Json
 
 module internal Error =
 
-    let create strings =
+    let private create strings =
         strings
         |> String.concat "\n"
         |> Error
 
-    let invalidType (expectedType:Type) element =
+    let private print (element:JsonElement) =
+        match element.ValueKind with
+        | Kind.Null | Kind.Undefined -> String.Empty
+        | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
+
+    let invalidValue (expectedType:Type) element =
         $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
 
-    let invalidElement (expected:Kind) (actual:Kind) =
+    let invalidKind (expected:Kind) (actual:Kind) =
         let expected =
             match expected with
             | Kind.True | Kind.False -> "Bool"
@@ -21,22 +26,17 @@ module internal Error =
 
         $"Expected: %s{expected}, actual: %s{string actual}."
 
-    let print (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.Null | Kind.Undefined -> String.Empty
-        | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
-
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."
-            invalidElement Kind.Object element.ValueKind
+            invalidKind Kind.Object element.ValueKind
             print element
         ]
 
     let notObject name previous (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
-            invalidElement Kind.Object element.ValueKind
+            invalidKind Kind.Object element.ValueKind
             print previous
         ]
 
