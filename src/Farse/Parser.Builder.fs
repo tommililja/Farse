@@ -6,14 +6,14 @@ module ParserBuilder =
 
     type ParserBuilder() =
 
-        member _.Return(x) : Parser<_> = from x
+        member _.Return(x) = from x
 
-        member _.ReturnFrom(x:Parser<_>) : Parser<_> = x
+        member _.ReturnFrom(x) = x
 
-        member _.Bind(x:Parser<_>, fn:_ -> Parser<_>) : Parser<_> = bind fn x
+        member _.Bind(x, fn) = bind fn x
 
-        member _.Zero() : Parser<_> = from ()
+        member _.Zero() = from ()
 
-        member _.Delay(fn:_ -> Parser<_>) : Parser<_> = fn ()
+        member _.Delay(fn) = fn ()
 
     let parser = ParserBuilder()
