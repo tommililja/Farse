@@ -1,5 +1,9 @@
 namespace Farse
 
+#if NET7_0_OR_GREATER
+open System.Numerics
+#endif
+
 open System.Text.Json.Nodes
 open System.Collections.Generic
 
@@ -18,12 +22,11 @@ type Json =
 
 and
     [<AutoOpen>]
-    [<NoComparison>]
     JNum =
 
         #if NET7_0_OR_GREATER
 
-        static member JNum<'a when 'a :> System.Numerics.INumber<'a>>(x:'a) =
+        static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
             JsonValue.Create<'a>(x)
             |> Json.JNum
 
@@ -45,7 +48,7 @@ module JNum =
 
     #if NET7_0_OR_GREATER
 
-    let nil<'a when 'a :> System.Numerics.INumber<'a>>(x:'a option) =
+    let nil<'a when 'a :> INumber<'a>>(x:'a option) =
         Json.nil JNum x
 
     #else
