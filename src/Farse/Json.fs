@@ -6,38 +6,34 @@ open System.Collections.Generic
 [<NoComparison>]
 type Json =
     | JStr of string
-    | JNum of JNum
+    | JNum of JsonValue
     | JBit of bool
     | JObj of JsonProperty seq
     | JArr of Json seq
     | JNil of Json option
     | JNon
 
-    static member internal nil fn =
+    static member internal nil(fn) =
         Option.map fn >> JNil
 
 and
     [<AutoOpen>]
+    [<NoComparison>]
     JNum =
-        | Int of int
-        | Float of float
-        | Decimal of decimal
-        | Byte of byte
 
-        static member internal int = Int >> Json.JNum
-        static member internal decimal = Decimal >> Json.JNum
-        static member internal float = Float >> Json.JNum
-        static member internal byte = Byte >> Json.JNum
+        #if NET7_0_OR_GREATER
 
-        static member JNum(x:int) = int x
-        static member JNum(x:decimal) = decimal x
-        static member JNum(x:float) = float x
-        static member JNum(x:byte) = byte x
+        static member JNum<'a when 'a :> System.Numerics.INumber<'a>>(x:'a) =
+            JsonValue.Create<'a>(x)
+            |> Json.JNum
 
-        static member nil(x:int option) = Json.nil int x
-        static member nil(x:decimal option) = Json.nil decimal x
-        static member nil(x:float option) = Json.nil float x
-        static member nil(x:byte option) = Json.nil byte x
+        #else
+
+        static member JNum<'a>(x:'a) =
+            JsonValue.Create<'a>(x)
+            |> Json.JNum
+
+        #endif
 
 and JsonProperty = string * Json
 
@@ -47,14 +43,17 @@ module JStr =
 
 module JNum =
 
-    let int = JNum.int
-    let intNil = Json.nil int
-    let float = JNum.float
-    let floatNil = Json.nil float
-    let decimal = JNum.decimal
-    let decimalNil = Json.nil decimal
-    let byte = JNum.byte
-    let byteNil = Json.nil byte
+    #if NET7_0_OR_GREATER
+
+    let nil<'a when 'a :> System.Numerics.INumber<'a>>(x:'a option) =
+        Json.nil JNum x
+
+    #else
+
+    let nil<'a>(x:'a option) =
+        Json.nil JNum x
+
+    #endif
 
 module JBit =
 
@@ -62,18 +61,15 @@ module JBit =
 
 module JNil =
 
+    let some = Some >> JNil
+
     let none = JNil None
 
 module Json =
 
     let rec internal getJsonNode = function
         | JStr str -> JsonNode.create str
-        | JNum num ->
-            match num with
-            | Int int -> JsonNode.create int
-            | Float float -> JsonNode.create float
-            | Decimal decimal -> JsonNode.create decimal
-            | Byte byte -> JsonNode.create byte
+        | JNum num -> num.Root
         | JBit bit -> JsonNode.create bit
         | JObj obj ->
             obj
