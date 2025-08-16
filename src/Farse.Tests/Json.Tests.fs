@@ -3,7 +3,7 @@ namespace Farse.Tests
 open Xunit
 open Farse
 
-module JsonString =
+module Json =
 
     [<Fact>]
     let ``Should create expected JSON object`` () =
