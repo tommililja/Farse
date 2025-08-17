@@ -20,25 +20,23 @@ type Json =
     static member internal nil(fn) =
         Option.map fn >> JNil
 
-and
-    [<AutoOpen>]
-    JNum =
-
-        #if NET7_0_OR_GREATER
-
-        static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
-            JsonValue.Create<'a>(x)
-            |> Json.JNum
-
-        #else
-
-        static member JNum<'a>(x:'a) =
-            JsonValue.Create<'a>(x)
-            |> Json.JNum
-
-        #endif
-
 and JsonProperty = string * Json
+
+and [<AutoOpen>] JNum =
+
+    #if NET7_0_OR_GREATER
+
+    static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
+        JsonValue.Create<'a>(x)
+        |> Json.JNum
+
+    #else
+
+    static member JNum<'a>(x:'a) =
+        JsonValue.Create<'a>(x)
+        |> Json.JNum
+
+    #endif
 
 module JStr =
 
