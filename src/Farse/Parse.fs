@@ -121,9 +121,9 @@ module Parse =
         | Flat name -> tryParse name parser
         | Nested path -> tryTrav path parser
 
-    // Values
+    // Custom
 
-    let custom (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
+    let inline internal getValue (tryParse: JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 if element.ValueKind = expectedKind then true
@@ -141,6 +141,14 @@ module Parse =
                 element.ValueKind
                 |> Error.invalidKind expectedKind
                 |> Error
+
+    /// <summary>Creates a custom parser with the given try parse function.</summary>
+    /// <param name="tryParse">The try parse function.</param>
+    /// <param name="expectedKind">The expected element kind.</param>
+    let custom tryParse expectedKind =
+        getValue tryParse expectedKind
+
+    // Values
 
     /// Parses a number as System.Int32.
     let int = custom _.TryGetInt32() Kind.Number
