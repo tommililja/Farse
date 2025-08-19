@@ -20,7 +20,7 @@ dotnet add package Farse
 There are some initial benchmarks [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.2, macOS Sequoia 15.5 (24F74) [Darwin 24.5.0]
+BenchmarkDotNet v0.15.2, macOS Sequoia 15.6 (24G84) [Darwin 24.6.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 .NET SDK 9.0.203
   [Host]     : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD DEBUG
@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean      | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
 |----------------------- |----------:|------:|-------:|-------:|----------:|------------:|
-| System.Text.Json       |  3.726 us |  0.79 | 0.1106 |      - |     696 B |        0.22 |
-| System.Text.Json*      |  4.035 us |  0.85 | 0.4044 | 0.0153 |    2562 B |        0.80 |
-| Farse                  |  4.742 us |  1.00 | 0.5112 |      - |    3208 B |        1.00 |
-| Newtonsoft.Json*       |  7.820 us |  1.65 | 1.5106 | 0.0153 |    9544 B |        2.98 |
-| Thoth.System.Text.Json |  8.059 us |  1.70 | 1.5717 | 0.0153 |    9944 B |        3.10 |
-| Newtonsoft.Json        |  8.607 us |  1.82 | 2.8229 | 0.1373 |   17720 B |        5.52 |
-| Thoth.Json.Net         | 10.149 us |  2.14 | 3.3569 | 0.1526 |   21136 B |        6.59 |
+| System.Text.Json       |  3.743 us |  0.77 | 0.1106 |      - |     696 B |        0.22 |
+| System.Text.Json*      |  3.771 us |  0.77 | 0.4082 | 0.0076 |    2562 B |        0.80 |
+| Farse                  |  4.877 us |  1.00 | 0.5035 |      - |    3200 B |        1.00 |
+| Newtonsoft.Json*       |  6.164 us |  1.26 | 1.5182 | 0.0229 |    9544 B |        2.98 |
+| Thoth.System.Text.Json |  8.095 us |  1.66 | 1.5717 | 0.0153 |    9944 B |        3.11 |
+| Newtonsoft.Json        |  8.536 us |  1.75 | 2.8229 | 0.1373 |   17720 B |        5.54 |
+| Thoth.Json.Net         | 10.423 us |  2.14 | 3.3569 | 0.1526 |   21136 B |        6.61 |
 
 * Serialization
 ```
