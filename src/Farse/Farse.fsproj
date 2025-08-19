@@ -22,7 +22,7 @@
         <RootNamespace>Farse</RootNamespace>
         <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
         <Title>Farse</Title>
-        <Version>0.2.5</Version>
+        <Version>0.2.6</Version>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Extensions.fs"/>
