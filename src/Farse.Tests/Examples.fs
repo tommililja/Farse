@@ -8,7 +8,7 @@ open NodaTime
 open NodaTime.Text
 open System.Text.Json
 
-module Parser =
+module Parse =
 
     let instant =
         Parse.custom (fun (element:JsonElement) ->
@@ -121,7 +121,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= Parser.instant
+                let! renewsAt = "renewsAt" ?= Parse.instant
 
                 return {
                     Plan = plan

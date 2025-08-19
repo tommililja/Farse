@@ -123,7 +123,7 @@ module Parse =
 
     // Custom
 
-    let inline internal getValue (tryParse: JsonElement -> bool * 'a) expectedKind : Parser<_> =
+    let inline internal customImpl (tryParse: JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 if element.ValueKind = expectedKind then true
@@ -146,9 +146,9 @@ module Parse =
     /// <param name="tryParse">The try parse function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
     let custom tryParse expectedKind =
-        getValue tryParse expectedKind
+        customImpl tryParse expectedKind
 
-    // Values
+    // Primitives
 
     /// Parses a number as System.Int32.
     let int = custom _.TryGetInt32() Kind.Number
