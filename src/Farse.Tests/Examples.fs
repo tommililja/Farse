@@ -4,6 +4,19 @@ open System
 
 open Farse
 open Farse.Operators
+open NodaTime
+open NodaTime.Text
+open System.Text.Json
+
+module Parser =
+
+    let instant =
+        Parse.custom (fun (element:JsonElement) ->
+            let string = element.GetString()
+            match InstantPattern.General.Parse(string) with
+            | result when result.Success -> true, result.Value
+            | _ -> false, Instant.MinValue
+        ) JsonValueKind.String
 
 type UserId = UserId of Guid
 
@@ -81,7 +94,7 @@ module Plan =
 type Subscription = {
     Plan: Plan
     IsCanceled: bool
-    RenewsAt: DateTime option
+    RenewsAt: Instant option
 }
 
 type User = {
@@ -108,7 +121,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= dateTime
+                let! renewsAt = "renewsAt" ?= Parser.instant
 
                 return {
                     Plan = plan

@@ -4,7 +4,7 @@ open System
 open Xunit
 open Farse
 
-module Error =
+module ErrorTests =
 
     module Parser =
 

@@ -5,7 +5,7 @@ open System.Text.Json
 open Xunit
 open Farse
 
-module Parse =
+module ParseTests =
 
     [<Fact>]
     let ``Should parse number as Some int`` () =

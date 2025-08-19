@@ -3,7 +3,7 @@ namespace Farse.Tests
 open Xunit
 open Farse
 
-module Parser =
+module ParserTests =
 
     [<Fact>]
     let ``Should create parser and return expected value`` () =
