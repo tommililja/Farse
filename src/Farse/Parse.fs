@@ -121,29 +121,7 @@ module Parse =
         | Flat name -> tryParse name parser
         | Nested path -> tryTrav path parser
 
-    let inline private seq convert (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
-            match element.ValueKind with
-            | Kind.Array ->
-                let mutable error = None
-                let mutable enumerator = element.EnumerateArray()
-
-                let array =
-                    element.GetArrayLength()
-                    |> ResizeArray
-
-                while error.IsNone && enumerator.MoveNext() do
-                    match parser enumerator.Current with
-                    | Ok x -> array.Add x
-                    | Error e -> error <- Some e
-
-                match error with
-                | Some e -> Error e
-                | None -> Ok <| convert array
-            | _ ->
-                element.ValueKind
-                |> Error.invalidKind Kind.Array
-                |> Error
+    // Values
 
     let inline private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
@@ -250,6 +228,30 @@ module Parse =
     let dateTimeOffsetExact (format:string) = getValue _.TryGetDateTimeOffsetExact(format) Kind.String
 
     // Sequences
+
+    let inline private seq convert (parser:Parser<_>) : Parser<_> =
+        fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Array ->
+                let mutable error = None
+                let mutable enumerator = element.EnumerateArray()
+
+                let array =
+                    element.GetArrayLength()
+                    |> ResizeArray
+
+                while error.IsNone && enumerator.MoveNext() do
+                    match parser enumerator.Current with
+                    | Ok x -> array.Add x
+                    | Error e -> error <- Some e
+
+                match error with
+                | Some e -> Error e
+                | None -> Ok <| convert array
+            | _ ->
+                element.ValueKind
+                |> Error.invalidKind Kind.Array
+                |> Error
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
