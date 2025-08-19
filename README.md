@@ -95,7 +95,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= Parse.instant // Custom parser example.
+                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
     
                 return {
                     Plan = plan
