@@ -58,8 +58,8 @@ Given the following JSON string.
     ],
     "subscription": {
         "plan": "Pro",
-        "isCanceled": true,
-        "renewsAt": null
+        "isCanceled": false,
+        "renewsAt": "2026-12-25T10:30:00Z"
     }
 }
 ```
@@ -95,7 +95,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= dateTime
+                let! renewsAt = "renewsAt" ?= Parse.instant // Custom parser example.
     
                 return {
                     Plan = plan
@@ -123,6 +123,7 @@ With the following types.
 
 ```fsharp
 open Farse
+open NodaTime
 
 type UserId = UserId of Guid
 
@@ -200,7 +201,7 @@ module Plan =
 type Subscription = {
     Plan: Plan
     IsCanceled: bool
-    RenewsAt: DateTime option
+    RenewsAt: Instant option
 }
 
 type User = {
@@ -222,6 +223,27 @@ let user =
     |> Result.defaultWith failwith
 
 printf "%s" user.Name
+```
+
+## Custom parsers
+
+You can use Parse.custom to create custom parsers.
+
+```fsharp
+open Farse
+open NodaTime
+open NodaTime.Text
+open System.Text.Json
+
+module Parse =
+
+    let instant =
+        Parse.custom (fun (element:JsonElement) ->
+            let string = element.GetString()
+            match InstantPattern.General.Parse(string) with
+            | result when result.Success -> true, result.Value
+            | _ -> false, Instant.MinValue
+        ) JsonValueKind.String
 ```
 
 ## Creating JSON
