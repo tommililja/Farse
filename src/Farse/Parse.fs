@@ -121,20 +121,21 @@ module Parse =
         | Flat name -> tryParse name parser
         | Nested path -> tryTrav path parser
 
-    let private seq convert (parser:Parser<_>) : Parser<_> =
+    let inline private seq convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Array ->
                 let mutable error = None
+                let mutable enumerator = element.EnumerateArray()
+
                 let array =
                     element.GetArrayLength()
                     |> ResizeArray
 
-                for element in element.EnumerateArray() do
-                    if error.IsNone then
-                        match parser element with
-                        | Ok x -> array.Add x
-                        | Error e -> error <- Some e
+                while error.IsNone && enumerator.MoveNext() do
+                    match parser enumerator.Current with
+                    | Ok x -> array.Add x
+                    | Error e -> error <- Some e
 
                 match error with
                 | Some e -> Error e
