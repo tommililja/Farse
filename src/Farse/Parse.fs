@@ -123,7 +123,7 @@ module Parse =
 
     // Values
 
-    let inline private getValue (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
+    let custom (tryParse:JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 if element.ValueKind = expectedKind then true
@@ -143,89 +143,89 @@ module Parse =
                 |> Error
 
     /// Parses a number as System.Int32.
-    let int = getValue _.TryGetInt32() Kind.Number
+    let int = custom _.TryGetInt32() Kind.Number
 
     /// Parses a number as System.Int16.
-    let int16 = getValue _.TryGetInt16() Kind.Number
+    let int16 = custom _.TryGetInt16() Kind.Number
 
     /// Parses a number as System.Int64.
-    let int64 = getValue _.TryGetInt64() Kind.Number
+    let int64 = custom _.TryGetInt64() Kind.Number
 
     /// Parses a number as System.UInt16.
-    let uint16 = getValue _.TryGetUInt16() Kind.Number
+    let uint16 = custom _.TryGetUInt16() Kind.Number
 
     /// Parses a number as System.UInt32.
-    let uint32 = getValue _.TryGetUInt32() Kind.Number
+    let uint32 = custom _.TryGetUInt32() Kind.Number
 
     /// Parses a number as System.UInt64.
-    let uint64 = getValue _.TryGetUInt64() Kind.Number
+    let uint64 = custom _.TryGetUInt64() Kind.Number
 
     /// Parses a number as System.Double.
-    let float = getValue _.TryGetDouble() Kind.Number
+    let float = custom _.TryGetDouble() Kind.Number
 
     /// Parses a number as System.Single.
-    let float32 = getValue _.TryGetSingle() Kind.Number
+    let float32 = custom _.TryGetSingle() Kind.Number
 
     /// Parses a number as System.Decimal.
-    let decimal = getValue _.TryGetDecimal() Kind.Number
+    let decimal = custom _.TryGetDecimal() Kind.Number
 
     /// Parses a number as System.Byte.
-    let byte = getValue _.TryGetByte() Kind.Number
+    let byte = custom _.TryGetByte() Kind.Number
 
     /// Parses a number as System.SByte.
-    let sbyte = getValue _.TryGetSByte() Kind.Number
+    let sbyte = custom _.TryGetSByte() Kind.Number
 
     /// Parses a string as System.Char.
-    let char = getValue _.TryGetChar() Kind.String
+    let char = custom _.TryGetChar() Kind.String
 
     /// Parses a string as System.String.
-    let string = getValue _.TryGetString() Kind.String
+    let string = custom _.TryGetString() Kind.String
 
     /// Parses a bool as System.Boolean.
-    let bool = getValue _.TryGetBoolean() Kind.True
+    let bool = custom _.TryGetBoolean() Kind.True
 
     /// Parses a string as System.Guid.
-    let guid = getValue _.TryGetGuid() Kind.String
+    let guid = custom _.TryGetGuid() Kind.String
 
     /// Parses null as FSharp.Core.Unit.
-    let unit = getValue _.TryGetUnit() Kind.Null
+    let unit = custom _.TryGetUnit() Kind.Null
 
     // Dates
 
     #if NET7_0_OR_GREATER
 
     /// Parses a string as System.TimeOnly.
-    let timeOnly = getValue _.TryGetTimeOnly() Kind.String
+    let timeOnly = custom _.TryGetTimeOnly() Kind.String
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let timeOnlyExact (format:string) = getValue _.TryGetTimeOnlyExact(format) Kind.String
+    let timeOnlyExact (format:string) = custom _.TryGetTimeOnlyExact(format) Kind.String
 
     /// Parses a string as System.DateOnly (ISO 8601).
-    let dateOnly = getValue _.TryGetDateOnly() Kind.String
+    let dateOnly = custom _.TryGetDateOnly() Kind.String
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateOnlyExact (format:string) = getValue _.TryGetDateOnlyExact(format) Kind.String
+    let dateOnlyExact (format:string) = custom _.TryGetDateOnlyExact(format) Kind.String
 
     #endif
 
     /// Parses a string as System.DateTime (ISO 8601).
-    let dateTime = getValue _.TryGetDateTime() Kind.String
+    let dateTime = custom _.TryGetDateTime() Kind.String
 
     /// Parses a string as System.DateTime (ISO 8601) and converts it to UTC.
-    let dateTimeUtc = getValue _.TryGetDateTimeUtc() Kind.String
+    let dateTimeUtc = custom _.TryGetDateTimeUtc() Kind.String
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeExact (format:string) = getValue _.TryGetDateTimeExact(format) Kind.String
+    let dateTimeExact (format:string) = custom _.TryGetDateTimeExact(format) Kind.String
 
     /// Parses a string as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = getValue _.TryGetDateTimeOffset() Kind.String
+    let dateTimeOffset = custom _.TryGetDateTimeOffset() Kind.String
 
     /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeOffsetExact (format:string) = getValue _.TryGetDateTimeOffsetExact(format) Kind.String
+    let dateTimeOffsetExact (format:string) = custom _.TryGetDateTimeOffsetExact(format) Kind.String
 
     // Sequences
 
@@ -271,10 +271,10 @@ module Parse =
     // Misc
 
     /// Parses an array's length as System.Int32.
-    let arrayLength = getValue _.TryGetArrayLength() Kind.Array
+    let arrayLength = custom _.TryGetArrayLength() Kind.Array
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
-    let kind = getValue _.TryGetKind() Kind.Undefined
+    let kind = custom _.TryGetKind() Kind.Undefined
 
     /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
