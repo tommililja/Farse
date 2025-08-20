@@ -1,11 +1,10 @@
 namespace Farse.Tests
 
-open System
-
 open Farse
 open Farse.Operators
 open NodaTime
 open NodaTime.Text
+open System
 open System.Text.Json
 
 module Parse =
@@ -121,7 +120,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= Parse.instant
+                let! renewsAt = "renewsAt" ?= instant
 
                 return {
                     Plan = plan
