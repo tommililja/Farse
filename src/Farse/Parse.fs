@@ -126,9 +126,10 @@ module Parse =
     let inline internal customImpl (tryParse: JsonElement -> bool * 'a) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
-                if element.ValueKind = expectedKind then true
-                else if expectedKind = Kind.True then element.ValueKind = Kind.False
-                else expectedKind = Kind.Undefined
+                match expectedKind with
+                | kind when kind = element.ValueKind -> true
+                | Kind.True | Kind.False -> element.ValueKind = Kind.True || element.ValueKind = Kind.False
+                | kind -> kind = Kind.Undefined
 
             if isExpectedKind then
                 match tryParse element with
