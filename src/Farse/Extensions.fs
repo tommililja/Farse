@@ -110,6 +110,10 @@ type internal JsonElementExtensions() =
     static member TryGetKind(element:JsonElement) =
         true, element.ValueKind
 
+    [<Extension>]
+    static member TryGetElement(element:JsonElement) =
+        true, element.Clone()
+
 module internal String =
 
     let startsWith (startsWith:string) (str:string) =

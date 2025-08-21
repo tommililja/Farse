@@ -364,6 +364,16 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse element as JsonElement`` () =
+        let expected = JsonDocument.Parse("""{ "prop2": 1 }""").RootElement.GetRawText()
+        let actual =
+            Parse.req "prop" Parse.element
+            |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+            |> Expect.ok
+            |> _.GetRawText()
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should not parse element and return unit`` () =
         let expected = ()
         let actual =
