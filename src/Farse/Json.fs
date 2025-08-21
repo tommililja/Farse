@@ -10,55 +10,35 @@ open System.Collections.Generic
 [<NoComparison>]
 type Json =
     | JStr of string
-    | JNum of JsonValue
+    | JNum of number
     | JBit of bool
     | JObj of JsonProperty seq
     | JArr of Json seq
     | JNil of Json option
     | JNon
 
-    static member internal nil(fn) =
-        Option.map fn >> JNil
-
 and JsonProperty = string * Json
 
-and [<AutoOpen>] JNum =
+and [<AutoOpen>]
+    number internal (x:JsonValue) =
 
-    #if NET7_0_OR_GREATER
+        member _.JsonNode = x.Root
 
-    static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
-        JsonValue.Create<'a>(x)
-        |> Json.JNum
+        #if NET7_0_OR_GREATER
 
-    #else
+        static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
+            JsonValue.Create<'a>(x)
+            |> number
+            |> Json.JNum
 
-    static member JNum<'a>(x:'a) =
-        JsonValue.Create<'a>(x)
-        |> Json.JNum
+        #else
 
-    #endif
+        static member JNum<'a>(x:'a) =
+            JsonValue.Create<'a>(x)
+            |> number
+            |> Json.JNum
 
-module JStr =
-
-    let nil = Json.nil JStr
-
-module JNum =
-
-    #if NET7_0_OR_GREATER
-
-    let nil<'a when 'a :> INumber<'a>>(x:'a option) =
-        Json.nil JNum x
-
-    #else
-
-    let nil<'a>(x:'a option) =
-        Json.nil JNum x
-
-    #endif
-
-module JBit =
-
-    let nil = Json.nil JBit
+        #endif
 
 module JNil =
 
@@ -66,11 +46,36 @@ module JNil =
 
     let none = JNil None
 
+    let internal nil fn =
+        Option.map fn >> JNil
+
+module JStr =
+
+    let nil = JNil.nil JStr
+
+module JNum =
+
+    #if NET7_0_OR_GREATER
+
+    let nil<'a when 'a :> INumber<'a>>(x:'a option) =
+        JNil.nil JNum x
+
+    #else
+
+    let nil<'a>(x:'a option) =
+        JNil.nil JNum x
+
+    #endif
+
+module JBit =
+
+    let nil = JNil.nil JBit
+
 module Json =
 
     let rec internal getJsonNode = function
         | JStr str -> JsonNode.create str
-        | JNum num -> num.Root
+        | JNum num -> num.JsonNode
         | JBit bit -> JsonNode.create bit
         | JObj obj ->
             obj
