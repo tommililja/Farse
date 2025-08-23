@@ -209,4 +209,4 @@ module Examples =
             |> User.json
             |> Json.asString
 
-        Expect.json json
+        Expect.string json
