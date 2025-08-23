@@ -227,7 +227,7 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-We can use Parse.custom to create our own parsers for types that do not have an included parser, or to create optimized versions that avoid mapping and other operations.
+We can use Parse.custom to create our own parsers for types that do not have an included parser, or to create optimized versions that avoid unnecessary operations.
 
 ```fsharp
 open Farse
