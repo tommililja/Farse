@@ -244,6 +244,14 @@ module Parse =
             | result when result.Success -> true, result.Value
             | _ -> false, Instant.MinValue
         ) JsonValueKind.String
+
+    // Direct parser example.
+    let userId =
+        Parse.custom (fun (element:JsonElement) ->
+            match element.TryGetGuid() with
+            | true, guid -> Some <| UserId guid
+            | _ -> None
+        ) JsonValueKind.String
 ```
 
 ## Creating JSON
