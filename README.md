@@ -43,7 +43,7 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 
 ## Example
 
-Given the following JSON string.
+Given the JSON string.
 
 ```json
 {
@@ -74,7 +74,7 @@ let (&=) = Parse.req
 let (?=) = Parse.opt
 ```
 
-We can create a parser.
+We can create a simple parser.
 
 ```fsharp
 open Farse
@@ -227,7 +227,7 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-We can use Parse.custom to create parsers for types that does not have an included parser.
+We can use Parse.custom to create our own parsers for types that do not have an included parser, or to create optimized versions that avoid mapping and other operations.
 
 ```fsharp
 open Farse
@@ -245,7 +245,7 @@ module Parse =
             | _ -> false, Instant.MinValue
         ) JsonValueKind.String
 
-    // Direct parser example.
+    // Optimized parser example.
     let userId =
         Parse.custom (fun (element:JsonElement) ->
             match element.TryGetGuid() with
@@ -256,7 +256,7 @@ module Parse =
 
 ## Creating JSON
 
-We can create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
+We can create JSON strings with [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs).
 
 > Note: Use JNum<'a> to be explicit.
 
@@ -299,4 +299,4 @@ Object:
 }
 ```
 
-> Farse doesn't throw exceptions and only catches **JsonException**, that is thrown when parsing invalid JSON.
+> Farse doesn't throw exceptions and only catches JsonException, that is thrown when parsing invalid JSON.
