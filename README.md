@@ -85,7 +85,7 @@ module User =
 
     let parser =
         parser {
-            let! id = "id" &= UserId.parser
+            let! id = "id" &= userId // Optimized parser example.
             let! name = "name" &= string
             let! age = "age" ?= Age.parser
             let! email = "email" &= Email.parser
