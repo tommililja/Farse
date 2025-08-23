@@ -7,16 +7,6 @@ open NodaTime.Text
 open System
 open System.Text.Json
 
-module Parse =
-
-    let instant =
-        Parse.custom (fun (element:JsonElement) ->
-            let string = element.GetString()
-            match InstantPattern.General.Parse(string) with
-            | result when result.Success -> true, result.Value
-            | _ -> false, Instant.MinValue
-        ) JsonValueKind.String
-
 type UserId = UserId of Guid
 
 module UserId =
@@ -104,6 +94,23 @@ type User = {
     Profiles: ProfileId Set
     Subscription: Subscription
 }
+
+module Parse =
+
+    let instant =
+        Parse.custom (fun (element:JsonElement) ->
+            let string = element.GetString()
+            match InstantPattern.General.Parse(string) with
+            | result when result.Success -> Some result.Value
+            | _ -> None
+        ) JsonValueKind.String
+
+    let userId =
+        Parse.custom (fun (element:JsonElement) ->
+            match element.TryGetGuid() with
+            | true, guid -> Some <| UserId guid
+            | _ -> None
+        ) JsonValueKind.String
 
 module User =
     open Parse

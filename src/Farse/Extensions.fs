@@ -2,7 +2,6 @@ namespace Farse
 
 open System
 open System.Globalization
-open System.Runtime.CompilerServices
 open System.Text.Json
 open System.Text.Json.Nodes
 
@@ -31,6 +30,110 @@ module internal JsonElement =
     let getJson (element:JsonElement) =
         JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
 
+    // Parsing
+
+    let inline private tryParse x =
+        match x with
+        | true, x -> Some x
+        | _ -> None
+
+    let inline tryGetInt (element:JsonElement) =
+        tryParse <| element.TryGetInt32()
+
+    let inline tryGetInt16 (element:JsonElement) =
+        tryParse <| element.TryGetInt16()
+
+    let inline tryGetInt64 (element:JsonElement) =
+        tryParse <| element.TryGetInt64()
+
+    let inline tryGetUInt16 (element:JsonElement) =
+        tryParse <| element.TryGetUInt16()
+
+    let inline tryGetUInt32 (element:JsonElement) =
+        tryParse <| element.TryGetUInt32()
+
+    let inline tryGetUInt64 (element:JsonElement) =
+        tryParse <| element.TryGetUInt64()
+
+    let inline tryGetFloat (element:JsonElement) =
+        tryParse <| element.TryGetDouble()
+
+    let inline tryGetFloat32 (element:JsonElement) =
+        tryParse <| element.TryGetSingle()
+
+    let inline tryGetDecimal (element:JsonElement) =
+        tryParse <| element.TryGetDecimal()
+
+    let inline tryGetByte (element:JsonElement) =
+        tryParse <| element.TryGetByte()
+
+    let inline tryGetSByte (element:JsonElement) =
+        tryParse <| element.TryGetSByte()
+
+    let inline tryGetChar (element:JsonElement) =
+        match element.GetString() with
+        | str when str.Length = 1 -> Some str[0]
+        | _ -> None
+
+    let inline tryGetString (element:JsonElement) =
+        Some <| element.GetString()
+
+    let inline tryGetBool (element:JsonElement) =
+        Some <| element.GetBoolean()
+
+    let inline tryGetGuid (element:JsonElement) =
+        tryParse <| element.TryGetGuid()
+
+    let inline tryGetUnit _ = Some ()
+
+    #if NET7_0_OR_GREATER
+
+    let inline tryGetTimeOnly (element:JsonElement) =
+        let timeString = element.GetString()
+        tryParse <| TimeOnly.TryParse(timeString, CultureInfo.InvariantCulture)
+
+    let inline tryGetTimeOnlyExact (format:string) (element:JsonElement) =
+        let timeString = element.GetString()
+        tryParse <| TimeOnly.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    let inline tryGetDateOnly (element:JsonElement) =
+        let dateString = element.GetString()
+        tryParse <| DateOnly.TryParse(dateString, CultureInfo.InvariantCulture)
+
+    let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
+        let dateString = element.GetString()
+        tryParse <| DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    #endif
+
+    let inline tryGetDateTime (element:JsonElement) =
+        tryParse <| element.TryGetDateTime()
+
+    let inline tryGetDateTimeUtc (element:JsonElement) =
+        match element.TryGetDateTime() with
+        | true, dateTime -> Some <| dateTime.ToUniversalTime()
+        | _ -> None
+
+    let inline tryGetDateTimeExact (format:string) (element:JsonElement) =
+        let dateString = element.GetString()
+        tryParse <| DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    let inline tryGetDateTimeOffset (element:JsonElement) =
+        tryParse <| element.TryGetDateTimeOffset()
+
+    let inline tryGetDateTimeOffsetExact (format:string) (element:JsonElement)  =
+        let dateString = element.GetString()
+        tryParse <| DateTimeOffset.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+
+    let inline tryGetArrayLength (element:JsonElement) =
+        Some <| element.GetArrayLength()
+
+    let inline tryGetKind (element:JsonElement) =
+        Some <| element.ValueKind
+
+    let inline tryGetElement (element:JsonElement) =
+        Some <| element.Clone()
+
 module internal JsonNode =
 
     let create x =
@@ -41,78 +144,6 @@ module internal JsonNode =
         if node = null
         then "null"
         else node.ToJsonString(JsonSerializerOptions.preset)
-
-type internal JsonElementExtensions() =
-
-    [<Extension>]
-    static member TryGetChar(element:JsonElement) =
-        match element.GetString() with
-        | str when str.Length = 1 -> true, str[0]
-        | _ -> false, Char.MinValue
-
-    #if NET7_0_OR_GREATER
-
-    [<Extension>]
-    static member TryGetTimeOnly(element:JsonElement) =
-        let timeString = element.GetString()
-        TimeOnly.TryParse(timeString, CultureInfo.InvariantCulture)
-
-    [<Extension>]
-    static member TryGetTimeOnlyExact(element:JsonElement, format:string) =
-        let timeString = element.GetString()
-        TimeOnly.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
-
-    [<Extension>]
-    static member TryGetDateOnly(element:JsonElement) =
-        let dateString = element.GetString()
-        DateOnly.TryParse(dateString, CultureInfo.InvariantCulture)
-
-    [<Extension>]
-    static member TryGetDateOnlyExact (element:JsonElement, format:string) =
-        let dateString = element.GetString()
-        DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
-
-    #endif
-
-    [<Extension>]
-    static member TryGetDateTimeUtc(element:JsonElement) =
-        match element.TryGetDateTime() with
-        | true, dateTime -> true, dateTime.ToUniversalTime()
-        | invalid -> invalid
-
-    [<Extension>]
-    static member TryGetDateTimeExact(element:JsonElement, format:string) =
-        let dateString = element.GetString()
-        DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
-
-    [<Extension>]
-    static member TryGetDateTimeOffsetExact(element:JsonElement, format:string) =
-        let dateString = element.GetString()
-        DateTimeOffset.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
-
-    [<Extension>]
-    static member TryGetString(element:JsonElement) =
-        true, element.GetString()
-
-    [<Extension>]
-    static member TryGetBoolean(element:JsonElement) =
-        true, element.GetBoolean()
-
-    [<Extension>]
-    static member TryGetUnit(element:JsonElement) =
-        element.ValueKind = Kind.Null, ()
-
-    [<Extension>]
-    static member TryGetArrayLength(element:JsonElement) =
-        true, element.GetArrayLength()
-
-    [<Extension>]
-    static member TryGetKind(element:JsonElement) =
-        true, element.ValueKind
-
-    [<Extension>]
-    static member TryGetElement(element:JsonElement) =
-        true, element.Clone()
 
 module internal String =
 
