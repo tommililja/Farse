@@ -30,4 +30,9 @@
     <ItemGroup>
         <ProjectReference Include="..\Farse\Farse.fsproj"/>
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="Examples.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 </Project>
