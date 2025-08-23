@@ -6,6 +6,7 @@ open NodaTime
 open NodaTime.Text
 open System
 open System.Text.Json
+open Xunit
 
 type UserId = UserId of Guid
 
@@ -105,6 +106,7 @@ module Parse =
             | _ -> None
         ) JsonValueKind.String
 
+    // Direct parser example.
     let userId =
         Parse.custom (fun (element:JsonElement) ->
             match element.TryGetGuid() with
@@ -127,7 +129,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Plan.parser
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant
+                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
                 return {
                     Plan = plan
@@ -173,13 +175,38 @@ module User =
             ]
         ]
 
-module App =
+module Examples =
 
-    let private json = String.Empty
+    let private json =
+        """
+            {
+                "id": "c8eae96a-025d-4bc9-88f8-f204e95f2883",
+                "name": "Alice",
+                "age": null,
+                "email": "alice@domain.com",
+                "profiles": [
+                    "01458283-b6e3-4ae7-ae54-a68eb587cdc0",
+                    "bf00d1e2-ee53-4969-9507-86bed7e96432",
+                    "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
+                ],
+                "subscription": {
+                    "plan": "Pro",
+                    "isCanceled": false,
+                    "renewsAt": "2026-12-25T10:30:00Z"
+                }
+            }
+        """
 
-    let user =
-        User.parser
-        |> Parser.parse json
-        |> Result.defaultWith failwith
+    [<Fact>]
+    let ``Should parse and create example JSON`` () =
+        let user =
+            User.parser
+            |> Parser.parse json
+            |> Result.defaultWith failwith
 
-    printf "%s" user.Name
+        let json =
+            user
+            |> User.json
+            |> Json.asString
+
+        Expect.json json

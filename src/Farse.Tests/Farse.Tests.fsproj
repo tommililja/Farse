@@ -5,12 +5,12 @@
         <GenerateProgramFile>false</GenerateProgramFile>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Examples.fs" />
         <Compile Include="Extensions.fs" />
         <Compile Include="Error.Tests.fs" />
         <Compile Include="Parse.Tests.fs" />
         <Compile Include="Parser.Tests.fs" />
         <Compile Include="Json.Tests.fs" />
+        <Compile Include="Examples.fs" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.4">
