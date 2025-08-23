@@ -241,8 +241,8 @@ module Parse =
         Parse.custom (fun (element:JsonElement) ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
-            | result when result.Success -> true, result.Value
-            | _ -> false, Instant.MinValue
+            | result when result.Success -> Some result.Value
+            | _ -> None
         ) JsonValueKind.String
 
     // Optimized parser example.
