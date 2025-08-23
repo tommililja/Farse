@@ -16,9 +16,6 @@ module Expect =
     let string (actual:string) =
         Verifier.Verify(actual, settings).ToTask()
 
-    let json (actual:string) =
-        Verifier.VerifyJson(actual, settings).ToTask()
-
     let ok x = Expect.wantOk x String.Empty
 
     let error x = Expect.wantError x String.Empty

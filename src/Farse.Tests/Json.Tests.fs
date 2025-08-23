@@ -36,4 +36,4 @@ module JsonTests =
             JStr "item 3"
         ]
         |> Json.asString
-        |> Expect.json
+        |> Expect.string
