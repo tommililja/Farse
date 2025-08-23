@@ -227,7 +227,7 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-You can use Parse.custom to create custom parsers.
+We can use Parse.custom to create parsers for types that does not have an included parser.
 
 ```fsharp
 open Farse
@@ -256,9 +256,9 @@ module Parse =
 
 ## Creating JSON
 
-We can also create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
+We can create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
-> Note: Use JNum<'a> if you want to be explicit.
+> Note: Use JNum<'a> to be explicit.
 
 ```fsharp
 JObj [
