@@ -1,11 +1,11 @@
 namespace Farse.Tests
 
-open System.IO
 open Farse
 open Farse.Operators
 open NodaTime
 open NodaTime.Text
 open System
+open System.IO
 open System.Text.Json
 open Xunit
 
@@ -176,7 +176,7 @@ module User =
             ]
         ]
 
-module Examples =
+module Example =
 
     let private expected =
         File.ReadAllText("Example.json")
