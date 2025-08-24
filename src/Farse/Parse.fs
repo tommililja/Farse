@@ -39,7 +39,7 @@ module Parse =
             | _ -> Error.couldNotRead name element
 
     // Pretty rowdy, but it works.
-    let private trav (path:string array) (parser:Parser<_>) : Parser<_> =
+    let private traverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun element ->
             let mutable last = Ok element
             let mutable previous = element
@@ -67,7 +67,7 @@ module Parse =
             | Error e -> Error e
 
     // Pretty rowdy, but it works.
-    let private tryTrav (path:string array) (parser:Parser<_>) : Parser<_> =
+    let private tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun element ->
             let mutable last = Ok (Some element)
             let mutable previous = element
@@ -106,7 +106,7 @@ module Parse =
     let req path parser =
         match path with
         | Flat name -> parse name parser
-        | Nested path -> trav path parser
+        | Nested path -> traverse path parser
 
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <example>
@@ -119,7 +119,7 @@ module Parse =
     let opt path parser =
         match path with
         | Flat name -> tryParse name parser
-        | Nested path -> tryTrav path parser
+        | Nested path -> tryTraverse path parser
 
     // Custom
 
