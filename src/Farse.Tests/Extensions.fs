@@ -22,5 +22,8 @@ module Expect =
 
     let errorString x = error x |> string
 
+    let isTrue actual expected =
+        Expect.equal actual expected String.Empty
+
     let equal actual expected =
         Expect.equal actual expected String.Empty
