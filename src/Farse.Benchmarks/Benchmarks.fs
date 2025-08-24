@@ -6,98 +6,32 @@ open BenchmarkDotNet.Configs
 open BenchmarkDotNet.Order
 open BenchmarkDotNet.Reports
 open BenchmarkDotNet.Running
+open Microsoft.FSharpLu.Json
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
-open Farse
-open Farse.Operators
 open Thoth.Json
 open Thoth.Json.Core
+open Farse
+open Farse.Operators
 
-type Base = {
-    Int: int
-    Decimal: decimal
-    String: string
-    Bool: bool
-    Guid: Guid
-    DateTime: DateTime
+[<CLIMutable>]
+[<NoComparison>]
+type Subscription = {
+    Plan: string
+    IsCanceled: bool
+    RenewsAt: DateTime option
 }
 
-type Benchmark = {
-    Int: int
-    Decimal: decimal
-    String: string
-    Bool: bool
-    Guid: Guid
-    DateTime: DateTime
-    Array: Base list
-    Object: Base
+[<CLIMutable>]
+[<NoComparison>]
+type User = {
+    Id: Guid
+    Name: string
+    Age: byte option
+    Email: string
+    Profiles: Guid Set
+    Subscription: Subscription
 }
-
-[<MemoryDiagnoser(true)>]
-[<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
-type BenchmarksNested() =
-
-    let mutable json = String.Empty
-
-    [<GlobalSetup>]
-    member _.Setup() =
-        json <- File.ReadAllText("Benchmarks.Nested.json")
-
-    [<Benchmark(Description = "Farse: Path / Single")>]
-    member _.FarsePathSingle() =
-        parser {
-            let! _ = "object.object.string" &= Parse.string
-
-            return ()
-        }
-        |> Parser.parse json
-        |> Result.defaultWith failwith
-
-    [<Benchmark(Description = "Farse: Path / Multiple")>]
-    member _.FarsePathMultiple() =
-        parser {
-            let! _ = "object.object.string" &= Parse.string
-            let! _ = "object.object.int" &= Parse.int
-            let! _ = "object.object.guid" &= Parse.guid
-
-            return ()
-        }
-        |> Parser.parse json
-        |> Result.defaultWith failwith
-
-    [<Benchmark(Description = "Farse: Objects / Single")>]
-    member _.FarseObjectsSingle() =
-        parser {
-            let! _ = "object" &= parser {
-                 return! "object" &= parser {
-                    let! _ = "string" &= Parse.string
-
-                    return ()
-                }
-            }
-
-            return ()
-        }
-        |> Parser.parse json
-        |> Result.defaultWith failwith
-
-    [<Benchmark(Description = "Farse: Objects / Multiple")>]
-    member _.FarseObjectsMany() =
-        parser {
-            let! _ = "object" &= parser {
-                 return! "object" &= parser {
-                    let! _ = "string" &= Parse.string
-                    let! _ = "int" &= Parse.int
-                    let! _ = "guid" &= Parse.guid
-
-                    return ()
-                }
-            }
-
-            return ()
-        }
-        |> Parser.parse json
-        |> Result.defaultWith failwith
 
 [<MemoryDiagnoser(true)>]
 [<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
@@ -106,148 +40,144 @@ type Benchmarks() =
     let mutable json = String.Empty
 
     [<GlobalSetup>]
-    member _.Setup() =
-        json <- File.ReadAllText("Benchmarks.json")
+    member _.Setup() = json <- File.ReadAllText("Benchmarks.100.json")
 
     [<Benchmark(Description = "Newtonsoft.Json*")>]
     member _.NewtonsoftJsonSerialization() =
-        JsonConvert.DeserializeObject<Benchmark>(json)
+        let settings = JsonSerializerSettings()
+        settings.Converters.Add(CompactUnionJsonConverter())
+        JsonConvert.DeserializeObject<User array>(json, settings)
+
+    [<Benchmark(Description = "System.Text.Json*")>]
+    member _.SystemTextJsonSerialization() =
+        System.Text.Json.JsonSerializer.Deserialize<User array>(
+            json, JsonSerializerOptions(PropertyNameCaseInsensitive = true))
 
     [<Benchmark(Description = "Newtonsoft.Json")>]
-    member _.NewtonsoftJson() =
-        let o = JObject.Parse(json)
+    member this.NewtonsoftJson() =
+        let users = JArray.Parse(json)
 
-        let object (o:JObject) =
-            let _ = o.Property("int").Value.Value<int>()
-            let _ = o.Property("decimal").Value.Value<decimal>()
-            let _ = o.Property("string").Value.Value<string>()
-            let _ = o.Property("bool").Value.Value<bool>()
-            let _ = o.Property("guid").Value.Value<string>() |> Guid.Parse
-            let _ = o.Property("dateTime").Value.Value<DateTime>()
+        let inline asOption fn (x:JToken) =
+            match x with
+            | x when x.Type <> JTokenType.Null -> Some <| fn x
+            | _ -> None
+
+        for user in users do
+            let user = user :?> JObject
+            let _ = user.GetValue("id").Value<string>() |> Guid.Parse
+            let _ = user.GetValue("name").Value<string>()
+            let _ = user.GetValue("age") |> asOption _.Value<byte>()
+            let _ = user.GetValue("email") |> _.Value<string>()
+            let _ = user.GetValue("profiles") |> Seq.map (_.Value<string>() >> Guid.Parse)
+
+            let subscription = user.GetValue("subscription") :?> JObject
+            let _ = subscription.GetValue("plan").Value<string>()
+            let _ = subscription.GetValue("isCanceled").Value<bool>()
+            let _ = subscription.GetValue("renewsAt") |> asOption _.Value<DateTime>()
 
             ()
-
-        object o
-
-        let _ =
-            o["array"] :?> JArray
-            |> Seq.map (fun x -> x :?> JObject)
-            |> Seq.map object
-            |> Seq.toList
-
-        let _ = o["object"] :?> JObject |> object
-
-        ()
 
     [<Benchmark(Description = "System.Text.Json")>]
     member _.SystemTextJson() =
         use doc = JsonDocument.Parse(json)
-        let e = doc.RootElement
+        let users = doc.RootElement.EnumerateArray()
 
-        let object (e:JsonElement) =
-            let _ = e.GetProperty("int").GetInt32()
-            let _ = e.GetProperty("decimal").GetDecimal()
-            let _ = e.GetProperty("string").GetString()
-            let _ = e.GetProperty("bool").GetBoolean()
-            let _ = e.GetProperty("guid").GetGuid()
-            let _ = e.GetProperty("dateTime").GetDateTime()
+        let inline asOption fn (x:JsonElement) =
+            match x with
+            | x when x.ValueKind <> JsonValueKind.Null -> Some <| fn x
+            | _ -> None
+
+        for user in users do
+            let _ = user.GetProperty("id").GetGuid()
+            let _ = user.GetProperty("name").GetString()
+            let _ = user.GetProperty("age") |> asOption _.GetByte()
+            let _ = user.GetProperty("email").GetString()
+            let _ = user.GetProperty("profiles").EnumerateArray() |> Seq.map _.GetGuid()
+
+            let subscription = user.GetProperty("subscription")
+            let _ = subscription.GetProperty("plan").GetString()
+            let _ = subscription.GetProperty("isCanceled").GetBoolean()
+            let _ = subscription.GetProperty("renewsAt") |> asOption _.GetDateTime()
 
             ()
 
-        object e
-
-        use arr = e.GetProperty("array").EnumerateArray()
-
-        let _ =
-            arr
-            |> Seq.map object
-            |> Seq.toList
-
-        let _ = e.GetProperty("object") |> object
-
-        ()
-
-    [<Benchmark(Description = "System.Text.Json*")>]
-    member _.SystemTextJsonSerialization() =
-        System.Text.Json.JsonSerializer.Deserialize<Benchmark>(
-            json, JsonSerializerOptions(PropertyNameCaseInsensitive = true))
-
     [<Benchmark(Description = "Thoth.Json.Net")>]
     member _.ThothJsonNet() =
-        let object =
+        let subscription =
             Thoth.Json.Net.Decode.object (fun get ->
-                let _ = get.Required.Field "int" Thoth.Json.Net.Decode.int
-                let _ = get.Required.Field "decimal" Thoth.Json.Net.Decode.decimal
-                let _ = get.Required.Field "string" Thoth.Json.Net.Decode.string
-                let _ = get.Required.Field "bool" Thoth.Json.Net.Decode.bool
-                let _ = get.Required.Field "guid" Thoth.Json.Net.Decode.guid
-                let _ = get.Required.Field "dateTime" Thoth.Json.Net.Decode.datetimeLocal
+                let _ = get.Required.Field "plan" Thoth.Json.Net.Decode.string
+                let _ = get.Required.Field "isCanceled" Thoth.Json.Net.Decode.bool
+                let _ = get.Optional.Field "renewsAt" Thoth.Json.Net.Decode.datetimeLocal
 
                 ()
             )
 
         let decoder =
             Thoth.Json.Net.Decode.object (fun get ->
-                let _ = get.Required.Raw object
-                let _ = get.Required.Field "array" (Thoth.Json.Net.Decode.list object)
-                let _ = get.Required.Field "object" object
+                let _ = get.Required.Field "id" Thoth.Json.Net.Decode.guid
+                let _ = get.Required.Field "name" Thoth.Json.Net.Decode.string
+                let _ = get.Optional.Field "age" Thoth.Json.Net.Decode.byte
+                let _ = get.Required.Field "email" Thoth.Json.Net.Decode.string
+                let _ = get.Required.Field "profiles" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.guid)
+                let _ = get.Required.Field "subscription" subscription
 
                 ()
             )
 
         json
-        |> Thoth.Json.Net.Decode.fromString decoder
+        |> Thoth.Json.Net.Decode.fromString (Thoth.Json.Net.Decode.array decoder)
         |> Result.defaultWith failwith
 
     [<Benchmark(Description = "Thoth.System.Text.Json")>]
     member _.ThothSystemTextJson() =
-        let object =
+        let subscription =
             Decode.object (fun get ->
-                let _ = get.Required.Field "int" Decode.int
-                let _ = get.Required.Field "decimal" Decode.decimal
-                let _ = get.Required.Field "string" Decode.string
-                let _ = get.Required.Field "bool" Decode.bool
-                let _ = get.Required.Field "guid" Decode.guid
-                let _ = get.Required.Field "dateTime" Decode.datetimeLocal
+                let _ = get.Required.Field "plan" Decode.string
+                let _ = get.Required.Field "isCanceled" Decode.bool
+                let _ = get.Optional.Field "renewsAt" Decode.datetimeLocal
 
                 ()
             )
 
         let decoder =
             Decode.object (fun get ->
-                let _ = get.Required.Raw object
-                let _ = get.Required.Field "array" (Decode.list object)
-                let _ = get.Required.Field "object" object
+                let _ = get.Required.Field "id" Decode.guid
+                let _ = get.Required.Field "name" Decode.string
+                let _ = get.Optional.Field "age" Decode.byte
+                let _ = get.Required.Field "email" Decode.string
+                let _ = get.Required.Field "profiles" (Decode.array Decode.guid)
+                let _ = get.Required.Field "subscription" subscription
 
                 ()
             )
 
         json
-        |> System.Text.Json.Decode.fromString decoder
+        |> System.Text.Json.Decode.fromString (Decode.array decoder)
         |> Result.defaultWith failwith
 
     [<Benchmark(Description = "Farse", Baseline = true)>]
     member _.Farse() =
-        let object =
+        let parser =
             parser {
-                let! _ = "int" &= Parse.int
-                let! _ = "decimal" &= Parse.decimal
-                let! _ = "string" &= Parse.string
-                let! _ = "bool" &= Parse.bool
-                let! _ = "guid" &= Parse.guid
-                let! _ = "dateTime" &= Parse.dateTime
+                let! _ = "id" &= Parse.guid
+                let! _ = "name" &= Parse.string
+                let! _ = "age" ?= Parse.byte
+                let! _ = "email" &= Parse.string
+                let! _ = "profiles" &= Parse.array Parse.guid
+
+                let! _ = "subscription" &= parser {
+                    let! _ = "plan" &= Parse.string
+                    let! _ = "isCanceled" &= Parse.bool
+                    let! _ = "renewsAt" ?= Parse.dateTime
+
+                    return ()
+                }
 
                 return ()
             }
 
-        parser {
-            do! object
-
-            let! _ = "array" &= Parse.list object
-            let! _ = "object" &= object
-
-            return ()
-        }
+        parser
+        |> Parse.array
         |> Parser.parse json
         |> Result.defaultWith failwith
 

@@ -11,9 +11,6 @@
         <Content Include="Benchmarks.100.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <Content Include="Benchmarks.Nested.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
         <Compile Include="Benchmarks.fs" />
     </ItemGroup>
     <ItemGroup>
@@ -21,6 +18,7 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
+      <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.11.7" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Thoth.Json.Net" Version="12.0.0" />
       <PackageReference Include="Thoth.Json.System.Text.Json" Version="0.2.1" />
