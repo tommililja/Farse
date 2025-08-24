@@ -86,8 +86,6 @@ module internal JsonElement =
 
     let inline tryGetUnit _ = Some ()
 
-    #if NET7_0_OR_GREATER
-
     let inline tryGetTimeOnly (element:JsonElement) =
         let timeString = element.GetString()
         tryParse <| TimeOnly.TryParse(timeString, CultureInfo.InvariantCulture)
@@ -103,8 +101,6 @@ module internal JsonElement =
     let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
         let dateString = element.GetString()
         tryParse <| DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
-
-    #endif
 
     let inline tryGetDateTime (element:JsonElement) =
         tryParse <| element.TryGetDateTime()

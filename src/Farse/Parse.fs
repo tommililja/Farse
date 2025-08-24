@@ -203,8 +203,6 @@ module Parse =
 
     // Dates
 
-    #if NET7_0_OR_GREATER
-
     /// Parses a string as System.TimeOnly.
     let timeOnly = getValue tryGetTimeOnly Kind.String
 
@@ -218,8 +216,6 @@ module Parse =
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
     let dateOnlyExact (format:string) = getValue (tryGetDateOnlyExact format) Kind.String
-
-    #endif
 
     /// Parses a string as System.DateTime (ISO 8601).
     let dateTime = getValue tryGetDateTime Kind.String

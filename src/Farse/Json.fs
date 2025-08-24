@@ -1,9 +1,6 @@
 namespace Farse
 
-#if NET7_0_OR_GREATER
 open System.Numerics
-#endif
-
 open System.Text.Json.Nodes
 open System.Collections.Generic
 
@@ -24,21 +21,10 @@ and [<AutoOpen>]
 
         member _.JsonNode = x.Root
 
-        #if NET7_0_OR_GREATER
-
         static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
             JsonValue.Create<'a>(x)
             |> number
             |> Json.JNum
-
-        #else
-
-        static member JNum<'a>(x:'a) =
-            JsonValue.Create<'a>(x)
-            |> number
-            |> Json.JNum
-
-        #endif
 
 module JNil =
 
@@ -55,17 +41,8 @@ module JStr =
 
 module JNum =
 
-    #if NET7_0_OR_GREATER
-
     let nil<'a when 'a :> INumber<'a>>(x:'a option) =
         JNil.nil JNum x
-
-    #else
-
-    let nil<'a>(x:'a option) =
-        JNil.nil JNum x
-
-    #endif
 
 module JBit =
 

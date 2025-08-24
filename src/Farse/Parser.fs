@@ -1,6 +1,5 @@
 namespace Farse
 
-open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
@@ -70,12 +69,7 @@ module Parser =
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
     /// <param name="parser">The parser used to parse the JSON string.</param>
-    let parse
-        #if NET7_0_OR_GREATER
-        ([<StringSyntax("Json")>] json:string) (parser:Parser<_>) =
-        #else
-        (json:string) (parser:Parser<_>) =
-        #endif
+    let parse ([<StringSyntax("Json")>] json:string) (parser:Parser<_>) =
         try
             match json with
             | Invalid -> Error.invalidString ()
