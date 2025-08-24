@@ -1,5 +1,7 @@
 namespace Farse
 
+open System
+open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
 // The type alias does not work in some function signatures.
@@ -68,7 +70,12 @@ module Parser =
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
     /// <param name="parser">The parser used to parse the JSON string.</param>
-    let parse (json:string) (parser:Parser<_>) =
+    let parse
+        #if NET7_0_OR_GREATER
+        ([<StringSyntax("Json")>] json:string) (parser:Parser<_>) =
+        #else
+        (json:string) (parser:Parser<_>) =
+        #endif
         try
             match json with
             | Invalid -> Error.invalidString ()
