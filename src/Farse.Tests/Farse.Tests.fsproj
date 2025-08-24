@@ -10,7 +10,7 @@
         <Compile Include="Parse.Tests.fs" />
         <Compile Include="Parser.Tests.fs" />
         <Compile Include="Json.Tests.fs" />
-        <Compile Include="Examples.fs" />
+        <Compile Include="Example.fs" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.4">
@@ -31,7 +31,7 @@
         <ProjectReference Include="..\Farse\Farse.fsproj"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Examples.json">
+      <Content Include="Example.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
