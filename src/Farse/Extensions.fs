@@ -13,10 +13,10 @@ module internal JsonSerializerOptions =
 
 module internal JsonElement =
 
-    let getProperty (name:string) (element:JsonElement) =
+    let inline getProperty (name:string) (element:JsonElement) =
         element.TryGetProperty(name) |> snd
 
-    let tryGetProperty (name:string) (element:JsonElement) =
+    let inline tryGetProperty (name:string) (element:JsonElement) =
         match element.TryGetProperty(name) with
         | true, prop when prop.ValueKind <> Kind.Null -> Some prop
         | _ -> None
