@@ -26,8 +26,7 @@ module Age =
 
     let asByte (Age x) = x
 
-    let fromByte age =
-        match age with
+    let fromByte = function
         | age when age >= 12uy -> Ok <| Age age
         | age -> Error $"Invalid age: %u{age}."
 
@@ -41,9 +40,8 @@ module Email =
 
     let asString (Email x) = x
 
-    let fromString str =
-        // Some validation.
-        Ok <| Email str
+    let fromString =
+        Email >> Ok // Some validation.
 
     let parser =
         Parse.string
@@ -71,7 +69,7 @@ module Plan =
         | "Pro" -> Ok Pro
         | "Standard" -> Ok Standard
         | "Free" -> Ok Free
-        | invalid -> Error $"Invalid plan: %s{invalid}."
+        | str -> Error $"Invalid plan: %s{str}."
 
     let asString = function
         | Pro -> "Pro"
