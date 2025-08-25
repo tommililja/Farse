@@ -27,10 +27,16 @@ module Parser =
             | Ok _ -> Ok ()
             | Error e -> Error e
 
-    let inline internal validateImpl fn (parser:Parser<_>) : Parser<_> =
+    let inline internal validateImpl fn (parser:Parser<_>) : Parser<'b> =
         fun element ->
             match parser element with
-            | Ok x -> fn x
+            | Ok x ->
+                match fn x with
+                | Ok x -> Ok x
+                | Error msg ->
+                    element
+                    |> Error.invalidValue msg typeof<'b>
+                    |> Error
             | Error e -> Error e
 
     /// <summary>Returns a parser with the given value.</summary>

@@ -101,16 +101,16 @@ module Parse =
         Parse.custom (fun (element:JsonElement) ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
-            | result when result.Success -> Some result.Value
-            | _ -> None
+            | result when result.Success -> Ok result.Value
+            | result -> Error result.Exception.Message
         ) JsonValueKind.String
 
     // Optimized parser example.
     let userId =
         Parse.custom (fun (element:JsonElement) ->
             match element.TryGetGuid() with
-            | true, guid -> Some <| UserId guid
-            | _ -> None
+            | true, guid -> Ok <| UserId guid
+            | _ -> Error String.Empty // No additional info.
         ) JsonValueKind.String
 
 module User =

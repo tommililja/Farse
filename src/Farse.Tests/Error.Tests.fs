@@ -26,6 +26,23 @@ module ErrorTests =
             |> Parser.parse String.Empty
             |> Expect.errorString
 
+        [<Fact>]
+        let ``Should return error when validation fails`` () =
+            Parse.int
+            |> Parser.validate (fun int ->
+                if int > 1 then Ok int
+                else Error "Error"
+            )
+            |> Parser.parse "1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return error when creating a parser from an error`` () =
+            Error "Error"
+            |> Parser.fromResult
+            |> Parser.parse "1"
+            |> Expect.errorString
+
     module Parsing =
 
         [<Fact>]
@@ -339,13 +356,25 @@ module ErrorTests =
         // TODO: Add tests for other Parse.* functions.
 
         [<Fact>]
-        let ``Should return error when parsing a datetime exact with an incorrect format`` () =
+        let ``Should return error when parsing a TimeOnly exact with an incorrect format`` () =
+            Parse.req "prop" (Parse.timeOnlyExact "HHmmss")
+            |> Parser.parse """{ "prop": "17:28:45" }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return error when parsing a DateOnly exact with an incorrect format`` () =
+            Parse.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
+            |> Parser.parse """{ "prop": "2025-05-13" }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return error when parsing a DateTime exact with an incorrect format`` () =
             Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return error when parsing a datetime exact when the value is not a string`` () =
+        let ``Should return error when parsing a DateTime exact when the value is not a string`` () =
             Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString

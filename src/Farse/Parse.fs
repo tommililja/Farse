@@ -123,7 +123,7 @@ module Parse =
 
     // Custom
 
-    let inline internal getValue (tryParse: JsonElement -> 'a option) expectedKind : Parser<_> =
+    let inline internal getValue (tryParse: JsonElement -> Result<'a, string>) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 match expectedKind with
@@ -133,10 +133,10 @@ module Parse =
 
             if isExpectedKind then
                 match tryParse element with
-                | Some x -> Ok x
-                | None ->
+                | Ok x -> Ok x
+                | Error msg ->
                     element
-                    |> Error.invalidValue typeof<'a>
+                    |> Error.invalidValue msg typeof<'a>
                     |> Error
             else
                 element.ValueKind

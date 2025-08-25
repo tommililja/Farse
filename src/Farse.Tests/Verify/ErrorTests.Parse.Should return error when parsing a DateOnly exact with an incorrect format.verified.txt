@@ -1,0 +1,6 @@
+﻿Error: Could not parse property 'prop'.
+Could not parse '"2025-05-13"' into System.DateOnly: Expected yyyyMMdd.
+Object:
+{
+  "prop": "2025-05-13"
+}

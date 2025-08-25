@@ -25,15 +25,6 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should create parser and return error`` () =
-        let expected = Error "Error"
-        let actual =
-            expected
-            |> Parser.fromResult
-            |> Parser.parse "1"
-        Expect.equal actual expected
-
-    [<Fact>]
     let ``Should bind parsers and return expected value`` () =
         let expected = 2
         let actual =
@@ -71,14 +62,4 @@ module ParserTests =
             |> Parser.validate Ok
             |> Parser.parse "1"
             |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
-    let ``Should return expected error when validation fails`` () =
-        let expected = "Error"
-        let actual =
-            Parse.int
-            |> Parser.validate (fun _ -> Error expected)
-            |> Parser.parse "1"
-            |> Expect.error
         Expect.equal actual expected

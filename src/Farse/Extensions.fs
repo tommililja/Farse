@@ -34,8 +34,8 @@ module internal JsonElement =
 
     let inline private tryParse x =
         match x with
-        | true, x -> Some x
-        | _ -> None
+        | true, x -> Ok x
+        | _ -> Error String.Empty // No additional info, String.empty for now.
 
     let inline tryGetInt (element:JsonElement) =
         tryParse <| element.TryGetInt32()
@@ -72,19 +72,19 @@ module internal JsonElement =
 
     let inline tryGetChar (element:JsonElement) =
         match element.GetString() with
-        | str when str.Length = 1 -> Some str[0]
-        | _ -> None
+        | str when str.Length = 1 -> Ok str[0]
+        | _ -> Error "Expected a string length of 1."
 
     let inline tryGetString (element:JsonElement) =
-        Some <| element.GetString()
+        Ok <| element.GetString()
 
     let inline tryGetBool (element:JsonElement) =
-        Some <| element.GetBoolean()
+        Ok <| element.GetBoolean()
 
     let inline tryGetGuid (element:JsonElement) =
         tryParse <| element.TryGetGuid()
 
-    let inline tryGetUnit _ = Some ()
+    let inline tryGetUnit _ = Ok ()
 
     let inline tryGetTimeOnly (element:JsonElement) =
         let timeString = element.GetString()
@@ -92,7 +92,9 @@ module internal JsonElement =
 
     let inline tryGetTimeOnlyExact (format:string) (element:JsonElement) =
         let timeString = element.GetString()
-        tryParse <| TimeOnly.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+        match TimeOnly.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, timeOnly -> Ok timeOnly
+        | _ -> Error $"Expected %s{format}."
 
     let inline tryGetDateOnly (element:JsonElement) =
         let dateString = element.GetString()
@@ -100,35 +102,41 @@ module internal JsonElement =
 
     let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
         let dateString = element.GetString()
-        tryParse <| DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+        match DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, dateOnly -> Ok dateOnly
+        | _ -> Error $"Expected %s{format}."
 
     let inline tryGetDateTime (element:JsonElement) =
         tryParse <| element.TryGetDateTime()
 
     let inline tryGetDateTimeUtc (element:JsonElement) =
         match element.TryGetDateTime() with
-        | true, dateTime -> Some <| dateTime.ToUniversalTime()
-        | _ -> None
+        | true, dateTime -> Ok <| dateTime.ToUniversalTime()
+        | _ -> Error String.Empty
 
     let inline tryGetDateTimeExact (format:string) (element:JsonElement) =
         let dateString = element.GetString()
-        tryParse <| DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+        match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, dateTime -> Ok dateTime
+        | _ -> Error $"Expected %s{format}."
 
     let inline tryGetDateTimeOffset (element:JsonElement) =
         tryParse <| element.TryGetDateTimeOffset()
 
     let inline tryGetDateTimeOffsetExact (format:string) (element:JsonElement)  =
         let dateString = element.GetString()
-        tryParse <| DateTimeOffset.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None)
+        match DateTimeOffset.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, dateTimeOffset -> Ok dateTimeOffset
+        | _ -> Error $"Expected %s{format}."
 
     let inline tryGetArrayLength (element:JsonElement) =
-        Some <| element.GetArrayLength()
+        Ok <| element.GetArrayLength()
 
     let inline tryGetKind (element:JsonElement) =
-        Some <| element.ValueKind
+        Ok <| element.ValueKind
 
     let inline tryGetElement (element:JsonElement) =
-        Some <| element.Clone()
+        Ok <| element.Clone()
 
 module internal JsonNode =
 

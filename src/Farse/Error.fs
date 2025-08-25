@@ -15,8 +15,13 @@ module internal Error =
         | Kind.Null | Kind.Undefined -> String.Empty
         | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
 
-    let invalidValue (expectedType:Type) element =
-        $"The value '%s{JsonElement.getRawText element}' is not valid for %s{expectedType.FullName}."
+    let invalidValue msg (expectedType:Type) element =
+        let additionalInfo =
+            match msg with
+            | String msg -> $": %s{msg}"
+            | Invalid -> "."
+
+        $"Could not parse '%s{JsonElement.getRawText element}' into %s{expectedType.FullName}%s{additionalInfo}"
 
     let invalidKind (expected:Kind) (actual:Kind) =
         let expected =
