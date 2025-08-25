@@ -124,6 +124,7 @@ With the following types.
 ```fsharp
 open Farse
 open NodaTime
+open System
 
 type UserId = UserId of Guid
 
