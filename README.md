@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
-| System.Text.Json       | 109.8 us |  0.73 |  4.1504 |       - |  25.85 KB |        0.23 |
-| System.Text.Json*      | 112.2 us |  0.74 | 13.0615 |  1.7090 |  80.19 KB |        0.71 |
-| Farse                  | 151.3 us |  1.00 | 18.3105 |       - | 113.56 KB |        1.00 |
-| Thoth.System.Text.Json | 245.7 us |  1.62 | 55.1758 | 18.0664 | 338.76 KB |        2.98 |
-| Newtonsoft.Json*       | 248.8 us |  1.64 | 59.5703 |  7.8125 | 365.69 KB |        3.22 |
-| Newtonsoft.Json        | 267.7 us |  1.77 | 75.6836 | 22.9492 | 464.07 KB |        4.09 |
-| Thoth.Json.Net         | 354.9 us |  2.35 | 94.7266 | 44.9219 | 581.86 KB |        5.12 |
+| System.Text.Json       | 109.8 us |  0.71 |  4.1504 |       - |  25.85 KB |        0.25 |
+| System.Text.Json*      | 113.4 us |  0.73 | 13.0615 |  1.7090 |  80.19 KB |        0.77 |
+| Farse                  | 154.6 us |  1.00 | 16.8457 |       - | 104.19 KB |        1.00 |
+| Thoth.System.Text.Json | 247.3 us |  1.60 | 55.1758 | 18.0664 | 338.76 KB |        3.25 |
+| Newtonsoft.Json*       | 248.7 us |  1.61 | 59.5703 |  7.8125 | 365.69 KB |        3.51 |
+| Newtonsoft.Json        | 306.6 us |  1.98 | 75.6836 |  6.8359 | 464.07 KB |        4.45 |
+| Thoth.Json.Net         | 366.9 us |  2.37 | 94.7266 | 44.9219 | 581.86 KB |        5.58 |
 
 * Serialization
 ```
@@ -240,16 +240,16 @@ module Parse =
         Parse.custom (fun (element:JsonElement) ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
-            | result when result.Success -> Some result.Value
-            | _ -> None
+            | result when result.Success -> Ok result.Value
+            | result -> Error result.Exception.Message
         ) JsonValueKind.String
 
     // Optimized parser example.
     let userId =
         Parse.custom (fun (element:JsonElement) ->
             match element.TryGetGuid() with
-            | true, guid -> Some <| UserId guid
-            | _ -> None
+            | true, guid -> Ok <| UserId guid
+            | _ -> Error String.Empty // No additional info.
         ) JsonValueKind.String
 ```
 
