@@ -1,5 +1,6 @@
 namespace Farse
 
+open System
 open System.Text.Json
 
 module Parse =
@@ -8,9 +9,9 @@ module Parse =
         let name = Array.last path
         if current.ValueKind = Kind.Array
         then
-            let msg = e.Split("\n")[1]
+            let msg = e.Split("\n")[1] |> _.Replace("Details: ", String.Empty)
             Error.couldNotParse name msg previous
-        else Error.notObject name previous  current
+        else Error.notObject name previous current
 
     let private parse name (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->

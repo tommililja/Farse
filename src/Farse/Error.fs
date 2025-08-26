@@ -16,12 +16,12 @@ module internal Error =
         | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
 
     let invalidValue msg (expectedType:Type) element =
-        let additionalInfo =
+        let msg =
             match msg with
-            | String msg -> $": %s{msg}"
-            | Invalid -> "."
+            | String msg -> $" %s{msg.TrimEnd('.')}."
+            | Invalid -> String.Empty
 
-        $"Could not parse '%s{JsonElement.getRawText element}' into %s{expectedType.FullName}%s{additionalInfo}"
+        $"Failed to parse '%s{JsonElement.asString element}' as %s{expectedType.FullName}.%s{msg}"
 
     let invalidKind (expected:Kind) (actual:Kind) =
         let expected =
@@ -29,26 +29,26 @@ module internal Error =
             | Kind.True | Kind.False -> "Bool"
             | kind -> string kind
 
-        $"Expected: %s{expected}, actual: %s{string actual}."
+        $"Expected '%s{expected}', but got '%s{string actual}'."
 
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."
-            invalidKind Kind.Object element.ValueKind
+            $"Details: %s{invalidKind Kind.Object element.ValueKind}"
             print element
         ]
 
     let notObject name previous (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
-            invalidKind Kind.Object element.ValueKind
+            $"Details: %s{invalidKind Kind.Object element.ValueKind}"
             print previous
         ]
 
     let couldNotParse name msg element =
         create [
             $"Error: Could not parse property '%s{name}'."
-            msg
+            $"Details: %s{msg}"
             print element
         ]
 

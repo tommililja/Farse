@@ -30,6 +30,9 @@ module internal JsonElement =
     let getJson (element:JsonElement) =
         JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
 
+    let asString (element:JsonElement) =
+        element.ToString()
+
     // Parsing
 
     let inline private tryParse x =

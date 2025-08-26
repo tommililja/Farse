@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Could not parse '"2025-05-13 17:28 +02:00"' into System.DateTimeOffset: Expected yyyyMMdd HH:mm:ss zzz.
+Details: Failed to parse '2025-05-13 17:28 +02:00' as System.DateTimeOffset. Expected yyyyMMdd HH:mm:ss zzz.
 Object:
 {
   "prop": "2025-05-13 17:28 \u002B02:00"

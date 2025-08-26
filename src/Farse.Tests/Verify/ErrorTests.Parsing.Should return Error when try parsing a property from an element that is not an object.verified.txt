@@ -1,4 +1,4 @@
 ﻿Error: Could not read property 'prop'.
-Expected: Object, actual: Array.
+Details: Expected 'Object', but got 'Array'.
 Array:
 []

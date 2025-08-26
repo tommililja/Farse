@@ -1,1 +1,1 @@
-﻿Could not parse '1' into System.Int32: Error
+﻿Failed to parse '1' as System.Int32. Value too small.

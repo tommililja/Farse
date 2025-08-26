@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Could not parse '"17:28:45"' into System.TimeOnly: Expected HHmmss.
+Details: Failed to parse '17:28:45' as System.TimeOnly. Expected HHmmss.
 Object:
 {
   "prop": "17:28:45"

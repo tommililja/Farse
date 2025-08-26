@@ -31,7 +31,7 @@ module ErrorTests =
             Parse.int
             |> Parser.validate (fun int ->
                 if int > 1 then Ok int
-                else Error "Error"
+                else Error "Value too small"
             )
             |> Parser.parse "1"
             |> Expect.errorString

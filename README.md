@@ -291,11 +291,13 @@ JObj [
 More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
 ```code
-﻿Error: Could not parse property 'prop'.
-Expected: Number, actual: String.
+Error: Could not parse property 'plan'.
+Details: Failed to parse 'Max' as Farse.Tests.Plan. Invalid plan: Max.
 Object:
 {
-  "prop": "1"
+  "plan": "Max",
+  "isCanceled": false,
+  "renewsAt": "2026-12-25T10:30:00Z"
 }
 ```
 

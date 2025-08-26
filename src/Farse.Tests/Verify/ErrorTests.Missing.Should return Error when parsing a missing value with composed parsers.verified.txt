@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'missing'.
-Expected: String, actual: Undefined.
+Details: Expected 'String', but got 'Undefined'.
 Object:
 {
   "prop2": "1"

@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop2'.
-Expected: String, actual: Null.
+Details: Expected 'String', but got 'Null'.
 Object:
 {
   "prop2": null
