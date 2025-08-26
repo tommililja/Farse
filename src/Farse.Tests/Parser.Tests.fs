@@ -6,7 +6,7 @@ open Farse
 module ParserTests =
 
     [<Fact>]
-    let ``Should create parser and return expected value`` () =
+    let ``Should create Parser and return expected value`` () =
         let expected = ()
         let actual =
             expected
@@ -16,7 +16,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should create parser and return ok`` () =
+    let ``Should create Parser and return Ok`` () =
         let expected = Ok ()
         let actual =
             expected
@@ -25,7 +25,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should bind parsers and return expected value`` () =
+    let ``Should bind Parser and return expected value`` () =
         let expected = 2
         let actual =
             Parse.int
@@ -35,7 +35,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should map parser and return expected value`` () =
+    let ``Should map Parser and return expected value`` () =
         let expected = "1"
         let actual =
             Parse.int
@@ -45,7 +45,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should ignore parser value and return unit`` () =
+    let ``Should ignore Parser value and return unit`` () =
         let expected = ()
         let actual =
             Parse.int
@@ -55,7 +55,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return ok with expected value when validation succeeds`` () =
+    let ``Should return Ok with expected value when validation succeeds`` () =
         let expected = 1
         let actual =
             Parse.int

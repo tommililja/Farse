@@ -282,7 +282,7 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse string as DateTime utc`` () =
+    let ``Should parse string as DateTime UTC`` () =
         let now = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00))
         let expected = now.ToUniversalTime()
         let actual =
@@ -337,7 +337,7 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse array as set`` () =
+    let ``Should parse array as Set`` () =
         let expected = set [ 1; 2; 3; ]
         let actual =
             Parse.req "prop" (Parse.set Parse.int)
