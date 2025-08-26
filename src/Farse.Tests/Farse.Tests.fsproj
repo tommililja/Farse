@@ -35,4 +35,10 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Remove="Verify\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Verify\**" />
+    </ItemGroup>
 </Project>
