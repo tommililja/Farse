@@ -9,7 +9,7 @@ module Expect =
 
     let private settings =
         let settings = VerifySettings()
-        settings.UseDirectory("Verify2")
+        settings.UseDirectory("Verify")
         settings.DisableDiff()
         settings
 
