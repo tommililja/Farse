@@ -34,65 +34,11 @@
       <Content Include="Example.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-      <Content Include="Verify\.DS_Store" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when a nested object is missing with mixed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when a nested object is missing with required parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when an object is missing with required parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when an object is missing.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when parsing a missing value with composed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when parsing a missing value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when parsing a nested missing value with required parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when parsing a nested missing value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when try parsing a missing value with composed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Missing.Should return Error when try parsing a nested missing value with mixed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when a nested object is null with mixed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when a nested object is null with required parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when an object is null with required parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when an object is null.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when parsing a nested null value with required parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when parsing a nested null value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when parsing a null value with composed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when parsing a null value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when try parsing a nested null value with mixed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Null.Should return Error when try parsing a null value with composed parsers.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parse.Should return Error when parsing a DateOnly exact with an incorrect format.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parse.Should return Error when parsing a DateTime exact with an incorrect format.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parse.Should return Error when parsing a DateTimeOffset exact with an incorrect format.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parse.Should return Error when parsing a TimeOnly exact with an incorrect format.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parser.Should return Error when creating a Parser from an Error.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parser.Should return Error when parsing a null string.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parser.Should return Error when parsing an empty string.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parser.Should return Error when parsing invalid JSON.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parser.Should return Error when validation fails.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested array that is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested incorrect value in an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested incorrect value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested object in an array that contains another kind.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested property from an element that is not an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested value when the value is an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a nested value when the value is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a property from an element that is not an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a value when the value is an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing a value when the value is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing an array that is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing an incorrect value in an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing an incorrect value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when parsing an object in an array that contains another kind.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested array that is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested incorrect value in an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested incorrect value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested object in an array that contains another kind.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested property from an element that is not an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested value when the value is an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a nested value when the value is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a property from an element that is not an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a value when the value is an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing a value when the value is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing an array that is an object.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing an incorrect value in an array.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing an incorrect value.verified.txt" />
-      <Content Include="Verify\ErrorTests.Parsing.Should return Error when try parsing an object in an array that contains another kind.verified.txt" />
-      <Content Include="Verify\JsonTests.Should create expected JSON array.verified.txt" />
-      <Content Include="Verify\JsonTests.Should create expected JSON object.verified.txt" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Remove="Verify\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Verify\**" />
     </ItemGroup>
 </Project>
