@@ -236,6 +236,7 @@ open System.Text.Json
 
 module Parse =
 
+    // Custom parser example.
     let instant =
         Parse.custom (fun (element:JsonElement) ->
             let string = element.GetString()

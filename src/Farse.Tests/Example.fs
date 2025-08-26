@@ -97,6 +97,7 @@ type User = {
 
 module Parse =
 
+    // Custom parser example.
     let instant =
         Parse.custom (fun (element:JsonElement) ->
             let string = element.GetString()
@@ -184,7 +185,7 @@ module Example =
         let user =
             User.parser
             |> Parser.parse expected
-            |> Result.defaultWith failwith
+            |> Expect.ok
 
         let actual =
             user
