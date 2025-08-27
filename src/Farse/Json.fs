@@ -16,15 +16,17 @@ type Json =
 
 and JsonProperty = string * Json
 
-and [<AutoOpen>]
-    number internal (x:JsonValue) =
+and number internal (value:JsonValue) =
 
-        member _.JsonNode = x.Root
+    member _.JsonNode = value.Root
 
-        static member JNum<'a when 'a :> INumber<'a>>(x:'a) =
-            JsonValue.Create<'a>(x)
-            |> number
-            |> Json.JNum
+[<AutoOpen>]
+module number =
+
+    let JNum<'a when 'a :> INumber<'a>> =
+        JsonValue.Create<'a>
+        >> number
+        >> JNum
 
 module JNil =
 
