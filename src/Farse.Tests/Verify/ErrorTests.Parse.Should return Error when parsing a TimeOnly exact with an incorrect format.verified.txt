@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Details: Failed to parse '17:28:45' as TimeOnly. Expected HHmmss.
+Message: Failed to parse '17:28:45' as TimeOnly. Expected HHmmss.
 Object:
 {
   "prop": "17:28:45"

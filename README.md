@@ -292,7 +292,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 
 ```code
 Error: Could not parse property 'plan'.
-Details: Failed to parse 'Max' as Plan. Invalid plan: Max.
+Message: Failed to parse 'Max' as Plan. Invalid plan: Max.
 Object:
 {
   "plan": "Max",

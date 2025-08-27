@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Details: Expected 'Array', but got 'Object'.
+Message: Expected 'Array', but got 'Object'.
 Object:
 {
   "prop": {

@@ -9,7 +9,7 @@ module Parse =
         let name = Array.last path
         if current.ValueKind = Kind.Array
         then
-            let msg = e.Split("\n")[1] |> _.Replace("Details: ", String.Empty)
+            let msg = e.Split("\n")[1] |> _.Replace("Message: ", String.Empty)
             Error.couldNotParse name msg previous
         else Error.notObject name previous current
 

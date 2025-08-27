@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop2'.
-Details: Expected 'Number', but got 'String'.
+Message: Expected 'Number', but got 'String'.
 Object:
 {
   "prop2": "1"

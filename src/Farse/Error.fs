@@ -34,21 +34,21 @@ module internal Error =
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."
-            $"Details: %s{invalidKind Kind.Object element.ValueKind}"
+            $"Message: %s{invalidKind Kind.Object element.ValueKind}"
             print element
         ]
 
     let notObject name previous (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
-            $"Details: %s{invalidKind Kind.Object element.ValueKind}"
+            $"Message: %s{invalidKind Kind.Object element.ValueKind}"
             print previous
         ]
 
     let couldNotParse name msg element =
         create [
             $"Error: Could not parse property '%s{name}'."
-            $"Details: %s{msg}"
+            $"Message: %s{msg}"
             print element
         ]
 
