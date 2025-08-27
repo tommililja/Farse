@@ -61,6 +61,6 @@ module internal Error =
     let invalidJson json (exn:exn) =
         create [
             "Error: Could not parse JSON string."
-            exn.Message
+            $"Message: %s{exn.Message}"
             $"JSON: '%s{json}'."
         ]
