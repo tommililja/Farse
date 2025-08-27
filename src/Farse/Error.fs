@@ -18,7 +18,10 @@ module internal Error =
     let invalidValue msg (expectedType:Type) element =
         let msg =
             match msg with
-            | String msg -> $" %s{msg.TrimEnd('.')}."
+            | String msg ->
+                match msg[msg.Length - 1] with
+                | '.' | '!' | '?' -> $" %s{msg}"
+                | _ -> $" %s{msg}."
             | Invalid -> String.Empty
 
         $"Failed to parse '%s{JsonElement.asString element}' as %s{expectedType.Name}.%s{msg}"
