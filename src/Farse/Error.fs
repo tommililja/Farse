@@ -21,7 +21,7 @@ module internal Error =
             | String msg -> $" %s{msg.TrimEnd('.')}."
             | Invalid -> String.Empty
 
-        $"Failed to parse '%s{JsonElement.asString element}' as %s{expectedType.FullName}.%s{msg}"
+        $"Failed to parse '%s{JsonElement.asString element}' as %s{expectedType.Name}.%s{msg}"
 
     let invalidKind (expected:Kind) (actual:Kind) =
         let expected =

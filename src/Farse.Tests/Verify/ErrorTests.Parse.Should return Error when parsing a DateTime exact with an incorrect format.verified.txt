@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Details: Failed to parse '2025-05-13T17:28:45' as System.DateTime. Expected yyyy-MM-dd HH:mm:ss.
+Details: Failed to parse '2025-05-13T17:28:45' as DateTime. Expected yyyy-MM-dd HH:mm:ss.
 Object:
 {
   "prop": "2025-05-13T17:28:45"
