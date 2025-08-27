@@ -55,7 +55,7 @@ module internal Error =
     let invalidString () =
         create [
             "Error: Could not parse JSON string."
-            "The string was null or empty."
+            "Message: The string was null or empty."
         ]
 
     let invalidJson json (exn:exn) =
