@@ -226,7 +226,7 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-We can use Parse.custom to create our own parsers for types that do not have an included parser, or to create optimized versions that avoid unnecessary operations.
+Use Parse.custom to create parsers for custom types, or optimized variants for our own types that avoid unnecessary operations.
 
 ```fsharp
 open Farse
@@ -251,8 +251,10 @@ module Parse =
             match element.TryGetGuid() with
             | true, guid -> Ok <| UserId guid
             | _ -> Error String.Empty // No additional info.
-        ) JsonValueKind.String
+        ) JsonValueKind.String // Expected kind.
 ```
+
+> Note: Use either True and False for bool values.
 
 ## Creating JSON
 
@@ -294,6 +296,8 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 Error: Could not parse property 'plan'.
 Message: Failed to parse 'Max' as Plan. Invalid plan: Max.
 Object:
+```
+```json
 {
   "plan": "Max",
   "isCanceled": false,
