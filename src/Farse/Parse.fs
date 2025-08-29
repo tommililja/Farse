@@ -203,7 +203,7 @@ module Parse =
     /// Parses null as FSharp.Core.Unit.
     let unit = getValue tryGetUnit Kind.Null
 
-    // Dates
+    // Date and time
 
     /// Parses a string as System.TimeOnly.
     let timeOnly = getValue tryGetTimeOnly Kind.String
