@@ -1,6 +1,5 @@
 namespace Farse
 
-open System
 open System.Text.Json
 open System.Text.RegularExpressions
 
@@ -11,7 +10,7 @@ module Parse =
         match current.ValueKind with
         | Kind.Array ->
             // Extracts the error message from the previous parser error.
-            let msg = Regex.Match(msg, "Message:\s*([^\r\n]+)").Value
+            let msg = Regex.Match(msg, "Message:\s*([^\r\n]+)").Groups[1].Value
             Error.couldNotParse name msg previous
         | _ -> Error.notObject name previous current
 
