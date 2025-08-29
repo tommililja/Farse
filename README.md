@@ -260,7 +260,7 @@ module Parse =
 
 We can create JSON strings with [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs).
 
-> Note: Use JNum<'a> to be explicit.
+This creates an object, but you can create any type and convert it with Json.asString.
 
 ```fsharp
 JObj [
@@ -286,7 +286,7 @@ JObj [
 ]
 ```
 
-> This creates an object, but you can create any type and convert it with Json.asString.
+> Note: Use JNum<'a> to be explicit.
 
 ## Errors
 
@@ -305,4 +305,4 @@ Object:
 }
 ```
 
-> Farse doesn't throw exceptions and only catches JsonException, that is thrown when parsing invalid JSON.
+> Note: Farse doesn't throw exceptions and only catches JsonException, that is thrown for invalid JSON.
