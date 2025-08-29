@@ -212,6 +212,13 @@ module Parse =
     /// <param name="format">The required format.</param>
     let timeOnlyExact (format:string) = getValue (tryGetTimeOnlyExact format) Kind.String
 
+    /// Parses a string as System.TimeSpan.
+    let timeSpan = getValue tryGetTimeSpan Kind.String
+
+    /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let timeSpanExact (format:string) = getValue (tryGetTimeSpanExact format) Kind.String
+
     /// Parses a string as System.DateOnly (ISO 8601).
     let dateOnly = getValue tryGetDateOnly Kind.String
 

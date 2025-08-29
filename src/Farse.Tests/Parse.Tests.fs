@@ -255,6 +255,24 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse string as TimeSpan`` () =
+        let expected = TimeSpan.Parse("1:23:45")
+        let actual =
+            Parse.req "prop" Parse.timeSpan
+            |> Parser.parse """{ "prop": "1:23:45" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse string as TimeSpan exact`` () =
+        let expected = TimeSpan.Parse("01:23:45")
+        let actual =
+            Parse.req "prop" (Parse.timeSpanExact "hhmmss")
+            |> Parser.parse """{ "prop": "012345" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse string as DateOnly`` () =
         let expected = DateOnly.Parse("2025-05-13")
         let actual =

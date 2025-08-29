@@ -99,6 +99,16 @@ module internal JsonElement =
         | true, timeOnly -> Ok timeOnly
         | _ -> Error $"Expected %s{format}."
 
+    let inline tryGetTimeSpan (element:JsonElement) =
+        let timeSpanString = element.GetString()
+        tryParse <| TimeSpan.TryParse(timeSpanString, CultureInfo.InvariantCulture)
+
+    let inline tryGetTimeSpanExact (format:string) (element:JsonElement) =
+        let timeSpanString  = element.GetString()
+        match TimeSpan.TryParseExact(timeSpanString, format, CultureInfo.InvariantCulture) with
+        | true, timeSpan -> Ok timeSpan
+        | _ -> Error $"Expected %s{format}."
+
     let inline tryGetDateOnly (element:JsonElement) =
         let dateString = element.GetString()
         tryParse <| DateOnly.TryParse(dateString, CultureInfo.InvariantCulture)
