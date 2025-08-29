@@ -2,16 +2,18 @@ namespace Farse
 
 open System
 open System.Text.Json
+open System.Text.RegularExpressions
 
 module Parse =
 
-    let private rewriteError (e:string) (current:JsonElement) previous path =
+    let private enrichMessage (msg:string) (current:JsonElement) previous path =
         let name = Array.last path
-        if current.ValueKind = Kind.Array
-        then
-            let msg = e.Split("\n")[1] |> _.Replace("Message: ", String.Empty)
+        match current.ValueKind with
+        | Kind.Array ->
+            // Extracts the error message from the previous parser error.
+            let msg = Regex.Match(msg, "Message:\s*([^\r\n]+)").Value
             Error.couldNotParse name msg previous
-        else Error.notObject name previous current
+        | _ -> Error.notObject name previous current
 
     let private parse name (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
@@ -20,7 +22,7 @@ module Parse =
                 let prop = JsonElement.getProperty name element
                 match parser prop with
                 | Ok x -> Ok x
-                | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop element [| name |]
+                | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop element [| name |]
                 | Error e when String.startsWith "Error:" e -> Error e
                 | Error msg -> Error.couldNotParse name msg element
             | _ -> Error.couldNotRead name element
@@ -33,7 +35,7 @@ module Parse =
                 | Some prop ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
-                    | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop element [| name |]
+                    | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop element [| name |]
                     | Error e when String.startsWith "Error:" e -> Error e
                     | Error msg -> Error.couldNotParse name msg element
                 | None -> Ok None
@@ -62,7 +64,7 @@ module Parse =
             | Ok prop ->
                 match parser prop with
                 | Ok x -> Ok x
-                | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
+                | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop previous path
                 | Error e when String.startsWith "Error:" e -> Error e
                 | Error msg -> Error.couldNotParse previousName msg previous
             | Error e -> Error e
@@ -90,7 +92,7 @@ module Parse =
             | Ok (Some prop) ->
                 match parser prop with
                 | Ok x -> Ok <| Some x
-                | Error e when String.startsWith "Error: Could not read" e -> rewriteError e prop previous path
+                | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop previous path
                 | Error e when String.startsWith "Error:" e -> Error e
                 | Error msg -> Error.couldNotParse previousName msg previous
             | Ok None -> Ok None
