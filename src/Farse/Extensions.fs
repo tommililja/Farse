@@ -90,32 +90,32 @@ module internal JsonElement =
     let inline tryGetUnit _ = Ok ()
 
     let inline tryGetTimeOnly (element:JsonElement) =
-        let timeString = element.GetString()
-        tryParse <| TimeOnly.TryParse(timeString, CultureInfo.InvariantCulture)
+        let string = element.GetString()
+        tryParse <| TimeOnly.TryParse(string, CultureInfo.InvariantCulture)
 
     let inline tryGetTimeOnlyExact (format:string) (element:JsonElement) =
-        let timeString = element.GetString()
-        match TimeOnly.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        let string = element.GetString()
+        match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
         | true, timeOnly -> Ok timeOnly
         | _ -> Error $"Expected %s{format}."
 
     let inline tryGetTimeSpan (element:JsonElement) =
-        let timeSpanString = element.GetString()
-        tryParse <| TimeSpan.TryParse(timeSpanString, CultureInfo.InvariantCulture)
+        let string = element.GetString()
+        tryParse <| TimeSpan.TryParse(string, CultureInfo.InvariantCulture)
 
     let inline tryGetTimeSpanExact (format:string) (element:JsonElement) =
-        let timeSpanString  = element.GetString()
-        match TimeSpan.TryParseExact(timeSpanString, format, CultureInfo.InvariantCulture) with
+        let string  = element.GetString()
+        match TimeSpan.TryParseExact(string, format, CultureInfo.InvariantCulture) with
         | true, timeSpan -> Ok timeSpan
         | _ -> Error $"Expected %s{format}."
 
     let inline tryGetDateOnly (element:JsonElement) =
-        let dateString = element.GetString()
-        tryParse <| DateOnly.TryParse(dateString, CultureInfo.InvariantCulture)
+        let string = element.GetString()
+        tryParse <| DateOnly.TryParse(string, CultureInfo.InvariantCulture)
 
     let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
-        let dateString = element.GetString()
-        match DateOnly.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        let string = element.GetString()
+        match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
         | true, dateOnly -> Ok dateOnly
         | _ -> Error $"Expected %s{format}."
 
@@ -128,8 +128,8 @@ module internal JsonElement =
         | _ -> Error String.Empty
 
     let inline tryGetDateTimeExact (format:string) (element:JsonElement) =
-        let dateString = element.GetString()
-        match DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        let string = element.GetString()
+        match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
         | true, dateTime -> Ok dateTime
         | _ -> Error $"Expected %s{format}."
 
@@ -137,8 +137,8 @@ module internal JsonElement =
         tryParse <| element.TryGetDateTimeOffset()
 
     let inline tryGetDateTimeOffsetExact (format:string) (element:JsonElement)  =
-        let dateString = element.GetString()
-        match DateTimeOffset.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        let string = element.GetString()
+        match DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
         | true, dateTimeOffset -> Ok dateTimeOffset
         | _ -> Error $"Expected %s{format}."
 
