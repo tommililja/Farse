@@ -254,7 +254,7 @@ module Parse =
         ) JsonValueKind.String // Expected kind.
 ```
 
-> Note: Use either True or False for bool values.
+> Note: Use True/False for any bool value.
 
 ## Creating JSON
 
