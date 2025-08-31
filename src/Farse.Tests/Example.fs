@@ -99,7 +99,7 @@ module Parse =
 
     // Custom parser example.
     let instant =
-        Parse.custom (fun (element:JsonElement) ->
+        Parse.custom (fun element ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
@@ -108,7 +108,7 @@ module Parse =
 
     // Optimized parser example.
     let userId =
-        Parse.custom (fun (element:JsonElement) ->
+        Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| UserId guid
             | _ -> Error String.Empty // No additional info.
