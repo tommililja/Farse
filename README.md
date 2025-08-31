@@ -85,10 +85,10 @@ module User =
 
     let parser =
         parser {
-            let! id = "id" &= userId // Optimized parser example.
+            let! id = "id" &= userId // Optimized parser example #1.
             let! name = "name" &= string
             let! age = "age" ?= Age.parser
-            let! email = "email" &= Email.parser
+            let! email = "email" &= email // Optimized parser example #2.
             let! profiles = "profiles" &= set ProfileId.parser
 
             // Inlined parser example.
@@ -226,7 +226,7 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-We can use Parse.custom to create parsers for custom types, or to create optimized variants for our own types that avoid unnecessary operations such as map, bind, and validate.
+Use Parse.custom to create parsers for third-party types, or to create optimized parsers for user-defined types that avoid unnecessary operations such as map, bind, and validate.
 
 ```fsharp
 open Farse
@@ -236,21 +236,28 @@ open System.Text.Json
 
 module Parse =
 
+    // Optimized parser example #1.
+    let userId =
+        Parse.custom (fun element ->
+            match element.TryGetGuid() with
+            | true, guid -> Ok <| UserId guid
+            | _ -> Error String.Empty // No additional info.
+        ) JsonValueKind.String // Expected kind.
+
+    // Optimized parser example #2.
+    let email =
+        Parse.custom (fun element ->
+            element.GetString()
+            |> Email.fromString // Error added as additional information.
+        ) JsonValueKind.String // Expected kind.
+
     // Custom parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error result.Exception.Message
-        ) JsonValueKind.String
-
-    // Optimized parser example.
-    let userId =
-        Parse.custom (fun element ->
-            match element.TryGetGuid() with
-            | true, guid -> Ok <| UserId guid
-            | _ -> Error String.Empty // No additional info.
+            | result -> Error result.Exception.Message // Error added as additional information.
         ) JsonValueKind.String // Expected kind.
 ```
 
