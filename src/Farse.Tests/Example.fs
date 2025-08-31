@@ -112,7 +112,7 @@ module Parse =
             match element.TryGetGuid() with
             | true, guid -> Ok <| UserId guid
             | _ -> Error String.Empty // No additional info.
-        ) JsonValueKind.String
+        ) JsonValueKind.String // Expected kind.
 
 module User =
     open Parse
