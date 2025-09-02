@@ -95,7 +95,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= plan
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant // Third-party type parser example.
+                let! renewsAt = "renewsAt" ?= instant // Third-party parser example.
 
                 return {
                     Plan = plan
@@ -124,8 +124,6 @@ module User =
 With the following types.
 
 ```fsharp
-open Farse
-
 type UserId = UserId of Guid
 
 module UserId =
@@ -213,7 +211,7 @@ open Farse
 
 module Parse =
 
-    // Third-party type parser example.
+    // Third-party parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
