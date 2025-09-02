@@ -119,7 +119,7 @@ module User =
         }
 ```
 
-> Note: All parsers are organized under the Parse module so that both user-defined and built-in parsers can be accessed uniformly. Creating pre-defined parsers is optional, you can of course parse, map, bind, and validate directly.
+> Note: In this example, all parsers are organized under the Parse module so that both user-defined and built-in parsers can be accessed uniformly, but this approach is of course optional.
 
 With the following types.
 
@@ -204,7 +204,7 @@ printf "%s" user.Name
 
 ## Creating parsers
 
-We can use Parse.custom to create parsers for third-party types, or to create optimized parsers for user-defined types that avoid unnecessary operations such as map, bind, and validate. This method is recommended for types that are frequently parsed.
+We can use Parse.custom to create parsers for third-party types, or optimized parsers for user-defined types that avoid unnecessary operations, which is recommended for frequently parsed types.
 
 ```fsharp
 open Farse
@@ -217,7 +217,7 @@ module Parse =
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error result.Exception.Message // Error added as additional information.
+            | result -> Error result.Exception.Message // Added as additional information.
         ) JsonValueKind.String // Expected kind.
 
     // Custom parser example.
