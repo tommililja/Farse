@@ -119,7 +119,7 @@ module User =
         }
 ```
 
-> Note: All parsers are organized under the Parse module so that both user-defined and built-in parsers can be accessed uniformly.
+> Note: All parsers are organized under the Parse module so that both user-defined and built-in parsers can be accessed uniformly. Creating pre-defined parsers is optional, you can of course parse, map, bind, and validate directly.
 
 With the following types.
 
@@ -202,7 +202,7 @@ let user =
 printf "%s" user.Name
 ```
 
-## Custom parsers
+## Creating parsers
 
 We can use Parse.custom to create parsers for third-party types, or to create optimized parsers for user-defined types that avoid unnecessary operations such as map, bind, and validate. This method is recommended for types that are frequently parsed.
 
