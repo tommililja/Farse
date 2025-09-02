@@ -16,36 +16,24 @@ module UserId =
     let asString (UserId x) =
         string x
 
-    let parser =
-        Parse.guid
-        |> Parser.map UserId
-
 type Age = Age of byte
 
 module Age =
-
-    let asByte (Age x) = x
 
     let fromByte = function
         | age when age >= 12uy -> Ok <| Age age
         | age -> Error $"Invalid age: %u{age}."
 
-    let parser =
-        Parse.byte
-        |> Parser.validate fromByte
+    let asByte (Age x) = x
 
 type Email = Email of string
 
 module Email =
 
-    let asString (Email x) = x
-
     let fromString =
         Email >> Ok // Some validation.
 
-    let parser =
-        Parse.string
-        |> Parser.validate fromString
+    let asString (Email x) = x
 
 type ProfileId = ProfileId of Guid
 
@@ -53,10 +41,6 @@ module ProfileId =
 
     let asString (ProfileId x) =
         string x
-
-    let parser =
-        Parse.guid
-        |> Parser.map ProfileId
 
 type Plan =
     | Pro
@@ -76,10 +60,6 @@ module Plan =
         | Standard -> "Standard"
         | Free -> "Free"
 
-    let parser =
-        Parse.string
-        |> Parser.validate fromString
-
 type Subscription = {
     Plan: Plan
     IsCanceled: bool
@@ -97,22 +77,7 @@ type User = {
 
 module Parse =
 
-    // Optimized parser example #1.
-    let userId =
-        Parse.custom (fun element ->
-            match element.TryGetGuid() with
-            | true, guid -> Ok <| UserId guid
-            | _ -> Error String.Empty // No additional info.
-        ) JsonValueKind.String // Expected kind.
-
-    // Optimized parser example #2.
-    let email =
-        Parse.custom (fun element ->
-            element.GetString()
-            |> Email.fromString // Error added as additional information.
-        ) JsonValueKind.String // Expected kind.
-
-    // Custom parser example.
+    // Third-party parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
@@ -121,22 +86,46 @@ module Parse =
             | result -> Error result.Exception.Message // Error added as additional information.
         ) JsonValueKind.String // Expected kind.
 
+    // Custom parser example.
+    let userId =
+        Parse.custom (fun element ->
+            match element.TryGetGuid() with
+            | true, guid -> Ok <| UserId guid
+            | _ -> Error String.Empty // No additional info.
+        ) JsonValueKind.String
+
+    let profileId =
+        Parse.guid
+        |> Parser.map ProfileId
+
+    let email =
+        Parse.string
+        |> Parser.validate Email.fromString
+
+    let age =
+        Parse.byte
+        |> Parser.validate Age.fromByte
+
+    let plan =
+        Parse.string
+        |> Parser.validate Plan.fromString
+
 module User =
     open Parse
 
     let parser =
         parser {
-            let! id = "id" &= userId // Optimized parser example #1.
+            let! id = "id" &= userId // Custom parser example.
             let! name = "name" &= string
-            let! age = "age" ?= Age.parser
-            let! email = "email" &= email // Optimized parser example #2.
-            let! profiles = "profiles" &= set ProfileId.parser
+            let! age = "age" ?= age
+            let! email = "email" &= email
+            let! profiles = "profiles" &= set profileId
 
             // Inlined parser example.
             let! subscription = "subscription" &= parser {
-                let! plan = "plan" &= Plan.parser
+                let! plan = "plan" &= plan
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
+                let! renewsAt = "renewsAt" ?= instant // Third-party parser example.
 
                 return {
                     Plan = plan
@@ -159,7 +148,7 @@ module User =
             }
         }
 
-    let json user =
+    let asJson user =
         JObj [
             "id", JStr <| UserId.asString user.Id
             "name", JStr user.Name
@@ -196,7 +185,7 @@ module Example =
 
         let actual =
             user
-            |> User.json
+            |> User.asJson
             |> Json.asString
 
         Expect.equal actual expected

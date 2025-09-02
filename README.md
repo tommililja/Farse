@@ -85,18 +85,18 @@ module User =
 
     let parser =
         parser {
-            let! id = "id" &= userId // Optimized parser example #1.
+            let! id = "id" &= userId // Custom parser example.
             let! name = "name" &= string
-            let! age = "age" ?= Age.parser
-            let! email = "email" &= email // Optimized parser example #2.
-            let! profiles = "profiles" &= set ProfileId.parser
+            let! age = "age" ?= age
+            let! email = "email" &= email
+            let! profiles = "profiles" &= set profileId
 
             // Inlined parser example.
             let! subscription = "subscription" &= parser {
-                let! plan = "plan" &= Plan.parser
+                let! plan = "plan" &= plan
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
-    
+                let! renewsAt = "renewsAt" ?= instant // Third-party type parser example.
+
                 return {
                     Plan = plan
                     IsCanceled = isCanceled
@@ -107,7 +107,7 @@ module User =
             // Simple "path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
             let! _isCanceled = "subscription.isCanceled" &= bool
-      
+
             return {
                 Id = id
                 Name = name
@@ -119,12 +119,12 @@ module User =
         }
 ```
 
+> Note: All parsers are organized under the Parse module so that both user-defined and built-in parsers can be accessed uniformly.
+
 With the following types.
 
 ```fsharp
 open Farse
-open NodaTime
-open System
 
 type UserId = UserId of Guid
 
@@ -133,36 +133,24 @@ module UserId =
     let asString (UserId x) =
         string x
 
-    let parser =
-        Parse.guid
-        |> Parser.map UserId
-
 type Age = Age of byte
 
 module Age =
 
-    let asByte (Age x) = x
-
     let fromByte = function
         | age when age >= 12uy -> Ok <| Age age
         | age -> Error $"Invalid age: %u{age}."
-
-    let parser =
-        Parse.byte
-        |> Parser.validate fromByte
+        
+    let asByte (Age x) = x
 
 type Email = Email of string
 
 module Email =
 
-    let asString (Email x) = x
-
     let fromString =
         Email >> Ok // Some validation.
-
-    let parser =
-        Parse.string
-        |> Parser.validate fromString
+        
+    let asString (Email x) = x
 
 type ProfileId = ProfileId of Guid
 
@@ -170,10 +158,6 @@ module ProfileId =
 
     let asString (ProfileId x) =
         string x
-
-    let parser =
-        Parse.guid
-        |> Parser.map ProfileId
 
 type Plan =
     | Pro
@@ -192,10 +176,6 @@ module Plan =
         | Pro -> "Pro"
         | Standard -> "Standard"
         | Free -> "Free"
-
-    let parser =
-        Parse.string
-        |> Parser.validate fromString
 
 type Subscription = {
     Plan: Plan
@@ -226,32 +206,14 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-Use Parse.custom to create parsers for third-party types, or to create optimized parsers for user-defined types that avoid unnecessary operations such as map, bind, and validate.
+We can use Parse.custom to create parsers for third-party types, or to create optimized parsers for user-defined types that avoid unnecessary operations such as map, bind, and validate. This method is recommended for types that are frequently parsed.
 
 ```fsharp
 open Farse
-open NodaTime
-open NodaTime.Text
-open System.Text.Json
 
 module Parse =
 
-    // Optimized parser example #1.
-    let userId =
-        Parse.custom (fun element ->
-            match element.TryGetGuid() with
-            | true, guid -> Ok <| UserId guid
-            | _ -> Error String.Empty // No additional info.
-        ) JsonValueKind.String // Expected kind.
-
-    // Optimized parser example #2.
-    let email =
-        Parse.custom (fun element ->
-            element.GetString()
-            |> Email.fromString // Error added as additional information.
-        ) JsonValueKind.String // Expected kind.
-
-    // Custom parser example.
+    // Third-party type parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
@@ -259,6 +221,30 @@ module Parse =
             | result when result.Success -> Ok result.Value
             | result -> Error result.Exception.Message // Error added as additional information.
         ) JsonValueKind.String // Expected kind.
+
+    // Custom parser example.
+    let userId =
+        Parse.custom (fun element ->
+            match element.TryGetGuid() with
+            | true, guid -> Ok <| UserId guid
+            | _ -> Error String.Empty // No additional info.
+        ) JsonValueKind.String
+
+    let profileId =
+        Parse.guid
+        |> Parser.map ProfileId
+
+    let email =
+        Parse.string
+        |> Parser.validate Email.fromString
+
+    let age =
+        Parse.byte
+        |> Parser.validate Age.fromByte
+
+    let plan =
+        Parse.string
+        |> Parser.validate Plan.fromString
 ```
 
 > Note: Use True or False for any bool value.
@@ -270,27 +256,32 @@ We can create JSON strings with [Json](https://github.com/tommililja/Farse/blob/
 This creates an object, but you can create any type and convert it with Json.asString.
 
 ```fsharp
-JObj [
-    "id", JStr <| UserId.asString user.Id
-    "name", JStr user.Name
-    "age",
-        user.Age
-        |> Option.map (Age.asByte >> JNum)
-        |> JNil
-    "email", JStr <| Email.asString user.Email
-    "profiles",
-        user.Profiles
-        |> Seq.map (ProfileId.asString >> JStr)
-        |> JArr
-    "subscription", JObj [
-        "plan", JStr <| Plan.asString user.Subscription.Plan
-        "isCanceled", JBit user.Subscription.IsCanceled
-        "renewsAt",
-            user.Subscription.RenewsAt
-            |> Option.map (_.ToString() >> JStr)
-            |> JNil
-    ]
-]
+open Farse
+
+module User =
+    
+    let asJson user =
+        JObj [
+            "id", JStr <| UserId.asString user.Id
+            "name", JStr user.Name
+            "age",
+                user.Age
+                |> Option.map (Age.asByte >> JNum)
+                |> JNil
+            "email", JStr <| Email.asString user.Email
+            "profiles",
+                user.Profiles
+                |> Seq.map (ProfileId.asString >> JStr)
+                |> JArr
+            "subscription", JObj [
+                "plan", JStr <| Plan.asString user.Subscription.Plan
+                "isCanceled", JBit user.Subscription.IsCanceled
+                "renewsAt",
+                    user.Subscription.RenewsAt
+                    |> Option.map (_.ToString() >> JStr)
+                    |> JNil
+            ]
+        ]
 ```
 
 > Note: Use JNum<'a> to be explicit.
