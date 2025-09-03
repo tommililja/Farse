@@ -362,6 +362,12 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when parsing a TimeSpan exact with an incorrect format`` () =
+            Parse.req "prop" (Parse.timeSpanExact @"hh\mm\ss")
+            |> Parser.parse """{ "prop": "01:28:45" }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing a DateOnly exact with an incorrect format`` () =
             Parse.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
             |> Parser.parse """{ "prop": "2025-05-13" }"""
