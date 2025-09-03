@@ -14,8 +14,7 @@ module Operators =
     /// </example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let inline (&=) path parser =
-        req path parser
+    let inline (&=) path parser = req path parser
 
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <example>
@@ -25,5 +24,4 @@ module Operators =
     /// </example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let inline (?=) path parser =
-        opt path parser
+    let inline (?=) path parser = opt path parser

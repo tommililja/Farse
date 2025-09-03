@@ -5,37 +5,37 @@ open System.Text.RegularExpressions
 
 module Parse =
 
-    let private enrichMessage (msg:string) (current:JsonElement) previous path =
+    let private enrichMessage (msg:string) (element:JsonElement) previous path =
         let name = Array.last path
-        match current.ValueKind with
+        match element.ValueKind with
         | Kind.Array ->
             // Extracts the error message from the previous parser error.
             let msg = Regex.Match(msg, "Message:\s*([^\r\n]+)").Groups[1].Value
             Error.couldNotParse name msg previous
-        | _ -> Error.notObject name previous current
+        | _ -> Error.notObject name previous element
 
     let private parse name (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
+        fun element ->
             match element.ValueKind with
             | Kind.Object ->
                 let prop = JsonElement.getProperty name element
                 match parser prop with
                 | Ok x -> Ok x
-                | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop element [| name |]
-                | Error e when String.startsWith "Error:" e -> Error e
+                | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop element [| name |]
+                | Error msg when String.startsWith "Error:" msg -> Error msg
                 | Error msg -> Error.couldNotParse name msg element
             | _ -> Error.couldNotRead name element
 
     let private tryParse name (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
+        fun element ->
             match element.ValueKind with
             | Kind.Object ->
                 match JsonElement.tryGetProperty name element with
                 | Some prop ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
-                    | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop element [| name |]
-                    | Error e when String.startsWith "Error:" e -> Error e
+                    | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop element [| name |]
+                    | Error msg when String.startsWith "Error:" msg -> Error msg
                     | Error msg -> Error.couldNotParse name msg element
                 | None -> Ok None
             | _ -> Error.couldNotRead name element
@@ -63,10 +63,10 @@ module Parse =
             | Ok prop ->
                 match parser prop with
                 | Ok x -> Ok x
-                | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop previous path
-                | Error e when String.startsWith "Error:" e -> Error e
+                | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop previous path
+                | Error msg when String.startsWith "Error:" msg -> Error msg
                 | Error msg -> Error.couldNotParse previousName msg previous
-            | Error e -> Error e
+            | Error msg -> Error msg
 
     // Pretty rowdy, but it works.
     let private tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
@@ -91,11 +91,11 @@ module Parse =
             | Ok (Some prop) ->
                 match parser prop with
                 | Ok x -> Ok <| Some x
-                | Error e when String.startsWith "Error: Could not read" e -> enrichMessage e prop previous path
-                | Error e when String.startsWith "Error:" e -> Error e
+                | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop previous path
+                | Error msg when String.startsWith "Error:" msg -> Error msg
                 | Error msg -> Error.couldNotParse previousName msg previous
             | Ok None -> Ok None
-            | Error e -> Error e
+            | Error msg -> Error msg
 
     /// <summary>Parses a required property with the given parser.</summary>
     /// <example>
@@ -148,8 +148,7 @@ module Parse =
     /// <summary>Creates a custom parser with the given try parse function.</summary>
     /// <param name="tryParse">The try parse function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let custom tryParse expectedKind =
-        getValue tryParse expectedKind
+    let custom tryParse expectedKind = getValue tryParse expectedKind
 
     // Primitives
 
@@ -246,7 +245,7 @@ module Parse =
     // Sequences
 
     let inline private seq convert (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
+        fun element ->
             match element.ValueKind with
             | Kind.Array ->
                 let mutable error = None
@@ -259,10 +258,10 @@ module Parse =
                 while error.IsNone && enumerator.MoveNext() do
                     match parser enumerator.Current with
                     | Ok x -> array.Add x
-                    | Error e -> error <- Some e
+                    | Error msg -> error <- Some msg
 
                 match error with
-                | Some e -> Error e
+                | Some msg -> Error msg
                 | None -> Ok <| convert array
             | _ ->
                 element.ValueKind
@@ -271,18 +270,15 @@ module Parse =
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let list parser =
-        seq Seq.toList parser
+    let list parser = seq Seq.toList parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Core.array.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let array parser =
-        seq Seq.toArray parser
+    let array parser = seq Seq.toArray parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let set parser =
-        seq Set.ofSeq parser
+    let set parser = seq Set.ofSeq parser
 
     // Misc
 

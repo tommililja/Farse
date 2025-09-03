@@ -5,8 +5,8 @@ open System.Text.Json
 
 module internal Error =
 
-    let private create strings =
-        strings
+    let private create errors =
+        errors
         |> String.concat "\n"
         |> Error
 
