@@ -303,4 +303,4 @@ Object:
 }
 ```
 
-> Note: Farse doesn't throw exceptions. It only catches JsonException, which is thrown when parsing invalid JSON.
+> Note: Farse does not throw exceptions. It only catches JsonException, which is thrown for invalid JSON.
