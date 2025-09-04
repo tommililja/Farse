@@ -95,7 +95,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= plan
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant // Third-party parser example.
+                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
                 return {
                     Plan = plan
@@ -104,7 +104,7 @@ module User =
                 }
             }
 
-            // Simple "path" example, which can be very useful
+            // "Path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
             let! _isCanceled = "subscription.isCanceled" &= bool
 
@@ -119,7 +119,7 @@ module User =
         }
 ```
 
-> Note: In this example, all parsers are organized under the Parse module so that both user-defined and built-in parsers can be accessed uniformly, but this approach is of course optional.
+> Note: In this example, all parsers are defined under the same module name as the included parsers.
 
 With the following types.
 
@@ -202,16 +202,16 @@ let user =
 printf "%s" user.Name
 ```
 
-## Creating parsers
+## Building parsers
 
-We can use Parse.custom to create parsers for third-party types, or optimized parsers for user-defined types that avoid unnecessary operations, which is recommended for frequently parsed types.
+We can build parsers by combining the included parsers with map and validate. Parse.custom can also be used to build parsers for third-party types, or if we just want to avoid unnecessary operations.
 
 ```fsharp
 open Farse
 
 module Parse =
 
-    // Third-party parser example.
+    // Custom parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
@@ -227,6 +227,8 @@ module Parse =
             | true, guid -> Ok <| UserId guid
             | _ -> Error String.Empty // No additional info.
         ) JsonValueKind.String
+
+    // Built with the included parsers.
 
     let profileId =
         Parse.guid
@@ -301,4 +303,4 @@ Object:
 }
 ```
 
-> Note: Farse doesn't throw exceptions and only catches JsonException, that is thrown for invalid JSON.
+> Note: Farse does not throw exceptions unless something unexpected occurs. It only catches JsonException, which is thrown when parsing invalid JSON.
