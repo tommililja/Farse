@@ -204,7 +204,7 @@ printf "%s" user.Name
 
 ## Building parsers
 
-We can build parsers by combining the included parsers with map and validate. Parse.custom can also be used to build parsers for third-party types, or if we just want to avoid unnecessary operations.
+Parsers can be built by combining the included parsers with map and validate. We can also use Parse.custom to build parsers for third-party types, or to avoid unnecessary operations.
 
 ```fsharp
 open Farse
@@ -228,7 +228,7 @@ module Parse =
             | _ -> Error String.Empty // No additional info.
         ) JsonValueKind.String
 
-    // Built with the included parsers.
+    // Combined parsers example.
 
     let profileId =
         Parse.guid
@@ -247,7 +247,7 @@ module Parse =
         |> Parser.validate Plan.fromString
 ```
 
-> Note: Use True or False for any bool value.
+> Note: Use True or False as expected kind for any bool value.
 
 ## Creating JSON
 
@@ -303,4 +303,4 @@ Object:
 }
 ```
 
-> Note: Farse does not throw exceptions unless something unexpected occurs. It only catches JsonException, which is thrown when parsing invalid JSON.
+> Note: Farse does not throw exceptions and only catches JsonException, which is thrown when parsing invalid JSON.
