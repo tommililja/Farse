@@ -31,7 +31,8 @@ type Email = Email of string
 module Email =
 
     let fromString =
-        Email >> Ok // Some validation.
+        // Some validation.
+        Email >> Ok
 
     let asString (Email x) = x
 
@@ -77,13 +78,13 @@ type User = {
 
 module Parse =
 
-    // Third-party parser example.
+    // Custom parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error result.Exception.Message // Error added as additional information.
+            | result -> Error result.Exception.Message // Added as additional information.
         ) JsonValueKind.String // Expected kind.
 
     // Custom parser example.
@@ -93,6 +94,8 @@ module Parse =
             | true, guid -> Ok <| UserId guid
             | _ -> Error String.Empty // No additional info.
         ) JsonValueKind.String
+
+    // Combined parsers example.
 
     let profileId =
         Parse.guid
@@ -125,7 +128,7 @@ module User =
             let! subscription = "subscription" &= parser {
                 let! plan = "plan" &= plan
                 let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant // Third-party parser example.
+                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
                 return {
                     Plan = plan
@@ -134,7 +137,7 @@ module User =
                 }
             }
 
-            // Simple "path" example, which can be very useful
+            // "Path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
             let! _isCanceled = "subscription.isCanceled" &= bool
 

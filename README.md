@@ -146,7 +146,8 @@ type Email = Email of string
 module Email =
 
     let fromString =
-        Email >> Ok // Some validation.
+        // Some validation.
+        Email >> Ok
         
     let asString (Email x) = x
 
