@@ -39,6 +39,6 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.Text.Json" Version="8.0.6"/>
-        <PackageReference Update="FSharp.Core" Version="6.0.0" />
+        <PackageReference Update="FSharp.Core" Version="7.0.403" />
     </ItemGroup>
 </Project>
