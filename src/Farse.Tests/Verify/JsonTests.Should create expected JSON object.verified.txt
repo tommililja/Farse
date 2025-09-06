@@ -1,16 +1,16 @@
 ﻿{
-  "int": 123,
-  "float": 123.12,
-  "decimal": 123.12,
-  "byte": 123,
-  "string": "string",
-  "bool": true,
-  "object": {
-    "string": "string"
-  },
-  "array": [
-    "string"
-  ],
-  "some": "string",
-  "none": null
+    "int": 123,
+    "float": 123.12,
+    "decimal": 123.12,
+    "byte": 123,
+    "string": "string",
+    "bool": true,
+    "object": {
+        "string": "string"
+    },
+    "array": [
+        "string"
+    ],
+    "some": "string",
+    "none": null
 }

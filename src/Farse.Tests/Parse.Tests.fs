@@ -373,6 +373,15 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse object property count as int`` () =
+        let expected = 3
+        let actual =
+            Parse.req "prop" Parse.propertyCount
+            |> Parser.parse """{ "prop": { "one": 1, "two": 2, "three": 3 } }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse element kind as JsonValueKind`` () =
         let expected = JsonValueKind.Number
         let actual =
@@ -389,6 +398,15 @@ module ParseTests =
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.ok
         Expect.isTrue <| JsonElement.DeepEquals(expected, actual)
+
+    [<Fact>]
+    let ``Should parse element as string`` () =
+        let expected = """{ "prop2": 1 }"""
+        let actual =
+            Parse.req "prop" Parse.rawText
+            |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+            |> Expect.ok
+        Expect.equal actual expected
 
     [<Fact>]
     let ``Should not parse element and return unit`` () =

@@ -9,7 +9,7 @@ type internal Kind = JsonValueKind
 
 module internal JsonSerializerOptions =
 
-    let preset = JsonSerializerOptions(WriteIndented = true)
+    let preset = JsonSerializerOptions(WriteIndented = true, IndentSize = 4)
 
 module internal JsonElement =
 
@@ -145,11 +145,17 @@ module internal JsonElement =
     let inline tryGetArrayLength (element:JsonElement) =
         Ok <| element.GetArrayLength()
 
+    let inline tryGetPropertyCount (element:JsonElement) =
+        Ok <| element.GetPropertyCount()
+
     let inline tryGetKind (element:JsonElement) =
         Ok element.ValueKind
 
     let inline tryGetElement (element:JsonElement) =
         Ok <| element.Clone()
+
+    let tryGetRawText (element:JsonElement) =
+        Ok <| element.GetRawText()
 
 module internal JsonNode =
 

@@ -2,5 +2,5 @@
 Message: Expected 'String', but got 'Undefined'.
 Object:
 {
-  "prop2": "1"
+    "prop2": "1"
 }

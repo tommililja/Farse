@@ -2,11 +2,11 @@
 Message: Expected 'Object', but got 'Number'.
 Object:
 {
-  "prop2": [
-    {
-      "prop3": "1"
-    },
-    2,
-    3
-  ]
+    "prop2": [
+        {
+            "prop3": "1"
+        },
+        2,
+        3
+    ]
 }

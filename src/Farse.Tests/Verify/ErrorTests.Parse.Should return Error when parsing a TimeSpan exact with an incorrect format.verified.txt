@@ -2,5 +2,5 @@
 Message: Failed to parse '01:28:45' as TimeSpan. Expected hh\mm\ss.
 Object:
 {
-  "prop": "01:28:45"
+    "prop": "01:28:45"
 }

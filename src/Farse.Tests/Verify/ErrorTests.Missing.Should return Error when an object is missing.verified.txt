@@ -2,7 +2,7 @@
 Message: Expected 'Object', but got 'Undefined'.
 Object:
 {
-  "prop": {
-    "prop2": 1
-  }
+    "prop": {
+        "prop2": 1
+    }
 }

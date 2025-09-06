@@ -2,7 +2,7 @@
 Message: Expected 'Array', but got 'Object'.
 Object:
 {
-  "prop": {
-    "prop2": 1
-  }
+    "prop": {
+        "prop2": 1
+    }
 }

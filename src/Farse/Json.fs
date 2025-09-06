@@ -82,6 +82,9 @@ module Json =
         | JNon -> null
 
     /// <summary>Converts the Json to a formatted string.</summary>
-    /// <remarks>WriteIndented = true</remarks>
+    /// <remarks>
+    ///     WriteIndented = true
+    ///     IndentSize = 4
+    /// </remarks>
     /// <typeparam name="json">The Json to convert.</typeparam>
     let asString = getJsonNode >> JsonNode.asString

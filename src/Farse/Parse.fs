@@ -282,8 +282,14 @@ module Parse =
 
     // Misc
 
+    /// Parses an element's raw text as System.String.
+    let rawText = getValue tryGetRawText Kind.Undefined
+
     /// Parses an array's length as System.Int32.
     let arrayLength = getValue tryGetArrayLength Kind.Array
+
+    /// Parses an object's property count as System.Int32.
+    let propertyCount = getValue tryGetPropertyCount Kind.Object
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
     let kind = getValue tryGetKind Kind.Undefined

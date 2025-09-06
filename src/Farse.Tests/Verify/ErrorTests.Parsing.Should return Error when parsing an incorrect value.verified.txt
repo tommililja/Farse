@@ -2,5 +2,5 @@
 Message: Expected 'Number', but got 'String'.
 Object:
 {
-  "prop": "1"
+    "prop": "1"
 }

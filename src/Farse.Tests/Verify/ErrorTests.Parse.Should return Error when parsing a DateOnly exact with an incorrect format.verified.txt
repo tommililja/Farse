@@ -2,5 +2,5 @@
 Message: Failed to parse '2025-05-13' as DateOnly. Expected yyyyMMdd.
 Object:
 {
-  "prop": "2025-05-13"
+    "prop": "2025-05-13"
 }

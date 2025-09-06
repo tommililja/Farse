@@ -5,8 +5,8 @@ open System.Text.Json
 
 module internal Error =
 
-    let private create errors =
-        errors
+    let private create lines =
+        lines
         |> String.concat "\n"
         |> Error
 
@@ -20,11 +20,11 @@ module internal Error =
             match msg with
             | String msg ->
                 match msg[msg.Length - 1] with
-                | '.' | '!' | '?' -> $" %s{msg}"
-                | _ -> $" %s{msg}."
+                | '.' | '!' | '?' -> $"%s{msg}"
+                | _ -> $"%s{msg}."
             | Invalid -> String.Empty
 
-        $"Failed to parse '%s{JsonElement.asString element}' as %s{expectedType.Name}.%s{msg}"
+        $"Failed to parse '%s{JsonElement.asString element}' as %s{expectedType.Name}. %s{msg}"
 
     let invalidKind (expected:Kind) (actual:Kind) =
         let expected =

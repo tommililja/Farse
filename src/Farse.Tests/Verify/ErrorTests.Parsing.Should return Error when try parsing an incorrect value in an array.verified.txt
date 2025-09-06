@@ -2,9 +2,9 @@
 Message: Expected 'String', but got 'Number'.
 Object:
 {
-  "prop": [
-    1,
-    2,
-    3
-  ]
+    "prop": [
+        1,
+        2,
+        3
+    ]
 }

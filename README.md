@@ -300,9 +300,9 @@ Object:
 ```
 ```json
 {
-  "plan": "Max",
-  "isCanceled": false,
-  "renewsAt": "2026-12-25T10:30:00Z"
+    "plan": "Max",
+    "isCanceled": false,
+    "renewsAt": "2026-12-25T10:30:00Z"
 }
 ```
 

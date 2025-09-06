@@ -2,5 +2,5 @@
 Message: Expected 'Object', but got 'Null'.
 Object:
 {
-  "prop2": null
+    "prop2": null
 }

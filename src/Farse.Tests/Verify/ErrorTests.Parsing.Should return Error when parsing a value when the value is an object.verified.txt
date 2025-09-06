@@ -2,7 +2,7 @@
 Message: Expected 'Number', but got 'Object'.
 Object:
 {
-  "prop": {
-    "prop2": null
-  }
+    "prop": {
+        "prop2": null
+    }
 }

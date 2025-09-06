@@ -2,5 +2,5 @@
 Message: Expected 'Number', but got 'Undefined'.
 Object:
 {
-  "prop": "1"
+    "prop": "1"
 }
