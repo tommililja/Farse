@@ -5,7 +5,7 @@
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <Copyright>Copyright © Tommi Lilja 2025</Copyright>
         <DebugType>embedded</DebugType>
-        <Description>Simple parsing library for F# using System.Text.Json</Description>
+        <Description>Simple parsing library for F# using System.Text.Json.</Description>
         <Deterministic Condition="'$(Configuration)' == 'Release'">true</Deterministic>
         <DeterministicSourcePaths Condition="'$(Configuration)' == 'Release'">true</DeterministicSourcePaths>
         <EmbedAllSources>true</EmbedAllSources>
