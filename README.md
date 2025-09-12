@@ -250,7 +250,7 @@ module Parse =
         |> Parser.validate Plan.fromString
 ```
 
-> Note: Use True or False as expected kind for any bool value.
+> Note: Use True or False as expected kind for any bool value. If you want to ignore the expected kind, use Undefined.
 
 ## Creating JSON
 
