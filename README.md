@@ -207,7 +207,7 @@ printf "%s" user.Name
 
 ## Building parsers
 
-Parsers can be built by combining the included parsers with map and validate. We can also use Parse.custom to build parsers for third-party types, or to avoid unnecessary operations.
+Parsers can be built by combining the included parsers with map and validate. We can also use Parse.custom to build parsers for third-party types, or to just avoid unnecessary operations.
 
 ```fsharp
 open Farse
@@ -250,7 +250,7 @@ module Parse =
         |> Parser.validate Plan.fromString
 ```
 
-> Note: Use True or False as expected kind for any bool value. If you want to ignore the expected kind, use Undefined.
+> Note: Use True or False as expected kind for any bool value. If you want to parse any kind, use Undefined.
 
 ## Creating JSON
 
