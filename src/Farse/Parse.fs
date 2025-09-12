@@ -3,12 +3,13 @@ namespace Farse
 open System.Text.Json
 
 module Parse =
+    open JsonElement
 
     let private parse name (parser:Parser<_>) : Parser<_> =
         fun element ->
             match element.ValueKind with
             | Kind.Object ->
-                let prop = JsonElement.getProperty name element
+                let prop = getProperty name element
                 match parser prop with
                 | Ok x -> Ok x
                 | Error error ->
@@ -23,7 +24,7 @@ module Parse =
         fun element ->
             match element.ValueKind with
             | Kind.Object ->
-                match JsonElement.tryGetProperty name element with
+                match tryGetProperty name element with
                 | Some prop ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
@@ -45,8 +46,8 @@ module Parse =
 
             for i in 0 .. path.Length - 1 do
                 match last with
-                | Ok element when JsonElement.getKind element = Kind.Object ->
-                    last <- Ok <| JsonElement.getProperty path[i] element
+                | Ok element when getKind element = Kind.Object ->
+                    last <- Ok <| getProperty path[i] element
                     object <- element
                     name <- path[i]
                 | Ok element ->
@@ -74,8 +75,8 @@ module Parse =
 
             for i in 0 .. path.Length - 1 do
                 match last with
-                | Ok (Some element) when JsonElement.getKind element = Kind.Object ->
-                    last <- Ok <| JsonElement.tryGetProperty path[i] element
+                | Ok (Some element) when getKind element = Kind.Object ->
+                    last <- Ok <| tryGetProperty path[i] element
                     object <- element
                     name <- path[i]
                 | Ok (Some element) ->
@@ -145,8 +146,6 @@ module Parse =
     let custom tryParse expectedKind = getValue tryParse expectedKind
 
     // Primitives
-
-    open JsonElement
 
     /// Parses a number as System.Int32.
     let int = getValue tryGetInt Kind.Number
