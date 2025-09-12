@@ -1,10 +1,8 @@
 ﻿Error: Could not parse property 'prop2[0]'.
 Message: Expected 'String', but got 'Number'.
-Object:
-{
-    "prop2": [
-        1,
-        2,
-        3
-    ]
-}
+Array:
+[
+    1,
+    2,
+    3
+]

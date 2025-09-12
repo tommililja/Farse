@@ -306,4 +306,19 @@ Object:
 }
 ```
 
+Array
+
+```code
+Error: Could not parse property 'profiles[1]'.
+Message: Failed to parse 'invalid' as Guid.
+Array:
+```
+```json
+[
+    "01458283-b6e3-4ae7-ae54-a68eb587cdc0",
+    "invalid",
+    "bf00d1e2-ee53-4969-9507-86bed7e96432"
+]
+```
+
 > Note: Farse does not throw exceptions. It only catches JsonException, which is thrown for invalid JSON.

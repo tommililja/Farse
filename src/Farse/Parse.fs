@@ -248,11 +248,11 @@ module Parse =
                     element.GetArrayLength()
                     |> ResizeArray
 
-                for element in enumerator do
+                for item in enumerator do
                     if error.IsNone then
-                        match parser element with
+                        match parser item with
                         | Ok x -> array.Add x
-                        | Error e -> error <- Some <| ArrayError (array.Count, e)
+                        | Error e -> error <- Some <| ArrayError (array.Count, element, e)
 
                 match error with
                 | Some e -> Error e

@@ -69,7 +69,7 @@ module internal Error =
 
 [<NoComparison>]
 type ParserError =
-    | ArrayError of index:int * error:ParserError
+    | ArrayError of index:int * array:JsonElement * error:ParserError
     | CouldNotParse of name:string * msg:string * element:JsonElement
     | CouldNotRead of name:string * element:JsonElement
     | InvalidKind of expected:Kind * actual:Kind
@@ -81,9 +81,9 @@ module ParserError =
     open Error
 
     let rec internal enrich name object = function
-        | ArrayError (index, error) ->
+        | ArrayError (index, array, error) ->
             let name = $"%s{name}[%i{index}]"
-            enrich name object error
+            enrich name array error
         | CouldNotRead(_, element) ->
             NotObject (name, object, element)
         | InvalidKind (expected, actual) ->
@@ -95,7 +95,7 @@ module ParserError =
         | other -> other
 
     let rec asString = function
-        | ArrayError (_, msg) -> asString msg
+        | ArrayError (_, _, msg) -> asString msg
         | CouldNotParse (name, msg, element) -> couldNotParse name msg element
         | CouldNotRead (name, element) -> couldNotRead name element
         | InvalidKind (expected, actual) -> invalidKind expected actual
