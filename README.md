@@ -293,6 +293,8 @@ module User =
 
 More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
+### Object
+
 ```code
 Error: Could not parse property 'plan'.
 Message: Failed to parse 'Max' as Plan. Invalid plan: Max.
@@ -306,7 +308,7 @@ Object:
 }
 ```
 
-Array
+### Array
 
 ```code
 Error: Could not parse property 'profiles[1]'.
@@ -321,4 +323,4 @@ Array:
 ]
 ```
 
-> Note: Farse does not throw exceptions. It only catches JsonException, which is thrown for invalid JSON.
+> Note: Farse does not throw exceptions, and it only catches JsonException, which is thrown when trying to parse invalid JSON.
