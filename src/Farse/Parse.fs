@@ -1,18 +1,8 @@
 namespace Farse
 
 open System.Text.Json
-open System.Text.RegularExpressions
 
 module Parse =
-
-    let private enrichMessage (msg:string) (element:JsonElement) previous path =
-        let name = Array.last path
-        match element.ValueKind with
-        | Kind.Array ->
-            // Extracts the error message from the previous parser error.
-            let msg = Regex.Match(msg, "Message:\s*([^\r\n]+)").Groups[1].Value
-            Error.couldNotParse name msg previous
-        | _ -> Error.notObject name previous element
 
     let private parse name (parser:Parser<_>) : Parser<_> =
         fun element ->
@@ -21,10 +11,13 @@ module Parse =
                 let prop = JsonElement.getProperty name element
                 match parser prop with
                 | Ok x -> Ok x
-                | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop element [| name |]
-                | Error msg when String.startsWith "Error:" msg -> Error msg
-                | Error msg -> Error.couldNotParse name msg element
-            | _ -> Error.couldNotRead name element
+                | Error error ->
+                    error
+                    |> ParserError.enrich name element
+                    |> Error
+            | _ ->
+               CouldNotRead (name, element)
+               |> Error
 
     let private tryParse name (parser:Parser<_>) : Parser<_> =
         fun element ->
@@ -34,68 +27,73 @@ module Parse =
                 | Some prop ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
-                    | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop element [| name |]
-                    | Error msg when String.startsWith "Error:" msg -> Error msg
-                    | Error msg -> Error.couldNotParse name msg element
+                    | Error error ->
+                        error
+                        |> ParserError.enrich name element
+                        |> Error
                 | None -> Ok None
-            | _ -> Error.couldNotRead name element
+            | _ ->
+                CouldNotRead (name, element)
+                |> Error
 
     // Pretty rowdy, but it works.
     let private traverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun element ->
             let mutable last = Ok element
-            let mutable previous = element
-            let mutable previousName = path[0]
+            let mutable object = element
+            let mutable name = path[0]
 
             for i in 0 .. path.Length - 1 do
                 match last with
                 | Ok element when JsonElement.getKind element = Kind.Object ->
                     last <- Ok <| JsonElement.getProperty path[i] element
-                    previous <- element
-                    previousName <- path[i]
+                    object <- element
+                    name <- path[i]
                 | Ok element ->
                     if i = path.Length
                     then last <- Ok element
-                    else last <- Error.notObject previousName previous element
+                    else last <- Error <| NotObject (name, object, element)
                 | _ -> ()
 
             match last with
             | Ok prop ->
                 match parser prop with
                 | Ok x -> Ok x
-                | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop previous path
-                | Error msg when String.startsWith "Error:" msg -> Error msg
-                | Error msg -> Error.couldNotParse previousName msg previous
-            | Error msg -> Error msg
+                | Error error ->
+                    error
+                    |> ParserError.enrich name object
+                    |> Error
+            | Error e -> Error e
 
     // Pretty rowdy, but it works.
     let private tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun element ->
             let mutable last = Ok (Some element)
-            let mutable previous = element
-            let mutable previousName = path[0]
+            let mutable object = element
+            let mutable name = path[0]
 
             for i in 0 .. path.Length - 1 do
                 match last with
                 | Ok (Some element) when JsonElement.getKind element = Kind.Object ->
                     last <- Ok <| JsonElement.tryGetProperty path[i] element
-                    previous <- element
-                    previousName <- path[i]
+                    object <- element
+                    name <- path[i]
                 | Ok (Some element) ->
                     if i = path.Length
                     then last <- Ok <| Some element
-                    else last <- Error.notObject previousName previous element
+                    else last <- Error <| NotObject (name, object, element)
                 | _ -> ()
 
             match last with
             | Ok (Some prop) ->
                 match parser prop with
                 | Ok x -> Ok <| Some x
-                | Error msg when String.startsWith "Error: Could not read" msg -> enrichMessage msg prop previous path
-                | Error msg when String.startsWith "Error:" msg -> Error msg
-                | Error msg -> Error.couldNotParse previousName msg previous
+                | Error error ->
+                    error
+                    |> ParserError.enrich name object
+                    |> Error
             | Ok None -> Ok None
-            | Error msg -> Error msg
+            | Error e -> Error e
 
     /// <summary>Parses a required property with the given parser.</summary>
     /// <example>
@@ -136,14 +134,10 @@ module Parse =
             if isExpectedKind then
                 match tryParse element with
                 | Ok x -> Ok x
-                | Error msg ->
-                    element
-                    |> Error.invalidValue msg typeof<'a>
-                    |> Error
+                | Error error -> Error <| InvalidValue (error, typeof<'a>, element)
             else
-                element.ValueKind
-                |> Error.invalidKind expectedKind
-                |> Error
+                 InvalidKind (expectedKind, element.ValueKind)
+                 |> Error
 
     /// <summary>Creates a custom parser with the given try parse function.</summary>
     /// <param name="tryParse">The try parse function.</param>
@@ -255,18 +249,16 @@ module Parse =
                     element.GetArrayLength()
                     |> ResizeArray
 
-                while error.IsNone && enumerator.MoveNext() do
-                    match parser enumerator.Current with
-                    | Ok x -> array.Add x
-                    | Error msg -> error <- Some msg
+                for element in enumerator do
+                    if error.IsNone then
+                        match parser element with
+                        | Ok x -> array.Add x
+                        | Error e -> error <- Some <| ArrayError (array.Count, e)
 
                 match error with
-                | Some msg -> Error msg
+                | Some e -> Error e
                 | None -> Ok <| convert array
-            | _ ->
-                element.ValueKind
-                |> Error.invalidKind Kind.Array
-                |> Error
+            | _ -> Error <| InvalidKind (Kind.Array, element.ValueKind)
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>

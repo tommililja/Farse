@@ -5,7 +5,7 @@ open System.Text.Json
 
 // The type alias does not work in some function signatures.
 // Fixing it increases memory allocations, so leaving it for now.
-type Parser<'a> = JsonElement -> Result<'a, string>
+type Parser<'a> = JsonElement -> Result<'a, ParserError>
 
 module Parser =
 
@@ -13,19 +13,19 @@ module Parser =
         fun element ->
             match parser element with
             | Ok x -> element |> fn x
-            | Error msg -> Error msg
+            | Error e -> Error e
 
     let inline internal mapImpl fn (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> Ok <| fn x
-            | Error msg -> Error msg
+            | Error e -> Error e
 
     let inline internal ignoreImpl (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok _ -> Ok ()
-            | Error msg -> Error msg
+            | Error e -> Error e
 
     let inline internal validateImpl fn (parser:Parser<_>) : Parser<'b> =
         fun element ->
@@ -33,11 +33,8 @@ module Parser =
             | Ok x ->
                 match fn x with
                 | Ok x -> Ok x
-                | Error msg ->
-                    element
-                    |> Error.invalidValue msg typeof<'b>
-                    |> Error
-            | Error msg -> Error msg
+                | Error msg -> Error <| InvalidValue (msg, typeof<'b>, element)
+            | Error e -> Error e
 
     /// <summary>Returns a parser with the given value.</summary>
     /// <param name="x">The value to return.</param>
@@ -45,7 +42,8 @@ module Parser =
 
     /// <summary>Returns a parser with the given result.</summary>
     /// <param name="x">The result to return.</param>
-    let fromResult x : Parser<_> = fun _ -> x
+    let fromResult x : Parser<_> =
+        fun _ -> x |> Result.mapError Other
 
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <param name="fn">The binder function.</param>
@@ -76,4 +74,5 @@ module Parser =
             | String json ->
                 use document = JsonDocument.Parse(json)
                 parser document.RootElement
+                |> Result.mapError ParserError.asString
         with :? JsonException as exn -> Error.invalidJson json exn
