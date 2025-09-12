@@ -323,4 +323,4 @@ Array:
 ]
 ```
 
-> Note: Farse does not throw exceptions, and it only catches JsonException, which is thrown when trying to parse invalid JSON.
+> Note: Farse does not throw any exceptions unless they are unhandled. It only catches JsonException and ArgumentNullException, which are thrown when trying to parse invalid JSON.
