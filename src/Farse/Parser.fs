@@ -1,5 +1,6 @@
 namespace Farse
 
+open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
@@ -69,10 +70,7 @@ module Parser =
     /// <param name="parser">The parser used to parse the JSON string.</param>
     let parse ([<StringSyntax("Json")>] json:string) (parser:Parser<_>) =
         try
-            match json with
-            | Invalid -> Error.invalidString ()
-            | String json ->
-                use document = JsonDocument.Parse(json)
-                parser document.RootElement
-                |> Result.mapError ParserError.asString
-        with :? JsonException as exn -> Error.invalidJson json exn
+            use document = JsonDocument.Parse(json)
+            parser document.RootElement
+            |> Result.mapError ParserError.asString
+        with :? JsonException | :? ArgumentNullException as exn -> Error.invalidJson json exn
