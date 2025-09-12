@@ -73,4 +73,6 @@ module Parser =
             use document = JsonDocument.Parse(json)
             parser document.RootElement
             |> Result.mapError ParserError.asString
-        with :? JsonException | :? ArgumentNullException as exn -> Error.invalidJson json exn
+        with
+            | :? JsonException
+            | :? ArgumentNullException as exn -> Error.invalidJson json exn
