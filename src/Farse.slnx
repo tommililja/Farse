@@ -1,10 +1,10 @@
 <Solution>
-  <Folder Name="/Solution/">
-    <File Path="..\Directory.Build.props" />
-    <File Path="..\LICENSE.md" />
-    <File Path="..\README.md" />
-  </Folder>
-  <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj" />
-  <Project Path="Farse.Tests/Farse.Tests.fsproj" />
-  <Project Path="Farse/Farse.fsproj" />
+    <Folder Name="/Solution/">
+        <File Path="..\Directory.Build.props" />
+        <File Path="..\LICENSE.md" />
+        <File Path="..\README.md" />
+    </Folder>
+    <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj" />
+    <Project Path="Farse.Tests/Farse.Tests.fsproj" />
+    <Project Path="Farse/Farse.fsproj" />
 </Solution>
