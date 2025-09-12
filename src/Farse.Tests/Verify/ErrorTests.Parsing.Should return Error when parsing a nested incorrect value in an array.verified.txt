@@ -1,4 +1,4 @@
-﻿Error: Could not parse property 'prop2'.
+﻿Error: Could not parse property 'prop2[0]'.
 Message: Expected 'String', but got 'Number'.
 Object:
 {

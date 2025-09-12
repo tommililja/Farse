@@ -81,8 +81,11 @@ module ParserError =
     open Error
 
     let rec internal enrich name object = function
-        | ArrayError (_, error) -> enrich name object error
-        | CouldNotRead(_, element) -> NotObject (name, object, element)
+        | ArrayError (index, error) ->
+            let name = $"%s{name}[%i{index}]"
+            enrich name object error
+        | CouldNotRead(_, element) ->
+            NotObject (name, object, element)
         | InvalidKind (expected, actual) ->
             let msg = invalidKind expected actual
             CouldNotParse (name, msg, object)
