@@ -121,7 +121,7 @@ module User =
         }
 ```
 
-> Note: In this example, all parsers are defined under the same module name as the included parsers.
+> Note: In this example, our parsers are defined under the same module name as the included parsers.
 
 With the following types.
 
@@ -293,7 +293,7 @@ module User =
 
 More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 
-### Object
+#### Object
 
 ```code
 Error: Could not parse property 'plan'.
@@ -308,7 +308,7 @@ Object:
 }
 ```
 
-### Array
+#### Array
 
 ```code
 Error: Could not parse property 'profiles[1]'.
@@ -323,4 +323,4 @@ Array:
 ]
 ```
 
-> Note: Farse does not throw any exceptions unless they are unhandled. It only catches JsonException and ArgumentNullException, which are thrown when trying to parse invalid JSON.
+> Note: Farse does not throw any exceptions unless something unexpected occurs.
