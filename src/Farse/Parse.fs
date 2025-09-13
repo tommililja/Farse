@@ -257,7 +257,9 @@ module Parse =
                 match error with
                 | Some e -> Error e
                 | None -> Ok <| convert array
-            | _ -> Error <| InvalidKind (Kind.Array, element.ValueKind)
+            | _ ->
+                InvalidKind (Kind.Array, element.ValueKind)
+                |> Error
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
