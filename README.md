@@ -43,7 +43,7 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 
 ## Example
 
-The whole example code can found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Example.fs).
+The complete example code can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Example.fs).
 
 Given the JSON string.
 
