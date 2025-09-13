@@ -8,7 +8,6 @@
         <Description>Simple parsing library for F# using System.Text.Json.</Description>
         <Deterministic Condition="'$(Configuration)' == 'Release'">true</Deterministic>
         <DeterministicSourcePaths Condition="'$(Configuration)' == 'Release'">true</DeterministicSourcePaths>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSymbols>true</IncludeSymbols>
         <PackageId>Farse</PackageId>
