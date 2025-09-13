@@ -121,7 +121,7 @@ module User =
         }
 ```
 
-> Note: In this example, our parsers are defined under the same module name as the included parsers.
+> Note: In this example, our parsers are defined under the same module name as included parsers.
 
 With the following types.
 
