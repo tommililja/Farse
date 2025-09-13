@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Failed to parse '2025-05-13 17:28 +02:00' as DateTimeOffset. Expected yyyyMMdd HH:mm:ss zzz.
+Message: Failed when parsing '2025-05-13 17:28 +02:00' as DateTimeOffset: Expected yyyyMMdd HH:mm:ss zzz.
 Object:
 {
     "prop": "2025-05-13 17:28 \u002B02:00"

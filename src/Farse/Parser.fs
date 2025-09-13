@@ -75,4 +75,7 @@ module Parser =
             |> Result.mapError ParserError.asString
         with
             | :? JsonException
-            | :? ArgumentNullException as exn -> Error.invalidJson json exn
+            | :? ArgumentNullException as exn ->
+                json
+                |> Error.invalidJson exn
+                |> Error
