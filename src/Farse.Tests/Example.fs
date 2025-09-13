@@ -22,7 +22,7 @@ module Age =
 
     let fromByte = function
         | age when age >= 12uy -> Ok <| Age age
-        | age -> Error $"Invalid age: %u{age}."
+        | age -> Error $"%u{age} is not a valid age."
 
     let asByte (Age x) = x
 
@@ -54,7 +54,7 @@ module Plan =
         | "Pro" -> Ok Pro
         | "Standard" -> Ok Standard
         | "Free" -> Ok Free
-        | str -> Error $"Invalid plan: %s{str}."
+        | str -> Error $"%s{str} is not a valid plan."
 
     let asString = function
         | Pro -> "Pro"
