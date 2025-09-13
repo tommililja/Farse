@@ -312,7 +312,7 @@ Object:
 
 ```code
 Error: Could not parse property 'profiles[1]'.
-Message: Failed to parse '927eb20f-cd62-470c-aafc-c3ce6b9248b' as Guid.
+Message: Failed to parse '927eb20f-cd62-470c-aafc-c3ce6b9248' as Guid.
 Array:
 ```
 ```json
