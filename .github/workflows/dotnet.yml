@@ -6,12 +6,29 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
+    runs-on: ubuntu-latest
 
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      working-directory: src
+      run: dotnet restore
+    - name: Build
+      working-directory: src
+      run: dotnet build -c Release --no-restore
+
+  test:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -29,3 +46,36 @@ jobs:
     - name: Test
       working-directory: src/Farse.Tests
       run: dotnet test -c Release --no-build --verbosity normal
+
+  publish:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      working-directory: src
+      run: dotnet restore
+    - name: Build
+      working-directory: src
+      run: dotnet build -c Release --no-restore
+    - name: Pack
+      working-directory: src
+      run: dotnet pack -c Release --no-build -o ./nupkg
+    - name: Publish to NuGet
+      working-directory: src
+      run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
