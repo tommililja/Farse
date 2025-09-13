@@ -4,13 +4,11 @@
         <Authors>Tommi Lilja</Authors>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <Copyright>Copyright © Tommi Lilja 2025</Copyright>
-        <DebugType>portable</DebugType>
+        <DebugType>embedded</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json.</Description>
         <Deterministic Condition="'$(Configuration)' == 'Release'">true</Deterministic>
-        <DeterministicSourcePaths Condition="'$(Configuration)' == 'Release'">true</DeterministicSourcePaths>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <IncludeSymbols>true</IncludeSymbols>
         <PackageId>Farse</PackageId>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/tommililja/Farse</PackageProjectUrl>
