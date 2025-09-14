@@ -6,7 +6,7 @@
         <Copyright>Copyright © Tommi Lilja 2025</Copyright>
         <DebugType>embedded</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json.</Description>
-        <Deterministic>true</Deterministic>
+        <EmbedAllSources>true</EmbedAllSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>Farse</PackageId>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
