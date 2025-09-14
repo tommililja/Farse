@@ -9,8 +9,7 @@ module Parse =
         fun element ->
             match element.ValueKind with
             | Kind.Object ->
-                let prop = getProperty name element
-                match parser prop with
+                match getProperty name element |> parser with
                 | Ok x -> Ok x
                 | Error error ->
                     error
@@ -135,7 +134,9 @@ module Parse =
             if isExpectedKind then
                 match tryParse element with
                 | Ok x -> Ok x
-                | Error error -> Error <| InvalidValue (error, typeof<'a>, element)
+                | Error error ->
+                    InvalidValue (error, typeof<'a>, element)
+                    |> Error
             else
                  InvalidKind (expectedKind, element.ValueKind)
                  |> Error

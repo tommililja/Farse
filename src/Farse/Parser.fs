@@ -34,7 +34,9 @@ module Parser =
             | Ok x ->
                 match fn x with
                 | Ok x -> Ok x
-                | Error msg -> Error <| InvalidValue (msg, typeof<'b>, element)
+                | Error msg ->
+                    InvalidValue (msg, typeof<'b>, element)
+                    |> Error
             | Error e -> Error e
 
     /// <summary>Returns a parser with the given value.</summary>
