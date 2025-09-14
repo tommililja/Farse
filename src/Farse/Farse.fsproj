@@ -9,7 +9,6 @@
         <DebugType>portable</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json.</Description>
         <Deterministic>true</Deterministic>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>Farse</PackageId>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -39,7 +38,6 @@
         <Content Include="../../LICENSE.md" Visible="false" Pack="true" PackagePath="\" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
         <PackageReference Include="System.Text.Json" Version="9.0.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.100" />
     </ItemGroup>
