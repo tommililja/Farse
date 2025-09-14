@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder> $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb </AllowedOutputExtensionsInPackageBuildOutputFolder> 
         <AssemblyName>Farse</AssemblyName>
         <Authors>Tommi Lilja</Authors>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <Copyright>Copyright © Tommi Lilja 2025</Copyright>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>portable</DebugType>
+        <DebugType>embedded</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json.</Description>
         <Deterministic>true</Deterministic>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
