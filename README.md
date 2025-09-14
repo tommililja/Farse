@@ -323,4 +323,4 @@ Array:
 ]
 ```
 
-> Note: Farse does not throw any exceptions unless something unexpected occurs.
+> Note: Farse does not throw exceptions unless something unexpected occurs.
