@@ -21,9 +21,6 @@ module internal JsonElement =
         | true, prop when prop.ValueKind <> Kind.Null -> Some prop
         | _ -> None
 
-    let getKind (element:JsonElement) =
-        element.ValueKind
-
     let getRawText (element:JsonElement) =
         element.GetRawText()
 
@@ -168,10 +165,13 @@ module internal JsonNode =
         then "null"
         else node.ToJsonString(JsonSerializerOptions.preset)
 
-module internal String =
+module internal ResultOption =
 
-    let startsWith (startsWith:string) (str:string) =
-        str.StartsWith(startsWith)
+    let bind fn =
+        Result.bind (function
+            | Some x -> fn x
+            | None -> Ok None
+        )
 
 [<AutoOpen>]
 module internal ActivePatterns =

@@ -36,26 +36,24 @@ module Parse =
                 CouldNotRead (name, element)
                 |> Error
 
-    // Pretty rowdy, but it works.
     let private traverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun element ->
-            let mutable last = Ok element
-            let mutable object = element
+            let mutable prop = Ok element
             let mutable name = path[0]
+            let mutable object = element
 
-            for i in 0 .. path.Length - 1 do
-                match last with
-                | Ok element when getKind element = Kind.Object ->
-                    last <- Ok <| getProperty path[i] element
-                    object <- element
-                    name <- path[i]
-                | Ok element ->
-                    if i = path.Length
-                    then last <- Ok element
-                    else last <- Error <| NotObject (name, object, element)
-                | _ -> ()
+            for segment in path do
+                prop <- prop
+                |> Result.bind (fun element ->
+                    match element.ValueKind with
+                    | Kind.Object ->
+                        name <- segment
+                        object <- element
+                        Ok <| getProperty name element
+                    | _ -> Error element
+                )
 
-            match last with
+            match prop with
             | Ok prop ->
                 match parser prop with
                 | Ok x -> Ok x
@@ -63,28 +61,28 @@ module Parse =
                     error
                     |> ParserError.enrich name object
                     |> Error
-            | Error e -> Error e
+            | Error element ->
+                NotObject (name, object, element)
+                |> Error
 
-    // Pretty rowdy, but it works.
     let private tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
         fun element ->
-            let mutable last = Ok (Some element)
-            let mutable object = element
+            let mutable prop = Ok <| Some element
             let mutable name = path[0]
+            let mutable object = element
 
-            for i in 0 .. path.Length - 1 do
-                match last with
-                | Ok (Some element) when getKind element = Kind.Object ->
-                    last <- Ok <| tryGetProperty path[i] element
-                    object <- element
-                    name <- path[i]
-                | Ok (Some element) ->
-                    if i = path.Length
-                    then last <- Ok <| Some element
-                    else last <- Error <| NotObject (name, object, element)
-                | _ -> ()
+            for segment in path do
+                prop <- prop
+                |> ResultOption.bind (fun element ->
+                    match element.ValueKind with
+                    | Kind.Object ->
+                        name <- segment
+                        object <- element
+                        Ok <| tryGetProperty name element
+                    | _ -> Error element
+                )
 
-            match last with
+            match prop with
             | Ok (Some prop) ->
                 match parser prop with
                 | Ok x -> Ok <| Some x
@@ -93,7 +91,9 @@ module Parse =
                     |> ParserError.enrich name object
                     |> Error
             | Ok None -> Ok None
-            | Error e -> Error e
+            | Error element ->
+                NotObject (name, object, element)
+                |> Error
 
     /// <summary>Parses a required property with the given parser.</summary>
     /// <example>
