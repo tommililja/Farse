@@ -164,14 +164,15 @@ module User =
                 user.Profiles
                 |> Seq.map (ProfileId.asString >> JStr)
                 |> JArr
-            "subscription", JObj [
-                "plan", JStr <| Plan.asString user.Subscription.Plan
-                "isCanceled", JBit user.Subscription.IsCanceled
-                "renewsAt",
-                    user.Subscription.RenewsAt
-                    |> Option.map (_.ToString() >> JStr)
-                    |> JNil
-            ]
+            "subscription",
+                JObj [
+                    "plan", JStr <| Plan.asString user.Subscription.Plan
+                    "isCanceled", JBit user.Subscription.IsCanceled
+                    "renewsAt",
+                        user.Subscription.RenewsAt
+                        |> Option.map (_.ToString() >> JStr)
+                        |> JNil
+                ]
         ]
 
 module Example =
