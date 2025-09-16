@@ -167,11 +167,12 @@ module internal JsonNode =
 
 module internal ResultOption =
 
-    let bind fn =
-        Result.bind (function
+    let inline bind fn = function
+        | Ok x ->
+            match x with
             | Some x -> fn x
             | None -> Ok None
-        )
+        | Error e -> Error e
 
 [<AutoOpen>]
 module internal ActivePatterns =
