@@ -177,11 +177,10 @@ module User =
 
 module Example =
 
-    let private expected =
-        File.ReadAllText("Example.json")
-
     [<Fact>]
     let ``Should parse and create example JSON`` () =
+        let expected = File.ReadAllText("Example.json")
+
         let user =
             User.parser
             |> Parser.parse expected
