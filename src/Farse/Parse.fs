@@ -1,5 +1,6 @@
 namespace Farse
 
+open System
 open System.Text.Json
 
 module Parse =
@@ -275,6 +276,10 @@ module Parse =
     let set parser = seq Set.ofSeq parser
 
     // Misc
+
+    /// Parses a string as an enum.
+    let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
+        getValue tryGetEnum<'a> Kind.String
 
     /// Parses an element's raw text as System.String.
     let rawText = getValue tryGetRawText Kind.Undefined

@@ -408,6 +408,18 @@ module ParseTests =
             |> Expect.ok
         Expect.equal actual expected
 
+    type TestEnum =
+        | Something = 1
+
+    [<Fact>]
+    let ``Should parse string as enum`` () =
+        let expected = TestEnum.Something
+        let actual =
+            Parse.req "prop" Parse.enum
+            |> Parser.parse """{ "prop": "something" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
     [<Fact>]
     let ``Should not parse element and return unit`` () =
         let expected = ()

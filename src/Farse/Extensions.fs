@@ -151,6 +151,12 @@ module internal JsonElement =
     let inline tryGetElement (element:JsonElement) =
         Ok <| element.Clone()
 
+    let inline tryGetEnum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> (element:JsonElement) =
+        let str = element.GetString()
+        match Enum.TryParse<'a>(str, true) with
+        | true, enum -> Ok enum
+        | _ -> Error String.Empty
+
     let tryGetRawText (element:JsonElement) =
         Ok <| element.GetRawText()
 
