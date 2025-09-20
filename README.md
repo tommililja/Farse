@@ -139,7 +139,7 @@ module Age =
 
     let fromByte = function
         | age when age >= 12uy -> Ok <| Age age
-        | age -> Error $"%u{age} is not a valid age."
+        | age -> Error $"Invalid age '%u{age}'."
         
     let asByte (Age x) = x
 
@@ -171,7 +171,7 @@ module Plan =
         | "Pro" -> Ok Pro
         | "Standard" -> Ok Standard
         | "Free" -> Ok Free
-        | str -> Error $"%s{str} is not a valid plan."
+        | str -> Error $"Invalid plan '%s{str}'."
 
     let asString = function
         | Pro -> "Pro"
@@ -298,7 +298,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 
 ```code
 Error: Could not parse property 'plan'.
-Message: Failed parsing 'Max' as Plan. Details: Max is not a valid plan.
+Message: Failed parsing 'Max' as Plan. Details: Invalid plan 'Max'.
 Object:
 ```
 ```json
