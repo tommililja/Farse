@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Expected 'Object', but got 'Null'.
+Message: Expected Object, but got Null.
 Object:
 {
     "prop": null

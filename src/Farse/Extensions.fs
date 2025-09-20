@@ -12,6 +12,10 @@ module Kind =
     let inline isBool (kind:JsonValueKind) =
         kind = Kind.True || kind = Kind.False
 
+    let asString = function
+        | kind when isBool kind -> "Bool"
+        | kind -> string kind
+
 module internal JsonSerializerOptions =
 
     let preset = JsonSerializerOptions(WriteIndented = true, IndentSize = 4)

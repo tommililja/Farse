@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'missing'.
-Message: Expected 'Number', but got 'Undefined'.
+Message: Expected Number, but got Undefined.
 Object:
 {
     "prop3": 1

@@ -14,35 +14,35 @@ module internal Error =
         | kind -> $"%s{string kind}:\n%s{JsonElement.asJsonString element}"
 
     let invalidValue msg (expectedType:Type) element =
-        let msg =
+        let value = JsonElement.asString element
+        let details =
             match msg with
-            | String msg ->
-                match msg[msg.Length - 1] with
-                | '.' | '!' | '?' -> $": %s{msg}"
-                | _ -> $": %s{msg}."
-            | Invalid -> "."
+            | String msg -> $" Details: %s{msg}"
+            | Invalid -> String.Empty
 
-        $"Failed when parsing '%s{JsonElement.asString element}' as %s{expectedType.Name}%s{msg}"
+        $"Failed parsing '%s{value}' as %s{expectedType.Name}.%s{details}"
 
-    let invalidKind (expected:Kind) (actual:Kind) =
-        let expected =
-            match expected with
-            | kind when Kind.isBool kind -> "Bool"
-            | kind -> string kind
+    let invalidKind (expected:Kind) (element:JsonElement) =
+        let expected = Kind.asString expected
+        let actual = Kind.asString element.ValueKind
+        let value =
+            match element.ValueKind with
+            | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> String.Empty
+            | _ -> $". Value: '%s{JsonElement.asString element}'"
 
-        $"Expected '%s{expected}', but got '%s{string actual}'."
+        $"Expected %s{expected}, but got %s{actual}%s{value}."
 
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."
-            $"Message: %s{invalidKind Kind.Object element.ValueKind}"
+            $"Message: %s{invalidKind Kind.Object element}"
             print element
         ]
 
     let notObject name (object:JsonElement) (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
-            $"Message: %s{invalidKind Kind.Object element.ValueKind}"
+            $"Message: %s{invalidKind Kind.Object element}"
             print object
         ]
 

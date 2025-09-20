@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop2[0]'.
-Message: Expected 'String', but got 'Number'.
+Message: Expected String, but got Number. Value: '1'.
 Array:
 [
     1,

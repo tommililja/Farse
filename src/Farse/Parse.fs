@@ -139,7 +139,7 @@ module Parse =
                     InvalidValue (msg, typeof<'a>, element)
                     |> Error
             else
-                 InvalidKind (expectedKind, element.ValueKind)
+                 InvalidKind (expectedKind, element)
                  |> Error
 
     let inline private seq convert (parser:Parser<_>) : Parser<_> =
@@ -163,7 +163,7 @@ module Parse =
                 | Some e -> Error e
                 | None -> Ok <| convert array
             | _ ->
-                InvalidKind (Kind.Array, element.ValueKind)
+                InvalidKind (Kind.Array, element)
                 |> Error
 
     // Custom
