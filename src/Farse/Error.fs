@@ -11,7 +11,7 @@ module internal Error =
     let private print (element:JsonElement) =
         match element.ValueKind with
         | Kind.Null | Kind.Undefined -> String.Empty
-        | kind -> $"%s{string kind}:\n%s{JsonElement.getJson element}"
+        | kind -> $"%s{string kind}:\n%s{JsonElement.asJsonString element}"
 
     let invalidValue msg (expectedType:Type) element =
         let msg =

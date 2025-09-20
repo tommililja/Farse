@@ -21,86 +21,86 @@ module internal JsonElement =
         | true, prop when prop.ValueKind <> Kind.Null -> Some prop
         | _ -> None
 
-    let getRawText (element:JsonElement) =
-        element.GetRawText()
-
-    let getJson (element:JsonElement) =
-        JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
-
     let asString (element:JsonElement) =
         element.ToString()
 
+    let asRawString (element:JsonElement) =
+        element.GetRawText()
+
+    let asJsonString (element:JsonElement) =
+        JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
+
     // Parsing
 
-    let inline private tryParse x =
-        match x with
+    let inline private tryParse parse =
+        match parse () with
         | true, x -> Ok x
         | _ -> Error String.Empty // No additional info, String.empty for now.
 
-    let inline private parseEnum<'a, 'b when 'a: enum<'b>> x =
+    let inline private parseEnum<'a, 'b when 'a: enum<'b>> parse =
         let enumType = typeof<'a>
-        match x with
+        match parse () with
         | true, x when Enum.IsDefined(enumType, x) ->
             Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
         | true, _ -> Error $"Expected %s{enumType.Name} enum."
         | _ -> Error String.Empty
 
     let inline tryGetInt (element:JsonElement) =
-        tryParse <| element.TryGetInt32()
+        tryParse element.TryGetInt32
 
     let inline tryGetIntEnum<'a when 'a: enum<int>> (element:JsonElement) =
-        parseEnum<'a, int> <| element.TryGetInt32()
+        parseEnum<'a, int> element.TryGetInt32
 
     let inline tryGetInt16 (element:JsonElement) =
-        tryParse <| element.TryGetInt16()
+        tryParse element.TryGetInt16
 
     let inline tryGetInt16Enum<'a when 'a: enum<int16>> (element:JsonElement) =
-        parseEnum<'a, int16> <| element.TryGetInt16()
+        parseEnum<'a, int16> element.TryGetInt16
 
     let inline tryGetInt64 (element:JsonElement) =
-        tryParse <| element.TryGetInt64()
+        tryParse element.TryGetInt64
 
     let inline tryGetInt64Enum<'a when 'a: enum<int64>> (element:JsonElement) =
-        parseEnum<'a, int64> <| element.TryGetInt64()
+        parseEnum<'a, int64> element.TryGetInt64
 
     let inline tryGetUInt16 (element:JsonElement) =
-        tryParse <| element.TryGetUInt16()
+        tryParse element.TryGetUInt16
 
     let inline tryGetUInt16Enum<'a when 'a: enum<uint16>> (element:JsonElement) =
-        parseEnum<'a, uint16> <| element.TryGetUInt16()
+        parseEnum<'a, uint16> element.TryGetUInt16
 
     let inline tryGetUInt32 (element:JsonElement) =
-        tryParse <| element.TryGetUInt32()
+        tryParse element.TryGetUInt32
 
     let inline tryGetUInt32Enum<'a when 'a: enum<uint32>> (element:JsonElement) =
-        parseEnum<'a, uint32> <| element.TryGetUInt32()
+        parseEnum<'a, uint32> element.TryGetUInt32
 
     let inline tryGetUInt64 (element:JsonElement) =
-        tryParse <| element.TryGetUInt64()
+        tryParse element.TryGetUInt64
 
     let inline tryGetUInt64Enum<'a when 'a: enum<uint64>> (element:JsonElement) =
-        parseEnum<'a, uint64> <| element.TryGetUInt64()
+        parseEnum<'a, uint64> element.TryGetUInt64
 
     let inline tryGetFloat (element:JsonElement) =
-        tryParse <| element.TryGetDouble()
+        tryParse element.TryGetDouble
 
     let inline tryGetFloat32 (element:JsonElement) =
-        tryParse <| element.TryGetSingle()
+        tryParse element.TryGetSingle
 
     let inline tryGetDecimal (element:JsonElement) =
-        tryParse <| element.TryGetDecimal()
+        tryParse element.TryGetDecimal
 
     let inline tryGetByte (element:JsonElement) =
-        tryParse <| element.TryGetByte()
+        tryParse element.TryGetByte
 
     let inline tryGetByteEnum<'a when 'a: enum<byte>> (element:JsonElement) =
-        parseEnum<'a, byte> <| element.TryGetByte()
+        parseEnum<'a, byte> element.TryGetByte
 
     let inline tryGetSByte (element:JsonElement) =
-        tryParse <| element.TryGetSByte()
+        tryParse element.TryGetSByte
 
     let inline tryGetSByteEnum<'a when 'a: enum<sbyte>> (element:JsonElement) =
-        parseEnum<'a, sbyte> <| element.TryGetSByte()
+        parseEnum<'a, sbyte> element.TryGetSByte
 
     let inline tryGetChar (element:JsonElement) =
         match element.GetString() with
@@ -114,13 +114,13 @@ module internal JsonElement =
         Ok <| element.GetBoolean()
 
     let inline tryGetGuid (element:JsonElement) =
-        tryParse <| element.TryGetGuid()
+        tryParse element.TryGetGuid
 
     let inline tryGetUnit _ = Ok ()
 
     let inline tryGetTimeOnly (element:JsonElement) =
         let str = element.GetString()
-        tryParse <| TimeOnly.TryParse(str, CultureInfo.InvariantCulture)
+        tryParse (fun _ -> TimeOnly.TryParse(str, CultureInfo.InvariantCulture))
 
     let inline tryGetTimeOnlyExact (format:string) (element:JsonElement) =
         let str = element.GetString()
@@ -130,7 +130,7 @@ module internal JsonElement =
 
     let inline tryGetTimeSpan (element:JsonElement) =
         let str = element.GetString()
-        tryParse <| TimeSpan.TryParse(str, CultureInfo.InvariantCulture)
+        tryParse (fun _ -> TimeSpan.TryParse(str, CultureInfo.InvariantCulture))
 
     let inline tryGetTimeSpanExact (format:string) (element:JsonElement) =
         let str = element.GetString()
@@ -140,7 +140,7 @@ module internal JsonElement =
 
     let inline tryGetDateOnly (element:JsonElement) =
         let str = element.GetString()
-        tryParse <| DateOnly.TryParse(str, CultureInfo.InvariantCulture)
+        tryParse (fun _ -> DateOnly.TryParse(str, CultureInfo.InvariantCulture))
 
     let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
         let str = element.GetString()
@@ -149,7 +149,7 @@ module internal JsonElement =
         | _ -> Error $"Expected %s{format}."
 
     let inline tryGetDateTime (element:JsonElement) =
-        tryParse <| element.TryGetDateTime()
+        tryParse element.TryGetDateTime
 
     let inline tryGetDateTimeUtc (element:JsonElement) =
         match element.TryGetDateTime() with
@@ -163,7 +163,7 @@ module internal JsonElement =
         | _ -> Error $"Expected %s{format}."
 
     let inline tryGetDateTimeOffset (element:JsonElement) =
-        tryParse <| element.TryGetDateTimeOffset()
+        tryParse element.TryGetDateTimeOffset
 
     let inline tryGetDateTimeOffsetExact (format:string) (element:JsonElement)  =
         let str = element.GetString()
