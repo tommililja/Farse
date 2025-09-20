@@ -171,7 +171,8 @@ module Parse =
     /// <summary>Creates a custom parser with the given try parse function.</summary>
     /// <param name="tryParse">The try parse function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let custom tryParse expectedKind = getValue tryParse expectedKind
+    let custom tryParse expectedKind =
+        getValue tryParse expectedKind
 
     // Basic types
 
@@ -179,37 +180,43 @@ module Parse =
     let int = getValue tryGetInt Kind.Number
 
     /// Parses a number as a System.Int32 enum.
-    let intEnum<'a when 'a : enum<int>> = getValue tryGetIntEnum<'a> Kind.Number
+    let intEnum<'a when 'a : enum<int>> =
+        getValue tryGetIntEnum<'a> Kind.Number
 
     /// Parses a number as System.Int16.
     let int16 = getValue tryGetInt16 Kind.Number
 
     /// Parses a number as a System.Int16 enum.
-    let int16Enum<'a when 'a : enum<int16>> = getValue tryGetInt16Enum<'a> Kind.Number
+    let int16Enum<'a when 'a : enum<int16>> =
+        getValue tryGetInt16Enum<'a> Kind.Number
 
     /// Parses a number as System.Int64.
     let int64 = getValue tryGetInt64 Kind.Number
 
     /// Parses a number as a System.Int16 enum.
-    let int64Enum<'a when 'a : enum<int64>> = getValue tryGetInt64Enum<'a> Kind.Number
+    let int64Enum<'a when 'a : enum<int64>> =
+        getValue tryGetInt64Enum<'a> Kind.Number
 
     /// Parses a number as System.UInt16.
     let uint16 = getValue tryGetUInt16 Kind.Number
 
     /// Parses a number as a System.UInt16 enum.
-    let uint16Enum<'a when 'a : enum<uint16>> = getValue tryGetUInt16Enum<'a> Kind.Number
+    let uint16Enum<'a when 'a : enum<uint16>> =
+        getValue tryGetUInt16Enum<'a> Kind.Number
 
     /// Parses a number as System.UInt32.
     let uint32 = getValue tryGetUInt32 Kind.Number
 
     /// Parses a number as a System.UInt32 enum.
-    let uint32Enum<'a when 'a : enum<uint32>> = getValue tryGetUInt32Enum<'a> Kind.Number
+    let uint32Enum<'a when 'a : enum<uint32>> =
+        getValue tryGetUInt32Enum<'a> Kind.Number
 
     /// Parses a number as System.UInt64.
     let uint64 = getValue tryGetUInt64 Kind.Number
 
     /// Parses a number as a System.UInt64 enum.
-    let uint64Enum<'a when 'a : enum<uint64>> = getValue tryGetUInt64Enum<'a> Kind.Number
+    let uint64Enum<'a when 'a : enum<uint64>> =
+        getValue tryGetUInt64Enum<'a> Kind.Number
 
     /// Parses a number as System.Double.
     let float = getValue tryGetFloat Kind.Number
@@ -224,13 +231,15 @@ module Parse =
     let byte = getValue tryGetByte Kind.Number
 
     /// Parses a number as a System.Byte enum.
-    let byteEnum<'a when 'a : enum<byte>> = getValue tryGetByteEnum<'a> Kind.Number
+    let byteEnum<'a when 'a : enum<byte>> =
+        getValue tryGetByteEnum<'a> Kind.Number
 
     /// Parses a number as System.SByte.
     let sbyte = getValue tryGetSByte Kind.Number
 
     /// Parses a number as a System.SByte enum.
-    let sbyteEnum<'a when 'a : enum<sbyte>> = getValue tryGetSByteEnum<'a> Kind.Number
+    let sbyteEnum<'a when 'a : enum<sbyte>> =
+        getValue tryGetSByteEnum<'a> Kind.Number
 
     /// Parses a string as System.Char.
     let char = getValue tryGetChar Kind.String
@@ -258,21 +267,24 @@ module Parse =
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let timeOnlyExact (format:string) = getValue (tryGetTimeOnlyExact format) Kind.String
+    let timeOnlyExact (format:string) =
+        getValue (tryGetTimeOnlyExact format) Kind.String
 
     /// Parses a string as System.TimeSpan.
     let timeSpan = getValue tryGetTimeSpan Kind.String
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let timeSpanExact (format:string) = getValue (tryGetTimeSpanExact format) Kind.String
+    let timeSpanExact (format:string) =
+        getValue (tryGetTimeSpanExact format) Kind.String
 
     /// Parses a string as System.DateOnly (ISO 8601).
     let dateOnly = getValue tryGetDateOnly Kind.String
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateOnlyExact (format:string) = getValue (tryGetDateOnlyExact format) Kind.String
+    let dateOnlyExact (format:string) =
+        getValue (tryGetDateOnlyExact format) Kind.String
 
     /// Parses a string as System.DateTime (ISO 8601).
     let dateTime = getValue tryGetDateTime Kind.String
@@ -282,14 +294,16 @@ module Parse =
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeExact (format:string) = getValue (tryGetDateTimeExact format) Kind.String
+    let dateTimeExact (format:string) =
+        getValue (tryGetDateTimeExact format) Kind.String
 
     /// Parses a string as System.DateTimeOffset (ISO 8601).
     let dateTimeOffset = getValue tryGetDateTimeOffset Kind.String
 
     /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeOffsetExact (format:string) = getValue (tryGetDateTimeOffsetExact format) Kind.String
+    let dateTimeOffsetExact (format:string) =
+        getValue (tryGetDateTimeOffsetExact format) Kind.String
 
     // Sequences
 
