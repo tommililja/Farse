@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Failed parsing '01:28:45' as TimeSpan. Details: Expected hh\mm\ss.
+Message: '01:28:45' is not a valid TimeSpan. Details: Expected hh\mm\ss.
 Object:
 {
     "prop": "01:28:45"

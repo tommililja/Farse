@@ -1,1 +1,1 @@
-﻿Failed parsing '1' as Int32. Details: Value too small.
+﻿'1' is not a valid Int32. Details: Value too small.

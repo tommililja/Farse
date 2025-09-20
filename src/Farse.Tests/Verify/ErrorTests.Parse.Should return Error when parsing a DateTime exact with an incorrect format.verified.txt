@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Failed parsing '2025-05-13T17:28:45' as DateTime. Details: Expected yyyy-MM-dd HH:mm:ss.
+Message: '2025-05-13T17:28:45' is not a valid DateTime. Details: Expected yyyy-MM-dd HH:mm:ss.
 Object:
 {
     "prop": "2025-05-13T17:28:45"
