@@ -296,5 +296,11 @@ module Parse =
     /// Parses an element as System.Text.Json.JsonElement.
     let element = getValue tryGetElement Kind.Undefined
 
+    // Misc
+
     /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
+
+    /// <summary>Always succeeds and returns the given value.</summary>
+    /// <param name="x">The value to return.</param>
+    let noneWith x = Parser.from x
