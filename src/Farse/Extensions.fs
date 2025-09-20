@@ -7,6 +7,11 @@ open System.Text.Json.Nodes
 
 type internal Kind = JsonValueKind
 
+module Kind =
+
+    let isBool (kind:Kind) =
+        kind = Kind.True || kind = Kind.False
+
 module internal JsonSerializerOptions =
 
     let preset = JsonSerializerOptions(WriteIndented = true, IndentSize = 4)
@@ -20,6 +25,9 @@ module internal JsonElement =
         match element.TryGetProperty(name) with
         | true, prop when prop.ValueKind <> Kind.Null -> Some prop
         | _ -> None
+
+    let inline isBool (element:JsonElement) =
+        element.ValueKind = Kind.True || element.ValueKind = Kind.False
 
     let asString (element:JsonElement) =
         element.ToString()

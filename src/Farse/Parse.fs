@@ -129,7 +129,7 @@ module Parse =
             let isExpectedKind =
                 match expectedKind with
                 | kind when kind = element.ValueKind -> true
-                | Kind.True | Kind.False -> element.ValueKind = Kind.True || element.ValueKind = Kind.False
+                | kind when Kind.isBool kind -> isBool element
                 | kind -> kind = Kind.Undefined
 
             if isExpectedKind then
