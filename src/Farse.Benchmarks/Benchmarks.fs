@@ -160,15 +160,15 @@ type Benchmarks() =
         let parser =
             parser {
                 let! _ = "id" &= Parse.guid
-                let! _ = "name" &= Parse.string
-                let! _ = "age" ?= Parse.byte
-                let! _ = "email" &= Parse.string
-                let! _ = "profiles" &= Parse.array Parse.guid
+                and! _ = "name" &= Parse.string
+                and! _ = "age" ?= Parse.byte
+                and! _ = "email" &= Parse.string
+                and! _ = "profiles" &= Parse.array Parse.guid
 
-                let! _ = "subscription" &= parser {
+                and! _ = "subscription" &= parser {
                     let! _ = "plan" &= Parse.string
-                    let! _ = "isCanceled" &= Parse.bool
-                    let! _ = "renewsAt" ?= Parse.dateTime
+                    and! _ = "isCanceled" &= Parse.bool
+                    and! _ = "renewsAt" ?= Parse.dateTime
 
                     return ()
                 }
