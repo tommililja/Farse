@@ -139,7 +139,7 @@ module User =
 
             // "Path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
-            let! _isCanceled = "subscription.isCanceled" &= bool
+            and! _isCanceled = "subscription.isCanceled" &= bool
 
             return {
                 Id = id
