@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
-| System.Text.Json       | 109.8 us |  0.71 |  4.1504 |       - |  25.85 KB |        0.25 |
-| System.Text.Json*      | 113.4 us |  0.73 | 13.0615 |  1.7090 |  80.19 KB |        0.77 |
-| Farse                  | 154.6 us |  1.00 | 16.8457 |       - | 104.19 KB |        1.00 |
-| Thoth.System.Text.Json | 247.3 us |  1.60 | 55.1758 | 18.0664 | 338.76 KB |        3.25 |
-| Newtonsoft.Json*       | 248.7 us |  1.61 | 59.5703 |  7.8125 | 365.69 KB |        3.51 |
-| Newtonsoft.Json        | 306.6 us |  1.98 | 75.6836 |  6.8359 | 464.07 KB |        4.45 |
-| Thoth.Json.Net         | 366.9 us |  2.37 | 94.7266 | 44.9219 | 581.86 KB |        5.58 |
+| System.Text.Json       | 109.7 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.55 |
+| System.Text.Json*      | 112.7 us |  0.85 | 13.0615 |  1.7090 |  80.19 KB |        1.71 |
+| Farse                  | 132.5 us |  1.00 |  7.5684 |       - |  46.95 KB |        1.00 |
+| Thoth.System.Text.Json | 245.2 us |  1.85 | 55.1758 | 18.0664 | 338.76 KB |        7.22 |
+| Newtonsoft.Json*       | 249.1 us |  1.88 | 59.5703 |  7.8125 | 365.01 KB |        7.78 |
+| Newtonsoft.Json        | 269.3 us |  2.03 | 75.6836 |  6.8359 | 464.07 KB |        9.89 |
+| Thoth.Json.Net         | 368.4 us |  2.78 | 94.7266 | 44.9219 | 581.86 KB |       12.39 |
 
 * Serialization
 ```
