@@ -22,7 +22,7 @@ module Age =
 
     let fromByte = function
         | age when age >= 12uy -> Ok <| Age age
-        | age -> Error $"%u{age} is not a valid age."
+        | age -> Error $"Invalid age '%u{age}'."
 
     let asByte (Age x) = x
 
@@ -54,7 +54,7 @@ module Plan =
         | "Pro" -> Ok Pro
         | "Standard" -> Ok Standard
         | "Free" -> Ok Free
-        | str -> Error $"%s{str} is not a valid plan."
+        | str -> Error $"Invalid plan '%s{str}'."
 
     let asString = function
         | Pro -> "Pro"
@@ -84,7 +84,7 @@ module Parse =
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error result.Exception.Message // Added as additional information.
+            | result -> Error result.Exception.Message // Added as details.
         ) JsonValueKind.String // Expected kind.
 
     // Custom parser example.
@@ -92,7 +92,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| UserId guid
-            | _ -> Error String.Empty // No additional info.
+            | _ -> Error String.Empty // No details.
         ) JsonValueKind.String
 
     // Combined parsers example.
