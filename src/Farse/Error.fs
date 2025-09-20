@@ -27,7 +27,7 @@ module internal Error =
     let invalidKind (expected:Kind) (actual:Kind) =
         let expected =
             match expected with
-            | Kind.True | Kind.False -> "Bool"
+            | kind when Kind.isBool kind -> "Bool"
             | kind -> string kind
 
         $"Expected '%s{expected}', but got '%s{string actual}'."

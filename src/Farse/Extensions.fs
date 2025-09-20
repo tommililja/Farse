@@ -9,7 +9,7 @@ type internal Kind = JsonValueKind
 
 module Kind =
 
-    let isBool (kind:Kind) =
+    let inline isBool (kind:JsonValueKind) =
         kind = Kind.True || kind = Kind.False
 
 module internal JsonSerializerOptions =
