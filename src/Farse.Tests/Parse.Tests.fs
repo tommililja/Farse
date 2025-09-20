@@ -101,11 +101,35 @@ module ParseTests =
             |> Expect.ok
         Expect.equal actual expected
 
+    type ByteEnum =
+        | Something = 1uy
+
+    [<Fact>]
+    let ``Should parse number as byte enum`` () =
+        let expected = ByteEnum.Something
+        let actual =
+            Parse.req "prop" Parse.byteEnum
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
     [<Fact>]
     let ``Should parse number as sbyte`` () =
         let expected = 1y
         let actual =
             Parse.req "prop" Parse.sbyte
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    type SByteEnum =
+        | Something = 1y
+
+    [<Fact>]
+    let ``Should parse number as sbyte enum`` () =
+        let expected = SByteEnum.Something
+        let actual =
+            Parse.req "prop" Parse.sbyteEnum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -119,11 +143,35 @@ module ParseTests =
             |> Expect.ok
         Expect.equal actual expected
 
+    type IntEnum =
+        | Something = 1
+
+    [<Fact>]
+    let ``Should parse number as int enum`` () =
+        let expected = IntEnum.Something
+        let actual =
+            Parse.req "prop" Parse.intEnum
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
     [<Fact>]
     let ``Should parse number as int16`` () =
         let expected = 1s
         let actual =
             Parse.req "prop" Parse.int16
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    type Int16Enum =
+        | Something = 1s
+
+    [<Fact>]
+    let ``Should parse number as int16 enum`` () =
+        let expected = Int16Enum.Something
+        let actual =
+            Parse.req "prop" Parse.int16Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -137,11 +185,35 @@ module ParseTests =
             |> Expect.ok
         Expect.equal actual expected
 
+    type Int64Enum =
+        | Something = 1L
+
+    [<Fact>]
+    let ``Should parse number as int64 enum`` () =
+        let expected = Int64Enum.Something
+        let actual =
+            Parse.req "prop" Parse.int64Enum
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
     [<Fact>]
     let ``Should parse number as uint16`` () =
         let expected = 1us
         let actual =
             Parse.req "prop" Parse.uint16
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    type UInt16Enum =
+        | Something = 1us
+
+    [<Fact>]
+    let ``Should parse number as uint16 enum`` () =
+        let expected = UInt16Enum.Something
+        let actual =
+            Parse.req "prop" Parse.uint16Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -155,11 +227,35 @@ module ParseTests =
             |> Expect.ok
         Expect.equal actual expected
 
+    type UInt32Enum =
+        | Something = 1u
+
+    [<Fact>]
+    let ``Should parse number as uint32 enum`` () =
+        let expected = UInt32Enum.Something
+        let actual =
+            Parse.req "prop" Parse.uint32Enum
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
     [<Fact>]
     let ``Should parse number as uint64`` () =
         let expected = 1UL
         let actual =
             Parse.req "prop" Parse.uint64
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    type UInt64Enum =
+        | Something = 1UL
+
+    [<Fact>]
+    let ``Should parse number as uint64 enum`` () =
+        let expected = UInt64Enum.Something
+        let actual =
+            Parse.req "prop" Parse.uint64Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -408,12 +504,12 @@ module ParseTests =
             |> Expect.ok
         Expect.equal actual expected
 
-    type TestEnum =
+    type StringEnum =
         | Something = 1
 
     [<Fact>]
     let ``Should parse string as enum`` () =
-        let expected = TestEnum.Something
+        let expected = StringEnum.Something
         let actual =
             Parse.req "prop" Parse.enum
             |> Parser.parse """{ "prop": "something" }"""

@@ -37,23 +37,49 @@ module internal JsonElement =
         | true, x -> Ok x
         | _ -> Error String.Empty // No additional info, String.empty for now.
 
+    let inline private parseEnum<'a, 'b when 'a: enum<'b>> x =
+        let enumType = typeof<'a>
+        match x with
+        | true, x when Enum.IsDefined(enumType, x) ->
+            Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
+        | true, _ -> Error $"Expected %s{enumType.Name} enum."
+        | _ -> Error String.Empty
+
     let inline tryGetInt (element:JsonElement) =
         tryParse <| element.TryGetInt32()
+
+    let inline tryGetIntEnum<'a when 'a: enum<int>> (element:JsonElement) =
+        parseEnum<'a, int> <| element.TryGetInt32()
 
     let inline tryGetInt16 (element:JsonElement) =
         tryParse <| element.TryGetInt16()
 
+    let inline tryGetInt16Enum<'a when 'a: enum<int16>> (element:JsonElement) =
+        parseEnum<'a, int16> <| element.TryGetInt16()
+
     let inline tryGetInt64 (element:JsonElement) =
         tryParse <| element.TryGetInt64()
+
+    let inline tryGetInt64Enum<'a when 'a: enum<int64>> (element:JsonElement) =
+        parseEnum<'a, int64> <| element.TryGetInt64()
 
     let inline tryGetUInt16 (element:JsonElement) =
         tryParse <| element.TryGetUInt16()
 
+    let inline tryGetUInt16Enum<'a when 'a: enum<uint16>> (element:JsonElement) =
+        parseEnum<'a, uint16> <| element.TryGetUInt16()
+
     let inline tryGetUInt32 (element:JsonElement) =
         tryParse <| element.TryGetUInt32()
 
+    let inline tryGetUInt32Enum<'a when 'a: enum<uint32>> (element:JsonElement) =
+        parseEnum<'a, uint32> <| element.TryGetUInt32()
+
     let inline tryGetUInt64 (element:JsonElement) =
         tryParse <| element.TryGetUInt64()
+
+    let inline tryGetUInt64Enum<'a when 'a: enum<uint64>> (element:JsonElement) =
+        parseEnum<'a, uint64> <| element.TryGetUInt64()
 
     let inline tryGetFloat (element:JsonElement) =
         tryParse <| element.TryGetDouble()
@@ -67,8 +93,14 @@ module internal JsonElement =
     let inline tryGetByte (element:JsonElement) =
         tryParse <| element.TryGetByte()
 
+    let inline tryGetByteEnum<'a when 'a: enum<byte>> (element:JsonElement) =
+        parseEnum<'a, byte> <| element.TryGetByte()
+
     let inline tryGetSByte (element:JsonElement) =
         tryParse <| element.TryGetSByte()
+
+    let inline tryGetSByteEnum<'a when 'a: enum<sbyte>> (element:JsonElement) =
+        parseEnum<'a, sbyte> <| element.TryGetSByte()
 
     let inline tryGetChar (element:JsonElement) =
         match element.GetString() with

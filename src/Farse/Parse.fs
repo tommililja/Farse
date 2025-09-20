@@ -122,7 +122,7 @@ module Parse =
         | Flat name -> tryParse name parser
         | Nested path -> tryTraverse path parser
 
-    // Custom
+    // Internal
 
     let inline internal getValue (tryParse: JsonElement -> Result<'a, string>) expectedKind : Parser<_> =
         fun element ->
@@ -135,37 +135,81 @@ module Parse =
             if isExpectedKind then
                 match tryParse element with
                 | Ok x -> Ok x
-                | Error error ->
-                    InvalidValue (error, typeof<'a>, element)
+                | Error msg ->
+                    InvalidValue (msg, typeof<'a>, element)
                     |> Error
             else
                  InvalidKind (expectedKind, element.ValueKind)
                  |> Error
+
+    let inline private seq convert (parser:Parser<_>) : Parser<_> =
+        fun element ->
+            match element.ValueKind with
+            | Kind.Array ->
+                let mutable error = None
+                let mutable enumerator = element.EnumerateArray()
+
+                let array =
+                    element.GetArrayLength()
+                    |> ResizeArray
+
+                for item in enumerator do
+                    if error.IsNone then
+                        match parser item with
+                        | Ok x -> array.Add x
+                        | Error e -> error <- Some <| ArrayError (array.Count, element, e)
+
+                match error with
+                | Some e -> Error e
+                | None -> Ok <| convert array
+            | _ ->
+                InvalidKind (Kind.Array, element.ValueKind)
+                |> Error
+
+    // Custom
 
     /// <summary>Creates a custom parser with the given try parse function.</summary>
     /// <param name="tryParse">The try parse function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
     let custom tryParse expectedKind = getValue tryParse expectedKind
 
-    // Primitives
+    // Basic types
 
     /// Parses a number as System.Int32.
     let int = getValue tryGetInt Kind.Number
 
+    /// Parses a number as a System.Int32 enum.
+    let intEnum<'a when 'a : enum<int>> = getValue tryGetIntEnum<'a> Kind.Number
+
     /// Parses a number as System.Int16.
     let int16 = getValue tryGetInt16 Kind.Number
+
+    /// Parses a number as a System.Int16 enum.
+    let int16Enum<'a when 'a : enum<int16>> = getValue tryGetInt16Enum<'a> Kind.Number
 
     /// Parses a number as System.Int64.
     let int64 = getValue tryGetInt64 Kind.Number
 
+    /// Parses a number as a System.Int16 enum.
+    let int64Enum<'a when 'a : enum<int64>> = getValue tryGetInt64Enum<'a> Kind.Number
+
     /// Parses a number as System.UInt16.
     let uint16 = getValue tryGetUInt16 Kind.Number
+
+    /// Parses a number as a System.UInt16 enum.
+    let uint16Enum<'a when 'a : enum<uint16>> = getValue tryGetUInt16Enum<'a> Kind.Number
 
     /// Parses a number as System.UInt32.
     let uint32 = getValue tryGetUInt32 Kind.Number
 
+    /// Parses a number as a System.UInt32 enum.
+    let uint32Enum<'a when 'a : enum<uint32>> = getValue tryGetUInt32Enum<'a> Kind.Number
+
     /// Parses a number as System.UInt64.
     let uint64 = getValue tryGetUInt64 Kind.Number
+
+    /// Parses a number as a System.UInt64 enum.
+    let uint64Enum<'a when 'a : enum<uint64>> = getValue tryGetUInt64Enum<'a> Kind.Number
 
     /// Parses a number as System.Double.
     let float = getValue tryGetFloat Kind.Number
@@ -179,14 +223,24 @@ module Parse =
     /// Parses a number as System.Byte.
     let byte = getValue tryGetByte Kind.Number
 
+    /// Parses a number as a System.Byte enum.
+    let byteEnum<'a when 'a : enum<byte>> = getValue tryGetByteEnum<'a> Kind.Number
+
     /// Parses a number as System.SByte.
     let sbyte = getValue tryGetSByte Kind.Number
+
+    /// Parses a number as a System.SByte enum.
+    let sbyteEnum<'a when 'a : enum<sbyte>> = getValue tryGetSByteEnum<'a> Kind.Number
 
     /// Parses a string as System.Char.
     let char = getValue tryGetChar Kind.String
 
     /// Parses a string as System.String.
     let string = getValue tryGetString Kind.String
+
+    /// Parses a string as an enum.
+    let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
+        getValue tryGetEnum<'a> Kind.String
 
     /// Parses a bool as System.Boolean.
     let bool = getValue tryGetBool Kind.True
@@ -239,30 +293,6 @@ module Parse =
 
     // Sequences
 
-    let inline private seq convert (parser:Parser<_>) : Parser<_> =
-        fun element ->
-            match element.ValueKind with
-            | Kind.Array ->
-                let mutable error = None
-                let mutable enumerator = element.EnumerateArray()
-
-                let array =
-                    element.GetArrayLength()
-                    |> ResizeArray
-
-                for item in enumerator do
-                    if error.IsNone then
-                        match parser item with
-                        | Ok x -> array.Add x
-                        | Error e -> error <- Some <| ArrayError (array.Count, element, e)
-
-                match error with
-                | Some e -> Error e
-                | None -> Ok <| convert array
-            | _ ->
-                InvalidKind (Kind.Array, element.ValueKind)
-                |> Error
-
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let list parser = seq Seq.toList parser
@@ -275,11 +305,7 @@ module Parse =
     /// <param name="parser">The parser used for every element.</param>
     let set parser = seq Set.ofSeq parser
 
-    // Misc
-
-    /// Parses a string as an enum.
-    let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
-        getValue tryGetEnum<'a> Kind.String
+    // Json
 
     /// Parses an element's raw text as System.String.
     let rawText = getValue tryGetRawText Kind.Undefined
