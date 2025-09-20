@@ -88,16 +88,16 @@ module User =
     let parser =
         parser {
             let! id = "id" &= userId // Custom parser example.
-            let! name = "name" &= string
-            let! age = "age" ?= age
-            let! email = "email" &= email
-            let! profiles = "profiles" &= set profileId
+            and! name = "name" &= string
+            and! age = "age" ?= age
+            and! email = "email" &= email
+            and! profiles = "profiles" &= set profileId
 
             // Inlined parser example.
-            let! subscription = "subscription" &= parser {
+            and! subscription = "subscription" &= parser {
                 let! plan = "plan" &= plan
-                let! isCanceled = "isCanceled" &= bool
-                let! renewsAt = "renewsAt" ?= instant // Custom parser example.
+                and! isCanceled = "isCanceled" &= bool
+                and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
                 return {
                     Plan = plan
