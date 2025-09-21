@@ -39,18 +39,18 @@ module internal Error =
             print element
         ]
 
-    let notObject name (object:JsonElement) (element:JsonElement) =
+    let notObject name (parent:JsonElement) (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{invalidKind Kind.Object element}"
-            print object
+            print parent
         ]
 
-    let couldNotParse name msg object =
+    let couldNotParse name msg parent =
         create [
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{msg}"
-            print object
+            print parent
         ]
 
     let invalidJson (exn:exn) json =
