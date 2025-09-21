@@ -4,7 +4,6 @@ open System
 open System.Text.Json
 
 module internal Error =
-    open Extensions
 
     let private create =
         String.concat "\n"

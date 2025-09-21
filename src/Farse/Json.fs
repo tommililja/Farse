@@ -51,7 +51,6 @@ module JBit =
     let nil = JNil.nil JBit
 
 module Json =
-    open Extensions
 
     let rec internal getJsonNode = function
         | JStr str -> JsonNode.create str

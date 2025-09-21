@@ -5,6 +5,7 @@ open System.Globalization
 open System.Text.Json
 open System.Text.Json.Nodes
 
+[<AutoOpen>]
 module internal Extensions =
 
     type Kind = JsonValueKind
