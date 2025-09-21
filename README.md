@@ -298,7 +298,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 
 ```code
 Error: Could not parse property 'plan'.
-Message: 'Max' is not a valid Plan. Details: Invalid plan 'Max'.
+Message: Tried parsing 'Max' to Plan. Details: Invalid plan 'Max'.
 Object:
 ```
 ```json
@@ -313,7 +313,7 @@ Object:
 
 ```code
 Error: Could not parse property 'profiles[1]'.
-Message: '927eb20f-cd62-470c-aafc-c3ce6b9248' is not a valid Guid.
+Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9248' to Guid.
 Array:
 ```
 ```json
