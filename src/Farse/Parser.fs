@@ -23,7 +23,7 @@ module Parser =
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <param name="fn">The binder function.</param>
     /// <param name="parser">The parser to bind.</param>
-    let inline bind fn (parser:Parser<_>) : Parser<_> =
+    let inline bind ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> element |> fn x
@@ -33,7 +33,7 @@ module Parser =
     /// <summary>Maps the parsed value with the given function.</summary>
     /// <param name="fn">The mapping function.</param>
     /// <param name="parser">The parser to map.</param>
-    let inline map fn (parser:Parser<_>) : Parser<_> =
+    let inline map ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> Ok <| fn x
@@ -52,7 +52,7 @@ module Parser =
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
-    let inline validate fn (parser:Parser<_>) : Parser<'b> =
+    let inline validate ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<'b> =
         fun element ->
             match parser element with
             | Ok x ->
