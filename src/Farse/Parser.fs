@@ -12,18 +12,18 @@ module Parser =
 
     /// <summary>Returns a parser with the given value.</summary>
     /// <param name="x">The value to return.</param>
-    let from x : Parser<_> =
+    let inline from x : Parser<_> =
         fun _ -> Ok x
 
     /// <summary>Returns a parser with the given result.</summary>
     /// <param name="x">The result to return.</param>
-    let fromResult x : Parser<_> =
+    let inline fromResult x : Parser<_> =
         fun _ -> Result.mapError Other x
 
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <param name="fn">The binder function.</param>
     /// <param name="parser">The parser to bind.</param>
-    let bind fn (parser:Parser<_>) : Parser<_> =
+    let inline bind fn (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> element |> fn x
@@ -33,7 +33,7 @@ module Parser =
     /// <summary>Maps the parsed value with the given function.</summary>
     /// <param name="fn">The mapping function.</param>
     /// <param name="parser">The parser to map.</param>
-    let map fn (parser:Parser<_>) : Parser<_> =
+    let inline map fn (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok x -> Ok <| fn x
@@ -42,7 +42,7 @@ module Parser =
 
     /// <summary>Ignores the parsed value.</summary>
     /// <param name="parser">The parser whose value to ignore.</param>
-    let ignore (parser:Parser<_>) : Parser<_> =
+    let inline ignore (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
             | Ok _ -> Ok ()
@@ -52,7 +52,7 @@ module Parser =
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
-    let validate fn (parser:Parser<_>) : Parser<'b> =
+    let inline validate fn (parser:Parser<_>) : Parser<'b> =
         fun element ->
             match parser element with
             | Ok x ->
