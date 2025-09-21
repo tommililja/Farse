@@ -21,7 +21,7 @@ module internal Error =
             | String msg -> $" Details: %s{msg}"
             | Empty -> String.Empty
 
-        $"'%s{value}' is not a valid %s{expectedType.Name}.%s{details}"
+        $"Tried parsing '%s{value}' to %s{expectedType.Name}.%s{details}"
 
     let invalidKind (expected:Kind) (element:JsonElement) =
         let expected = Kind.asString expected
