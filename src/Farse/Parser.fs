@@ -4,8 +4,6 @@ open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
-// The type alias does not work in some function signatures.
-// Fixing it increases memory allocations, so leaving it for now.
 type Parser<'a> = JsonElement -> Result<'a, ParserError>
 
 module Parser =
@@ -14,11 +12,13 @@ module Parser =
     /// <param name="x">The value to return.</param>
     let inline from x : Parser<_> =
         fun _ -> Ok x
+        |> id
 
     /// <summary>Returns a parser with the given result.</summary>
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<_> =
         fun _ -> Result.mapError Other x
+        |> id
 
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <param name="fn">The binder function.</param>
