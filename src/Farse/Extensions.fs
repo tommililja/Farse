@@ -5,234 +5,236 @@ open System.Globalization
 open System.Text.Json
 open System.Text.Json.Nodes
 
-type internal Kind = JsonValueKind
+module internal Extensions =
 
-module Kind =
+    type Kind = JsonValueKind
 
-    let inline isBool (kind:JsonValueKind) =
-        kind = Kind.True || kind = Kind.False
+    module Kind =
 
-    let asString kind =
-        if isBool kind then "Bool"
-        else string kind
+        let inline isBool (kind:Kind) =
+            kind = Kind.True || kind = Kind.False
 
-module internal JsonSerializerOptions =
+        let asString kind =
+            if isBool kind then "Bool"
+            else string kind
 
-    let preset = JsonSerializerOptions(WriteIndented = true, IndentSize = 4)
+    module JsonSerializerOptions =
 
-module internal JsonElement =
+        let preset = JsonSerializerOptions(WriteIndented = true, IndentSize = 4)
 
-    let inline getProperty (name:string) (element:JsonElement) =
-        element.TryGetProperty(name) |> snd
+    module JsonElement =
 
-    let inline tryGetProperty (name:string) (element:JsonElement) =
-        match element.TryGetProperty(name) with
-        | true, prop when prop.ValueKind <> Kind.Null -> Some prop
-        | _ -> None
+        let inline getProperty (name:string) (element:JsonElement) =
+            element.TryGetProperty(name) |> snd
 
-    let inline isBool (element:JsonElement) =
-        element.ValueKind = Kind.True || element.ValueKind = Kind.False
+        let inline tryGetProperty (name:string) (element:JsonElement) =
+            match element.TryGetProperty(name) with
+            | true, prop when prop.ValueKind <> Kind.Null -> Some prop
+            | _ -> None
 
-    let asString (element:JsonElement) =
-        element.ToString()
+        let inline isBool (element:JsonElement) =
+            element.ValueKind = Kind.True || element.ValueKind = Kind.False
 
-    let asRawString (element:JsonElement) =
-        element.GetRawText()
+        let asString (element:JsonElement) =
+            element.ToString()
 
-    let asJsonString (element:JsonElement) =
-        JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
+        let asRawString (element:JsonElement) =
+            element.GetRawText()
 
-    // Parsing
+        let asJsonString (element:JsonElement) =
+            JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
 
-    let inline private tryParse parse =
-        match parse () with
-        | true, x -> Ok x
-        | _ -> Error String.Empty // No details, String.empty for now.
+        // Parsing
 
-    let inline private parseEnum<'a, 'b when 'a: enum<'b>> parse =
-        let enumType = typeof<'a>
-        match parse () with
-        | true, x when Enum.IsDefined(enumType, x) ->
-            Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
-        | true, _ -> Error $"Expected %s{enumType.Name} enum."
-        | _ -> Error String.Empty
+        let inline private tryParse parse =
+            match parse () with
+            | true, x -> Ok x
+            | _ -> Error String.Empty // No details, String.empty for now.
 
-    let inline tryGetInt (element:JsonElement) =
-        tryParse element.TryGetInt32
+        let inline private parseEnum<'a, 'b when 'a: enum<'b>> parse =
+            let enumType = typeof<'a>
+            match parse () with
+            | true, x when Enum.IsDefined(enumType, x) ->
+                Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
+            | true, _ -> Error $"Expected %s{enumType.Name} enum."
+            | _ -> Error String.Empty
 
-    let inline tryGetIntEnum<'a when 'a: enum<int>> (element:JsonElement) =
-        parseEnum<'a, int> element.TryGetInt32
+        let inline tryGetInt (element:JsonElement) =
+            tryParse element.TryGetInt32
 
-    let inline tryGetInt16 (element:JsonElement) =
-        tryParse element.TryGetInt16
+        let inline tryGetIntEnum<'a when 'a: enum<int>> (element:JsonElement) =
+            parseEnum<'a, int> element.TryGetInt32
 
-    let inline tryGetInt16Enum<'a when 'a: enum<int16>> (element:JsonElement) =
-        parseEnum<'a, int16> element.TryGetInt16
+        let inline tryGetInt16 (element:JsonElement) =
+            tryParse element.TryGetInt16
 
-    let inline tryGetInt64 (element:JsonElement) =
-        tryParse element.TryGetInt64
+        let inline tryGetInt16Enum<'a when 'a: enum<int16>> (element:JsonElement) =
+            parseEnum<'a, int16> element.TryGetInt16
 
-    let inline tryGetInt64Enum<'a when 'a: enum<int64>> (element:JsonElement) =
-        parseEnum<'a, int64> element.TryGetInt64
+        let inline tryGetInt64 (element:JsonElement) =
+            tryParse element.TryGetInt64
 
-    let inline tryGetUInt16 (element:JsonElement) =
-        tryParse element.TryGetUInt16
+        let inline tryGetInt64Enum<'a when 'a: enum<int64>> (element:JsonElement) =
+            parseEnum<'a, int64> element.TryGetInt64
 
-    let inline tryGetUInt16Enum<'a when 'a: enum<uint16>> (element:JsonElement) =
-        parseEnum<'a, uint16> element.TryGetUInt16
+        let inline tryGetUInt16 (element:JsonElement) =
+            tryParse element.TryGetUInt16
 
-    let inline tryGetUInt32 (element:JsonElement) =
-        tryParse element.TryGetUInt32
+        let inline tryGetUInt16Enum<'a when 'a: enum<uint16>> (element:JsonElement) =
+            parseEnum<'a, uint16> element.TryGetUInt16
 
-    let inline tryGetUInt32Enum<'a when 'a: enum<uint32>> (element:JsonElement) =
-        parseEnum<'a, uint32> element.TryGetUInt32
+        let inline tryGetUInt32 (element:JsonElement) =
+            tryParse element.TryGetUInt32
 
-    let inline tryGetUInt64 (element:JsonElement) =
-        tryParse element.TryGetUInt64
+        let inline tryGetUInt32Enum<'a when 'a: enum<uint32>> (element:JsonElement) =
+            parseEnum<'a, uint32> element.TryGetUInt32
 
-    let inline tryGetUInt64Enum<'a when 'a: enum<uint64>> (element:JsonElement) =
-        parseEnum<'a, uint64> element.TryGetUInt64
+        let inline tryGetUInt64 (element:JsonElement) =
+            tryParse element.TryGetUInt64
 
-    let inline tryGetFloat (element:JsonElement) =
-        tryParse element.TryGetDouble
+        let inline tryGetUInt64Enum<'a when 'a: enum<uint64>> (element:JsonElement) =
+            parseEnum<'a, uint64> element.TryGetUInt64
 
-    let inline tryGetFloat32 (element:JsonElement) =
-        tryParse element.TryGetSingle
+        let inline tryGetFloat (element:JsonElement) =
+            tryParse element.TryGetDouble
 
-    let inline tryGetDecimal (element:JsonElement) =
-        tryParse element.TryGetDecimal
+        let inline tryGetFloat32 (element:JsonElement) =
+            tryParse element.TryGetSingle
 
-    let inline tryGetByte (element:JsonElement) =
-        tryParse element.TryGetByte
+        let inline tryGetDecimal (element:JsonElement) =
+            tryParse element.TryGetDecimal
 
-    let inline tryGetByteEnum<'a when 'a: enum<byte>> (element:JsonElement) =
-        parseEnum<'a, byte> element.TryGetByte
+        let inline tryGetByte (element:JsonElement) =
+            tryParse element.TryGetByte
 
-    let inline tryGetSByte (element:JsonElement) =
-        tryParse element.TryGetSByte
+        let inline tryGetByteEnum<'a when 'a: enum<byte>> (element:JsonElement) =
+            parseEnum<'a, byte> element.TryGetByte
 
-    let inline tryGetSByteEnum<'a when 'a: enum<sbyte>> (element:JsonElement) =
-        parseEnum<'a, sbyte> element.TryGetSByte
+        let inline tryGetSByte (element:JsonElement) =
+            tryParse element.TryGetSByte
 
-    let inline tryGetChar (element:JsonElement) =
-        match element.GetString() with
-        | str when str.Length = 1 -> Ok str[0]
-        | _ -> Error "Expected a string length of 1."
+        let inline tryGetSByteEnum<'a when 'a: enum<sbyte>> (element:JsonElement) =
+            parseEnum<'a, sbyte> element.TryGetSByte
 
-    let inline tryGetString (element:JsonElement) =
-        Ok <| element.GetString()
+        let inline tryGetChar (element:JsonElement) =
+            match element.GetString() with
+            | str when str.Length = 1 -> Ok str[0]
+            | _ -> Error "Expected a string length of 1."
 
-    let inline tryGetBool (element:JsonElement) =
-        Ok <| element.GetBoolean()
+        let inline tryGetString (element:JsonElement) =
+            Ok <| element.GetString()
 
-    let inline tryGetGuid (element:JsonElement) =
-        tryParse element.TryGetGuid
+        let inline tryGetBool (element:JsonElement) =
+            Ok <| element.GetBoolean()
 
-    let inline tryGetUnit _ = Ok ()
+        let inline tryGetGuid (element:JsonElement) =
+            tryParse element.TryGetGuid
 
-    let inline tryGetTimeOnly (element:JsonElement) =
-        let str = element.GetString()
-        tryParse (fun _ -> TimeOnly.TryParse(str, CultureInfo.InvariantCulture))
+        let inline tryGetUnit _ = Ok ()
 
-    let inline tryGetTimeOnlyExact (format:string) (element:JsonElement) =
-        let str = element.GetString()
-        match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-        | true, timeOnly -> Ok timeOnly
-        | _ -> Error $"Expected %s{format}."
-
-    let inline tryGetTimeSpan (element:JsonElement) =
-        let str = element.GetString()
-        tryParse (fun _ -> TimeSpan.TryParse(str, CultureInfo.InvariantCulture))
-
-    let inline tryGetTimeSpanExact (format:string) (element:JsonElement) =
-        let str = element.GetString()
-        match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
-        | true, timeSpan -> Ok timeSpan
-        | _ -> Error $"Expected %s{format}."
-
-    let inline tryGetDateOnly (element:JsonElement) =
-        let str = element.GetString()
-        tryParse (fun _ -> DateOnly.TryParse(str, CultureInfo.InvariantCulture))
-
-    let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
-        let str = element.GetString()
-        match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-        | true, dateOnly -> Ok dateOnly
-        | _ -> Error $"Expected %s{format}."
-
-    let inline tryGetDateTime (element:JsonElement) =
-        tryParse element.TryGetDateTime
-
-    let inline tryGetDateTimeUtc (element:JsonElement) =
-        match element.TryGetDateTime() with
-        | true, dateTime -> Ok <| dateTime.ToUniversalTime()
-        | _ -> Error String.Empty
-
-    let inline tryGetDateTimeExact (format:string) (element:JsonElement) =
-        let str = element.GetString()
-        match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-        | true, dateTime -> Ok dateTime
-        | _ -> Error $"Expected %s{format}."
-
-    let inline tryGetDateTimeOffset (element:JsonElement) =
-        tryParse element.TryGetDateTimeOffset
-
-    let inline tryGetDateTimeOffsetExact (format:string) (element:JsonElement)  =
-        let str = element.GetString()
-        match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-        | true, dateTimeOffset -> Ok dateTimeOffset
-        | _ -> Error $"Expected %s{format}."
-
-    let inline tryGetArrayLength (element:JsonElement) =
-        Ok <| element.GetArrayLength()
-
-    let inline tryGetPropertyCount (element:JsonElement) =
-        Ok <| element.GetPropertyCount()
-
-    let inline tryGetKind (element:JsonElement) =
-        Ok element.ValueKind
-
-    let inline tryGetElement (element:JsonElement) =
-        Ok <| element.Clone()
-
-    let inline tryGetEnum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> (element:JsonElement) =
-        let str = element.GetString()
-        match Enum.TryParse<'a>(str, true) with
-        | true, enum -> Ok enum
-        | _ -> Error String.Empty
-
-    let tryGetRawText (element:JsonElement) =
-        Ok <| element.GetRawText()
-
-module internal JsonNode =
-
-    let create x =
-        JsonValue.Create<'a>(x)
-            .Root
-
-    let asString (node:JsonNode) =
-        if node = null
-        then "null"
-        else node.ToJsonString(JsonSerializerOptions.preset)
-
-module internal ResultOption =
-
-    let inline bind fn = function
-        | Ok x ->
-            match x with
-            | Some x -> fn x
-            | None -> Ok None
-        | Error e -> Error e
-
-[<AutoOpen>]
-module internal ActivePatterns =
-
-    let (|String|Empty|) (str:string) =
-        if String.IsNullOrEmpty(str)
-        then Empty
-        else String str
-
-    let (|Flat|Nested|) (str:string) =
-        if str.Contains('.')
-        then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
-        else Flat str
+        let inline tryGetTimeOnly (element:JsonElement) =
+            let str = element.GetString()
+            tryParse (fun _ -> TimeOnly.TryParse(str, CultureInfo.InvariantCulture))
+
+        let inline tryGetTimeOnlyExact (format:string) (element:JsonElement) =
+            let str = element.GetString()
+            match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            | true, timeOnly -> Ok timeOnly
+            | _ -> Error $"Expected %s{format}."
+
+        let inline tryGetTimeSpan (element:JsonElement) =
+            let str = element.GetString()
+            tryParse (fun _ -> TimeSpan.TryParse(str, CultureInfo.InvariantCulture))
+
+        let inline tryGetTimeSpanExact (format:string) (element:JsonElement) =
+            let str = element.GetString()
+            match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
+            | true, timeSpan -> Ok timeSpan
+            | _ -> Error $"Expected %s{format}."
+
+        let inline tryGetDateOnly (element:JsonElement) =
+            let str = element.GetString()
+            tryParse (fun _ -> DateOnly.TryParse(str, CultureInfo.InvariantCulture))
+
+        let inline tryGetDateOnlyExact (format:string) (element:JsonElement) =
+            let str = element.GetString()
+            match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            | true, dateOnly -> Ok dateOnly
+            | _ -> Error $"Expected %s{format}."
+
+        let inline tryGetDateTime (element:JsonElement) =
+            tryParse element.TryGetDateTime
+
+        let inline tryGetDateTimeUtc (element:JsonElement) =
+            match element.TryGetDateTime() with
+            | true, dateTime -> Ok <| dateTime.ToUniversalTime()
+            | _ -> Error String.Empty
+
+        let inline tryGetDateTimeExact (format:string) (element:JsonElement) =
+            let str = element.GetString()
+            match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            | true, dateTime -> Ok dateTime
+            | _ -> Error $"Expected %s{format}."
+
+        let inline tryGetDateTimeOffset (element:JsonElement) =
+            tryParse element.TryGetDateTimeOffset
+
+        let inline tryGetDateTimeOffsetExact (format:string) (element:JsonElement)  =
+            let str = element.GetString()
+            match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            | true, dateTimeOffset -> Ok dateTimeOffset
+            | _ -> Error $"Expected %s{format}."
+
+        let inline tryGetArrayLength (element:JsonElement) =
+            Ok <| element.GetArrayLength()
+
+        let inline tryGetPropertyCount (element:JsonElement) =
+            Ok <| element.GetPropertyCount()
+
+        let inline tryGetKind (element:JsonElement) =
+            Ok element.ValueKind
+
+        let inline tryGetElement (element:JsonElement) =
+            Ok <| element.Clone()
+
+        let inline tryGetEnum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> (element:JsonElement) =
+            let str = element.GetString()
+            match Enum.TryParse<'a>(str, true) with
+            | true, enum -> Ok enum
+            | _ -> Error String.Empty
+
+        let tryGetRawText (element:JsonElement) =
+            Ok <| element.GetRawText()
+
+    module JsonNode =
+
+        let create x =
+            JsonValue.Create<'a>(x)
+                .Root
+
+        let asString (node:JsonNode) =
+            if node = null
+            then "null"
+            else node.ToJsonString(JsonSerializerOptions.preset)
+
+    module ResultOption =
+
+        let inline bind fn = function
+            | Ok x ->
+                match x with
+                | Some x -> fn x
+                | None -> Ok None
+            | Error e -> Error e
+
+    [<AutoOpen>]
+    module ActivePatterns =
+
+        let (|String|Empty|) (str:string) =
+            if String.IsNullOrEmpty(str)
+            then Empty
+            else String str
+
+        let (|Flat|Nested|) (str:string) =
+            if str.Contains('.')
+            then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
+            else Flat str

@@ -4,6 +4,7 @@ open System
 open System.Text.Json
 
 module Parse =
+    open Extensions
     open JsonElement
 
     let private parse name (parser:Parser<_>) : Parser<_> =
