@@ -47,7 +47,7 @@ module internal JsonElement =
     let inline private tryParse parse =
         match parse () with
         | true, x -> Ok x
-        | _ -> Error String.Empty // No additional info, String.empty for now.
+        | _ -> Error String.Empty // No details, String.empty for now.
 
     let inline private parseEnum<'a, 'b when 'a: enum<'b>> parse =
         let enumType = typeof<'a>
@@ -227,9 +227,9 @@ module internal ResultOption =
 [<AutoOpen>]
 module internal ActivePatterns =
 
-    let (|String|Invalid|) (str:string) =
+    let (|String|Empty|) (str:string) =
         if String.IsNullOrEmpty(str)
-        then Invalid
+        then Empty
         else String str
 
     let (|Flat|Nested|) (str:string) =

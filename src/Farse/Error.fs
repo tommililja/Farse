@@ -18,7 +18,7 @@ module internal Error =
         let details =
             match msg with
             | String msg -> $" Details: %s{msg}"
-            | Invalid -> String.Empty
+            | Empty -> String.Empty
 
         $"'%s{value}' is not a valid %s{expectedType.Name}.%s{details}"
 
