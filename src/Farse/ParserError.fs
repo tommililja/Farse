@@ -6,7 +6,7 @@ open System.Text.Json
 [<NoComparison>]
 type ParserError =
     | ArrayError of index:int * array:JsonElement * error:ParserError
-    | CouldNotParse of name:string * msg:string * element:JsonElement
+    | CouldNotParse of name:string * msg:string * object:JsonElement
     | CouldNotRead of name:string * element:JsonElement
     | InvalidKind of expected:Kind * element:JsonElement
     | InvalidValue of msg:string * expected:Type * element:JsonElement
@@ -32,7 +32,7 @@ module ParserError =
 
     let rec asString = function
         | ArrayError (_, _, msg) -> asString msg
-        | CouldNotParse (name, msg, element) -> couldNotParse name msg element
+        | CouldNotParse (name, msg, object) -> couldNotParse name msg object
         | CouldNotRead (name, element) -> couldNotRead name element
         | InvalidKind (expected, actual) -> invalidKind expected actual
         | InvalidValue (msg, expected, element) -> invalidValue msg expected element

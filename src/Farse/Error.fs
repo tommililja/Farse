@@ -46,11 +46,11 @@ module internal Error =
             print object
         ]
 
-    let couldNotParse name msg element =
+    let couldNotParse name msg object =
         create [
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{msg}"
-            print element
+            print object
         ]
 
     let invalidJson (exn:exn) json =
