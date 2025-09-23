@@ -154,10 +154,15 @@ module Parse =
                     |> ResizeArray
 
                 for item in enumerator do
-                    if error.IsNone then
+                    error <- error
+                    |> Option.orElse (
                         match parser item with
-                        | Ok x -> array.Add x
-                        | Error e -> error <- Some <| ArrayError (array.Count, element, e)
+                        | Ok x -> array.Add x; None
+                        | Error error ->
+                            (array.Count, element, error)
+                            |> ArrayError
+                            |> Some
+                    )
 
                 match error with
                 | Some e -> Error e
