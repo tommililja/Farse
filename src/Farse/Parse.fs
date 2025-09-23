@@ -156,15 +156,14 @@ module Parse =
                     |> Option.orElse (
                         match parser item with
                         | Ok x -> array.Add x; None
-                        | Error error ->
-                            (array.Count, element, error)
-                            |> ArrayError
-                            |> Some
+                        | Error error -> Some error
                     )
 
                 match error with
-                | Some e -> Error e
                 | None -> Ok <| convert array
+                | Some error ->
+                    ArrayError (array.Count, element, error)
+                    |> Error
             | _ ->
                 InvalidKind (Kind.Array, element)
                 |> Error
