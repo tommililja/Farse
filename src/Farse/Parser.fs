@@ -50,6 +50,22 @@ module Parser =
         |> id
 
     /// <summary>Validates the parsed value with the given function.</summary>
+    /// <remarks>
+    ///     Adds the error string as details to the parser error message.
+    ///     <example>
+    ///         Do
+    ///         <code>
+    ///             let! plan = "plan" &amp;= (string |> Parser.validate Plan.fromString)
+    ///             let! plan = "plan" &amp;= Parser.validate Plan.fromString string
+    ///         </code>
+    ///     </example>
+    ///     <example>
+    ///         Don't
+    ///         <code>
+    ///             let! plan = "plan" &amp;= string |> Parser.validate Plan.fromString
+    ///         </code>
+    ///     </example>
+    /// </remarks>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
     let inline validate ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<'b> =
