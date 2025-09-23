@@ -146,14 +146,12 @@ module Parse =
         fun element ->
             match element.ValueKind with
             | Kind.Array ->
-                let mutable error = None
-                let mutable enumerator = element.EnumerateArray()
-
                 let array =
                     element.GetArrayLength()
                     |> ResizeArray
 
-                for item in enumerator do
+                let mutable error = None
+                for item in element.EnumerateArray() do
                     error <- error
                     |> Option.orElse (
                         match parser item with
