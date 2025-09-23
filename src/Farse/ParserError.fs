@@ -8,7 +8,7 @@ type ParserError =
     | ArrayError of index:int * array:JsonElement * error:ParserError
     | CouldNotParse of name:string * msg:string * parent:JsonElement
     | CouldNotRead of name:string * element:JsonElement
-    | InvalidKind of expected:Kind * element:JsonElement
+    | InvalidKind of expected:ExpectedKind * element:JsonElement
     | InvalidValue of msg:string * expected:Type * element:JsonElement
     | NotObject of name:string * parent:JsonElement * element:JsonElement
     | Other of msg:string

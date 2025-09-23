@@ -85,7 +85,7 @@ module Parse =
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
             | result -> Error result.Exception.Message // Added as details.
-        ) JsonValueKind.String // Expected kind.
+        ) ExpectedKind.String
 
     // Custom parser example.
     let userId =
@@ -93,7 +93,7 @@ module Parse =
             match element.TryGetGuid() with
             | true, guid -> Ok <| UserId guid
             | _ -> Error String.Empty // No details.
-        ) JsonValueKind.String
+        ) ExpectedKind.String
 
     // Combined parsers example.
 

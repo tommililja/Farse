@@ -22,8 +22,8 @@ module internal Error =
 
         $"Tried parsing '%s{value}' to %s{expectedType.Name}.%s{details}"
 
-    let invalidKind (expected:Kind) (element:JsonElement) =
-        let expected = Kind.asString expected
+    let invalidKind (expected:ExpectedKind) (element:JsonElement) =
+        let expected = ExpectedKind.asString expected
         let actual = Kind.asString element.ValueKind
         let value =
             match element.ValueKind with
@@ -35,14 +35,14 @@ module internal Error =
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."
-            $"Message: %s{invalidKind Kind.Object element}"
+            $"Message: %s{invalidKind ExpectedKind.Object element}"
             print element
         ]
 
     let notObject name (parent:JsonElement) (element:JsonElement) =
         create [
             $"Error: Could not parse property '%s{name}'."
-            $"Message: %s{invalidKind Kind.Object element}"
+            $"Message: %s{invalidKind ExpectedKind.Object element}"
             print parent
         ]
 

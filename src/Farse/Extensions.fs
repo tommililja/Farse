@@ -5,6 +5,16 @@ open System.Globalization
 open System.Text.Json
 open System.Text.Json.Nodes
 
+type ExpectedKind =
+    | Undefined
+    | Object
+    | Array
+    | String
+    | Number
+    | Bool
+    | Null
+    | Any
+
 [<AutoOpen>]
 module internal Extensions =
 
@@ -18,6 +28,29 @@ module internal Extensions =
         let asString kind =
             if isBool kind then "Bool"
             else string kind
+
+    module ExpectedKind =
+
+        let fromKind = function
+            | Kind.Undefined -> Any
+            | Kind.Object -> Object
+            | Kind.Array -> Array
+            | Kind.String -> String
+            | Kind.Number -> Number
+            | Kind.True -> Bool
+            | Kind.False -> Bool
+            | Kind.Null -> Null
+            | _ -> raise <| ArgumentOutOfRangeException()
+
+        let asString = function
+            | Undefined -> "Undefined"
+            | Object -> "Object"
+            | Array -> "Array"
+            | String -> "String"
+            | Number -> "Number"
+            | Bool -> "Bool"
+            | Null -> "Null"
+            | Any -> "Any"
 
     module JsonSerializerOptions =
 
@@ -35,6 +68,11 @@ module internal Extensions =
 
         let inline isBool (element:JsonElement) =
             element.ValueKind = Kind.True || element.ValueKind = Kind.False
+
+        let inline isExpectedKind (expectedKind:ExpectedKind) (element:JsonElement) =
+            element.ValueKind
+            |> ExpectedKind.fromKind
+            |> (=) expectedKind
 
         let asString (element:JsonElement) =
             element.ToString()
