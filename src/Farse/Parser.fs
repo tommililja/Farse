@@ -75,7 +75,7 @@ module Parser =
                 match fn x with
                 | Ok x -> Ok x
                 | Error msg ->
-                    InvalidValue (msg, typeof<'b>, element)
+                    InvalidValue (Some msg, typeof<'b>, element)
                     |> Error
             | Error e -> Error e
         |> id

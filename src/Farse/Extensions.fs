@@ -88,15 +88,15 @@ module internal Extensions =
         let inline private tryParse parse =
             match parse () with
             | true, x -> Ok x
-            | _ -> Error String.Empty // No details, String.empty for now.
+            | _ -> Error None
 
         let inline private parseEnum<'a, 'b when 'a: enum<'b>> parse =
             let enumType = typeof<'a>
             match parse () with
             | true, x when Enum.IsDefined(enumType, x) ->
                 Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
-            | true, _ -> Error $"Expected %s{enumType.Name} enum."
-            | _ -> Error String.Empty
+            | true, _ -> Error <| Some $"Expected %s{enumType.Name} enum."
+            | _ -> Error None
 
         let inline tryGetInt (element:JsonElement) =
             tryParse element.TryGetInt32
@@ -158,7 +158,7 @@ module internal Extensions =
         let inline tryGetChar (element:JsonElement) =
             match element.GetString() with
             | str when str.Length = 1 -> Ok str[0]
-            | _ -> Error "Expected a string length of 1."
+            | _ -> Error <| Some "Expected a string length of 1."
 
         let inline tryGetString (element:JsonElement) =
             Ok <| element.GetString()
@@ -179,7 +179,7 @@ module internal Extensions =
             let str = element.GetString()
             match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, timeOnly -> Ok timeOnly
-            | _ -> Error $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected %s{format}."
 
         let inline tryGetTimeSpan (element:JsonElement) =
             let str = element.GetString()
@@ -189,7 +189,7 @@ module internal Extensions =
             let str = element.GetString()
             match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
-            | _ -> Error $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected %s{format}."
 
         let inline tryGetDateOnly (element:JsonElement) =
             let str = element.GetString()
@@ -199,7 +199,7 @@ module internal Extensions =
             let str = element.GetString()
             match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected %s{format}."
 
         let inline tryGetDateTime (element:JsonElement) =
             tryParse element.TryGetDateTime
@@ -207,13 +207,13 @@ module internal Extensions =
         let inline tryGetDateTimeUtc (element:JsonElement) =
             match element.TryGetDateTime() with
             | true, dateTime -> Ok <| dateTime.ToUniversalTime()
-            | _ -> Error String.Empty
+            | _ -> Error None
 
         let inline tryGetDateTimeExact (format:string) (element:JsonElement) =
             let str = element.GetString()
             match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTime -> Ok dateTime
-            | _ -> Error $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected %s{format}."
 
         let inline tryGetDateTimeOffset (element:JsonElement) =
             tryParse element.TryGetDateTimeOffset
@@ -222,7 +222,7 @@ module internal Extensions =
             let str = element.GetString()
             match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTimeOffset -> Ok dateTimeOffset
-            | _ -> Error $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected %s{format}."
 
         let inline tryGetArrayLength (element:JsonElement) =
             Ok <| element.GetArrayLength()
@@ -236,11 +236,11 @@ module internal Extensions =
         let inline tryGetElement (element:JsonElement) =
             Ok <| element.Clone()
 
-        let inline tryGetEnum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> (element:JsonElement) =
+        let inline tryGetEnum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> (element:JsonElement) : Result<'a, string option> =
             let str = element.GetString()
             match Enum.TryParse<'a>(str, true) with
             | true, enum -> Ok enum
-            | _ -> Error String.Empty
+            | _ -> Error None
 
         let tryGetRawText (element:JsonElement) =
             Ok <| element.GetRawText()
@@ -267,11 +267,6 @@ module internal Extensions =
 
     [<AutoOpen>]
     module ActivePatterns =
-
-        let (|String|Empty|) (str:string) =
-            if String.IsNullOrEmpty(str)
-            then Empty
-            else String str
 
         let (|Flat|Nested|) (str:string) =
             if str.Contains('.')

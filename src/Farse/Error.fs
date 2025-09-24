@@ -17,8 +17,8 @@ module internal Error =
         let value = JsonElement.asString element
         let details =
             match msg with
-            | String msg -> $" Details: %s{msg}"
-            | Empty -> String.Empty
+            | Some msg -> $" Details: %s{msg}"
+            | None -> String.Empty
 
         $"Tried parsing '%s{value}' to %s{expectedType.Name}.%s{details}"
 

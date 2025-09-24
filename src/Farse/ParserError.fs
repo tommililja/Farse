@@ -9,7 +9,7 @@ type ParserError =
     | CouldNotParse of name:string * msg:string * parent:JsonElement
     | CouldNotRead of name:string * element:JsonElement
     | InvalidKind of expected:ExpectedKind * element:JsonElement
-    | InvalidValue of msg:string * expected:Type * element:JsonElement
+    | InvalidValue of msg:string option * expected:Type * element:JsonElement
     | NotObject of name:string * parent:JsonElement * element:JsonElement
     | Other of msg:string
 

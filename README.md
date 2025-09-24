@@ -220,7 +220,7 @@ module Parse =
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error result.Exception.Message // Added as details.
+            | result -> Error <| Some result.Exception.Message // Added as details.
         ) ExpectedKind.String
 
     // Custom parser example.
@@ -228,7 +228,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| UserId guid
-            | _ -> Error String.Empty // No details.
+            | _ -> Error None // No details.
         ) ExpectedKind.String
 
     // Combined parsers example.

@@ -125,7 +125,7 @@ module Parse =
 
     // Internal
 
-    let inline internal getValue (tryParse: JsonElement -> Result<'a, string>) expectedKind : Parser<_> =
+    let inline internal getValue (tryParse: JsonElement -> Result<'a, string option>) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 match expectedKind with
