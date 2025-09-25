@@ -15,22 +15,16 @@ module internal Error =
 
     let invalidValue msg (expectedType:Type) element =
         let value = JsonElement.asString element
-        let details =
-            match msg with
-            | Some msg when String.isNotEmpty msg -> $" Details: %s{msg}"
-            | _ -> String.Empty
-
-        $"Tried parsing '%s{value}' to %s{expectedType.Name}.%s{details}"
+        match msg with
+        | Some msg when String.isNotEmpty msg -> $"Tried parsing '%s{value}' to %s{expectedType.Name}. Details: %s{msg}"
+        | _ -> $"Tried parsing '%s{value}' to %s{expectedType.Name}."
 
     let invalidKind (expected:ExpectedKind) (element:JsonElement) =
         let expected = ExpectedKind.asString expected
         let actual = Kind.asString element.ValueKind
-        let value =
-            match element.ValueKind with
-            | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> String.Empty
-            | _ -> $". Value: '%s{JsonElement.asString element}'"
-
-        $"Expected %s{expected}, but got %s{actual}%s{value}."
+        match element.ValueKind with
+        | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> $"Expected %s{expected}, but got %s{actual}."
+        | _ -> $"Expected %s{expected}, but got %s{actual}. Value: '%s{JsonElement.asString element}'."
 
     let couldNotRead name (element:JsonElement) =
         create [
