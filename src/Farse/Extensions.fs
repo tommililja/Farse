@@ -265,6 +265,10 @@ module internal Extensions =
                 | None -> Ok None
             | Error e -> Error e
 
+    module String =
+
+        let isNotEmpty = String.IsNullOrWhiteSpace >> not
+
     [<AutoOpen>]
     module ActivePatterns =
 
