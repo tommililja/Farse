@@ -6,7 +6,6 @@ open NodaTime
 open NodaTime.Text
 open System
 open System.IO
-open System.Text.Json
 open Xunit
 
 type UserId = UserId of Guid
