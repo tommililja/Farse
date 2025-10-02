@@ -6,10 +6,10 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Extensions.fs" />
-        <Compile Include="Error.Tests.fs" />
-        <Compile Include="Parse.Tests.fs" />
-        <Compile Include="Parser.Tests.fs" />
-        <Compile Include="Json.Tests.fs" />
+        <Compile Include="Tests\Json.Tests.fs" />
+        <Compile Include="Tests\Parser.Tests.fs" />
+        <Compile Include="Tests\Parse.Tests.fs" />
+        <Compile Include="Tests\Error.Tests.fs" />
         <Compile Include="Example.fs" />
     </ItemGroup>
     <ItemGroup>
