@@ -312,11 +312,11 @@ module Parse =
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let list parser = arr Seq.toList parser
+    let list parser = arr List.ofSeq parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Core.array.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let array parser = arr Seq.toArray parser
+    let array parser = arr Array.ofSeq parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
     /// <param name="parser">The parser used for every element.</param>
