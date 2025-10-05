@@ -4,7 +4,28 @@ open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
-type Parser<'a> = JsonElement -> Result<'a, ParserError>
+type Validate =
+
+    static member inline Validate (parser:Parser<Option<_>>, fn) =
+        fun element ->
+            match parser element with
+            | Ok (Some x) ->
+                match fn x with
+                | Ok x -> Ok <| Some x
+                | Error msg -> Error <| Other msg
+            | Ok None -> Ok None
+            | Error e -> Error e
+
+    static member inline Validate (parser:Parser<_>, fn) =
+        fun element ->
+            match parser element with
+            | Ok x ->
+                match fn x with
+                | Ok x -> Ok x
+                | Error msg -> Error <| Other msg
+            | Error e -> Error e
+
+and Parser<'a> = JsonElement -> Result<'a, ParserError>
 
 module Parser =
 
@@ -48,27 +69,6 @@ module Parser =
             | Ok _ -> Ok ()
             | Error e -> Error e
         |> id
-
-    type Validate =
-
-        static member inline Validate (parser: Parser<Option<_>>, fn: _ -> _) =
-            fun element ->
-                match parser element with
-                | Ok (Some x) ->
-                    match fn x with
-                    | Ok x -> Ok <| Some x
-                    | Error msg -> Error <| Other msg
-                | Ok None -> Ok None
-                | Error e -> Error e
-
-        static member inline Validate (parser: Parser<_>, fn: _ -> _) =
-            fun element ->
-                match parser element with
-                | Ok x ->
-                    match fn x with
-                    | Ok x -> Ok x
-                    | Error msg -> Error <| Other msg
-                | Error e -> Error e
 
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <param name="fn">The validation function.</param>
