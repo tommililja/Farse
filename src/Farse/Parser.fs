@@ -6,7 +6,7 @@ open System.Text.Json
 
 type Validate =
 
-    static member inline Validate (parser:Parser<Option<_>>, fn) =
+    static member inline Validate(parser:Parser<_ option>, fn) =
         fun element ->
             match parser element with
             | Ok (Some x) ->
@@ -16,7 +16,7 @@ type Validate =
             | Ok None -> Ok None
             | Error e -> Error e
 
-    static member inline Validate (parser:Parser<_>, fn) =
+    static member inline Validate(parser:Parser<_>, fn) =
         fun element ->
             match parser element with
             | Ok x ->
