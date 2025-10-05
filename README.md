@@ -296,7 +296,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 
 ```code
 Error: Could not parse property 'renewsAt'.
-Message: Tried parsing '202612-25T10:30:00Z' to Instant. Details: The value string does not [...]
+Message: Tried parsing '202612-25T10:30:00Z' to Instant. Details: The value string [...]
 Object:
 ```
 ```json
