@@ -42,7 +42,7 @@ module Parser =
         |> id
 
     /// <summary>Binds the parsed value with the given function.</summary>
-    /// <param name="fn">The binder function.</param>
+    /// <param name="fn">The binding function.</param>
     /// <param name="parser">The parser to bind.</param>
     let inline bind ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
         fun element ->
