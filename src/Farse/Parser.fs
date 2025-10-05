@@ -74,7 +74,7 @@ module Parser =
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
     let inline validate ([<InlineIfLambda>] fn) parser =
-        ((^T or Validate) : (static member Validate : ^T * (_ -> _) -> Parser<_>) (parser, fn))
+        ((^T or Validate) : (static member Validate : ^T * (_ -> Result<_, string>) -> Parser<_>) (parser, fn))
 
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
