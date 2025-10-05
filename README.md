@@ -87,11 +87,11 @@ module User =
 
     let parser =
         parser {
-            let! id = "id" &= userId // Custom parser example.
+            let! id = "id" &= userId
             and! name = "name" &= string
             and! age = "age" ?= age
             and! email = "email" &= email
-            and! profiles = "profiles" &= set profileId
+            and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
@@ -224,18 +224,18 @@ module Parse =
         ) ExpectedKind.String
 
     // Custom parser example.
-    let userId =
+    let profileId =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
-            | true, guid -> Ok <| UserId guid
+            | true, guid -> Ok <| ProfileId guid
             | _ -> Error None // No details.
         ) ExpectedKind.String
 
     // Combined parsers example.
 
-    let profileId =
+    let userId =
         Parse.guid
-        |> Parser.map ProfileId
+        |> Parser.map UserId
 
     let email =
         Parse.string
@@ -311,14 +311,14 @@ Object:
 
 ```code
 Error: Could not parse property 'profiles[1]'.
-Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9248' to Guid.
+Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9248' to ProfileId.
 Array:
 ```
 ```json
 [
     "01458283-b6e3-4ae7-ae54-a68eb587cdc0",
     "927eb20f-cd62-470c-aafc-c3ce6b9248",
-    "bf00d1e2-ee53-4969-9507-86bed7e96432"
+    "bf00d1e2-ee53-4969-9507-86bed7e9643c"
 ]
 ```
 

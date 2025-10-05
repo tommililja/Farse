@@ -87,18 +87,18 @@ module Parse =
         ) ExpectedKind.String
 
     // Custom parser example.
-    let userId =
+    let profileId =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
-            | true, guid -> Ok <| UserId guid
+            | true, guid -> Ok <| ProfileId guid
             | _ -> Error None // No details.
         ) ExpectedKind.String
 
     // Combined parsers example.
 
-    let profileId =
+    let userId =
         Parse.guid
-        |> Parser.map ProfileId
+        |> Parser.map UserId
 
     let email =
         Parse.string
@@ -117,11 +117,11 @@ module User =
 
     let parser =
         parser {
-            let! id = "id" &= userId // Custom parser example.
+            let! id = "id" &= userId
             and! name = "name" &= string
             and! age = "age" ?= age
             and! email = "email" &= email
-            and! profiles = "profiles" &= set profileId
+            and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
