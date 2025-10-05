@@ -54,7 +54,10 @@ module internal Extensions =
 
     module JsonSerializerOptions =
 
-        let preset = JsonSerializerOptions(WriteIndented = true, IndentSize = 4)
+        let preset = JsonSerializerOptions(
+            WriteIndented = true,
+            IndentSize = 4
+        )
 
     module JsonElement =
 
@@ -267,7 +270,9 @@ module internal Extensions =
 
     module String =
 
-        let isNotEmpty = String.IsNullOrWhiteSpace >> not
+        let isNotEmpty =
+            String.IsNullOrWhiteSpace
+            >> not
 
     [<AutoOpen>]
     module ActivePatterns =
