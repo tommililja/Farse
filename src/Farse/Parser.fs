@@ -61,6 +61,12 @@ module Parser =
             | Error e -> Error e
         |> id
 
+    /// <summary>Validates the parsed value with the given function.</summary>
+    /// <param name="fn">The validation function.</param>
+    /// <param name="parser">The parser to validate.</param>
+    let inline validate ([<InlineIfLambda>] fn) parser =
+        ((^T or Validate) : (static member Validate : ^T * (_ -> Result<_, string>) -> Parser<_>) (parser, fn))
+
     /// <summary>Ignores the parsed value.</summary>
     /// <param name="parser">The parser to ignore.</param>
     let inline ignore (parser:Parser<_>) : Parser<_> =
@@ -69,12 +75,6 @@ module Parser =
             | Ok _ -> Ok ()
             | Error e -> Error e
         |> id
-
-    /// <summary>Validates the parsed value with the given function.</summary>
-    /// <param name="fn">The validation function.</param>
-    /// <param name="parser">The parser to validate.</param>
-    let inline validate ([<InlineIfLambda>] fn) parser =
-        ((^T or Validate) : (static member Validate : ^T * (_ -> Result<_, string>) -> Parser<_>) (parser, fn))
 
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
