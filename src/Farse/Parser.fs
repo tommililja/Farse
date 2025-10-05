@@ -62,7 +62,7 @@ module Parser =
         |> id
 
     /// <summary>Ignores the parsed value.</summary>
-    /// <param name="parser">The parser whose value to ignore.</param>
+    /// <param name="parser">The parser to ignore.</param>
     let inline ignore (parser:Parser<_>) : Parser<_> =
         fun element ->
             match parser element with
