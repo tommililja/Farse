@@ -147,18 +147,16 @@ module Parse =
         fun element ->
             match element.ValueKind with
             | Kind.Array ->
+                let mutable error = None
+                let mutable enumerator = element.EnumerateArray()
                 let array =
                     element.GetArrayLength()
                     |> ResizeArray
 
-                let mutable error = None
-                for item in element.EnumerateArray() do
-                    error <- error
-                    |> Option.orElse (
-                        match parser item with
-                        | Ok x -> array.Add x; None
-                        | Error error -> Some error
-                    )
+                while error.IsNone && enumerator.MoveNext() do
+                    match parser enumerator.Current with
+                    | Ok x -> array.Add x
+                    | Error e -> error <- Some e
 
                 match error with
                 | None -> Ok <| convert array
