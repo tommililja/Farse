@@ -63,3 +63,13 @@ module ParserTests =
             |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
+    [<Fact>]
+
+    let ``Should return Ok with expected value when optional validation succeeds`` () =
+        let expected = Some 1
+        let actual =
+            Parse.opt "prop" Parse.int
+            |> Parser.validate (fun (x:int) -> Ok x)
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected

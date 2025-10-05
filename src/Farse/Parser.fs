@@ -49,36 +49,32 @@ module Parser =
             | Error e -> Error e
         |> id
 
+    type Validate =
+
+        static member inline Validate (parser: Parser<Option<_>>, fn: _ -> _) =
+            fun element ->
+                match parser element with
+                | Ok (Some x) ->
+                    match fn x with
+                    | Ok x -> Ok <| Some x
+                    | Error msg -> Error <| Other msg
+                | Ok None -> Ok None
+                | Error e -> Error e
+
+        static member inline Validate (parser: Parser<_>, fn: _ -> _) =
+            fun element ->
+                match parser element with
+                | Ok x ->
+                    match fn x with
+                    | Ok x -> Ok x
+                    | Error msg -> Error <| Other msg
+                | Error e -> Error e
+
     /// <summary>Validates the parsed value with the given function.</summary>
-    /// <remarks>
-    ///     Adds the error string as details to the parser error message.
-    ///     <example>
-    ///         Do
-    ///         <code>
-    ///             let! plan = "plan" &amp;= (string |> Parser.validate Plan.fromString)
-    ///             let! plan = "plan" &amp;= Parser.validate Plan.fromString string
-    ///         </code>
-    ///     </example>
-    ///     <example>
-    ///         Don't
-    ///         <code>
-    ///             let! plan = "plan" &amp;= string |> Parser.validate Plan.fromString
-    ///         </code>
-    ///     </example>
-    /// </remarks>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
-    let inline validate ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<'b> =
-        fun element ->
-            match parser element with
-            | Ok x ->
-                match fn x with
-                | Ok x -> Ok x
-                | Error msg ->
-                    InvalidValue (Some msg, typeof<'b>, element)
-                    |> Error
-            | Error e -> Error e
-        |> id
+    let inline validate ([<InlineIfLambda>] fn) parser =
+        ((^T or Validate) : (static member Validate : ^T * (_ -> _) -> Parser<_>) (parser, fn))
 
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>

@@ -37,6 +37,16 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when optional validation fails`` () =
+            Parse.opt "prop" Parse.int
+            |> Parser.validate (fun int ->
+                if int > 1 then Ok int
+                else Error "Value too small."
+            )
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when creating a Parser from an Error`` () =
             Error "Error"
             |> Parser.fromResult
