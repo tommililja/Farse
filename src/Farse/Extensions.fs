@@ -32,7 +32,7 @@ module internal Extensions =
     module ExpectedKind =
 
         let fromKind = function
-            | Kind.Undefined -> Any
+            | Kind.Undefined -> Undefined
             | Kind.Object -> Object
             | Kind.Array -> Array
             | Kind.String -> String
