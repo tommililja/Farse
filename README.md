@@ -295,15 +295,15 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 #### Object
 
 ```code
-Error: Could not parse property 'plan'.
-Message: Tried parsing 'Max' to Plan. Details: Invalid plan 'Max'.
+Error: Could not parse property 'renewsAt'.
+Message: Tried parsing '202612-25T10:30:00Z' to Instant. Details: The value string does not [...]
 Object:
 ```
 ```json
 {
-    "plan": "Max",
+    "plan": "Pro",
     "isCanceled": false,
-    "renewsAt": "2026-12-25T10:30:00Z"
+    "renewsAt": "202612-25T10:30:00Z"
 }
 ```
 
