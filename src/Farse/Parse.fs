@@ -7,96 +7,6 @@ module Parse =
     open JsonElement
     open type ExpectedKind
 
-    let private parse name (parser:Parser<_>) : Parser<_> =
-        fun element ->
-            match element.ValueKind with
-            | Kind.Object ->
-                match getProperty name element |> parser with
-                | Ok x -> Ok x
-                | Error error ->
-                    error
-                    |> ParserError.enrich name element
-                    |> Error
-            | _ ->
-               CouldNotRead (name, element)
-               |> Error
-
-    let private tryParse name (parser:Parser<_>) : Parser<_> =
-        fun element ->
-            match element.ValueKind with
-            | Kind.Object ->
-                match tryGetProperty name element with
-                | Some prop ->
-                    match parser prop with
-                    | Ok x -> Ok <| Some x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich name element
-                        |> Error
-                | None -> Ok None
-            | _ ->
-                CouldNotRead (name, element)
-                |> Error
-
-    let private traverse (path:string array) (parser:Parser<_>) : Parser<_> =
-        fun element ->
-            let mutable prop = Ok element
-            let mutable name = path[0]
-            let mutable object = element
-
-            for segment in path do
-                prop <- prop
-                |> Result.bind (fun element ->
-                    match element.ValueKind with
-                    | Kind.Object ->
-                        name <- segment
-                        object <- element
-                        Ok <| getProperty name element
-                    | _ -> Error element
-                )
-
-            match prop with
-            | Ok prop ->
-                match parser prop with
-                | Ok x -> Ok x
-                | Error error ->
-                    error
-                    |> ParserError.enrich name object
-                    |> Error
-            | Error element ->
-                NotObject (name, object, element)
-                |> Error
-
-    let private tryTraverse (path:string array) (parser:Parser<_>) : Parser<_> =
-        fun element ->
-            let mutable prop = Ok <| Some element
-            let mutable name = path[0]
-            let mutable object = element
-
-            for segment in path do
-                prop <- prop
-                |> ResultOption.bind (fun element ->
-                    match element.ValueKind with
-                    | Kind.Object ->
-                        name <- segment
-                        object <- element
-                        Ok <| tryGetProperty name element
-                    | _ -> Error element
-                )
-
-            match prop with
-            | Ok (Some prop) ->
-                match parser prop with
-                | Ok x -> Ok <| Some x
-                | Error error ->
-                    error
-                    |> ParserError.enrich name object
-                    |> Error
-            | Ok None -> Ok None
-            | Error element ->
-                NotObject (name, object, element)
-                |> Error
-
     /// <summary>Parses a required property with the given parser.</summary>
     /// <example>
     ///     <code>
@@ -105,10 +15,49 @@ module Parse =
     /// </example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let req path parser =
+    let req path (parser:Parser<_>) : Parser<_> =
         match path with
-        | Flat name -> parse name parser
-        | Nested path -> traverse path parser
+        | Flat name ->
+            fun (element:JsonElement) ->
+                match element.ValueKind with
+                | Kind.Object ->
+                    match getProperty name element |> parser with
+                    | Ok x -> Ok x
+                    | Error error ->
+                        error
+                        |> ParserError.enrich name element
+                        |> Error
+                | _ ->
+                   CouldNotRead (name, element)
+                   |> Error
+        | Nested path ->
+            fun element ->
+                let mutable prop = Ok element
+                let mutable name = path[0]
+                let mutable object = element
+
+                for segment in path do
+                    prop <- prop
+                    |> Result.bind (fun element ->
+                        match element.ValueKind with
+                        | Kind.Object ->
+                            name <- segment
+                            object <- element
+                            Ok <| getProperty name element
+                        | _ -> Error element
+                    )
+
+                match prop with
+                | Ok prop ->
+                    match parser prop with
+                    | Ok x -> Ok x
+                    | Error error ->
+                        error
+                        |> ParserError.enrich name object
+                        |> Error
+                | Error element ->
+                    NotObject (name, object, element)
+                    |> Error
 
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <example>
@@ -118,10 +67,53 @@ module Parse =
     /// </example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let opt path parser =
+    let opt path (parser:Parser<_>) : Parser<_> =
         match path with
-        | Flat name -> tryParse name parser
-        | Nested path -> tryTraverse path parser
+        | Flat name ->
+            fun (element:JsonElement) ->
+                match element.ValueKind with
+                | Kind.Object ->
+                    match tryGetProperty name element with
+                    | Some prop ->
+                        match parser prop with
+                        | Ok x -> Ok <| Some x
+                        | Error error ->
+                            error
+                            |> ParserError.enrich name element
+                            |> Error
+                    | None -> Ok None
+                | _ ->
+                    CouldNotRead (name, element)
+                    |> Error
+        | Nested path ->
+            fun element ->
+                let mutable prop = Ok <| Some element
+                let mutable name = path[0]
+                let mutable object = element
+
+                for segment in path do
+                    prop <- prop
+                    |> ResultOption.bind (fun element ->
+                        match element.ValueKind with
+                        | Kind.Object ->
+                            name <- segment
+                            object <- element
+                            Ok <| tryGetProperty name element
+                        | _ -> Error element
+                    )
+
+                match prop with
+                | Ok (Some prop) ->
+                    match parser prop with
+                    | Ok x -> Ok <| Some x
+                    | Error error ->
+                        error
+                        |> ParserError.enrich name object
+                        |> Error
+                | Ok None -> Ok None
+                | Error element ->
+                    NotObject (name, object, element)
+                    |> Error
 
     /// <summary>Creates a custom parser with the given function.</summary>
     /// <param name="fn">The parsing function.</param>
