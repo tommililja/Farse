@@ -62,6 +62,7 @@ module Parser =
         |> id
 
     /// <summary>Validates the parsed value with the given function.</summary>
+    /// <remarks>Works with both required and optional parsers.</remarks>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
     let inline validate ([<InlineIfLambda>] fn) parser =
