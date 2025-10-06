@@ -15,6 +15,39 @@ type ExpectedKind =
     | Null
     | Any
 
+module ExpectedKind =
+
+    let fromJsonValueKind = function
+        | JsonValueKind.Undefined -> Undefined
+        | JsonValueKind.Object -> Object
+        | JsonValueKind.Array -> Array
+        | JsonValueKind.String -> String
+        | JsonValueKind.Number -> Number
+        | JsonValueKind.True -> Bool
+        | JsonValueKind.False -> Bool
+        | JsonValueKind.Null -> Null
+        | _ -> raise <| ArgumentOutOfRangeException()
+
+    let asString = function
+        | Undefined -> "Undefined"
+        | Object -> "Object"
+        | Array -> "Array"
+        | String -> "String"
+        | Number -> "Number"
+        | Bool -> "Bool"
+        | Null -> "Null"
+        | Any -> "Any"
+
+module JsonElement =
+
+    let inline isBool (element:JsonElement) =
+        element.ValueKind = JsonValueKind.True || element.ValueKind = JsonValueKind.False
+
+    let inline isExpectedKind (expectedKind:ExpectedKind) (element:JsonElement) =
+        element.ValueKind
+        |> ExpectedKind.fromJsonValueKind
+        |> (=) expectedKind
+
 [<AutoOpen>]
 module internal Extensions =
 
@@ -28,29 +61,6 @@ module internal Extensions =
         let asString kind =
             if isBool kind then "Bool"
             else string kind
-
-    module ExpectedKind =
-
-        let fromKind = function
-            | Kind.Undefined -> Undefined
-            | Kind.Object -> Object
-            | Kind.Array -> Array
-            | Kind.String -> String
-            | Kind.Number -> Number
-            | Kind.True -> Bool
-            | Kind.False -> Bool
-            | Kind.Null -> Null
-            | _ -> raise <| ArgumentOutOfRangeException()
-
-        let asString = function
-            | Undefined -> "Undefined"
-            | Object -> "Object"
-            | Array -> "Array"
-            | String -> "String"
-            | Number -> "Number"
-            | Bool -> "Bool"
-            | Null -> "Null"
-            | Any -> "Any"
 
     module JsonSerializerOptions =
 
@@ -68,14 +78,6 @@ module internal Extensions =
             match element.TryGetProperty(name) with
             | true, prop when prop.ValueKind <> Kind.Null -> Some prop
             | _ -> None
-
-        let inline isBool (element:JsonElement) =
-            element.ValueKind = Kind.True || element.ValueKind = Kind.False
-
-        let inline isExpectedKind (expectedKind:ExpectedKind) (element:JsonElement) =
-            element.ValueKind
-            |> ExpectedKind.fromKind
-            |> (=) expectedKind
 
         let asString (element:JsonElement) =
             element.ToString()

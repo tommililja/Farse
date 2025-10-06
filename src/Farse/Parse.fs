@@ -123,9 +123,10 @@ module Parse =
         | Flat name -> tryParse name parser
         | Nested path -> tryTraverse path parser
 
-    // Internal
-
-    let inline internal getValue (tryParse: JsonElement -> Result<'a, string option>) expectedKind : Parser<_> =
+    /// <summary>Creates a custom parser with the given function.</summary>
+    /// <param name="fn">The parsing function.</param>
+    /// <param name="expectedKind">The expected element kind.</param>
+    let inline custom (fn: JsonElement -> Result<'a, _>) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 match expectedKind with
@@ -134,7 +135,7 @@ module Parse =
                 | kind -> isExpectedKind kind element
 
             if isExpectedKind then
-                match tryParse element with
+                match fn element with
                 | Ok x -> Ok x
                 | Error msg ->
                     InvalidValue (msg, typeof<'a>, element)
@@ -142,6 +143,140 @@ module Parse =
             else
                  InvalidKind (expectedKind, element)
                  |> Error
+        |> id
+
+    // Basic types
+
+    /// Parses a number as System.Int32.
+    let int = custom tryGetInt Number
+
+    /// Parses a number as a System.Int32 enum.
+    let intEnum<'a when 'a : enum<int>> =
+        custom tryGetIntEnum<'a> Number
+
+    /// Parses a number as System.Int16.
+    let int16 = custom tryGetInt16 Number
+
+    /// Parses a number as a System.Int16 enum.
+    let int16Enum<'a when 'a : enum<int16>> =
+        custom tryGetInt16Enum<'a> Number
+
+    /// Parses a number as System.Int64.
+    let int64 = custom tryGetInt64 Number
+
+    /// Parses a number as a System.Int16 enum.
+    let int64Enum<'a when 'a : enum<int64>> =
+        custom tryGetInt64Enum<'a> Number
+
+    /// Parses a number as System.UInt16.
+    let uint16 = custom tryGetUInt16 Number
+
+    /// Parses a number as a System.UInt16 enum.
+    let uint16Enum<'a when 'a : enum<uint16>> =
+        custom tryGetUInt16Enum<'a> Number
+
+    /// Parses a number as System.UInt32.
+    let uint32 = custom tryGetUInt32 Number
+
+    /// Parses a number as a System.UInt32 enum.
+    let uint32Enum<'a when 'a : enum<uint32>> =
+        custom tryGetUInt32Enum<'a> Number
+
+    /// Parses a number as System.UInt64.
+    let uint64 = custom tryGetUInt64 Number
+
+    /// Parses a number as a System.UInt64 enum.
+    let uint64Enum<'a when 'a : enum<uint64>> =
+        custom tryGetUInt64Enum<'a> Number
+
+    /// Parses a number as System.Double.
+    let float = custom tryGetFloat Number
+
+    /// Parses a number as System.Single.
+    let float32 = custom tryGetFloat32 Number
+
+    /// Parses a number as System.Decimal.
+    let decimal = custom tryGetDecimal Number
+
+    /// Parses a number as System.Byte.
+    let byte = custom tryGetByte Number
+
+    /// Parses a number as a System.Byte enum.
+    let byteEnum<'a when 'a : enum<byte>> =
+        custom tryGetByteEnum<'a> Number
+
+    /// Parses a number as System.SByte.
+    let sbyte = custom tryGetSByte Number
+
+    /// Parses a number as a System.SByte enum.
+    let sbyteEnum<'a when 'a : enum<sbyte>> =
+        custom tryGetSByteEnum<'a> Number
+
+    /// Parses a string as System.Char.
+    let char = custom tryGetChar String
+
+    /// Parses a string as System.String.
+    let string = custom tryGetString String
+
+    /// Parses a string as an enum.
+    let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
+        custom tryGetEnum<'a> String
+
+    /// Parses a bool as System.Boolean.
+    let bool = custom tryGetBool Bool
+
+    /// Parses a string as System.Guid.
+    let guid = custom tryGetGuid String
+
+    /// Parses null as FSharp.Core.Unit.
+    let unit = custom tryGetUnit Null
+
+    // Date and time
+
+    /// Parses a string as System.TimeOnly.
+    let timeOnly = custom tryGetTimeOnly String
+
+    /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let timeOnlyExact (format:string) =
+        custom (tryGetTimeOnlyExact format) String
+
+    /// Parses a string as System.TimeSpan.
+    let timeSpan = custom tryGetTimeSpan String
+
+    /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let timeSpanExact (format:string) =
+        custom (tryGetTimeSpanExact format) String
+
+    /// Parses a string as System.DateOnly (ISO 8601).
+    let dateOnly = custom tryGetDateOnly String
+
+    /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let dateOnlyExact (format:string) =
+        custom (tryGetDateOnlyExact format) String
+
+    /// Parses a string as System.DateTime (ISO 8601).
+    let dateTime = custom tryGetDateTime String
+
+    /// Parses a string as System.DateTime (ISO 8601) and converts it to UTC.
+    let dateTimeUtc = custom tryGetDateTimeUtc String
+
+    /// <summary>Parses a string as System.DateTime with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let dateTimeExact (format:string) =
+        custom (tryGetDateTimeExact format) String
+
+    /// Parses a string as System.DateTimeOffset (ISO 8601).
+    let dateTimeOffset = custom tryGetDateTimeOffset String
+
+    /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
+    /// <param name="format">The required format.</param>
+    let dateTimeOffsetExact (format:string) =
+        custom (tryGetDateTimeOffsetExact format) String
+
+    // Sequences
 
     let inline private arr convert (parser:Parser<_>) : Parser<_> =
         fun element ->
@@ -167,147 +302,6 @@ module Parse =
                 InvalidKind (Array, element)
                 |> Error
 
-    // Custom
-
-    /// <summary>Creates a custom parser with the given try parse function.</summary>
-    /// <param name="tryParse">The try parse function.</param>
-    /// <param name="expectedKind">The expected element kind.</param>
-    let custom tryParse expectedKind =
-        getValue tryParse expectedKind
-
-    // Basic types
-
-    /// Parses a number as System.Int32.
-    let int = getValue tryGetInt Number
-
-    /// Parses a number as a System.Int32 enum.
-    let intEnum<'a when 'a : enum<int>> =
-        getValue tryGetIntEnum<'a> Number
-
-    /// Parses a number as System.Int16.
-    let int16 = getValue tryGetInt16 Number
-
-    /// Parses a number as a System.Int16 enum.
-    let int16Enum<'a when 'a : enum<int16>> =
-        getValue tryGetInt16Enum<'a> Number
-
-    /// Parses a number as System.Int64.
-    let int64 = getValue tryGetInt64 Number
-
-    /// Parses a number as a System.Int16 enum.
-    let int64Enum<'a when 'a : enum<int64>> =
-        getValue tryGetInt64Enum<'a> Number
-
-    /// Parses a number as System.UInt16.
-    let uint16 = getValue tryGetUInt16 Number
-
-    /// Parses a number as a System.UInt16 enum.
-    let uint16Enum<'a when 'a : enum<uint16>> =
-        getValue tryGetUInt16Enum<'a> Number
-
-    /// Parses a number as System.UInt32.
-    let uint32 = getValue tryGetUInt32 Number
-
-    /// Parses a number as a System.UInt32 enum.
-    let uint32Enum<'a when 'a : enum<uint32>> =
-        getValue tryGetUInt32Enum<'a> Number
-
-    /// Parses a number as System.UInt64.
-    let uint64 = getValue tryGetUInt64 Number
-
-    /// Parses a number as a System.UInt64 enum.
-    let uint64Enum<'a when 'a : enum<uint64>> =
-        getValue tryGetUInt64Enum<'a> Number
-
-    /// Parses a number as System.Double.
-    let float = getValue tryGetFloat Number
-
-    /// Parses a number as System.Single.
-    let float32 = getValue tryGetFloat32 Number
-
-    /// Parses a number as System.Decimal.
-    let decimal = getValue tryGetDecimal Number
-
-    /// Parses a number as System.Byte.
-    let byte = getValue tryGetByte Number
-
-    /// Parses a number as a System.Byte enum.
-    let byteEnum<'a when 'a : enum<byte>> =
-        getValue tryGetByteEnum<'a> Number
-
-    /// Parses a number as System.SByte.
-    let sbyte = getValue tryGetSByte Number
-
-    /// Parses a number as a System.SByte enum.
-    let sbyteEnum<'a when 'a : enum<sbyte>> =
-        getValue tryGetSByteEnum<'a> Number
-
-    /// Parses a string as System.Char.
-    let char = getValue tryGetChar String
-
-    /// Parses a string as System.String.
-    let string = getValue tryGetString String
-
-    /// Parses a string as an enum.
-    let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
-        getValue tryGetEnum<'a> String
-
-    /// Parses a bool as System.Boolean.
-    let bool = getValue tryGetBool Bool
-
-    /// Parses a string as System.Guid.
-    let guid = getValue tryGetGuid String
-
-    /// Parses null as FSharp.Core.Unit.
-    let unit = getValue tryGetUnit Null
-
-    // Date and time
-
-    /// Parses a string as System.TimeOnly.
-    let timeOnly = getValue tryGetTimeOnly String
-
-    /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
-    /// <param name="format">The required format.</param>
-    let timeOnlyExact (format:string) =
-        getValue (tryGetTimeOnlyExact format) String
-
-    /// Parses a string as System.TimeSpan.
-    let timeSpan = getValue tryGetTimeSpan String
-
-    /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
-    /// <param name="format">The required format.</param>
-    let timeSpanExact (format:string) =
-        getValue (tryGetTimeSpanExact format) String
-
-    /// Parses a string as System.DateOnly (ISO 8601).
-    let dateOnly = getValue tryGetDateOnly String
-
-    /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
-    /// <param name="format">The required format.</param>
-    let dateOnlyExact (format:string) =
-        getValue (tryGetDateOnlyExact format) String
-
-    /// Parses a string as System.DateTime (ISO 8601).
-    let dateTime = getValue tryGetDateTime String
-
-    /// Parses a string as System.DateTime (ISO 8601) and converts it to UTC.
-    let dateTimeUtc = getValue tryGetDateTimeUtc String
-
-    /// <summary>Parses a string as System.DateTime with a specific format.</summary>
-    /// <param name="format">The required format.</param>
-    let dateTimeExact (format:string) =
-        getValue (tryGetDateTimeExact format) String
-
-    /// Parses a string as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = getValue tryGetDateTimeOffset String
-
-    /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
-    /// <param name="format">The required format.</param>
-    let dateTimeOffsetExact (format:string) =
-        getValue (tryGetDateTimeOffsetExact format) String
-
-    // Sequences
-
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let list parser = arr List.ofSeq parser
@@ -323,19 +317,19 @@ module Parse =
     // Json
 
     /// Parses an element's raw text as System.String.
-    let rawText = getValue tryGetRawText Any
+    let rawText = custom tryGetRawText Any
 
     /// Parses an array's length as System.Int32.
-    let arrayLength = getValue tryGetArrayLength Array
+    let arrayLength = custom tryGetArrayLength Array
 
     /// Parses an object's property count as System.Int32.
-    let propertyCount = getValue tryGetPropertyCount Object
+    let propertyCount = custom tryGetPropertyCount Object
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
-    let kind = getValue tryGetKind Any
+    let kind = custom tryGetKind Any
 
     /// Parses an element as System.Text.Json.JsonElement.
-    let element = getValue tryGetElement Any
+    let element = custom tryGetElement Any
 
     // Misc
 
