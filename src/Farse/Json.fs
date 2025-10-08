@@ -86,5 +86,5 @@ module Json =
     ///     WriteIndented = true
     ///     IndentSize = 4
     /// </remarks>
-    /// <typeparam name="json">The Json to convert.</typeparam>
+    /// <typeparam name="Json">The Json to convert.</typeparam>
     let asString = getJsonNode >> JsonNode.asString

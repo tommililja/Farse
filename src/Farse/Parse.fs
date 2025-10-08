@@ -8,11 +8,7 @@ module Parse =
     open type ExpectedKind
 
     /// <summary>Parses a required property with the given parser.</summary>
-    /// <example>
-    ///     <code>
-    ///         Parse.req "prop.prop2" Parse.int
-    ///     </code>
-    /// </example>
+    /// <code>let! int = Parse.req "prop.prop2" Parse.int</code>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
     let req path (parser:Parser<_>) : Parser<_> =
@@ -60,11 +56,7 @@ module Parse =
                     |> Error
 
     /// <summary>Parses an optional property with the given parser.</summary>
-    /// <example>
-    ///     <code>
-    ///         Parse.opt "prop.prop2" Parse.int
-    ///     </code>
-    /// </example>
+    /// <code>let! int = Parse.opt "prop.prop2" Parse.int</code>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
     let opt path (parser:Parser<_>) : Parser<_> =

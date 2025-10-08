@@ -30,18 +30,21 @@ and Parser<'a> = JsonElement -> Result<'a, ParserError>
 module Parser =
 
     /// <summary>Returns a parser with the given value.</summary>
+    /// <code>let! int = Parser.from 1</code>
     /// <param name="x">The value to return.</param>
     let inline from x : Parser<_> =
         fun _ -> Ok x
         |> id
 
     /// <summary>Returns a parser with the given result.</summary>
+    /// <code>let! int = Ok 1 |> Parser.fromResult</code>
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<_> =
         fun _ -> Result.mapError Other x
         |> id
 
     /// <summary>Binds the parsed value with the given function.</summary>
+    /// <code>let! int = "prop" &amp;= Parse.int |> Parser.bind Parser.from</code>
     /// <param name="fn">The binding function.</param>
     /// <param name="parser">The parser to bind.</param>
     let inline bind ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
@@ -52,6 +55,7 @@ module Parser =
         |> id
 
     /// <summary>Maps the parsed value with the given function.</summary>
+    /// <code>let! string = "prop" &amp;= Parse.int |> Parser.map string</code>
     /// <param name="fn">The mapping function.</param>
     /// <param name="parser">The parser to map.</param>
     let inline map ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
@@ -63,12 +67,14 @@ module Parser =
 
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Works with both required and optional parsers.</remarks>
+    /// <code>let! email = "prop" &amp;= Parse.string |> Parser.validate Email.fromString</code>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
     let inline validate ([<InlineIfLambda>] fn) parser =
         ((^T or Validate) : (static member Validate : ^T * (_ -> Result<_, string>) -> Parser<_>) (parser, fn))
 
     /// <summary>Ignores the parsed value.</summary>
+    /// <code>do! "prop" &amp;= Parse.string |> Parser.ignore</code>
     /// <param name="parser">The parser to ignore.</param>
     let inline ignore (parser:Parser<_>) : Parser<_> =
         fun element ->
