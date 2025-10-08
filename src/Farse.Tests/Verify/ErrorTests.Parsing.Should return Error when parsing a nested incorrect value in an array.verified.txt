@@ -1,8 +1,8 @@
-﻿Error: Could not parse property 'prop2[0]'.
-Message: Expected String, but got Number. Value: '1'.
+﻿Error: Could not parse property 'prop2[1]'.
+Message: Expected String, but got Number. Value: '2'.
 Array:
 [
-    1,
+    "1",
     2,
-    3
+    "3"
 ]

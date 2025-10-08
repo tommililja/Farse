@@ -1,4 +1,4 @@
-﻿Error: Could not parse property 'prop[1]'.
+﻿Error: Could not parse property 'prop2[1][1]'.
 Message: Expected String, but got Number. Value: '2'.
 Array:
 [
