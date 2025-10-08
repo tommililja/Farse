@@ -214,21 +214,19 @@ open Farse
 
 module Parse =
 
-    // Custom parser example.
+    let profileId =
+        Parse.custom (fun element ->
+            match element.TryGetGuid() with
+            | true, guid -> Ok <| ProfileId guid
+            | _ -> Error None // No details.
+        ) ExpectedKind.String
+
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
             | result -> Error <| Some result.Exception.Message // Added as details.
-        ) ExpectedKind.String
-
-    // Custom parser example.
-    let profileId =
-        Parse.custom (fun element ->
-            match element.TryGetGuid() with
-            | true, guid -> Ok <| ProfileId guid
-            | _ -> Error None // No details.
         ) ExpectedKind.String
 ```
 
