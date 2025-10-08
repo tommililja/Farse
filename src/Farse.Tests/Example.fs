@@ -77,7 +77,6 @@ type User = {
 
 module Parse =
 
-    // Custom parser example.
     let instant =
         Parse.custom (fun element ->
             let string = element.GetString()
@@ -86,7 +85,6 @@ module Parse =
             | result -> Error <| Some result.Exception.Message // Added as details.
         ) ExpectedKind.String
 
-    // Custom parser example.
     let profileId =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
@@ -94,38 +92,20 @@ module Parse =
             | _ -> Error None // No details.
         ) ExpectedKind.String
 
-    // Combined parsers example.
-
-    let userId =
-        Parse.guid
-        |> Parser.map UserId
-
-    let email =
-        Parse.string
-        |> Parser.validate Email.fromString
-
-    let age =
-        Parse.byte
-        |> Parser.validate Age.fromByte
-
-    let plan =
-        Parse.string
-        |> Parser.validate Plan.fromString
-
 module User =
     open Parse
 
     let parser =
         parser {
-            let! id = "id" &= userId
+            let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= age
-            and! email = "email" &= email
+            and! age = "age" ?= byte |> Parser.validate Age.fromByte
+            and! email = "email" &= string |> Parser.validate Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= plan
+                let! plan = "plan" &= string |> Parser.validate Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 

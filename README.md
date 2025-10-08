@@ -87,15 +87,15 @@ module User =
 
     let parser =
         parser {
-            let! id = "id" &= userId
+            let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= age
-            and! email = "email" &= email
+            and! age = "age" ?= byte |> Parser.validate Age.fromByte
+            and! email = "email" &= string |> Parser.validate Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= plan
+                let! plan = "plan" &= string |> Parser.validate Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
@@ -205,9 +205,9 @@ let user =
 printf "%s" user.Name
 ```
 
-## Building parsers
+## Custom parsers
 
-Parsers can be built by combining the included parsers with map and validate. We can also use Parse.custom to build parsers for third-party types, or to just avoid unnecessary operations.
+Parse.custom can be used to build parsers for third-party types, or to just avoid unnecessary operations.
 
 ```fsharp
 open Farse
@@ -230,24 +230,6 @@ module Parse =
             | true, guid -> Ok <| ProfileId guid
             | _ -> Error None // No details.
         ) ExpectedKind.String
-
-    // Combined parsers example.
-
-    let userId =
-        Parse.guid
-        |> Parser.map UserId
-
-    let email =
-        Parse.string
-        |> Parser.validate Email.fromString
-
-    let age =
-        Parse.byte
-        |> Parser.validate Age.fromByte
-
-    let plan =
-        Parse.string
-        |> Parser.validate Plan.fromString
 ```
 
 ## Creating JSON
