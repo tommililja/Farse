@@ -64,7 +64,7 @@ module internal Extensions =
 
     module JsonSerializerOptions =
 
-        let preset = JsonSerializerOptions(
+        let preset = JsonSerializerOptions (
             WriteIndented = true,
             IndentSize = 4
         )
