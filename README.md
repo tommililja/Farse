@@ -230,6 +230,8 @@ module Parse =
         ) ExpectedKind.String
 ```
 
+> Note: Custom parsers produce detailed error messages when validation fails, see [errors](#errors).
+
 ## Creating JSON
 
 We can create JSON strings with [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs).
