@@ -119,10 +119,13 @@ module Parse =
                 | kind -> isExpectedKind kind element
 
             if isExpectedKind then
-                match fn element with
-                | Ok x -> Ok x
-                | Error msg ->
-                    InvalidValue (msg, typeof<'a>, element)
+                try match fn element with
+                    | Ok x -> Ok x
+                    | Error msg ->
+                        InvalidValue (msg, typeof<'a>, element)
+                        |> Error
+                with ex ->
+                    InvalidValue (Some ex.Message, typeof<'a>, element)
                     |> Error
             else
                  InvalidKind (expectedKind, element)
