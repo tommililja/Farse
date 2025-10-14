@@ -41,7 +41,8 @@ module ExpectedKind =
 module JsonElement =
 
     let inline isBool (element:JsonElement) =
-        element.ValueKind = JsonValueKind.True || element.ValueKind = JsonValueKind.False
+        element.ValueKind = JsonValueKind.True
+        || element.ValueKind = JsonValueKind.False
 
     let inline isExpectedKind (expectedKind:ExpectedKind) (element:JsonElement) =
         element.ValueKind
