@@ -13,8 +13,12 @@ module internal Error =
         | Kind.Null | Kind.Undefined -> String.Empty
         | kind -> $"%s{string kind}:\n%s{JsonElement.asJsonString element}"
 
-    let invalidValue msg (expectedType:Type) element =
-        let value = JsonElement.asString element
+    let invalidValue msg (expectedType:Type) (element:JsonElement) =
+        let value =
+            match element.ValueKind with
+            | Kind.Number | Kind.String | Kind.True | Kind.False -> JsonElement.asString element
+            | kind -> Kind.asString kind
+
         match msg with
         | Some msg when String.isNotEmpty msg -> $"Tried parsing '%s{value}' to %s{expectedType.Name}. Details: %s{msg}"
         | _ -> $"Tried parsing '%s{value}' to %s{expectedType.Name}."
