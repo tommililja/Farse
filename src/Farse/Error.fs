@@ -16,12 +16,12 @@ module internal Error =
     let invalidValue msg (expectedType:Type) (element:JsonElement) =
         let value =
             match element.ValueKind with
-            | Kind.Number | Kind.String | Kind.True | Kind.False -> JsonElement.asString element
+            | Kind.Number | Kind.String | Kind.True | Kind.False -> $"'%s{JsonElement.asString element}'"
             | kind -> Kind.asString kind
 
         match msg with
-        | Some msg when String.isNotEmpty msg -> $"Tried parsing '%s{value}' to %s{expectedType.Name}. Details: %s{msg}"
-        | _ -> $"Tried parsing '%s{value}' to %s{expectedType.Name}."
+        | Some msg when String.isNotEmpty msg -> $"Tried parsing %s{value} to %s{expectedType.Name}. Details: %s{msg}"
+        | _ -> $"Tried parsing %s{value} to %s{expectedType.Name}."
 
     let invalidKind (expected:ExpectedKind) (element:JsonElement) =
         let expected = ExpectedKind.asString expected
