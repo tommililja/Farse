@@ -95,7 +95,7 @@ module User =
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= valid string |> Plan.fromString
+                let! plan = "plan" &= valid string Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
