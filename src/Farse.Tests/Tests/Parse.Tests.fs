@@ -533,3 +533,35 @@ module ParseTests =
             |> Parser.parse """{ "prop": true }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse value with custom parser`` () =
+        let parser : Parser<int> =
+            Parse.custom (fun element ->
+                match element.TryGetInt32() with
+                | true, int -> Ok <| int + 1
+                | _ -> Error None
+            ) ExpectedKind.Number
+        let expected = 2
+        let actual =
+            Parse.req "prop" parser
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal expected actual
+
+    [<Fact>]
+    let ``Should Ok when value is valid`` () =
+        let fromInt (x:int) = Ok x
+        let expected = 1
+        let actual =
+            Parse.req "prop" (Parse.valid Parse.int fromInt)
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should Error when value is not valid`` () =
+        let fromInt (_:int) = Error "Not valid."
+        Parse.req "prop" (Parse.valid Parse.int fromInt)
+        |> Parser.parse """{ "prop": 1 }"""
+        |> Expect.error

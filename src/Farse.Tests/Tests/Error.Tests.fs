@@ -391,6 +391,53 @@ module ErrorTests =
 
     module Parse =
 
+        [<Fact>]
+        let ``Should return Error when custom parser does not match expected kind`` () =
+            let parser : Parser<int> =
+                Parse.custom (fun _ ->
+                    Ok 1
+                ) ExpectedKind.Number
+            Parse.req "prop" parser
+            |> Parser.parse """{ "prop": "1" }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when custom parser throws an exception`` () =
+            let parser : Parser<int> =
+                Parse.custom (fun _ ->
+                    failwith "Failed."
+                ) ExpectedKind.Number
+            Parse.req "prop" parser
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error with details when custom parser fails`` () =
+            let parser : Parser<int> =
+                Parse.custom (fun _ ->
+                    Error <| Some "Failed."
+                ) ExpectedKind.Number
+            Parse.req "prop" parser
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error without details when custom parser fails`` () =
+            let parser : Parser<int> =
+                Parse.custom (fun _ ->
+                    Error <| None
+                ) ExpectedKind.Number
+            Parse.req "prop" parser
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when value is not valid`` () =
+            let fromInt (_:int) : Result<string, _> = Error "Not valid."
+            Parse.req "prop" (Parse.valid Parse.int fromInt)
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.errorString
+
         // TODO: Add tests for other Parse.* functions.
 
         [<Fact>]
