@@ -277,6 +277,10 @@ module internal Extensions =
             String.IsNullOrWhiteSpace
             >> not
 
+    module Seq =
+
+        let ofSeq x = x :> seq<_>
+
     [<AutoOpen>]
     module ActivePatterns =
 

@@ -288,6 +288,7 @@ module Parse =
             | Kind.Array ->
                 let mutable error = None
                 let mutable enumerator = element.EnumerateArray()
+
                 let array =
                     element.GetArrayLength()
                     |> ResizeArray
@@ -317,6 +318,10 @@ module Parse =
     /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
     /// <param name="parser">The parser used for every element.</param>
     let set parser = arr Set.ofSeq parser
+
+    /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
+    /// <param name="parser">The parser used for every element.</param>
+    let seq parser = arr Seq.ofSeq parser
 
     // Json
 

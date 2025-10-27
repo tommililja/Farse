@@ -460,6 +460,15 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse array as seq`` () =
+        let expected = seq [ 1; 2; 3; ]
+        let actual =
+            Parse.req "prop" (Parse.seq Parse.int)
+            |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
     let ``Should parse array length as int`` () =
         let expected = 3
         let actual =

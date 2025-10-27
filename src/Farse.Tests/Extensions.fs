@@ -27,3 +27,6 @@ module Expect =
 
     let equal actual expected =
         Expect.equal actual expected String.Empty
+
+    let equalSeq actual expected =
+        Expect.sequenceEqual actual expected
