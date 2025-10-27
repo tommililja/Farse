@@ -323,6 +323,32 @@ module Parse =
     /// <param name="parser">The parser used for every element.</param>
     let seq parser = arr Seq.ofSeq parser
 
+    /// <summary>Parses an object as Microsoft.FSharp.Collections.Map.</summary>
+    /// <param name="parser">The parser used for every property.</param>
+    let map (parser:Parser<_>) : Parser<_> =
+        fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Object ->
+                let mutable error = None
+                let mutable enumerator = element.EnumerateObject()
+
+                let array =
+                    element.GetPropertyCount()
+                    |> ResizeArray
+
+                while error.IsNone && enumerator.MoveNext() do
+                    match parser enumerator.Current.Value with
+                    | Ok x -> array.Add (enumerator.Current.Name, x)
+                    | Error e -> error <- Some e
+
+                match error with
+                | None -> Ok <| Map.ofSeq array
+                | Some e -> Error e
+            | _ ->
+                InvalidKind (Object, element)
+                |> Error
+        |> id
+
     // Json
 
     /// Parses an element's raw text as System.String.
