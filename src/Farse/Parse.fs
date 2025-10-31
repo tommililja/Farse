@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Collections.Generic
 open System.Text.Json
 
 module Parse =
@@ -323,9 +324,17 @@ module Parse =
     /// <param name="parser">The parser used for every element.</param>
     let seq parser = arr Seq.ofSeq parser
 
-    /// <summary>Parses an object as Microsoft.FSharp.Collections.Map.</summary>
-    /// <param name="parser">The parser used for every property.</param>
-    let map (parser:Parser<_>) : Parser<_> =
+    // Key/Value
+
+    let inline private getDuplicateKey (pairs: ('k * 'v) seq) =
+        let seen = HashSet<'k>()
+        pairs
+        |> Seq.tryPick (fun (k, _) ->
+            if seen.Add(k) then None
+            else Some k
+        )
+
+    let inline private keyValue convert (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -338,16 +347,27 @@ module Parse =
 
                 while error.IsNone && enumerator.MoveNext() do
                     match parser enumerator.Current.Value with
-                    | Ok x -> array.Add (enumerator.Current.Name, x)
+                    | Ok x -> array.Add(enumerator.Current.Name, x)
                     | Error e -> error <- Some e
 
                 match error with
-                | None -> Ok <| Map.ofSeq array
+                | None ->
+                    match getDuplicateKey array with
+                    | Some key -> Error <| DuplicateKeys (key, element)
+                    | None -> Ok <| convert array
                 | Some e -> Error e
             | _ ->
                 InvalidKind (Object, element)
                 |> Error
         |> id
+
+    /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
+    /// <param name="parser">The parser used for every property.</param>
+    let map parser = keyValue Map.ofSeq parser
+
+    /// <summary>Parses an object's properties as System.Collections.Generic.IDictionary.</summary>
+    /// <param name="parser">The parser used for every property.</param>
+    let dict parser = keyValue Dictionary.ofSeq parser
 
     // Json
 

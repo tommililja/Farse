@@ -30,6 +30,9 @@ module internal Error =
         | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> $"Expected %s{expected}, but got %s{actual}."
         | _ -> $"Expected %s{expected}, but got %s{actual}. Value: '%s{JsonElement.asString element}'."
 
+    let duplicateKey key =
+        $"Duplicate key '%s{key}'."
+
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."

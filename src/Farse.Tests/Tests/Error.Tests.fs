@@ -438,6 +438,18 @@ module ErrorTests =
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
+        [<Fact>]
+        let ``Should return Error when Map has duplicate keys`` () =
+            Parse.req "prop" (Parse.map Parse.int)
+            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when Dictionary has duplicate keys`` () =
+            Parse.req "prop" (Parse.dict Parse.int)
+            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.errorString
+
         // TODO: Add tests for other Parse.* functions.
 
         [<Fact>]

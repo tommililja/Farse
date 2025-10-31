@@ -281,6 +281,10 @@ module internal Extensions =
 
         let ofSeq x = x :> seq<_>
 
+    module Dictionary =
+
+        let ofSeq x = dict x
+
     [<AutoOpen>]
     module ActivePatterns =
 

@@ -478,6 +478,15 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse object as Dictionary`` () =
+        let expected = dict [ "key1", 1; "key2", 2; "key3", 3; ]
+        let actual =
+            Parse.req "prop" (Parse.dict Parse.int)
+            |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
     let ``Should parse array length as int`` () =
         let expected = 3
         let actual =
