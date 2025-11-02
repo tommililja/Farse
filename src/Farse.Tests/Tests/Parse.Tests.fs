@@ -1,6 +1,7 @@
 namespace Farse.Tests
 
 open System
+open System.Collections.Generic
 open System.Text.Json
 open Xunit
 open Farse
@@ -482,6 +483,24 @@ module ParseTests =
         let expected = dict [ "key1", 1; "key2", 2; "key3", 3; ]
         let actual =
             Parse.req "prop" (Parse.dict Parse.int)
+            |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should parse object as KeyValuePair seq`` () =
+        let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ] |> Seq.map KeyValuePair
+        let actual =
+            Parse.req "prop" (Parse.keyValuePairs Parse.int)
+            |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should parse object as (key * value) seq`` () =
+        let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ]
+        let actual =
+            Parse.req "prop" (Parse.keyValues Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equalSeq actual expected

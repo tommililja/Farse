@@ -369,6 +369,14 @@ module Parse =
     /// <param name="parser">The parser used for every property.</param>
     let dict parser = keyValue Dictionary.ofSeq parser
 
+    /// <summary>Parses an object's properties as System.Collections.Generic.KeyValuePair seq.</summary>
+    /// <param name="parser">The parser used for every property.</param>
+    let keyValuePairs parser = keyValue KeyValuePairs.ofSeq parser
+
+    /// <summary>Parses an object's properties as (key * value) seq.</summary>
+    /// <param name="parser">The parser used for every property.</param>
+    let keyValues parser = keyValue Seq.ofSeq parser
+
     // Json
 
     /// Parses an element's raw text as System.String.

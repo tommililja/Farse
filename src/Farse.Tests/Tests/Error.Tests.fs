@@ -439,14 +439,26 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when Map has duplicate keys`` () =
+        let ``Should return Error when trying to parse Map with duplicate keys`` () =
             Parse.req "prop" (Parse.map Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when Dictionary has duplicate keys`` () =
+        let ``Should return Error when trying to parse Dictionary with duplicate keys`` () =
             Parse.req "prop" (Parse.dict Parse.int)
+            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when trying to parse KeyValuePair seq with duplicate keys`` () =
+            Parse.req "prop" (Parse.keyValuePairs Parse.int)
+            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when trying to parse (key * value) seq with duplicate keys`` () =
+            Parse.req "prop" (Parse.keyValues Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 

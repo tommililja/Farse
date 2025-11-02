@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Collections.Generic
 open System.Globalization
 open System.Text.Json
 open System.Text.Json.Nodes
@@ -279,11 +280,15 @@ module internal Extensions =
 
     module Seq =
 
-        let ofSeq x = x :> seq<_>
+        let inline ofSeq x = x :> seq<_>
+
+    module KeyValuePairs =
+
+        let inline ofSeq x = Seq.map KeyValuePair.Create x
 
     module Dictionary =
 
-        let ofSeq x = dict x
+        let inline ofSeq x = dict x
 
     [<AutoOpen>]
     module ActivePatterns =

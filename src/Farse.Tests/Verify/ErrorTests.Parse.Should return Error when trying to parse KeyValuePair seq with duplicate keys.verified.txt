@@ -1,0 +1,8 @@
+﻿Error: Could not parse property 'prop'.
+Message: Duplicate key 'key2'.
+Object:
+{
+    "key2": 1,
+    "key2": 2,
+    "key3": 3
+}
