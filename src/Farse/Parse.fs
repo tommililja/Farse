@@ -322,7 +322,7 @@ module Parse =
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let seq parser = arr Seq.ofSeq parser
+    let seq parser = arr List.ofSeq parser
 
     // Key/Value
 
@@ -375,7 +375,7 @@ module Parse =
 
     /// <summary>Parses an object's properties as (key * value) seq.</summary>
     /// <param name="parser">The parser used for every property.</param>
-    let keyValues parser = keyValue Seq.ofSeq parser
+    let keyValues parser = keyValue List.ofSeq parser
 
     // Json
 

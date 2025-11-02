@@ -278,10 +278,6 @@ module internal Extensions =
             String.IsNullOrWhiteSpace
             >> not
 
-    module Seq =
-
-        let inline ofSeq x = x :> seq<_>
-
     module KeyValuePairs =
 
         let inline ofSeq x = Seq.map KeyValuePair.Create x
