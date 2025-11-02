@@ -436,7 +436,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse array as list`` () =
         let expected = [ 1; 2; 3; ]
-        let actual =
+        let actual: _ list =
             Parse.req "prop" (Parse.list Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
@@ -445,7 +445,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse array as array`` () =
         let expected = [| 1; 2; 3; |]
-        let actual =
+        let actual: _ array =
             Parse.req "prop" (Parse.array Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
@@ -454,7 +454,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse array as Set`` () =
         let expected = set [ 1; 2; 3; ]
-        let actual =
+        let actual: _ Set =
             Parse.req "prop" (Parse.set Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
@@ -463,7 +463,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse array as seq`` () =
         let expected = seq [ 1; 2; 3; ]
-        let actual =
+        let actual: _ seq =
             Parse.req "prop" (Parse.seq Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
@@ -472,7 +472,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse object as Map`` () =
         let expected = Map.ofSeq [ "key1", 1; "key2", 2; "key3", 3; ]
-        let actual =
+        let actual: Map<_,_> =
             Parse.req "prop" (Parse.map Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
@@ -481,7 +481,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse object as Dictionary`` () =
         let expected = dict [ "key1", 1; "key2", 2; "key3", 3; ]
-        let actual =
+        let actual: IDictionary<_,_> =
             Parse.req "prop" (Parse.dict Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
@@ -490,7 +490,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse object as KeyValuePair seq`` () =
         let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ] |> Seq.map KeyValuePair
-        let actual =
+        let actual: _ seq =
             Parse.req "prop" (Parse.keyValuePairs Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
@@ -499,7 +499,7 @@ module ParseTests =
     [<Fact>]
     let ``Should parse object as (key * value) seq`` () =
         let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ]
-        let actual =
+        let actual: _ seq =
             Parse.req "prop" (Parse.keyValues Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
