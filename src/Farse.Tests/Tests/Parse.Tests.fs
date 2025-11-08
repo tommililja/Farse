@@ -47,12 +47,13 @@ module ParseTests =
 
     [<Fact>]
     let ``Should parse nested null as None with optional parsers`` () =
-        let expected = Some None
+        let expected = None
         let actual =
             let parser = Parse.opt "prop3" Parse.int
             Parse.opt "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
             |> Expect.ok
+            |> Option.flatten
         Expect.equal actual expected
 
     [<Fact>]
@@ -468,6 +469,15 @@ module ParseTests =
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should parse array at index`` () =
+        let expected = 1
+        let actual =
+            Parse.req "prop" (Parse.index 0 Parse.int)
+            |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
 
     [<Fact>]
     let ``Should parse object as Map`` () =

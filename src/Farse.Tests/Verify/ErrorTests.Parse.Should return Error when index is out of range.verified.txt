@@ -1,0 +1,8 @@
+﻿Error: Could not parse property 'prop'.
+Message: Index 3 is out of range. Array length: 3.
+Array:
+[
+    1,
+    2,
+    3
+]

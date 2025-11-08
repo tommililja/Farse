@@ -6,6 +6,7 @@ open System.Text.Json
 [<NoComparison>]
 type ParserError =
     | ArrayError of index:int * array:JsonElement * error:ParserError
+    | ArrayLengthError of index:int * length:int * array:JsonElement
     | CouldNotParse of name:string * msg:string * parent:JsonElement
     | CouldNotRead of name:string * element:JsonElement
     | InvalidKind of expected:ExpectedKind * element:JsonElement
@@ -22,6 +23,9 @@ module ParserError =
         | ArrayError (index, array, error) ->
             let name = $"%s{name}[%i{index}]"
             enrich name array error
+        | ArrayLengthError (index, length, array) ->
+            let msg = invalidIndex index length
+            CouldNotParse (name, msg, array)
         | CouldNotRead(_, element) ->
             NotObject (name, parent, element)
         | InvalidKind (expected, actual) ->
@@ -40,6 +44,7 @@ module ParserError =
 
     let rec asString = function
         | ArrayError (_, _, msg) -> asString msg
+        | ArrayLengthError (index, length, _) -> invalidIndex index length
         | CouldNotParse (name, msg, parent) -> couldNotParse name msg parent
         | CouldNotRead (name, element) -> couldNotRead name element
         | InvalidKind (expected, actual) -> invalidKind expected actual

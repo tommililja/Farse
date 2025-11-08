@@ -36,6 +36,9 @@ module internal Error =
     let invalidTuple expected actual =
         $"Expected a tuple of %i{expected}, actual %i{actual}."
 
+    let invalidIndex index length =
+        $"Index %i{index} is out of range. Array length: %i{length}."
+
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."

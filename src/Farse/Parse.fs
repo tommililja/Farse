@@ -324,6 +324,18 @@ module Parse =
     /// <param name="parser">The parser used for every element.</param>
     let seq parser = arr Seq.ofResizeArray parser
 
+    /// <summary>Parses an array at a specific index.</summary>
+    /// <param name="i">The index to parse in the array.</param>
+    /// <param name="parser">The parser used for the element.</param>
+    let index i (parser:Parser<_>) : Parser<_> =
+        fun (element:JsonElement) ->
+            let arrayLength = element.GetArrayLength()
+            match element.ValueKind with
+            | Kind.Array when i >= 0 && arrayLength >= i + 1 -> element.Item(i) |> parser
+            | Kind.Array -> Error <| ArrayLengthError (i, arrayLength, element)
+            | _ -> Error <| InvalidKind (Array, element)
+        |> id
+
     // Key/Value
 
     let inline private getDuplicateKey (pairs: ('k * 'v) seq) =
@@ -380,7 +392,7 @@ module Parse =
     // Tuples
 
     let inline private parseItem i parser (element:JsonElement) =
-        element.Item i
+        element.Item(i)
         |> parser
         |> Result.mapError (fun e -> ArrayError(i, element, e))
 

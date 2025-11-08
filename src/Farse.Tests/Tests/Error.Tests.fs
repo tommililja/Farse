@@ -468,6 +468,12 @@ module ErrorTests =
             |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
             |> Expect.errorString
 
+        [<Fact>]
+        let ``Should return Error when index is out of range`` () =
+            Parse.req "prop" (Parse.index 3 Parse.int)
+            |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+            |> Expect.errorString
+
         // TODO: Add tests for other Parse.* functions.
 
         [<Fact>]
