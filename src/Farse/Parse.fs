@@ -373,9 +373,52 @@ module Parse =
     /// <param name="parser">The parser used for every property.</param>
     let keyValuePairs parser = keyValue KeyValuePairs.ofSeq parser
 
-    /// <summary>Parses an object's properties as (key * value) seq.</summary>
+    /// <summary>Parses an object's properties as tuple seq.</summary>
     /// <param name="parser">The parser used for every property.</param>
-    let keyValues parser = keyValue Seq.ofResizeArray parser
+    let tuples parser = keyValue Seq.ofResizeArray parser
+
+    // Tuples
+
+    let inline private parseItem i parser (element:JsonElement) =
+        element.Item i
+        |> parser
+        |> Result.mapError (fun e -> ArrayError(i, element, e))
+
+    let inline private tuple length fn : Parser<_> =
+        fun (element:JsonElement) ->
+            let arrayLength = element.GetArrayLength()
+            match element.ValueKind with
+            | Kind.Array when arrayLength = length -> fn element
+            | Kind.Array -> Error <| InvalidTuple(length, arrayLength, element)
+            | _ -> Error <| InvalidKind(Array, element)
+
+    /// <summary>Parses an array with two values as a tuple.</summary>
+    /// <param name="a">The parser used for the first value.</param>
+    /// <param name="b">The parser used for the second value.</param>
+    let tuple2 (a:Parser<_>) (b:Parser<_>) =
+        tuple 2 (fun e ->
+            result {
+                let! a = parseItem 0 a e
+                let! b = parseItem 1 b e
+
+                return a, b
+            }
+        )
+
+    /// <summary>Parses an array with three values as a tuple of three.</summary>
+    /// <param name="a">The parser used for the first value.</param>
+    /// <param name="b">The parser used for the second value.</param>
+    /// <param name="c">The parser used for the third value.</param>
+    let tuple3 (a:Parser<_>) (b:Parser<_>) (c:Parser<_>) =
+        tuple 3 (fun e ->
+            result {
+                let! a = parseItem 0 a e
+                let! b = parseItem 1 b e
+                let! c = parseItem 2 c e
+
+                return a, b, c
+            }
+        )
 
     // Json
 

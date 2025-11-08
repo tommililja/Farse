@@ -10,6 +10,7 @@ type ParserError =
     | CouldNotRead of name:string * element:JsonElement
     | InvalidKind of expected:ExpectedKind * element:JsonElement
     | InvalidValue of msg:string option * expected:Type * element:JsonElement
+    | InvalidTuple of expected:int * actual:int * element:JsonElement
     | DuplicateKeys of key:string * element:JsonElement
     | NotObject of name:string * parent:JsonElement * element:JsonElement
     | Other of msg:string
@@ -32,6 +33,9 @@ module ParserError =
         | DuplicateKeys (key, element) ->
             let msg = duplicateKey key
             CouldNotParse (name, msg, element)
+        | InvalidTuple (expected, actual, array) ->
+            let msg = invalidTuple expected actual
+            CouldNotParse (name, msg, array)
         | other -> other
 
     let rec asString = function
@@ -39,7 +43,8 @@ module ParserError =
         | CouldNotParse (name, msg, parent) -> couldNotParse name msg parent
         | CouldNotRead (name, element) -> couldNotRead name element
         | InvalidKind (expected, actual) -> invalidKind expected actual
-        | DuplicateKeys (key, _element) -> duplicateKey key
+        | DuplicateKeys (key, _) -> duplicateKey key
         | InvalidValue (msg, expected, element) -> invalidValue msg expected element
+        | InvalidTuple (expected, actual, _) -> invalidTuple expected actual
         | NotObject (name, parent, element) -> notObject name parent element
         | Other msg -> msg

@@ -33,6 +33,9 @@ module internal Error =
     let duplicateKey key =
         $"Duplicate key '%s{key}'."
 
+    let invalidTuple expected actual =
+        $"Expected a tuple of %i{expected}, actual %i{actual}."
+
     let couldNotRead name (element:JsonElement) =
         create [
             $"Error: Could not read property '%s{name}'."

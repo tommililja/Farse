@@ -263,6 +263,23 @@ module internal Extensions =
             then "null"
             else node.ToJsonString(JsonSerializerOptions.preset)
 
+    [<AutoOpen>]
+    module ResultBuilder =
+
+        type ResultBuilder() =
+
+            member inline _.Return(x) = Ok x
+
+            member inline _.ReturnFrom(x) = x
+
+            member inline _.Delay([<InlineIfLambda>] fn) = fn ()
+
+            member inline _.Zero() = Ok ()
+
+            member inline _.Bind(x, [<InlineIfLambda>] fn) = Result.bind fn x
+
+        let result = ResultBuilder ()
+
     module ResultOption =
 
         let inline bind fn = function

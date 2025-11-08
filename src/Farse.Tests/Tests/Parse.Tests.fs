@@ -497,13 +497,31 @@ module ParseTests =
         Expect.equalSeq actual expected
 
     [<Fact>]
-    let ``Should parse object as (key * value) seq`` () =
+    let ``Should parse object as tuple seq`` () =
         let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ]
         let actual: _ seq =
-            Parse.req "prop" (Parse.keyValues Parse.int)
+            Parse.req "prop" (Parse.tuples Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should parse array as tuple`` () =
+        let expected = "1", 1
+        let actual =
+            Parse.req "prop" (Parse.tuple2 Parse.string Parse.int)
+            |> Parser.parse """{ "prop": [ "1", 1 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse array as tuple of three`` () =
+        let expected = "1", 1, 1
+        let actual =
+            Parse.req "prop" (Parse.tuple3 Parse.string Parse.int Parse.int)
+            |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
 
     [<Fact>]
     let ``Should parse array length as int`` () =
