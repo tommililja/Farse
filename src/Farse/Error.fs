@@ -34,7 +34,7 @@ module internal Error =
         $"Duplicate key '%s{key}'."
 
     let invalidTuple expected actual =
-        $"Expected a tuple of %i{expected}, actual %i{actual}."
+        $"Expected a tuple of %i{expected}, but got %i{actual}."
 
     let invalidIndex index length =
         $"Index %i{index} is out of range. Array length: %i{length}."
