@@ -66,7 +66,7 @@ module Parser =
         |> id
 
     /// <summary>Validates the parsed value with the given function.</summary>
-    /// <remarks>Works with both required and optional parsers.</remarks>
+    /// <remarks>Works with both required and optional values.</remarks>
     /// <code>let! email = "prop" &amp;= Parse.string |> Parser.validate Email.fromString</code>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>

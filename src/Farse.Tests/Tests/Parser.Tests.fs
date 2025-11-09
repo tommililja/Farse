@@ -16,7 +16,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should create Parser and return Ok`` () =
+    let ``Should create Parser and return expected Result`` () =
         let expected = Ok ()
         let actual =
             expected
@@ -25,7 +25,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should bind Parser and return expected value`` () =
+    let ``Should bind Parser value and return expected value`` () =
         let expected = 2
         let actual =
             Parse.int
@@ -35,7 +35,7 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should map Parser and return expected value`` () =
+    let ``Should map Parser value and return expected value`` () =
         let expected = "1"
         let actual =
             Parse.int
@@ -63,8 +63,8 @@ module ParserTests =
             |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
-    [<Fact>]
 
+    [<Fact>]
     let ``Should return Ok with expected value when optional validation succeeds`` () =
         let expected = Some 1
         let actual =

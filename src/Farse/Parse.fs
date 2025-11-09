@@ -111,7 +111,7 @@ module Parse =
     /// <summary>Creates a custom parser with the given function.</summary>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let inline custom (fn: JsonElement -> Result<'a, _>) expectedKind : Parser<_> =
+    let inline custom (fn:JsonElement -> Result<'a, _>) expectedKind : Parser<_> =
         fun element ->
             let isExpectedKind =
                 match expectedKind with
@@ -338,7 +338,7 @@ module Parse =
 
     // Key/Value
 
-    let inline private getDuplicateKey (pairs: ('k * 'v) seq) =
+    let inline private getDuplicateKey (pairs:('k * 'v) seq) =
         let seen = HashSet<'k>()
         pairs
         |> Seq.tryPick (fun (k, _) ->

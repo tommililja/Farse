@@ -609,7 +609,7 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should parse value with custom parser`` () =
+    let ``Should parse value with custom Parser`` () =
         let parser : Parser<int> =
             Parse.custom (fun element ->
                 match element.TryGetInt32() with

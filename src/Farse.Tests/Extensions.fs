@@ -29,4 +29,4 @@ module Expect =
         Expect.equal actual expected String.Empty
 
     let equalSeq actual expected =
-        Expect.sequenceEqual actual expected
+        Expect.sequenceEqual actual expected String.Empty
