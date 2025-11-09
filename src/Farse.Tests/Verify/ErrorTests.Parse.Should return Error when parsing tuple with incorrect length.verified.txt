@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Expected a tuple of 2, actual 3.
+Message: Expected a tuple of 2, but got 3.
 Array:
 [
     "1",
