@@ -359,13 +359,13 @@ Object:
 
 ```code
 Error: Could not parse property 'profiles[1]'.
-Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9248' to ProfileId. Details: Invalid guid.
+Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId. Details: Invalid guid.
 Array:
 ```
 ```json
 [
     "01458283-b6e3-4ae7-ae54-a68eb587cdc0",
-    "927eb20f-cd62-470c-aafc-c3ce6b9248",
+    "927eb20f-cd62-470c-aafc-c3ce6b9",
     "bf00d1e2-ee53-4969-9507-86bed7e9643c"
 ]
 ```
