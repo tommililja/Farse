@@ -19,9 +19,12 @@ type Age = Age of byte
 
 module Age =
 
+    [<Literal>]
+    let private AllowedAge = 12uy
+
     let fromByte = function
-        | age when age >= 12uy -> Ok <| Age age
-        | age -> Error $"Invalid age '%u{age}'."
+        | age when age >= AllowedAge -> Ok <| Age age
+        | _ -> Error $"The lowest allowed age is '%u{AllowedAge}'."
 
     let asByte (Age x) = x
 
@@ -53,7 +56,7 @@ module Plan =
         | "Pro" -> Ok Pro
         | "Standard" -> Ok Standard
         | "Free" -> Ok Free
-        | str -> Error $"Invalid plan '%s{str}'."
+        | str -> Error $"Plan '%s{str}' not found."
 
     let asString = function
         | Pro -> "Pro"
@@ -81,7 +84,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error None // No details.
+            | _ -> Error <| Some "Invalid guid." // Added as details.
         ) ExpectedKind.String
 
     let instant =
@@ -99,13 +102,13 @@ module User =
         parser {
             let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= valid byte Age.fromByte
-            and! email = "email" &= valid string Email.fromString
+            and! age = "age" ?= byte |> Parser.validate Age.fromByte
+            and! email = "email" &= string |> Parser.validate Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= valid string Plan.fromString
+                let! plan = "plan" &= string |> Parser.validate Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
