@@ -142,7 +142,7 @@ module Age =
 
     let fromByte = function
         | age when age >= AllowedAge -> Ok <| Age age
-        | age -> Error $"%u{age} was below '%u{AllowedAge}'."
+        | _ -> Error $"The lowest allowed age is '%u{AllowedAge}'."
         
     let asByte (Age x) = x
 
