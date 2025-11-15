@@ -12,7 +12,7 @@ Farse uses a slightly different syntax, includes a computation expression, and a
 ## Installation
 
 ```shell
-dotnet add package Farse
+dotnet package add Farse
 ```
 
 ## Benchmarks
@@ -20,23 +20,23 @@ dotnet add package Farse
 There are some initial benchmarks [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.3, macOS 26.0 (25A354) [Darwin 25.0.0]
+BenchmarkDotNet v0.15.6, macOS 26.1 (25B78) [Darwin 25.1.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
-.NET SDK 9.0.305
-  [Host]     : .NET 9.0.9 (9.0.9, 9.0.925.41916), Arm64 RyuJIT armv8.0-a DEBUG
-  DefaultJob : .NET 9.0.9 (9.0.9, 9.0.925.41916), Arm64 RyuJIT armv8.0-a
+.NET SDK 10.0.100
+  [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a DEBUG
+  DefaultJob : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a
 ```
 
 ```shell
 | Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
-| System.Text.Json       | 109.1 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.60 |
-| System.Text.Json*      | 112.1 us |  0.86 | 13.0615 |  1.7090 |  80.19 KB |        1.86 |
-| Farse                  | 130.9 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
-| Thoth.System.Text.Json | 247.5 us |  1.89 | 55.1758 | 18.0664 | 338.76 KB |        7.87 |
-| Newtonsoft.Json*       | 248.1 us |  1.89 | 58.5938 |  5.8594 | 365.01 KB |        8.48 |
-| Newtonsoft.Json        | 274.0 us |  2.09 | 75.6836 | 22.9492 | 464.07 KB |       10.79 |
-| Thoth.Json.Net         | 365.5 us |  2.79 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
+| System.Text.Json*      | 106.2 us |  0.84 | 13.0615 |  1.7090 |  80.19 KB |        1.86 |
+| System.Text.Json       | 107.9 us |  0.85 |  4.1504 |       - |  25.85 KB |        0.60 |
+| Farse                  | 126.6 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
+| Newtonsoft.Json        | 217.9 us |  1.72 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
+| Thoth.System.Text.Json | 218.2 us |  1.72 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
+| Newtonsoft.Json*       | 221.2 us |  1.75 | 42.9688 |  5.8594 | 271.13 KB |        6.30 |
+| Thoth.Json.Net         | 309.9 us |  2.45 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
 
 * Serialization
 ```
@@ -89,13 +89,13 @@ module User =
         parser {
             let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= valid byte Age.fromByte
-            and! email = "email" &= valid string Email.fromString
+            and! age = "age" ?= byte |> Parser.validate Age.fromByte
+            and! email = "email" &= string |> Parser.validate Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= valid string Plan.fromString
+                let! plan = "plan" &= string |> Parser.validate Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
@@ -137,9 +137,12 @@ type Age = Age of byte
 
 module Age =
 
+    [<Literal>]
+    let private AllowedAge = 12uy
+
     let fromByte = function
-        | age when age >= 12uy -> Ok <| Age age
-        | age -> Error $"Invalid age '%u{age}'."
+        | age when age >= AllowedAge -> Ok <| Age age
+        | age -> Error $"%u{age} was below '%u{AllowedAge}'."
         
     let asByte (Age x) = x
 
@@ -171,7 +174,7 @@ module Plan =
         | "Pro" -> Ok Pro
         | "Standard" -> Ok Standard
         | "Free" -> Ok Free
-        | str -> Error $"Invalid plan '%s{str}'."
+        | str -> Error $"Plan '%s{str}' not found."
 
     let asString = function
         | Pro -> "Pro"
@@ -218,7 +221,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error None // No details.
+            | _ -> Error <| Some "Invalid guid." // Added as details.
         ) ExpectedKind.String
 
     let instant =
@@ -230,7 +233,70 @@ module Parse =
         ) ExpectedKind.String
 ```
 
-> Note: Custom parsers produce detailed error messages when validation fails, see [errors](#errors).
+## Validation
+
+There is a few different options availble depending on your use case.
+
+#### Parser.validate 
+
+Only passes along the error string from the validation function.
+
+```fsharp
+let! age = "age" ?= byte |> Parser.validate Age.fromByte
+```
+
+```fsharp
+The lowest allowed age is '12'.
+```
+
+#### Parse.valid
+
+```fsharp
+let! age = "age" ?= valid byte Age.fromByte
+```
+
+```code
+Error: Could not parse property 'age'.
+Message: Tried parsing '10' to Age. Details: The lowest allowed age is '12'.
+Object:
+```
+```json
+{
+    "id": "c8eae96a-025d-4bc9-88f8-f204e95f2883",
+    "name": "Alice",
+    "age": 10
+}
+```
+
+#### Parse.custom
+
+Produces a detailed error message when validation fails.
+
+```fsharp
+let age =
+    Parse.custom (fun element ->
+        match e.TryGetByte() with
+        | true, byte -> Age.fromByte byte |> Result.mapError Some
+        | _ -> Error None
+    ) ExpectedKind.Number
+```
+
+```fsharp
+let! age = "age" ?= age
+```
+
+```code
+Error: Could not parse property 'age'.
+Message: Tried parsing '10' to Age. Details: The lowest allowed age is '12'.
+Object:
+```
+```json
+{
+    "id": "c8eae96a-025d-4bc9-88f8-f204e95f2883",
+    "name": "Alice",
+    "age": 10
+}
+```
 
 ## Creating JSON
 
@@ -293,7 +359,7 @@ Object:
 
 ```code
 Error: Could not parse property 'profiles[1]'.
-Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9248' to ProfileId.
+Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9248' to ProfileId. Details: Invalid guid.
 Array:
 ```
 ```json
