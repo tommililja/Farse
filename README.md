@@ -251,6 +251,8 @@ The lowest allowed age is '12'.
 
 #### Parse.valid
 
+Produces a detailed error message when validation fails.
+
 ```fsharp
 let! age = "age" ?= valid byte Age.fromByte
 ```
