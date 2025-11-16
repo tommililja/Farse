@@ -235,7 +235,7 @@ module Parse =
 
 ## Validation
 
-There is a few different options availble depending on your use case.
+There is a few different options available depending on your use case.
 
 #### Parser.validate 
 
