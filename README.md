@@ -221,7 +221,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error <| Some "Invalid guid." // Added as details.
+            | _ -> Error None // No details.
         ) ExpectedKind.String
 
     let instant =
@@ -239,7 +239,8 @@ There is a few different options available depending on your use case.
 
 #### Parser.validate 
 
-Only passes along the error string from the validation function.
+- Passes along the error string from the validation function.
+- Works for both optional and non-optional values (SRTP).
 
 ```fsharp
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
@@ -251,7 +252,7 @@ The lowest allowed age is '12'.
 
 #### Parse.valid
 
-Produces a detailed error message when validation fails.
+- Produces detailed error messages when validation fails.
 
 ```fsharp
 let! age = "age" ?= valid byte Age.fromByte
@@ -272,14 +273,15 @@ Object:
 
 #### Parse.custom
 
-Produces a detailed error message when validation fails.
+- Produces detailed error messages when validation fails.
+- Helpful error messages are recommended for when parsing fails.
 
 ```fsharp
 let age =
     Parse.custom (fun element ->
         match e.TryGetByte() with
         | true, byte -> Age.fromByte byte |> Result.mapError Some
-        | _ -> Error None
+        | _ -> Error <| Some "Invalid byte."
     ) ExpectedKind.Number
 ```
 
@@ -361,7 +363,7 @@ Object:
 
 ```code
 Error: Could not parse property 'profiles[1]'.
-Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId. Details: Invalid guid.
+Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId.
 Array:
 ```
 ```json
