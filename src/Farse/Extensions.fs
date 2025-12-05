@@ -117,9 +117,10 @@ module internal Extensions =
 
     module String =
 
-        let isNotEmpty =
-            String.IsNullOrWhiteSpace
-            >> not
+        let inline isNotEmpty str =
+            str
+            |> String.IsNullOrWhiteSpace
+            |> not
 
     module Seq =
 
@@ -136,7 +137,7 @@ module internal Extensions =
     [<AutoOpen>]
     module ActivePatterns =
 
-        let (|Flat|Nested|) (str:string) =
+        let inline (|Flat|Nested|) (str:string) =
             if str.Contains('.')
             then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Flat str
