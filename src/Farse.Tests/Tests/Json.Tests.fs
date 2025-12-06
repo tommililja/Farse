@@ -14,16 +14,16 @@ module JsonTests =
             "byte", JNum 123uy
             "string", JStr "string"
             "bool", JBit true
-            "object", JObj [
-                "string", JStr "string"
-            ]
-            "array", JArr [
-                JStr "string"
-                JNon
-            ]
+            "object",
+                JObj [
+                    "string", JStr "string"
+                ]
+            "array",
+                JArr [
+                    JStr "string"
+                ]
             "some", JNil <| Some (JStr "string")
             "none", JNil None
-            "missing", JNon
         ]
         |> Json.asString
         |> Expect.string

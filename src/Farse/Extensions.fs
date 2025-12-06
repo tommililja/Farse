@@ -89,6 +89,14 @@ module internal Extensions =
             then "null"
             else node.ToJsonString(JsonSerializerOptions.preset)
 
+    module JsonArray =
+
+        let asJsonNode (arr:JsonArray) = arr.Root
+
+    module JsonObject =
+
+        let asJsonNode (obj:JsonObject) = obj.Root
+
     [<AutoOpen>]
     module ResultBuilder =
 

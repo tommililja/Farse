@@ -12,7 +12,6 @@ type Json =
     | JObj of JsonProperty seq
     | JArr of Json seq
     | JNil of Json option
-    | JNon
 
 and JsonProperty = string * Json
 
@@ -58,28 +57,22 @@ module Json =
         | JBit bit -> JsonNode.create bit
         | JObj obj ->
             obj
-            |> Seq.choose (function
-                | _, JNon -> None
-                | key, value ->
-                    let node = getJsonNode value
-                    Some <| KeyValuePair(key, node)
+            |> Seq.map (fun (name, json) ->
+                let node = getJsonNode json
+                KeyValuePair(name, node)
             )
             |> JsonObject
-            |> _.Root
+            |> JsonObject.asJsonNode
         | JArr arr ->
             arr
-            |> Seq.choose (function
-                | JNon -> None
-                | json -> Some <| getJsonNode json
-            )
+            |> Seq.map getJsonNode
             |> Seq.toArray
             |> JsonArray
-            |> _.Root
+            |> JsonArray.asJsonNode
         | JNil nil ->
             nil
             |> Option.map getJsonNode
             |> Option.defaultValue null
-        | JNon -> null
 
     /// <summary>Converts the Json to a formatted string.</summary>
     /// <remarks>
