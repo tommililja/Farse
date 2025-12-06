@@ -463,6 +463,12 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when trying to parse string seq with duplicate keys`` () =
+            Parse.req "prop" Parse.keys
+            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
             Parse.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""

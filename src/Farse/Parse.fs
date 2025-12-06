@@ -164,6 +164,15 @@ module Parse =
 
     open type ExpectedKind
 
+    // Misc
+
+    /// Always succeeds and returns FSharp.Core.Unit.
+    let none = Parser.from ()
+
+    /// <summary>Always succeeds and returns the given value.</summary>
+    /// <param name="x">The value to return.</param>
+    let noneWith x = Parser.from x
+
     // Basic types
 
     let inline private tryParse fn =
@@ -475,6 +484,9 @@ module Parse =
     /// <param name="parser">The parser used for every property.</param>
     let tuples parser = keyValue Seq.ofResizeArray parser
 
+    /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq</summary>
+    let keys = keyValue (Seq.ofResizeArray >> Seq.map fst) none
+
     // Tuples
 
     let inline private parseItem i parser (element:JsonElement) =
@@ -534,12 +546,3 @@ module Parse =
 
     /// Parses an element as System.Text.Json.JsonElement.
     let element = custom (_.Clone() >> Ok) Any
-
-    // Misc
-
-    /// Always succeeds and returns FSharp.Core.Unit.
-    let none = Parser.from ()
-
-    /// <summary>Always succeeds and returns the given value.</summary>
-    /// <param name="x">The value to return.</param>
-    let noneWith x = Parser.from x
