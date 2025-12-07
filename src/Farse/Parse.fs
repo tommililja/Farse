@@ -3,6 +3,7 @@ namespace Farse
 open System
 open System.Collections.Generic
 open System.Globalization
+open System.Numerics
 open System.Text.Json
 
 module Parse =
@@ -119,6 +120,15 @@ module Parse =
 
     /// Parses a string as System.String.
     let string = custom (_.GetString() >> Ok) String
+
+    /// Parses a string as System.Numerics.BigInteger.
+    let bigInt =
+        custom (fun element ->
+            let str = element.GetString()
+            match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            | true, bigInt -> Ok bigInt
+            | false, _ -> Error None
+        ) String
 
     /// Parses a bool as System.Boolean.
     let bool = custom (_.GetBoolean() >> Ok) Bool
