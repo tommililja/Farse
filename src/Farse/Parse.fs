@@ -11,6 +11,19 @@ module Parse =
     /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
 
+    /// <summary>Parses an optional value with the given parser.</summary>
+    /// <code>let! int = "prop" &amp;= Parse.optional Parse.int</code>
+    /// <param name="parser">The parser used to parse the property value.</param>
+    let optional (parser:Parser<_>) : Parser<_> =
+        fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Null -> Ok None
+            | _ ->
+                match parser element with
+                | Ok x -> Ok <| Some x
+                | Error e -> Error e
+        |> id
+
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>

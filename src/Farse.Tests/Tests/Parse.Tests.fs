@@ -609,6 +609,24 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse optional null value as None`` () =
+        let expected = None
+        let actual =
+            Parser.req "prop" (Parse.optional Parse.int)
+            |> Parser.parse """{ "prop": null }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse optional value as Some int`` () =
+        let expected = Some 1
+        let actual =
+            Parser.req "prop" (Parse.optional Parse.int)
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse value with custom Parser`` () =
         let parser : Parser<int> =
             Parse.custom (fun element ->
