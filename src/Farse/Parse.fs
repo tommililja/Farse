@@ -6,114 +6,31 @@ open System.Globalization
 open System.Text.Json
 
 module Parse =
+    open type ExpectedKind
 
-    /// <summary>Parses a required property with the given parser.</summary>
-    /// <code>let! int = Parse.req "prop.prop2" Parse.int</code>
-    /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
-    let req path (parser:Parser<_>) : Parser<_> =
-        match path with
-        | Flat name ->
-            fun (element:JsonElement) ->
-                match element.ValueKind with
-                | Kind.Object ->
-                    let prop = JsonElement.getProperty name element
-                    match parser prop with
-                    | Ok x -> Ok x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich name element
-                        |> Error
-                | _ ->
-                   CouldNotRead (name, element)
-                   |> Error
-        | Nested path ->
-            fun element ->
-                let mutable prop = Ok element
-                let mutable name = path[0]
-                let mutable object = element
+    /// Always succeeds and returns FSharp.Core.Unit.
+    let none = Parser.from ()
 
-                for segment in path do
-                    prop <- prop
-                    |> Result.bind (fun element ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            name <- segment
-                            object <- element
+    /// <summary>Always succeeds and returns the given value.</summary>
+    /// <param name="x">The value to return.</param>
+    let noneWith x = Parser.from x
 
-                            element
-                            |> JsonElement.getProperty name
-                            |> Ok
-                        | _ -> Error element
-                    )
-
-                match prop with
-                | Ok prop ->
-                    match parser prop with
-                    | Ok x -> Ok x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich name object
-                        |> Error
-                | Error element ->
-                    NotObject (name, object, element)
+    /// <summary>Validates the parsed value with the given function.</summary>
+    /// <remarks>Produces detailed error messages when validation fails.</remarks>
+    /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
+    /// <param name="parser">The parser to validate.</param>
+    /// <param name="fn">The validation function.</param>
+    let inline valid (parser:Parser<_>) ([<InlineIfLambda>] fn) : Parser<'b> =
+        fun element ->
+            match parser element with
+            | Ok x ->
+                match fn x with
+                | Ok x -> Ok x
+                | Error msg ->
+                    InvalidValue (Some msg, typeof<'b>, element)
                     |> Error
-
-    /// <summary>Parses an optional property with the given parser.</summary>
-    /// <code>let! int = Parse.opt "prop.prop2" Parse.int</code>
-    /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
-    let opt path (parser:Parser<_>) : Parser<_> =
-        match path with
-        | Flat name ->
-            fun (element:JsonElement) ->
-                match element.ValueKind with
-                | Kind.Object ->
-                    let prop = JsonElement.tryGetProperty name element
-                    match prop with
-                    | Some prop ->
-                        match parser prop with
-                        | Ok x -> Ok <| Some x
-                        | Error error ->
-                            error
-                            |> ParserError.enrich name element
-                            |> Error
-                    | None -> Ok None
-                | _ ->
-                    CouldNotRead (name, element)
-                    |> Error
-        | Nested path ->
-            fun element ->
-                let mutable prop = Ok <| Some element
-                let mutable name = path[0]
-                let mutable object = element
-
-                for segment in path do
-                    prop <- prop
-                    |> ResultOption.bind (fun element ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            name <- segment
-                            object <- element
-
-                            element
-                            |> JsonElement.tryGetProperty name
-                            |> Ok
-                        | _ -> Error element
-                    )
-
-                match prop with
-                | Ok (Some prop) ->
-                    match parser prop with
-                    | Ok x -> Ok <| Some x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich name object
-                        |> Error
-                | Ok None -> Ok None
-                | Error element ->
-                    NotObject (name, object, element)
-                    |> Error
+            | Error e -> Error e
+        |> id
 
     /// <summary>Creates a custom parser with the given function.</summary>
     /// <param name="fn">The parsing function.</param>
@@ -142,36 +59,6 @@ module Parse =
                  InvalidKind (expectedKind, element)
                  |> Error
         |> id
-
-    /// <summary>Validates the parsed value with the given function.</summary>
-    /// <remarks>Produces detailed error messages when validation fails.</remarks>
-    /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
-    /// <param name="parser">The parser to validate.</param>
-    /// <param name="fn">The validation function.</param>
-    let inline valid (parser:Parser<_>) ([<InlineIfLambda>] fn) : Parser<'b> =
-        fun element ->
-            match parser element with
-            | Ok x ->
-                match fn x with
-                | Ok x -> Ok x
-                | Error msg ->
-                    InvalidValue (Some msg, typeof<'b>, element)
-                    |> Error
-            | Error e -> Error e
-        |> id
-
-    // Parsing
-
-    open type ExpectedKind
-
-    // Misc
-
-    /// Always succeeds and returns FSharp.Core.Unit.
-    let none = Parser.from ()
-
-    /// <summary>Always succeeds and returns the given value.</summary>
-    /// <param name="x">The value to return.</param>
-    let noneWith x = Parser.from x
 
     // Basic types
 
@@ -532,6 +419,12 @@ module Parse =
 
     // Json
 
+    /// Parses an element's kind as System.Text.Json.JsonValueKind.
+    let kind = custom (_.ValueKind >> Ok) Any
+
+    /// Parses an element as System.Text.Json.JsonElement.
+    let element = custom (_.Clone() >> Ok) Any
+
     /// Parses an element's raw text as System.String.
     let rawText = custom (_.GetRawText() >> Ok) Any
 
@@ -540,9 +433,3 @@ module Parse =
 
     /// Parses an object's property count as System.Int32.
     let propertyCount = custom (_.GetPropertyCount() >> Ok) Object
-
-    /// Parses an element's kind as System.Text.Json.JsonValueKind.
-    let kind = custom (_.ValueKind >> Ok) Any
-
-    /// Parses an element as System.Text.Json.JsonElement.
-    let element = custom (_.Clone() >> Ok) Any

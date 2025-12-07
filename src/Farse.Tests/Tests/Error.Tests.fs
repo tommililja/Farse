@@ -38,7 +38,7 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when optional validation fails`` () =
-            Parse.opt "prop" Parse.int
+            Parser.opt "prop" Parse.int
             |> Parser.validate (fun int ->
                 if int > 1 then Ok int
                 else Error "Value too small."
@@ -57,201 +57,201 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when parsing an incorrect value`` () =
-            Parse.req "prop" Parse.int
+            Parser.req "prop" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested incorrect value`` () =
-            Parse.req "prop.prop2" Parse.int
+            Parser.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing an incorrect value`` () =
-            Parse.opt "prop" Parse.int
+            Parser.opt "prop" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested incorrect value`` () =
-            Parse.opt "prop.prop2" Parse.int
+            Parser.opt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a property from an element that is not an object`` () =
-            Parse.req "prop" Parse.int
+            Parser.req "prop" Parse.int
             |> Parser.parse """[]"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested property from an element that is not an object`` () =
-            Parse.req "prop.prop2" Parse.int
+            Parser.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": [] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a property from an element that is not an object`` () =
-            Parse.opt "prop" Parse.int
+            Parser.opt "prop" Parse.int
             |> Parser.parse """[]"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested property from an element that is not an object`` () =
-            Parse.opt "prop.prop2" Parse.int
+            Parser.opt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": [] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a value when the value is an object`` () =
-            Parse.req "prop" Parse.int
+            Parser.req "prop" Parse.int
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested value when the value is an object`` () =
-            Parse.req "prop.prop2" Parse.int
+            Parser.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a value when the value is an object`` () =
-            Parse.opt "prop" Parse.int
+            Parser.opt "prop" Parse.int
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested value when the value is an object`` () =
-            Parse.opt "prop.prop2" Parse.int
+            Parser.opt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a value when the value is an array`` () =
-            Parse.req "prop" Parse.int
+            Parser.req "prop" Parse.int
             |> Parser.parse """{ "prop": [] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested value when the value is an array`` () =
-            Parse.req "prop.prop2" Parse.int
+            Parser.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a value when the value is an array`` () =
-            Parse.opt "prop" Parse.int
+            Parser.opt "prop" Parse.int
             |> Parser.parse """{ "prop": [] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested value when the value is an array`` () =
-            Parse.opt "prop.prop2" Parse.int
+            Parser.opt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing an incorrect value in an array`` () =
-            Parse.req "prop" (Parse.list Parse.string)
+            Parser.req "prop" (Parse.list Parse.string)
             |> Parser.parse """{ "prop": [ "1", 2, "3" ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing an incorrect value in a nested array`` () =
             let parser = Parse.list Parse.string
-            Parse.req "prop" (Parse.list parser)
+            Parser.req "prop" (Parse.list parser)
             |> Parser.parse """{ "prop": [ [ "1" ], [ "1", 2, "3" ] ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested incorrect value in an array`` () =
-            Parse.req "prop.prop2" (Parse.list Parse.string)
+            Parser.req "prop.prop2" (Parse.list Parse.string)
             |> Parser.parse """{ "prop": { "prop2": [ "1", 2, "3" ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested incorrect value in a nested array`` () =
             let parser = Parse.list Parse.string
-            Parse.req "prop.prop2" (Parse.list parser)
+            Parser.req "prop.prop2" (Parse.list parser)
             |> Parser.parse """{ "prop": { "prop2": [ [ "1" ], [ "1", 2, "3" ] ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing an incorrect value in an array`` () =
-            Parse.opt "prop" (Parse.list Parse.string)
+            Parser.opt "prop" (Parse.list Parse.string)
             |> Parser.parse """{ "prop": [ "1", 2, "3"] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing an incorrect value in a nested array`` () =
             let parser = Parse.list Parse.string
-            Parse.opt "prop" (Parse.list parser)
+            Parser.opt "prop" (Parse.list parser)
             |> Parser.parse """{ "prop": [ [ "1" ], [ "1", 2, "3" ] ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested incorrect value in an array`` () =
-            Parse.opt "prop.prop2" (Parse.list Parse.string)
+            Parser.opt "prop.prop2" (Parse.list Parse.string)
             |> Parser.parse """{ "prop": { "prop2": [ "1", 2, "3" ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested incorrect value in an nested array`` () =
             let parser = Parse.list Parse.string
-            Parse.opt "prop.prop2" (Parse.list parser)
+            Parser.opt "prop.prop2" (Parse.list parser)
             |> Parser.parse """{ "prop": { "prop2": [ [ "1" ], [ "1", 2, "3" ] ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing an object in an array that contains another kind`` () =
-            let parser = Parse.req "prop2" Parse.string
-            Parse.req "prop" (Parse.list parser)
+            let parser = Parser.req "prop2" Parse.string
+            Parser.req "prop" (Parse.list parser)
             |> Parser.parse """{ "prop": [ { "prop2": "1" }, 2, 3 ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested object in an array that contains another kind`` () =
-            let parser = Parse.req "prop3" Parse.string
-            Parse.req "prop.prop2" (Parse.list parser)
+            let parser = Parser.req "prop3" Parse.string
+            Parser.req "prop.prop2" (Parse.list parser)
             |> Parser.parse """{ "prop": { "prop2": [ { "prop3": "1" }, 2, 3 ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing an object in an array that contains another kind`` () =
-            let parser = Parse.opt "prop2" Parse.string
-            Parse.opt "prop" (Parse.list parser)
+            let parser = Parser.opt "prop2" Parse.string
+            Parser.opt "prop" (Parse.list parser)
             |> Parser.parse """{ "prop": [ { "prop2": "1" }, 2, 3 ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested object in an array that contains another kind`` () =
-            let parser = Parse.req "prop3" Parse.string
-            Parse.opt "prop.prop2" (Parse.list parser)
+            let parser = Parser.req "prop3" Parse.string
+            Parser.opt "prop.prop2" (Parse.list parser)
             |> Parser.parse """{ "prop": { "prop2": [ { "prop3": "1" }, 2, 3 ] } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing an array that is an object`` () =
-            Parse.req "prop" (Parse.array Parse.string)
+            Parser.req "prop" (Parse.array Parse.string)
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested array that is an object`` () =
-            Parse.req "prop.prop2" (Parse.array Parse.string)
+            Parser.req "prop.prop2" (Parse.array Parse.string)
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing an array that is an object`` () =
-            Parse.opt "prop" (Parse.array Parse.string)
+            Parser.opt "prop" (Parse.array Parse.string)
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested array that is an object`` () =
-            Parse.opt "prop.prop2" (Parse.array Parse.string)
+            Parser.opt "prop.prop2" (Parse.array Parse.string)
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
@@ -259,66 +259,66 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when parsing a null value`` () =
-            Parse.req "prop" Parse.int
+            Parser.req "prop" Parse.int
             |> Parser.parse """{ "prop": null }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a null value with composed parsers`` () =
-            Parse.req "prop" (Parse.req "prop2" Parse.string)
+            Parser.req "prop" (Parser.req "prop2" Parse.string)
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a null value with composed parsers`` () =
-            Parse.opt "prop" (Parse.req "prop2" Parse.string)
+            Parser.opt "prop" (Parser.req "prop2" Parse.string)
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested null value`` () =
-            Parse.req "prop.prop2" Parse.int
+            Parser.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested null value with required parsers`` () =
-            let parser = Parse.req "prop3" Parse.int
-            Parse.req "prop.prop2" parser
+            let parser = Parser.req "prop3" Parse.int
+            Parser.req "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested null value with mixed parsers`` () =
-            let parser = Parse.req "prop3" Parse.int
-            Parse.opt "prop.prop2" parser
+            let parser = Parser.req "prop3" Parse.int
+            Parser.opt "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when an object is null`` () =
-            Parse.req "prop.prop2" Parse.int
+            Parser.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": null }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when an object is null with required parsers`` () =
-            let parser = Parse.req "prop3" Parse.int
-            Parse.req "prop.prop2" parser
+            let parser = Parser.req "prop3" Parse.int
+            Parser.req "prop.prop2" parser
             |> Parser.parse """{ "prop": null }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when a nested object is null with required parsers`` () =
-            let parser = Parse.req "prop3" Parse.int
-            Parse.req "prop.prop2" parser
+            let parser = Parser.req "prop3" Parse.int
+            Parser.req "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when a nested object is null with mixed parsers`` () =
-            let parser = Parse.opt "prop3" Parse.int
-            Parse.req "prop.prop2" parser
+            let parser = Parser.opt "prop3" Parse.int
+            Parser.req "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
@@ -326,66 +326,66 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when parsing a missing value`` () =
-            Parse.req "missing" Parse.int
+            Parser.req "missing" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a missing value with composed parsers`` () =
-            Parse.req "prop" (Parse.req "missing" Parse.string)
+            Parser.req "prop" (Parser.req "missing" Parse.string)
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a missing value with composed parsers`` () =
-            Parse.opt "prop" (Parse.req "missing" Parse.string)
+            Parser.opt "prop" (Parser.req "missing" Parse.string)
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested missing value`` () =
-            Parse.req "prop.missing" Parse.int
+            Parser.req "prop.missing" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a nested missing value with required parsers`` () =
-            let parser = Parse.req "missing" Parse.int
-            Parse.req "prop.prop2" parser
+            let parser = Parser.req "missing" Parse.int
+            Parser.req "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when try parsing a nested missing value with mixed parsers`` () =
-            let parser = Parse.req "missing" Parse.int
-            Parse.opt "prop.prop2" parser
+            let parser = Parser.req "missing" Parse.int
+            Parser.opt "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when an object is missing`` () =
-            Parse.req "missing.prop2" Parse.int
+            Parser.req "missing.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when an object is missing with required parsers`` () =
-            let parser = Parse.req "prop3" Parse.int
-            Parse.req "missing.prop2" parser
+            let parser = Parser.req "prop3" Parse.int
+            Parser.req "missing.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when a nested object is missing with required parsers`` () =
-            let parser = Parse.req "prop3" Parse.int
-            Parse.req "prop.missing" parser
+            let parser = Parser.req "prop3" Parse.int
+            Parser.req "prop.missing" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when a nested object is missing with mixed parsers`` () =
-            let parser = Parse.opt "prop3" Parse.int
-            Parse.req "prop.missing" parser
+            let parser = Parser.opt "prop3" Parse.int
+            Parser.req "prop.missing" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.errorString
 
@@ -397,7 +397,7 @@ module ErrorTests =
                 Parse.custom (fun _ ->
                     Ok 1
                 ) ExpectedKind.Number
-            Parse.req "prop" parser
+            Parser.req "prop" parser
             |> Parser.parse """{ "prop": "1" }"""
             |> Expect.errorString
 
@@ -407,7 +407,7 @@ module ErrorTests =
                 Parse.custom (fun _ ->
                     failwith "Failed."
                 ) ExpectedKind.Number
-            Parse.req "prop" parser
+            Parser.req "prop" parser
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
@@ -417,7 +417,7 @@ module ErrorTests =
                 Parse.custom (fun _ ->
                     Error <| Some "Failed."
                 ) ExpectedKind.Number
-            Parse.req "prop" parser
+            Parser.req "prop" parser
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
@@ -427,56 +427,56 @@ module ErrorTests =
                 Parse.custom (fun _ ->
                     Error <| None
                 ) ExpectedKind.Number
-            Parse.req "prop" parser
+            Parser.req "prop" parser
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when value is not valid`` () =
             let fromInt (_:int) : Result<string, _> = Error "Not valid."
-            Parse.req "prop" (Parse.valid Parse.int fromInt)
+            Parser.req "prop" (Parse.valid Parse.int fromInt)
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when trying to parse Map with duplicate keys`` () =
-            Parse.req "prop" (Parse.map Parse.int)
+            Parser.req "prop" (Parse.map Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when trying to parse Dictionary with duplicate keys`` () =
-            Parse.req "prop" (Parse.dict Parse.int)
+            Parser.req "prop" (Parse.dict Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when trying to parse KeyValuePair seq with duplicate keys`` () =
-            Parse.req "prop" (Parse.keyValuePairs Parse.int)
+            Parser.req "prop" (Parse.keyValuePairs Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when trying to parse tuple seq with duplicate keys`` () =
-            Parse.req "prop" (Parse.tuples Parse.int)
+            Parser.req "prop" (Parse.tuples Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when trying to parse string seq with duplicate keys`` () =
-            Parse.req "prop" Parse.keys
+            Parser.req "prop" Parse.keys
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
-            Parse.req "prop" (Parse.tuple2 Parse.string Parse.int)
+            Parser.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when index is out of range`` () =
-            Parse.req "prop" (Parse.index 3 Parse.int)
+            Parser.req "prop" (Parse.index 3 Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.errorString
 
@@ -484,30 +484,30 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when parsing a TimeOnly exact with an incorrect format`` () =
-            Parse.req "prop" (Parse.timeOnlyExact "HHmmss")
+            Parser.req "prop" (Parse.timeOnlyExact "HHmmss")
             |> Parser.parse """{ "prop": "17:28:45" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a TimeSpan exact with an incorrect format`` () =
-            Parse.req "prop" (Parse.timeSpanExact @"hh\mm\ss")
+            Parser.req "prop" (Parse.timeSpanExact @"hh\mm\ss")
             |> Parser.parse """{ "prop": "01:28:45" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a DateOnly exact with an incorrect format`` () =
-            Parse.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
+            Parser.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
             |> Parser.parse """{ "prop": "2025-05-13" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a DateTime exact with an incorrect format`` () =
-            Parse.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
+            Parser.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing a DateTimeOffset exact with an incorrect format`` () =
-            Parse.req "prop" (Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz")
+            Parser.req "prop" (Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz")
             |> Parser.parse """{ "prop": "2025-05-13 17:28 +02:00" }"""
             |> Expect.errorString

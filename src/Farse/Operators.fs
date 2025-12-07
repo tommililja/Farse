@@ -4,7 +4,7 @@ open Farse
 
 [<AutoOpen>]
 module Operators =
-    open Parse
+    open Parser
 
     /// <summary>Parses a required property with the given parser.</summary>
     /// <code>let! int = "prop.prop2" &amp;= Parse.int</code>
