@@ -609,15 +609,6 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should not parse element and return value`` () =
-        let expected = 1
-        let actual =
-            Parser.req "prop" (Parse.noneWith 1)
-            |> Parser.parse """{ "prop": true }"""
-            |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
     let ``Should parse value with custom Parser`` () =
         let parser : Parser<int> =
             Parse.custom (fun element ->

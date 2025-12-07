@@ -11,10 +11,6 @@ module Parse =
     /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
 
-    /// <summary>Always succeeds and returns the given value.</summary>
-    /// <param name="x">The value to return.</param>
-    let noneWith x = Parser.from x
-
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
