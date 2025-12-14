@@ -260,8 +260,8 @@ let! age = "age" ?= valid byte Age.fromByte
 
 ```code
 Error: Could not parse property 'age'.
-Message: Tried parsing '10' to Age. Details: The lowest allowed age is '12'.
-Object:
+Message: Tried parsing '10' to Age.
+Details: The lowest allowed age is '12'.
 ```
 ```json
 {
@@ -289,8 +289,8 @@ let! age = "age" ?= age
 
 ```code
 Error: Could not parse property 'age'.
-Message: Tried parsing '10' to Age. Details: The lowest allowed age is '12'.
-Object:
+Message: Tried parsing '10' to Age.
+Details: The lowest allowed age is '12'.
 ```
 ```json
 {
@@ -346,8 +346,8 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 
 ```code
 Error: Could not parse property 'renewsAt'.
-Message: Tried parsing '202612-25T10:30:00Z' to Instant. Details: The value string [...]
-Object:
+Message: Tried parsing '202612-25T10:30:00Z' to Instant.
+Details: The value string does not [...]
 ```
 ```json
 {
@@ -362,7 +362,6 @@ Object:
 ```code
 Error: Could not parse property 'profiles[1]'.
 Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId.
-Array:
 ```
 ```json
 [
