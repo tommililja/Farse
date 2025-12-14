@@ -240,7 +240,7 @@ There is a few different options available depending on your use case.
 #### Parser.validate 
 
 Passes along the error string from the validation function,  
-works for both optional and non-optional values (SRTP).
+but works for both optional and non-optional values (SRTP).
 
 ```fsharp
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
@@ -274,7 +274,7 @@ Object:
 #### Parse.custom
 
 Produces detailed error messages when validation fails,  
-helpful error messages are recommended for when parsing fails.
+but helpful error messages are recommended for when parsing fails.
 
 ```fsharp
 let age =
