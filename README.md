@@ -121,7 +121,7 @@ module User =
         }
 ```
 
-> Note: In this example, our parsers are defined under the same module name as included parsers.
+> Note: In this example, our custom parsers are defined under the same module name as included parsers.
 
 With the following types.
 
@@ -239,8 +239,8 @@ There is a few different options available depending on your use case.
 
 #### Parser.validate 
 
-- Passes along the error string from the validation function.
-- Works for both optional and non-optional values (SRTP).
+Passes along the error string from the validation function,  
+works for both optional and non-optional values (SRTP).
 
 ```fsharp
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
@@ -252,7 +252,7 @@ The lowest allowed age is '12'.
 
 #### Parse.valid
 
-- Produces detailed error messages when validation fails.
+Produces detailed error messages when validation fails.
 
 ```fsharp
 let! age = "age" ?= valid byte Age.fromByte
@@ -273,8 +273,8 @@ Object:
 
 #### Parse.custom
 
-- Produces detailed error messages when validation fails.
-- Helpful error messages are recommended for when parsing fails.
+Produces detailed error messages when validation fails,  
+helpful error messages are recommended for when parsing fails.
 
 ```fsharp
 let age =
@@ -283,9 +283,7 @@ let age =
         | true, byte -> Age.fromByte byte |> Result.mapError Some
         | _ -> Error <| Some "Invalid byte."
     ) ExpectedKind.Number
-```
 
-```fsharp
 let! age = "age" ?= age
 ```
 
@@ -304,7 +302,7 @@ Object:
 
 ## Creating JSON
 
-We can create JSON strings with [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs).
+We can create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
 This creates an object, but you can create any type and convert it with Json.asString.
 
