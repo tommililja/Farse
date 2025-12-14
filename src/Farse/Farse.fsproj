@@ -19,7 +19,7 @@
         <RootNamespace>Farse</RootNamespace>
         <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
         <Title>Farse</Title>
-        <Version>0.6.1</Version>
+        <Version>0.7.0</Version>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Extensions.fs"/>
