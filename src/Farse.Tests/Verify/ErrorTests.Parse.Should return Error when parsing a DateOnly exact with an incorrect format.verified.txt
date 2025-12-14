@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Tried parsing '2025-05-13' to DateOnly. Details: Expected yyyyMMdd.
-Object:
+Message: Tried parsing '2025-05-13' to DateOnly.
+Details: Expected 'yyyyMMdd'.
+
 {
     "prop": "2025-05-13"
 }

@@ -1,0 +1,8 @@
+﻿Error: Could not parse property 'key2'.
+Message: Expected Number, but got String.
+
+{
+    "key1": 1,
+    "key2": "2",
+    "key3": 3
+}

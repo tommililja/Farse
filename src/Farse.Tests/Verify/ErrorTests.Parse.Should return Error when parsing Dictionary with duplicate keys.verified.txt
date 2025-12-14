@@ -1,5 +1,5 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Tried parsing Object to IEnumerable<String>.
+Message: Tried parsing Object to IDictionary<String, Int32>.
 Details: Duplicate key 'key2'.
 
 {

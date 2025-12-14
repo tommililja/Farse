@@ -1,6 +1,6 @@
 ﻿Error: Could not parse property 'prop'.
 Message: Expected a tuple of 2, but got 3.
-Array:
+
 [
     "1",
     1,

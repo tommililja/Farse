@@ -1,6 +1,6 @@
 ﻿Error: Could not parse property 'prop2'.
-Message: Expected Number, but got String. Value: '1'.
-Object:
+Message: Expected Number, but got String.
+
 {
     "prop2": "1"
 }

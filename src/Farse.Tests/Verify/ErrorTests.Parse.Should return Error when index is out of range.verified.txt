@@ -1,6 +1,6 @@
-﻿Error: Could not parse property 'prop'.
-Message: Index 3 is out of range. Array length: 3.
-Array:
+﻿Error: Could not parse property 'prop[3]'.
+Message: Index out of range.
+
 [
     1,
     2,

@@ -6,8 +6,9 @@ open System.Text.Json
 [<NoComparison>]
 type ParserError =
     | ArrayError of index:int * array:JsonElement * error:ParserError
-    | ArrayLengthError of index:int * length:int * array:JsonElement
+    | ArrayLengthError
     | CouldNotParse of name:string * msg:string * parent:JsonElement
+    | KeyValueError of name:string * error:ParserError * parent:JsonElement
     | CouldNotRead of name:string * element:JsonElement
     | InvalidKind of expected:ExpectedKind * element:JsonElement
     | InvalidValue of msg:string option * expected:Type * element:JsonElement
@@ -23,11 +24,12 @@ module ParserError =
         | ArrayError (index, array, error) ->
             let name = $"%s{name}[%i{index}]"
             enrich name array error
-        | ArrayLengthError (index, length, array) ->
-            let msg = invalidIndex index length
-            CouldNotParse (name, msg, array)
+        | ArrayLengthError ->
+            CouldNotParse (name, invalidIndex, parent)
         | CouldNotRead(_, element) ->
             NotObject (name, parent, element)
+        | KeyValueError (name, error, parent) ->
+            enrich name parent error
         | InvalidKind (expected, actual) ->
             let msg = invalidKind expected actual
             CouldNotParse (name, msg, parent)
@@ -43,13 +45,14 @@ module ParserError =
         | other -> other
 
     let rec asString = function
-        | ArrayError (_, _, msg) -> asString msg
-        | ArrayLengthError (index, length, _) -> invalidIndex index length
+        | ArrayError (_, _, error) -> asString error
+        | ArrayLengthError -> invalidIndex
         | CouldNotParse (name, msg, parent) -> couldNotParse name msg parent
         | CouldNotRead (name, element) -> couldNotRead name element
         | InvalidKind (expected, actual) -> invalidKind expected actual
-        | DuplicateKeys (key, _) -> duplicateKey key
         | InvalidValue (msg, expected, element) -> invalidValue msg expected element
+        | KeyValueError (_, error, _) -> asString error
         | InvalidTuple (expected, actual, _) -> invalidTuple expected actual
+        | DuplicateKeys (key, _) -> duplicateKey key
         | NotObject (name, parent, element) -> notObject name parent element
         | Other msg -> msg

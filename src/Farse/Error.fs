@@ -11,7 +11,19 @@ module internal Error =
     let private print (element:JsonElement) =
         match element.ValueKind with
         | Kind.Null | Kind.Undefined -> String.Empty
-        | kind -> $"%s{string kind}:\n%s{JsonElement.asJsonString element}"
+        | _ -> $"\n%s{JsonElement.asJsonString element}"
+
+    let rec private getTypeName (x:Type) =
+        match x with
+        | x when x.IsGenericType ->
+            let genericName = x.Name.Substring(0, x.Name.IndexOf('`'))
+            let args =
+                x.GetGenericArguments()
+                |> Array.map getTypeName
+                |> String.concat ", "
+
+            $"%s{genericName}<%s{args}>"
+        | x -> x.Name
 
     let invalidValue msg (expectedType:Type) (element:JsonElement) =
         let value =
@@ -19,16 +31,18 @@ module internal Error =
             | Kind.Number | Kind.String | Kind.True | Kind.False -> $"'%s{JsonElement.asString element}'"
             | kind -> Kind.asString kind
 
-        match msg with
-        | Some msg when String.isNotEmpty msg -> $"Tried parsing %s{value} to %s{expectedType.Name}. Details: %s{msg}"
-        | _ -> $"Tried parsing %s{value} to %s{expectedType.Name}."
+        create [
+            $"Tried parsing %s{value} to %s{getTypeName expectedType}."
+
+            match msg with
+            | Some msg when String.isNotEmpty msg -> $"Details: %s{msg}"
+            | _ -> ()
+        ]
 
     let invalidKind (expected:ExpectedKind) (element:JsonElement) =
         let expected = ExpectedKind.asString expected
         let actual = Kind.asString element.ValueKind
-        match element.ValueKind with
-        | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> $"Expected %s{expected}, but got %s{actual}."
-        | _ -> $"Expected %s{expected}, but got %s{actual}. Value: '%s{JsonElement.asString element}'."
+        $"Expected %s{expected}, but got %s{actual}."
 
     let duplicateKey key =
         $"Duplicate key '%s{key}'."
@@ -36,8 +50,7 @@ module internal Error =
     let invalidTuple expected actual =
         $"Expected a tuple of %i{expected}, but got %i{actual}."
 
-    let invalidIndex index length =
-        $"Index %i{index} is out of range. Array length: %i{length}."
+    let invalidIndex = "Index out of range."
 
     let couldNotRead name (element:JsonElement) =
         create [

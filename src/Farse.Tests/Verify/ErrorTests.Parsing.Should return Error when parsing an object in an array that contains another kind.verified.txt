@@ -1,6 +1,6 @@
 ﻿Error: Could not parse property 'prop[1]'.
-Message: Expected Object, but got Number. Value: '2'.
-Array:
+Message: Expected Object, but got Number.
+
 [
     {
         "prop2": "1"

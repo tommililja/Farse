@@ -207,7 +207,7 @@ module Parse =
             let str = element.GetString()
             match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, timeOnly -> Ok timeOnly
-            | _ -> Error <| Some $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected '%s{format}'."
         ) String
 
     /// Parses a string as System.TimeSpan.
@@ -226,7 +226,7 @@ module Parse =
             let str = element.GetString()
             match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
-            | _ -> Error <| Some $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected '%s{format}'."
         ) String
 
     /// Parses a string as System.DateOnly (ISO 8601).
@@ -245,7 +245,7 @@ module Parse =
             let str = element.GetString()
             match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error <| Some $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected '%s{format}'."
         ) String
 
     /// Parses a string as System.DateTime (ISO 8601).
@@ -266,7 +266,7 @@ module Parse =
             let str = element.GetString()
             match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTime -> Ok dateTime
-            | _ -> Error <| Some $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected '%s{format}'."
         ) String
 
     /// Parses a string as System.DateTimeOffset (ISO 8601).
@@ -279,7 +279,7 @@ module Parse =
             let str = element.GetString()
             match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTimeOffset -> Ok dateTimeOffset
-            | _ -> Error <| Some $"Expected %s{format}."
+            | _ -> Error <| Some $"Expected '%s{format}'."
         ) String
 
     // Sequences
@@ -332,8 +332,11 @@ module Parse =
         fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when i >= 0 && arrayLength >= i + 1 -> element.Item(i) |> parser
-            | Kind.Array -> Error <| ArrayLengthError (i, arrayLength, element)
+            | Kind.Array when i >= 0 && arrayLength >= i + 1 ->
+                match element.Item i |> parser with
+                | Ok x -> Ok x
+                | Error e -> Error <| ArrayError(i, element, e)
+            | Kind.Array -> Error <| ArrayError (i, element, ArrayLengthError)
             | _ -> Error <| InvalidKind (Array, element)
         |> id
 
@@ -347,7 +350,7 @@ module Parse =
             else Some k
         )
 
-    let inline private keyValue convert (parser:Parser<_>) : Parser<_> =
+    let inline private keyValue convert (parser:Parser<_>) : Parser<'b> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -361,12 +364,17 @@ module Parse =
                 while error.IsNone && enumerator.MoveNext() do
                     match parser enumerator.Current.Value with
                     | Ok x -> array.Add(enumerator.Current.Name, x)
-                    | Error e -> error <- Some e
+                    | Error e ->
+                        error <-
+                            KeyValueError (enumerator.Current.Name, e, element)
+                            |> Some
 
                 match error with
                 | None ->
                     match getDuplicateKey array with
-                    | Some key -> Error <| DuplicateKeys (key, element)
+                    | Some key ->
+                        let msg = Error.duplicateKey key
+                        Error <| InvalidValue (Some msg, typeof<'b>, element)
                     | None -> Ok <| convert array
                 | Some e -> Error e
             | _ ->
@@ -396,7 +404,7 @@ module Parse =
     // Tuples
 
     let inline private parseItem i parser (element:JsonElement) =
-        element.Item(i)
+        element.Item i
         |> parser
         |> Result.mapError (fun e -> ArrayError(i, element, e))
 

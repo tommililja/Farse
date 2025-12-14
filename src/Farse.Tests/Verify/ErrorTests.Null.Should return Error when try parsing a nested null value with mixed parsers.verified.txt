@@ -1,6 +1,6 @@
 ﻿Error: Could not parse property 'prop3'.
 Message: Expected Number, but got Null.
-Object:
+
 {
     "prop3": null
 }

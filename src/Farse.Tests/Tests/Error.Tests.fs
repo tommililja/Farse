@@ -439,25 +439,31 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when trying to parse Map with duplicate keys`` () =
+        let ``Should return Error when parsing Map with duplicate keys`` () =
             Parser.req "prop" (Parse.map Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when trying to parse Dictionary with duplicate keys`` () =
+        let ``Should return Error when parsing Dictionary fails`` () =
+            Parser.req "prop" (Parse.dict Parse.int)
+            |> Parser.parse """{ "prop": { "key1": 1, "key2": "2", "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when parsing Dictionary with duplicate keys`` () =
             Parser.req "prop" (Parse.dict Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when trying to parse KeyValuePair seq with duplicate keys`` () =
+        let ``Should return Error when parsing KeyValuePair seq with duplicate keys`` () =
             Parser.req "prop" (Parse.keyValuePairs Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when trying to parse tuple seq with duplicate keys`` () =
+        let ``Should return Error when parsing tuple seq with duplicate keys`` () =
             Parser.req "prop" (Parse.tuples Parse.int)
             |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
@@ -469,9 +475,21 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when tuple parsing fails`` () =
+            Parser.req "prop" (Parse.tuple2 Parse.guid Parse.int)
+            |> Parser.parse """{ "prop": [ "1", 1 ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
             Parser.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when index parsing fails`` () =
+            Parser.req "prop" (Parse.index 1 Parse.int)
+            |> Parser.parse """{ "prop": [ 1, "2", 3 ] }"""
             |> Expect.errorString
 
         [<Fact>]
@@ -479,8 +497,6 @@ module ErrorTests =
             Parser.req "prop" (Parse.index 3 Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.errorString
-
-        // TODO: Add tests for other Parse.* functions.
 
         [<Fact>]
         let ``Should return Error when parsing a TimeOnly exact with an incorrect format`` () =

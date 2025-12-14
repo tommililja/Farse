@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Tried parsing '1' to String. Details: Not valid.
-Object:
+Message: Tried parsing '1' to String.
+Details: Not valid.
+
 {
     "prop": 1
 }
