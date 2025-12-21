@@ -5,9 +5,6 @@ open System.Text.Json
 
 module internal Error =
 
-    let private create =
-        String.concat "\n"
-
     let private print (element:JsonElement) =
         match element.ValueKind with
         | Kind.Null | Kind.Undefined -> String.Empty
@@ -31,13 +28,16 @@ module internal Error =
             | Kind.Number | Kind.String | Kind.True | Kind.False -> $"'%s{JsonElement.asString element}'"
             | kind -> Kind.asString kind
 
-        create [
-            $"Tried parsing %s{value} to %s{getTypeName expectedType}."
+        let details =
+            msg
+            |> Option.map (fun msg ->
+                $"Details: %s{msg}"
+            )
 
-            match msg with
-            | Some msg when String.isNotEmpty msg -> $"Details: %s{msg}"
-            | _ -> ()
-        ]
+        string {
+            $"Tried parsing %s{value} to %s{getTypeName expectedType}."
+            details
+        }
 
     let invalidKind (expected:ExpectedKind) (element:JsonElement) =
         let expected = ExpectedKind.asString expected
@@ -53,29 +53,29 @@ module internal Error =
     let invalidIndex = "Index out of range."
 
     let couldNotRead name (element:JsonElement) =
-        create [
+        string {
             $"Error: Could not read property '%s{name}'."
             $"Message: %s{invalidKind ExpectedKind.Object element}"
             print element
-        ]
+        }
 
     let notObject name (parent:JsonElement) (element:JsonElement) =
-        create [
+        string {
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{invalidKind ExpectedKind.Object element}"
             print parent
-        ]
+        }
 
     let couldNotParse name msg parent =
-        create [
+        string {
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{msg}"
             print parent
-        ]
+        }
 
     let invalidJson (exn:exn) json =
-        create [
+        string {
             "Error: Could not parse JSON string."
             $"Message: %s{exn.Message}"
             $"JSON: '%s{json}'."
-        ]
+        }

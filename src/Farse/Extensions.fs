@@ -130,6 +130,30 @@ module internal Extensions =
             |> String.IsNullOrWhiteSpace
             |> not
 
+    type StringBuilder() =
+
+        member _.Yield(line:string) = [ line ]
+
+        member _.Yield(line:string option) =
+            line
+            |> Option.map List.singleton
+            |> Option.defaultValue []
+
+        member _.YieldFrom(lines:string list) = lines
+
+        member _.Combine(a, b) = a @ b
+
+        member _.Delay(fn) = fn()
+
+        member _.Zero() = []
+
+        member _.Run(lines) =
+            lines
+            |> Seq.filter String.isNotEmpty
+            |> String.concat "\n"
+
+    let string = StringBuilder()
+
     module Seq =
 
         let inline ofResizeArray (x:ResizeArray<_>) = x :> seq<_>
