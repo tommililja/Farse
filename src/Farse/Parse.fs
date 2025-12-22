@@ -303,7 +303,7 @@ module Parse =
                 match error with
                 | None -> Ok <| convert array
                 | Some error ->
-                    ArrayError (array.Count, element, error)
+                    ArrayItem (array.Count, element, error)
                     |> Error
             | _ ->
                 InvalidKind (Array, element)
@@ -323,7 +323,7 @@ module Parse =
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let seq parser = arr Seq.ofResizeArray parser
+    let seq parser = arr Seq.ofSeq parser
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <param name="i">The index to parse in the array.</param>
@@ -335,9 +335,15 @@ module Parse =
             | Kind.Array when i >= 0 && arrayLength >= i + 1 ->
                 match element.Item i |> parser with
                 | Ok x -> Ok x
-                | Error e -> Error <| ArrayError(i, element, e)
-            | Kind.Array -> Error <| ArrayError (i, element, ArrayLengthError)
-            | _ -> Error <| InvalidKind (Array, element)
+                | Error e ->
+                    ArrayItem (i, element, e)
+                    |> Error
+            | Kind.Array ->
+                ArrayItem (i, element, ArrayLength)
+                |> Error
+            | _ ->
+                InvalidKind (Array, element)
+                |> Error
         |> id
 
     // Key/Value
@@ -364,23 +370,15 @@ module Parse =
                 while error.IsNone && enumerator.MoveNext() do
                     match parser enumerator.Current.Value with
                     | Ok x -> array.Add(enumerator.Current.Name, x)
-                    | Error e ->
-                        error <-
-                            KeyValueError (enumerator.Current.Name, e, element)
-                            |> Some
+                    | Error e -> error <- Some <| KeyValue (enumerator.Current.Name, e, element)
 
                 match error with
                 | None ->
                     match getDuplicateKey array with
-                    | Some key ->
-                        let msg = Error.duplicateKey key
-                        Error <| InvalidValue (Some msg, typeof<'b>, element)
+                    | Some key -> Error <| InvalidValue (Some <| Error.duplicateKey key, typeof<'b>, element)
                     | None -> Ok <| convert array
                 | Some e -> Error e
-            | _ ->
-                InvalidKind (Object, element)
-                |> Error
-        |> id
+            | _ -> Error <| InvalidKind (Object, element)
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <param name="parser">The parser used for every property.</param>
@@ -396,25 +394,30 @@ module Parse =
 
     /// <summary>Parses an object's properties as tuple seq.</summary>
     /// <param name="parser">The parser used for every property.</param>
-    let tuples parser = keyValue Seq.ofResizeArray parser
+    let tuples parser = keyValue Seq.ofSeq parser
 
     /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq</summary>
-    let keys = keyValue (Seq.ofResizeArray >> Seq.map fst) none
+    let keys = keyValue (Seq.ofSeq >> Seq.map fst) none
 
     // Tuples
 
     let inline private parseItem i parser (element:JsonElement) =
         element.Item i
         |> parser
-        |> Result.mapError (fun e -> ArrayError(i, element, e))
+        |> Result.mapError (fun e -> ArrayItem (i, element, e))
 
-    let inline private tuple length fn : Parser<_> =
+    let inline private tuple length fn : Parser<'b> =
         fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
             | Kind.Array when arrayLength = length -> fn element
-            | Kind.Array -> Error <| InvalidTuple(length, arrayLength, element)
-            | _ -> Error <| InvalidKind(Array, element)
+            | Kind.Array ->
+                let details = Error.invalidTuple length arrayLength
+                InvalidValue (Some details, typeof<'b>, element)
+                |> Error
+            | _ ->
+                InvalidKind (Array, element)
+                |> Error
 
     /// <summary>Parses an array with two values as a tuple.</summary>
     /// <param name="a">The parser used for the first value.</param>

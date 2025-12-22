@@ -98,23 +98,6 @@ module internal Extensions =
 
         let asJsonNode (obj:JsonObject) = obj.Root
 
-    [<AutoOpen>]
-    module ResultBuilder =
-
-        type ResultBuilder() =
-
-            member inline _.Return(x) = Ok x
-
-            member inline _.ReturnFrom(x) = x
-
-            member inline _.Delay([<InlineIfLambda>] fn) = fn ()
-
-            member inline _.Zero() = Ok ()
-
-            member inline _.Bind(x, [<InlineIfLambda>] fn) = Result.bind fn x
-
-        let result = ResultBuilder ()
-
     module ResultOption =
 
         let inline bind fn = function
@@ -124,40 +107,9 @@ module internal Extensions =
                 | None -> Ok None
             | Error e -> Error e
 
-    module String =
-
-        let inline isNotEmpty str =
-            str
-            |> String.IsNullOrWhiteSpace
-            |> not
-
-    type StringBuilder() =
-
-        member _.Yield(line:string) = [ line ]
-
-        member _.Yield(line:string option) =
-            line
-            |> Option.map List.singleton
-            |> Option.defaultValue []
-
-        member _.YieldFrom(lines:string list) = lines
-
-        member _.Combine(a, b) = a @ b
-
-        member _.Delay(fn) = fn()
-
-        member _.Zero() = []
-
-        member _.Run(lines) =
-            lines
-            |> Seq.filter String.isNotEmpty
-            |> String.concat "\n"
-
-    let string = StringBuilder()
-
     module Seq =
 
-        let inline ofResizeArray (x:ResizeArray<_>) = x :> seq<_>
+        let inline ofSeq x = x :> seq<_>
 
     module KeyValuePairs =
 
@@ -174,3 +126,44 @@ module internal Extensions =
             if str.Contains('.')
             then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Flat str
+
+    [<AutoOpen>]
+    module Builders =
+
+        type StringBuilder() =
+
+            member _.Yield(line:string) = [ line ]
+
+            member _.Yield(line:string option) =
+                line
+                |> Option.map List.singleton
+                |> Option.defaultValue []
+
+            member _.YieldFrom(lines:string list) = lines
+
+            member _.Combine(a, b) = a @ b
+
+            member _.Delay(fn) = fn()
+
+            member _.Zero() = []
+
+            member _.Run(lines) =
+                lines
+                |> Seq.filter (String.IsNullOrWhiteSpace >> not)
+                |> String.concat "\n"
+
+        type ResultBuilder() =
+
+            member inline _.Return(x) = Ok x
+
+            member inline _.ReturnFrom(x) = x
+
+            member inline _.Delay([<InlineIfLambda>] fn) = fn ()
+
+            member inline _.Zero() = Ok ()
+
+            member inline _.Bind(x, [<InlineIfLambda>] fn) = Result.bind fn x
+
+        let string = StringBuilder()
+
+        let result = ResultBuilder()

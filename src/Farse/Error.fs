@@ -22,27 +22,16 @@ module internal Error =
             $"%s{genericName}<%s{args}>"
         | x -> x.Name
 
-    let invalidValue msg (expectedType:Type) (element:JsonElement) =
+    let invalidValue (expectedType:Type) (element:JsonElement) =
         let value =
             match element.ValueKind with
             | Kind.Number | Kind.String | Kind.True | Kind.False -> $"'%s{JsonElement.asString element}'"
             | kind -> Kind.asString kind
 
-        let details =
-            msg
-            |> Option.map (fun msg ->
-                $"Details: %s{msg}"
-            )
-
-        string {
-            $"Tried parsing %s{value} to %s{getTypeName expectedType}."
-            details
-        }
+        $"Tried parsing %s{value} to %s{getTypeName expectedType}."
 
     let invalidKind (expected:ExpectedKind) (element:JsonElement) =
-        let expected = ExpectedKind.asString expected
-        let actual = Kind.asString element.ValueKind
-        $"Expected %s{expected}, but got %s{actual}."
+        $"Expected %s{ExpectedKind.asString expected}, but got %s{Kind.asString element.ValueKind}."
 
     let duplicateKey key =
         $"Duplicate key '%s{key}'."
@@ -50,26 +39,35 @@ module internal Error =
     let invalidTuple expected actual =
         $"Expected a tuple of %i{expected}, but got %i{actual}."
 
-    let invalidIndex = "Index out of range."
+    let invalidIndex =
+        "Index out of range."
 
     let couldNotRead name (element:JsonElement) =
         string {
             $"Error: Could not read property '%s{name}'."
             $"Message: %s{invalidKind ExpectedKind.Object element}"
+
             print element
+        }
+
+    let couldNotParse name msg details parent =
+        string {
+            $"Error: Could not parse property '%s{name}'."
+            $"Message: %s{msg}"
+
+            details
+            |> Option.map (fun msg ->
+                $"Details: %s{msg}"
+            )
+
+            print parent
         }
 
     let notObject name (parent:JsonElement) (element:JsonElement) =
         string {
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{invalidKind ExpectedKind.Object element}"
-            print parent
-        }
 
-    let couldNotParse name msg parent =
-        string {
-            $"Error: Could not parse property '%s{name}'."
-            $"Message: %s{msg}"
             print parent
         }
 

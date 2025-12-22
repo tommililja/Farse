@@ -1,8 +1,11 @@
 ﻿Error: Could not parse property 'prop'.
-Message: Expected a tuple of 2, but got 3.
+Message: Tried parsing Array to Tuple<String, Int32>.
+Details: Expected a tuple of 2, but got 3.
 
-[
-    "1",
-    1,
-    1
-]
+{
+    "prop": [
+        "1",
+        1,
+        1
+    ]
+}
