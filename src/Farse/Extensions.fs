@@ -1,5 +1,7 @@
 namespace Farse
 
+#nowarn 104
+
 open System
 open System.Collections.Generic
 open System.Text.Json
@@ -39,7 +41,6 @@ module internal Extensions =
             | Kind.True -> Bool
             | Kind.False -> Bool
             | Kind.Null -> Null
-            | _ -> raise <| ArgumentOutOfRangeException()
 
         let inline asString expectedKind =
             match expectedKind with
