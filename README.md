@@ -20,7 +20,7 @@ dotnet package add Farse
 There are some initial benchmarks [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.6, macOS 26.1 (25B78) [Darwin 25.1.0]
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.2 (25C56) [Darwin 25.2.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 .NET SDK 10.0.100
   [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a DEBUG
@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
+| System.Text.Json       | 105.6 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.60 |
 | System.Text.Json*      | 106.2 us |  0.84 | 13.0615 |  1.7090 |  80.19 KB |        1.86 |
-| System.Text.Json       | 107.9 us |  0.85 |  4.1504 |       - |  25.85 KB |        0.60 |
-| Farse                  | 126.6 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
-| Newtonsoft.Json        | 217.9 us |  1.72 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
-| Thoth.System.Text.Json | 218.2 us |  1.72 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
-| Newtonsoft.Json*       | 221.2 us |  1.75 | 42.9688 |  5.8594 | 271.13 KB |        6.30 |
-| Thoth.Json.Net         | 309.9 us |  2.45 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
+| Farse                  | 127.2 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
+| Newtonsoft.Json*       | 212.2 us |  1.67 | 44.1895 |  6.3477 | 271.14 KB |        6.30 |
+| Thoth.System.Text.Json | 213.7 us |  1.68 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
+| Newtonsoft.Json        | 217.6 us |  1.71 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
+| Thoth.Json.Net         | 312.8 us |  2.46 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
 
 * Serialization
 ```
@@ -239,8 +239,8 @@ There is a few different options available depending on your use case.
 
 #### Parser.validate 
 
-Passes along the error string from the validation function,  
-but works for both optional and non-optional values (SRTP).
+Passes along the error string from the validation function.  
+Works for both optional and non-optional values (SRTP).
 
 ```fsharp
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
@@ -273,8 +273,8 @@ Details: The lowest allowed age is '12'.
 
 #### Parse.custom
 
-Produces detailed error messages when validation fails,  
-but helpful error messages are recommended for when parsing fails.
+Produces detailed error messages when validation fails.  
+Helpful error messages are recommended for when parsing fails.
 
 ```fsharp
 let age =
