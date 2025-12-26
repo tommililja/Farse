@@ -7,6 +7,7 @@ open System.Collections.Generic
 open System.Text.Json
 open System.Text.Json.Nodes
 
+[<RequireQualifiedAccess>]
 type ExpectedKind =
     | Undefined
     | Object
@@ -32,32 +33,38 @@ module internal Extensions =
 
         let inline asString kind =
             match kind with
-            | Kind.True | Kind.False -> "Bool"
-            | kind -> string kind
+            | Kind.Undefined -> "Undefined"
+            | Kind.Object -> "Object"
+            | Kind.Array -> "Array"
+            | Kind.String -> "String"
+            | Kind.Number -> "Number"
+            | Kind.True
+            | Kind.False -> "Bool"
+            | Kind.Null -> "Null"
 
     module ExpectedKind =
 
         let inline fromKind kind =
             match kind with
-            | Kind.Undefined -> Undefined
-            | Kind.Object -> Object
-            | Kind.Array -> Array
-            | Kind.String -> String
-            | Kind.Number -> Number
-            | Kind.True -> Bool
-            | Kind.False -> Bool
-            | Kind.Null -> Null
+            | Kind.Undefined -> ExpectedKind.Undefined
+            | Kind.Object -> ExpectedKind.Object
+            | Kind.Array -> ExpectedKind.Array
+            | Kind.String -> ExpectedKind.String
+            | Kind.Number -> ExpectedKind.Number
+            | Kind.True -> ExpectedKind.Bool
+            | Kind.False -> ExpectedKind.Bool
+            | Kind.Null -> ExpectedKind.Null
 
         let inline asString expectedKind =
             match expectedKind with
-            | Undefined -> "Undefined"
-            | Object -> "Object"
-            | Array -> "Array"
-            | String -> "String"
-            | Number -> "Number"
-            | Bool -> "Bool"
-            | Null -> "Null"
-            | Any -> "Any"
+            | ExpectedKind.Undefined -> "Undefined"
+            | ExpectedKind.Object -> "Object"
+            | ExpectedKind.Array -> "Array"
+            | ExpectedKind.String -> "String"
+            | ExpectedKind.Number -> "Number"
+            | ExpectedKind.Bool -> "Bool"
+            | ExpectedKind.Null -> "Null"
+            | ExpectedKind.Any -> "Any"
 
     module JsonSerializerOptions =
 

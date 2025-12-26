@@ -7,7 +7,6 @@ open System.Numerics
 open System.Text.Json
 
 module Parse =
-    open type ExpectedKind
 
     /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
@@ -49,8 +48,8 @@ module Parse =
         fun (element:JsonElement) ->
             let isExpectedKind =
                 match expectedKind with
-                | Any -> true
-                | Bool -> element.ValueKind = Kind.True || element.ValueKind = Kind.False
+                | ExpectedKind.Any -> true
+                | ExpectedKind.Bool -> element.ValueKind = Kind.True || element.ValueKind = Kind.False
                 | kind ->
                     element.ValueKind
                     |> ExpectedKind.fromKind
@@ -78,37 +77,37 @@ module Parse =
         | _ -> Error None
 
     /// Parses a number as System.Int32.
-    let int = custom (_.TryGetInt32 >> tryParse) Number
+    let int = custom (_.TryGetInt32 >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.Int16.
-    let int16 = custom (_.TryGetInt16 >> tryParse) Number
+    let int16 = custom (_.TryGetInt16 >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.Int64.
-    let int64 = custom (_.TryGetInt64 >> tryParse) Number
+    let int64 = custom (_.TryGetInt64 >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.UInt16.
-    let uint16 = custom (_.TryGetUInt16 >> tryParse) Number
+    let uint16 = custom (_.TryGetUInt16 >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.UInt32.
-    let uint32 = custom (_.TryGetUInt32 >> tryParse) Number
+    let uint32 = custom (_.TryGetUInt32 >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.UInt64.
-    let uint64 = custom (_.TryGetUInt64 >> tryParse) Number
+    let uint64 = custom (_.TryGetUInt64 >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.Double.
-    let float = custom (_.TryGetDouble >> tryParse) Number
+    let float = custom (_.TryGetDouble >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.Single.
-    let float32 = custom (_.TryGetSingle >> tryParse) Number
+    let float32 = custom (_.TryGetSingle >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.Decimal.
-    let decimal = custom (_.TryGetDecimal >> tryParse) Number
+    let decimal = custom (_.TryGetDecimal >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.Byte.
-    let byte = custom (_.TryGetByte >> tryParse) Number
+    let byte = custom (_.TryGetByte >> tryParse) ExpectedKind.Number
 
     /// Parses a number as System.SByte.
-    let sbyte = custom (_.TryGetSByte >> tryParse) Number
+    let sbyte = custom (_.TryGetSByte >> tryParse) ExpectedKind.Number
 
     /// Parses a string as System.Char.
     let char =
@@ -116,10 +115,10 @@ module Parse =
             match element.GetString() with
             | str when str.Length = 1 -> Ok str[0]
             | _ -> Error <| Some "Expected a string length of 1."
-        ) String
+        ) ExpectedKind.String
 
-    /// Parses a string as System.String.
-    let string = custom (_.GetString() >> Ok) String
+    /// Parses a string as System.ExpectedKind.String.
+    let string = custom (_.GetString() >> Ok) ExpectedKind.String
 
     /// Parses a string as System.Numerics.BigInteger.
     let bigInt =
@@ -128,16 +127,16 @@ module Parse =
             match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, bigInt -> Ok bigInt
             | false, _ -> Error None
-        ) String
+        ) ExpectedKind.String
 
     /// Parses a bool as System.Boolean.
-    let bool = custom (_.GetBoolean() >> Ok) Bool
+    let bool = custom (_.GetBoolean() >> Ok) ExpectedKind.Bool
 
     /// Parses a string as System.Guid.
-    let guid = custom (_.TryGetGuid >> tryParse) String
+    let guid = custom (_.TryGetGuid >> tryParse) ExpectedKind.String
 
     /// Parses null as FSharp.Core.Unit.
-    let unit = custom (ignore >> Ok) Null
+    let unit = custom (ignore >> Ok) ExpectedKind.Null
 
     // Enums
 
@@ -155,39 +154,39 @@ module Parse =
             match Enum.TryParse<'a>(str, true) with
             | true, enum -> Ok enum
             | _ -> Error None
-        ) String
+        ) ExpectedKind.String
 
     /// Parses a number as a System.Int32 enum.
     let intEnum<'a when 'a : enum<int>> =
-        custom (_.TryGetInt32 >> parseEnum<'a, int>) Number
+        custom (_.TryGetInt32 >> parseEnum<'a, int>) ExpectedKind.Number
 
     /// Parses a number as a System.Int16 enum.
     let int16Enum<'a when 'a : enum<int16>> =
-        custom (_.TryGetInt16 >> parseEnum<'a, int16>) Number
+        custom (_.TryGetInt16 >> parseEnum<'a, int16>) ExpectedKind.Number
 
     /// Parses a number as a System.Int16 enum.
     let int64Enum<'a when 'a : enum<int64>> =
-        custom (_.TryGetInt64 >> parseEnum<'a, int64>) Number
+        custom (_.TryGetInt64 >> parseEnum<'a, int64>) ExpectedKind.Number
 
     /// Parses a number as a System.UInt16 enum.
     let uint16Enum<'a when 'a : enum<uint16>> =
-        custom (_.TryGetUInt16 >> parseEnum<'a, uint16>) Number
+        custom (_.TryGetUInt16 >> parseEnum<'a, uint16>) ExpectedKind.Number
 
     /// Parses a number as a System.UInt32 enum.
     let uint32Enum<'a when 'a : enum<uint32>> =
-        custom (_.TryGetUInt32 >> parseEnum<'a, uint32>) Number
+        custom (_.TryGetUInt32 >> parseEnum<'a, uint32>) ExpectedKind.Number
 
     /// Parses a number as a System.UInt64 enum.
     let uint64Enum<'a when 'a : enum<uint64>> =
-        custom (_.TryGetUInt64 >> parseEnum<'a, uint64>) Number
+        custom (_.TryGetUInt64 >> parseEnum<'a, uint64>) ExpectedKind.Number
 
     /// Parses a number as a System.Byte enum.
     let byteEnum<'a when 'a : enum<byte>> =
-        custom (_.TryGetByte >> parseEnum<'a, byte>) Number
+        custom (_.TryGetByte >> parseEnum<'a, byte>) ExpectedKind.Number
 
     /// Parses a number as a System.SByte enum.
     let sbyteEnum<'a when 'a : enum<sbyte>> =
-        custom (_.TryGetSByte >> parseEnum<'a, sbyte>) Number
+        custom (_.TryGetSByte >> parseEnum<'a, sbyte>) ExpectedKind.Number
 
     // Date and time
 
@@ -198,7 +197,7 @@ module Parse =
             match TimeOnly.TryParse(str, CultureInfo.InvariantCulture) with
             | true, timeOnly -> Ok timeOnly
             | _ -> Error None
-        ) String
+        ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
@@ -208,7 +207,7 @@ module Parse =
             match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, timeOnly -> Ok timeOnly
             | _ -> Error <| Some $"Expected '%s{format}'."
-        ) String
+        ) ExpectedKind.String
 
     /// Parses a string as System.TimeSpan.
     let timeSpan =
@@ -217,7 +216,7 @@ module Parse =
             match TimeSpan.TryParse(str, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
             | _ -> Error None
-        ) String
+        ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
     /// <param name="format">The required format.</param>
@@ -227,7 +226,7 @@ module Parse =
             match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
             | _ -> Error <| Some $"Expected '%s{format}'."
-        ) String
+        ) ExpectedKind.String
 
     /// Parses a string as System.DateOnly (ISO 8601).
     let dateOnly =
@@ -236,7 +235,7 @@ module Parse =
             match DateOnly.TryParse(str, CultureInfo.InvariantCulture) with
             | true, dateOnly -> Ok dateOnly
             | _ -> Error None
-        ) String
+        ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
@@ -246,10 +245,10 @@ module Parse =
             match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
             | _ -> Error <| Some $"Expected '%s{format}'."
-        ) String
+        ) ExpectedKind.String
 
     /// Parses a string as System.DateTime (ISO 8601).
-    let dateTime = custom (_.TryGetDateTime >> tryParse) String
+    let dateTime = custom (_.TryGetDateTime >> tryParse) ExpectedKind.String
 
     /// Parses a string as System.DateTime (ISO 8601) and converts it to UTC.
     let dateTimeUtc =
@@ -257,7 +256,7 @@ module Parse =
             match element.TryGetDateTime() with
             | true, dateTime -> Ok <| dateTime.ToUniversalTime()
             | _ -> Error None
-        ) String
+        ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
@@ -267,10 +266,10 @@ module Parse =
             match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTime -> Ok dateTime
             | _ -> Error <| Some $"Expected '%s{format}'."
-        ) String
+        ) ExpectedKind.String
 
     /// Parses a string as System.DateTimeOffset (ISO 8601).
-    let dateTimeOffset = custom (_.TryGetDateTimeOffset >> tryParse) String
+    let dateTimeOffset = custom (_.TryGetDateTimeOffset >> tryParse) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
     /// <param name="format">The required format.</param>
@@ -280,7 +279,7 @@ module Parse =
             match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTimeOffset -> Ok dateTimeOffset
             | _ -> Error <| Some $"Expected '%s{format}'."
-        ) String
+        ) ExpectedKind.String
 
     // Sequences
 
@@ -306,7 +305,7 @@ module Parse =
                     ArrayItem (array.Count, element, error)
                     |> Error
             | _ ->
-                InvalidKind (Array, element)
+                InvalidKind (ExpectedKind.Array, element)
                 |> Error
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
@@ -342,7 +341,7 @@ module Parse =
                 ArrayItem (i, element, ArrayLength)
                 |> Error
             | _ ->
-                InvalidKind (Array, element)
+                InvalidKind (ExpectedKind.Array, element)
                 |> Error
         |> id
 
@@ -378,7 +377,7 @@ module Parse =
                     | Some key -> Error <| InvalidValue (Some <| Error.duplicateKey key, typeof<'b>, element)
                     | None -> Ok <| convert array
                 | Some e -> Error e
-            | _ -> Error <| InvalidKind (Object, element)
+            | _ -> Error <| InvalidKind (ExpectedKind.Object, element)
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <param name="parser">The parser used for every property.</param>
@@ -396,7 +395,7 @@ module Parse =
     /// <param name="parser">The parser used for every property.</param>
     let tuples parser = keyValue Seq.ofSeq parser
 
-    /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq</summary>
+    /// <summary>Parses an object's keys as System.ExpectedKind.String Microsoft.FSharp.Collections.seq</summary>
     let keys = keyValue (Seq.ofSeq >> Seq.map fst) none
 
     // Tuples
@@ -416,7 +415,7 @@ module Parse =
                 InvalidValue (Some details, typeof<'b>, element)
                 |> Error
             | _ ->
-                InvalidKind (Array, element)
+                InvalidKind (ExpectedKind.Array, element)
                 |> Error
 
     /// <summary>Parses an array with two values as a tuple.</summary>
@@ -450,16 +449,16 @@ module Parse =
     // Json
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
-    let kind = custom (_.ValueKind >> Ok) Any
+    let kind = custom (_.ValueKind >> Ok) ExpectedKind.Any
 
     /// Parses an element as System.Text.Json.JsonElement.
-    let element = custom (_.Clone() >> Ok) Any
+    let element = custom (_.Clone() >> Ok) ExpectedKind.Any
 
-    /// Parses an element's raw text as System.String.
-    let rawText = custom (_.GetRawText() >> Ok) Any
+    /// Parses an element's raw text as System.ExpectedKind.String.
+    let rawText = custom (_.GetRawText() >> Ok) ExpectedKind.Any
 
     /// Parses an array's length as System.Int32.
-    let arrayLength = custom (_.GetArrayLength() >> Ok) Array
+    let arrayLength = custom (_.GetArrayLength() >> Ok) ExpectedKind.Array
 
     /// Parses an object's property count as System.Int32.
-    let propertyCount = custom (_.GetPropertyCount() >> Ok) Object
+    let propertyCount = custom (_.GetPropertyCount() >> Ok) ExpectedKind.Object
