@@ -74,10 +74,9 @@ module Json =
             |> Option.map getJsonNode
             |> Option.defaultValue null
 
-    /// <summary>Converts the Json to a formatted string.</summary>
-    /// <remarks>
-    ///     WriteIndented = true
-    ///     IndentSize = 4
-    /// </remarks>
-    /// <typeparam name="Json">The Json to convert.</typeparam>
-    let asString = getJsonNode >> JsonNode.asString
+    /// <summary>Converts the Json to a JSON string with the given format.</summary>
+    /// <param name="format">The format to use.</param>
+    /// <param name="json">The Json to convert.</param>
+    let asString format json =
+        getJsonNode json
+        |> JsonNode.asString format

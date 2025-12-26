@@ -171,6 +171,6 @@ module Example =
         let actual =
             user
             |> User.asJson
-            |> Json.asString
+            |> Json.asString preset
 
         Expect.equal actual expected

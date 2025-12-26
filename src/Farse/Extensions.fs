@@ -17,6 +17,12 @@ type ExpectedKind =
     | Null
     | Any
 
+[<NoComparison>]
+type JsonFormat =
+    | Indented of int
+    | Custom of JsonSerializerOptions
+    | Raw
+
 [<AutoOpen>]
 module internal Extensions =
 
@@ -55,10 +61,12 @@ module internal Extensions =
 
     module JsonSerializerOptions =
 
-        let preset = JsonSerializerOptions(
+        let indented size = JsonSerializerOptions(
             WriteIndented = true,
-            IndentSize = 4
+            IndentSize = size
         )
+
+        let preset = indented 4
 
     module JsonElement =
 
@@ -85,10 +93,17 @@ module internal Extensions =
             JsonValue.Create<'a>(x)
                 .Root
 
-        let asString (node:JsonNode) =
-            if node = null
-            then "null"
-            else node.ToJsonString(JsonSerializerOptions.preset)
+        let asString format (node:JsonNode) =
+            match node with
+            | node when isNull node -> "null"
+            | node ->
+                let options =
+                    match format with
+                    | Indented size -> JsonSerializerOptions.indented size
+                    | Custom options -> options
+                    | Raw -> null
+
+                node.ToJsonString(options)
 
     module JsonArray =
 

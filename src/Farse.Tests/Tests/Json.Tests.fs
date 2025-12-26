@@ -25,7 +25,7 @@ module JsonTests =
             "some", JNil <| Some (JStr "string")
             "none", JNil None
         ]
-        |> Json.asString
+        |> Json.asString preset
         |> Expect.string
 
     [<Fact>]
@@ -35,5 +35,5 @@ module JsonTests =
             JStr "item 2"
             JStr "item 3"
         ]
-        |> Json.asString
+        |> Json.asString preset
         |> Expect.string
