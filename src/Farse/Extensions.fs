@@ -96,11 +96,15 @@ module internal Extensions =
 
     module JsonArray =
 
-        let asJsonNode (arr:JsonArray) = arr.Root
+        let asJsonNode (x:JsonNode array) =
+            JsonArray(x)
+            |> _.Root
 
     module JsonObject =
 
-        let asJsonNode (obj:JsonObject) = obj.Root
+        let asJsonNode x =
+            JsonObject(properties = x)
+            |> _.Root
 
     module ResultOption =
 

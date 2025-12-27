@@ -7,28 +7,23 @@ open System.Collections.Generic
 
 type Json =
     | JStr of string
-    | JNum of number
+    | JNum of JsonNode
     | JBit of bool
     | JObj of (string * Json) seq
     | JArr of Json seq
     | JNil of Json option
 
-and JsonFormat =
+type JsonFormat =
     | Indented of int
     | Custom of JsonSerializerOptions
     | Raw
 
-and number internal (value:JsonValue) =
-
-    member _.JsonNode = value.Root
-
 [<AutoOpen>]
-module number =
+type JNum =
 
-    let JNum<'a when 'a :> INumber<'a>> =
-        JsonValue.Create<'a>
-        >> number
-        >> JNum
+    static member JNum<'a when 'a :> INumber<'a>>(x) =
+        JsonValue.Create<'a>(x).Root
+        |> Json.JNum
 
 module JNil =
 
@@ -45,7 +40,7 @@ module JStr =
 
 module JNum =
 
-    let nil<'a when 'a :> INumber<'a>>(x:'a option) =
+    let nil<'a when 'a :> INumber<'a>> (x:'a option) =
         JNil.from JNum x
 
 module JBit =
@@ -56,7 +51,7 @@ module Json =
 
     let rec internal getJsonNode = function
         | JStr str -> JsonNode.create str
-        | JNum num -> num.JsonNode
+        | JNum num -> num
         | JBit bit -> JsonNode.create bit
         | JObj obj ->
             obj
@@ -64,13 +59,11 @@ module Json =
                 let node = getJsonNode json
                 KeyValuePair(name, node)
             )
-            |> JsonObject
             |> JsonObject.asJsonNode
         | JArr arr ->
             arr
             |> Seq.map getJsonNode
             |> Seq.toArray
-            |> JsonArray
             |> JsonArray.asJsonNode
         | JNil nil ->
             nil
