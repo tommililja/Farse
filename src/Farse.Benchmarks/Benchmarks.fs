@@ -15,7 +15,6 @@ open Farse
 open Farse.Operators
 
 [<CLIMutable>]
-[<NoComparison>]
 type Subscription = {
     Plan: string
     IsCanceled: bool
@@ -23,7 +22,6 @@ type Subscription = {
 }
 
 [<CLIMutable>]
-[<NoComparison>]
 type User = {
     Id: Guid
     Name: string

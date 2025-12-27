@@ -3,7 +3,6 @@ namespace Farse
 open System
 open System.Text.Json
 
-[<NoComparison>]
 type ParserError =
     | ArrayItem of index:int * array:JsonElement * error:ParserError
     | ArrayLength

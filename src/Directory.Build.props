@@ -3,6 +3,6 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <WarnOn>$(WarnOn);1182;3579</WarnOn>
         <Features>strict</Features>
-        <WarningLevel>5</WarningLevel>
+        <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 </Project>

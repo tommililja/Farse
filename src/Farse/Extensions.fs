@@ -18,12 +18,6 @@ type ExpectedKind =
     | Null
     | Any
 
-[<NoComparison>]
-type JsonFormat =
-    | Indented of int
-    | Custom of JsonSerializerOptions
-    | Raw
-
 [<AutoOpen>]
 module internal Extensions =
 
@@ -99,18 +93,6 @@ module internal Extensions =
         let create x =
             JsonValue.Create<'a>(x)
                 .Root
-
-        let asString format (node:JsonNode) =
-            match node with
-            | node when isNull node -> "null"
-            | node ->
-                let options =
-                    match format with
-                    | Indented size -> JsonSerializerOptions.indented size
-                    | Custom options -> options
-                    | Raw -> null
-
-                node.ToJsonString(options)
 
     module JsonArray =
 

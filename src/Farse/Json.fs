@@ -1,19 +1,22 @@
 namespace Farse
 
 open System.Numerics
+open System.Text.Json
 open System.Text.Json.Nodes
 open System.Collections.Generic
 
-[<NoComparison>]
 type Json =
     | JStr of string
     | JNum of number
     | JBit of bool
-    | JObj of JsonProperty seq
+    | JObj of (string * Json) seq
     | JArr of Json seq
     | JNil of Json option
 
-and JsonProperty = string * Json
+and JsonFormat =
+    | Indented of int
+    | Custom of JsonSerializerOptions
+    | Raw
 
 and number internal (value:JsonValue) =
 
@@ -33,21 +36,21 @@ module JNil =
 
     let none = JNil None
 
-    let internal nil fn =
+    let internal from fn =
         Option.map fn >> JNil
 
 module JStr =
 
-    let nil = JNil.nil JStr
+    let nil = JNil.from JStr
 
 module JNum =
 
     let nil<'a when 'a :> INumber<'a>>(x:'a option) =
-        JNil.nil JNum x
+        JNil.from JNum x
 
 module JBit =
 
-    let nil = JNil.nil JBit
+    let nil = JNil.from JBit
 
 module Json =
 
@@ -78,5 +81,13 @@ module Json =
     /// <param name="format">The format to use.</param>
     /// <param name="json">The Json to convert.</param>
     let asString format json =
-        getJsonNode json
-        |> JsonNode.asString format
+        match getJsonNode json with
+        | node when isNull node -> "null"
+        | node ->
+            let options =
+                match format with
+                | Indented size -> JsonSerializerOptions.indented size
+                | Custom options -> options
+                | Raw -> null
+
+            node.ToJsonString(options)
