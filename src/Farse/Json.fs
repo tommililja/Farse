@@ -27,8 +27,6 @@ type JNum =
 
 module JNil =
 
-    let some = Some >> JNil
-
     let none = JNil None
 
     let internal from fn =
