@@ -29,25 +29,42 @@ module JNil =
 
     let none = JNil None
 
-    let internal from fn =
+    let inline internal from fn =
         Option.map fn >> JNil
+
+module JArr =
+
+    let inline internal from fn =
+        Seq.map fn >> JArr
 
 module JStr =
 
-    let nil = JNil.from JStr
+    let nil fn = JNil.from (fn >> JStr)
+
+    let arr fn = JArr.from (fn >> JStr)
 
 module JNum =
 
-    let nil<'a when 'a :> INumber<'a>> (x:'a option) =
-        JNil.from JNum x
+    let nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
+        JNil.from (fn >> JNum)
+
+    let arr fn = JArr.from (fn >> JNum)
 
 module JBit =
 
-    let nil = JNil.from JBit
+    let nil fn = JNil.from (fn >> JBit)
+
+    let arr fn = JArr.from (fn >> JBit)
+
+module JObj =
+
+    let nil fn = JNil.from (fn >> JObj)
+
+    let arr fn = JArr.from (fn >> JObj)
 
 module Json =
 
-    let rec internal getJsonNode = function
+    let rec private getJsonNode = function
         | JStr str -> JsonNode.create str
         | JNum num -> num
         | JBit bit -> JsonNode.create bit

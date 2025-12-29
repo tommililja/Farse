@@ -62,12 +62,15 @@ module internal Extensions =
 
     module JsonSerializerOptions =
 
-        let indented size = JsonSerializerOptions(
+        let preset = JsonSerializerOptions(
             WriteIndented = true,
-            IndentSize = size
+            IndentSize = 4
         )
 
-        let preset = indented 4
+        let indented size =
+            let options = JsonSerializerOptions(preset)
+            options.IndentSize <- size
+            options
 
     module JsonElement =
 
@@ -90,21 +93,19 @@ module internal Extensions =
 
     module JsonNode =
 
-        let create x =
+        let create<'a> x =
             JsonValue.Create<'a>(x)
                 .Root
 
     module JsonArray =
 
         let asJsonNode (x:JsonNode array) =
-            JsonArray(x)
-            |> _.Root
+            JsonArray(x).Root
 
     module JsonObject =
 
-        let asJsonNode x =
-            JsonObject(properties = x)
-            |> _.Root
+        let asJsonNode (x:KeyValuePair<string, JsonNode> seq) =
+            JsonObject(x).Root
 
     module ResultOption =
 
