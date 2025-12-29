@@ -37,19 +37,25 @@ type Benchmarks() =
 
     let mutable json = String.Empty
 
+    let options = JsonSerializerOptions(
+        PropertyNameCaseInsensitive = true
+    )
+
+    let settings =
+        let settings = JsonSerializerSettings()
+        settings.Converters.Add(CompactUnionJsonConverter())
+        settings
+
     [<GlobalSetup>]
     member _.Setup() = json <- File.ReadAllText("Benchmarks.100.json")
 
     [<Benchmark(Description = "Newtonsoft.Json*")>]
     member _.NewtonsoftJsonSerialization() =
-        let settings = JsonSerializerSettings()
-        settings.Converters.Add(CompactUnionJsonConverter())
         JsonConvert.DeserializeObject<User array>(json, settings)
 
     [<Benchmark(Description = "System.Text.Json*")>]
     member _.SystemTextJsonSerialization() =
-        System.Text.Json.JsonSerializer.Deserialize<User array>(
-            json, JsonSerializerOptions(PropertyNameCaseInsensitive = true))
+        System.Text.Json.JsonSerializer.Deserialize<User array>(json, options)
 
     [<Benchmark(Description = "Newtonsoft.Json")>]
     member this.NewtonsoftJson() =
