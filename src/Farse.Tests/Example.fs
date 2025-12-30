@@ -139,21 +139,16 @@ module User =
             "name", JStr user.Name
             "age",
                 user.Age
-                |> Option.map (Age.asByte >> JNum)
-                |> JNil
+                |> JNum.nil Age.asByte
             "email", JStr <| Email.asString user.Email
-            "profiles",
-                user.Profiles
-                |> Seq.map (ProfileId.asString >> JStr)
-                |> JArr
+            "profiles", JStr.arr ProfileId.asString user.Profiles
             "subscription",
                 JObj [
                     "plan", JStr <| Plan.asString user.Subscription.Plan
                     "isCanceled", JBit user.Subscription.IsCanceled
                     "renewsAt",
                         user.Subscription.RenewsAt
-                        |> Option.map (_.ToString() >> JStr)
-                        |> JNil
+                        |> JStr.nil _.ToString()
                 ]
         ]
 
