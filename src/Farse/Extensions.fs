@@ -111,18 +111,6 @@ module internal Extensions =
                 | None -> Ok None
             | Error e -> Error e
 
-    module Seq =
-
-        let inline ofSeq x = x :> seq<_>
-
-    module KeyValuePairs =
-
-        let inline ofSeq x = Seq.map KeyValuePair.Create x
-
-    module Dictionary =
-
-        let inline ofSeq x = dict x
-
     [<AutoOpen>]
     module ActivePatterns =
 

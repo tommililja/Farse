@@ -283,7 +283,7 @@ module Parse =
 
     // Sequences
 
-    let inline private arr convert (parser:Parser<_>) : Parser<_> =
+    let inline private arr ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<_> =
         fun element ->
             match element.ValueKind with
             | Kind.Array ->
@@ -300,7 +300,7 @@ module Parse =
                     | Error e -> error <- Some e
 
                 match error with
-                | None -> Ok <| convert array
+                | None -> Ok <| convert (array :> seq<_>)
                 | Some error ->
                     ArrayItem (array.Count, element, error)
                     |> Error
@@ -322,7 +322,7 @@ module Parse =
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
     /// <param name="parser">The parser used for every element.</param>
-    let seq parser = arr Seq.ofSeq parser
+    let seq parser = arr id parser
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <param name="i">The index to parse in the array.</param>
@@ -355,7 +355,7 @@ module Parse =
             else Some k
         )
 
-    let inline private keyValue convert (parser:Parser<_>) : Parser<'b> =
+    let inline private keyValue ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<'b> =
         fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -375,7 +375,7 @@ module Parse =
                 | None ->
                     match getDuplicateKey array with
                     | Some key -> Error <| InvalidValue (Some <| Error.duplicateKey key, typeof<'b>, element)
-                    | None -> Ok <| convert array
+                    | None -> Ok <| convert (array :> seq<_>)
                 | Some e -> Error e
             | _ -> Error <| InvalidKind (ExpectedKind.Object, element)
 
@@ -385,18 +385,18 @@ module Parse =
 
     /// <summary>Parses an object's properties as System.Collections.Generic.IDictionary.</summary>
     /// <param name="parser">The parser used for every property.</param>
-    let dict parser = keyValue Dictionary.ofSeq parser
+    let dict parser = keyValue dict parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.KeyValuePair seq.</summary>
     /// <param name="parser">The parser used for every property.</param>
-    let keyValuePairs parser = keyValue KeyValuePairs.ofSeq parser
+    let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
     /// <summary>Parses an object's properties as tuple seq.</summary>
     /// <param name="parser">The parser used for every property.</param>
-    let tuples parser = keyValue Seq.ofSeq parser
+    let tuples parser = keyValue id parser
 
     /// <summary>Parses an object's keys as System.ExpectedKind.String Microsoft.FSharp.Collections.seq</summary>
-    let keys = keyValue (Seq.ofSeq >> Seq.map fst) none
+    let keys = keyValue (Seq.map fst) none
 
     // Tuples
 
