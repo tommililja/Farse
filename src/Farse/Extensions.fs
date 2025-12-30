@@ -67,11 +67,6 @@ module internal Extensions =
             IndentSize = 4
         )
 
-        let indented size =
-            let options = JsonSerializerOptions(preset)
-            options.IndentSize <- size
-            options
-
     module JsonElement =
 
         let inline getProperty (name:string) (element:JsonElement) =

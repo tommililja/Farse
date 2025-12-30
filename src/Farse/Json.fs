@@ -14,7 +14,7 @@ type Json =
     | JNil of Json option
 
 type JsonFormat =
-    | Indented of int
+    | Indented
     | Custom of JsonSerializerOptions
     | Raw
 
@@ -94,7 +94,7 @@ module Json =
         | node ->
             let options =
                 match format with
-                | Indented size -> JsonSerializerOptions.indented size
+                | Indented -> JsonSerializerOptions.preset
                 | Custom options -> options
                 | Raw -> null
 

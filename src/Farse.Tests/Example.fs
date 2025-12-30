@@ -171,6 +171,6 @@ module Example =
         let actual =
             user
             |> User.asJson
-            |> Json.asString preset
+            |> Json.asString Indented
 
         Expect.equal actual expected

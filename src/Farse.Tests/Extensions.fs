@@ -4,12 +4,6 @@ open System
 open Expecto
 open VerifyTests
 open VerifyXunit
-open Farse
-
-[<AutoOpen>]
-module JsonFormat =
-
-    let preset = Indented 4
 
 module Expect =
 
