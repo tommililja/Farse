@@ -80,27 +80,8 @@ module internal Extensions =
         let inline asString (element:JsonElement) =
             element.ToString()
 
-        let inline asRawString (element:JsonElement) =
-            element.GetRawText()
-
         let inline asJsonString (element:JsonElement) =
             JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
-
-    module JsonNode =
-
-        let create<'a> x =
-            JsonValue.Create<'a>(x)
-                .Root
-
-    module JsonArray =
-
-        let asJsonNode (x:JsonNode array) =
-            JsonArray(x).Root
-
-    module JsonObject =
-
-        let asJsonNode (x:KeyValuePair<string, JsonNode> seq) =
-            JsonObject(x).Root
 
     module ResultOption =
 

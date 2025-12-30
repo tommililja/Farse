@@ -65,21 +65,21 @@ module JObj =
 module Json =
 
     let rec private getJsonNode = function
-        | JStr str -> JsonNode.create str
+        | JStr str -> JsonValue.Create(str).Root
+        | JBit bit -> JsonValue.Create(bit).Root
         | JNum num -> num
-        | JBit bit -> JsonNode.create bit
         | JObj obj ->
             obj
             |> Seq.map (fun (name, json) ->
                 let node = getJsonNode json
                 KeyValuePair(name, node)
             )
-            |> JsonObject.asJsonNode
+            |> JsonObject :> JsonNode
         | JArr arr ->
             arr
             |> Seq.map getJsonNode
             |> Seq.toArray
-            |> JsonArray.asJsonNode
+            |> JsonArray :> JsonNode
         | JNil nil ->
             nil
             |> Option.map getJsonNode
