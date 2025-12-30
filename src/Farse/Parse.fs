@@ -117,7 +117,7 @@ module Parse =
             | _ -> Error <| Some "Expected a string length of 1."
         ) ExpectedKind.String
 
-    /// Parses a string as System.ExpectedKind.String.
+    /// Parses a string as System.String.
     let string = custom (_.GetString() >> Ok) ExpectedKind.String
 
     /// Parses a string as System.Numerics.BigInteger.
@@ -380,22 +380,22 @@ module Parse =
             | _ -> Error <| InvalidKind (ExpectedKind.Object, element)
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
-    /// <param name="parser">The parser used for every property.</param>
+    /// <param name="parser">The parser used for every property value.</param>
     let map parser = keyValue Map.ofSeq parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.IDictionary.</summary>
-    /// <param name="parser">The parser used for every property.</param>
+    /// <param name="parser">The parser used for every property value.</param>
     let dict parser = keyValue dict parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.KeyValuePair seq.</summary>
-    /// <param name="parser">The parser used for every property.</param>
+    /// <param name="parser">The parser used for every property value.</param>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
-    /// <summary>Parses an object's properties as tuple seq.</summary>
-    /// <param name="parser">The parser used for every property.</param>
+    /// <summary>Parses an object's properties as tuple Microsoft.FSharp.Collections.seq.</summary>
+    /// <param name="parser">The parser used for every property value.</param>
     let tuples parser = keyValue id parser
 
-    /// <summary>Parses an object's keys as System.ExpectedKind.String Microsoft.FSharp.Collections.seq</summary>
+    /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq.</summary>
     let keys = keyValue (Seq.map fst) none
 
     // Tuples
@@ -449,7 +449,7 @@ module Parse =
     /// Parses an element as System.Text.Json.JsonElement.
     let element = custom (_.Clone() >> Ok) ExpectedKind.Any
 
-    /// Parses an element's raw text as System.ExpectedKind.String.
+    /// Parses an element's raw text as System.String.
     let rawText = custom (_.GetRawText() >> Ok) ExpectedKind.Any
 
     /// Parses an array's length as System.Int32.
