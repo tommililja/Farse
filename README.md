@@ -70,10 +70,10 @@ And the two (optional) operators.
 
 ```fsharp
 // Parses a required property.
-let (&=) = Parser.req
+let (&=) = Prop.req
 
 // Parses an optional property.
-let (?=) = Parser.opt
+let (?=) = Prop.opt
 ```
 
 We can create a simple parser.

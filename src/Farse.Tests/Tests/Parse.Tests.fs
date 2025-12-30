@@ -13,7 +13,7 @@ module ParseTests =
     let ``Should parse number as Some int`` () =
         let expected = Some 1
         let actual =
-            Parser.opt "prop" Parse.int
+            Prop.opt "prop" Parse.int
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -22,7 +22,7 @@ module ParseTests =
     let ``Should parse null as None`` () =
         let expected = None
         let actual =
-            Parser.opt "prop" Parse.int
+            Prop.opt "prop" Parse.int
             |> Parser.parse """{ "prop": null }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -31,7 +31,7 @@ module ParseTests =
     let ``Should parse nested number as int`` () =
         let expected = 1
         let actual =
-            Parser.req "prop.prop2.prop3" Parse.int
+            Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -40,8 +40,8 @@ module ParseTests =
     let ``Should parse nested number as int with required parsers`` () =
         let expected = 1
         let actual =
-            let parser = Parser.req "prop3" Parse.int
-            Parser.req "prop.prop2" parser
+            let parser = Prop.req "prop3" Parse.int
+            Prop.req "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -50,8 +50,8 @@ module ParseTests =
     let ``Should parse nested null as None with optional parsers`` () =
         let expected = None
         let actual =
-            let parser = Parser.opt "prop3" Parse.int
-            Parser.opt "prop.prop2" parser
+            let parser = Prop.opt "prop3" Parse.int
+            Prop.opt "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
             |> Expect.ok
             |> Option.flatten
@@ -61,8 +61,8 @@ module ParseTests =
     let ``Should parse nested number as Some int with mixed parsers`` () =
         let expected = Some 1
         let actual =
-            let parser = Parser.req "prop3" Parse.int
-            Parser.opt "prop.prop2" parser
+            let parser = Prop.req "prop3" Parse.int
+            Prop.opt "prop.prop2" parser
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -71,7 +71,7 @@ module ParseTests =
     let ``Should parse nested null as None``() =
         let expected = None
         let actual =
-            Parser.opt "prop.prop2.prop3" Parse.int
+            Prop.opt "prop.prop2.prop3" Parse.int
             |> Parser.parse """ { "prop": { "prop2": { "prop3": null } } } """
             |> Expect.ok
         Expect.equal actual expected
@@ -80,7 +80,7 @@ module ParseTests =
     let ``Should parse nested null object as None`` () =
         let expected = None
         let actual =
-            Parser.opt "prop.prop2.prop3" Parse.int
+            Prop.opt "prop.prop2.prop3" Parse.int
             |> Parser.parse """ { "prop": { "prop2": null } } """
             |> Expect.ok
         Expect.equal actual expected
@@ -89,8 +89,8 @@ module ParseTests =
     let ``Should parse nested null object as None with mixed parsers`` () =
         let expected = None
         let actual =
-            let parser = Parser.req "prop3" Parse.int
-            Parser.opt "prop.prop2" parser
+            let parser = Prop.req "prop3" Parse.int
+            Prop.opt "prop.prop2" parser
             |> Parser.parse """ { "prop": { "prop2": null } } """
             |> Expect.ok
         Expect.equal actual expected
@@ -99,7 +99,7 @@ module ParseTests =
     let ``Should parse number as byte`` () =
         let expected = 1uy
         let actual =
-            Parser.req "prop" Parse.byte
+            Prop.req "prop" Parse.byte
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -111,7 +111,7 @@ module ParseTests =
     let ``Should parse number as byte enum`` () =
         let expected = ByteEnum.Something
         let actual =
-            Parser.req "prop" Parse.byteEnum
+            Prop.req "prop" Parse.byteEnum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -120,7 +120,7 @@ module ParseTests =
     let ``Should parse number as sbyte`` () =
         let expected = 1y
         let actual =
-            Parser.req "prop" Parse.sbyte
+            Prop.req "prop" Parse.sbyte
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -132,7 +132,7 @@ module ParseTests =
     let ``Should parse number as sbyte enum`` () =
         let expected = SByteEnum.Something
         let actual =
-            Parser.req "prop" Parse.sbyteEnum
+            Prop.req "prop" Parse.sbyteEnum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -141,7 +141,7 @@ module ParseTests =
     let ``Should parse number as int`` () =
         let expected = 1
         let actual =
-            Parser.req "prop" Parse.int
+            Prop.req "prop" Parse.int
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -153,7 +153,7 @@ module ParseTests =
     let ``Should parse number as int enum`` () =
         let expected = IntEnum.Something
         let actual =
-            Parser.req "prop" Parse.intEnum
+            Prop.req "prop" Parse.intEnum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -162,7 +162,7 @@ module ParseTests =
     let ``Should parse number as int16`` () =
         let expected = 1s
         let actual =
-            Parser.req "prop" Parse.int16
+            Prop.req "prop" Parse.int16
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -174,7 +174,7 @@ module ParseTests =
     let ``Should parse number as int16 enum`` () =
         let expected = Int16Enum.Something
         let actual =
-            Parser.req "prop" Parse.int16Enum
+            Prop.req "prop" Parse.int16Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -183,7 +183,7 @@ module ParseTests =
     let ``Should parse number as int64`` () =
         let expected = 1L
         let actual =
-            Parser.req "prop" Parse.int64
+            Prop.req "prop" Parse.int64
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -195,7 +195,7 @@ module ParseTests =
     let ``Should parse number as int64 enum`` () =
         let expected = Int64Enum.Something
         let actual =
-            Parser.req "prop" Parse.int64Enum
+            Prop.req "prop" Parse.int64Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -204,7 +204,7 @@ module ParseTests =
     let ``Should parse number as uint16`` () =
         let expected = 1us
         let actual =
-            Parser.req "prop" Parse.uint16
+            Prop.req "prop" Parse.uint16
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -216,7 +216,7 @@ module ParseTests =
     let ``Should parse number as uint16 enum`` () =
         let expected = UInt16Enum.Something
         let actual =
-            Parser.req "prop" Parse.uint16Enum
+            Prop.req "prop" Parse.uint16Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -225,7 +225,7 @@ module ParseTests =
     let ``Should parse number as uint32`` () =
         let expected = 1u
         let actual =
-            Parser.req "prop" Parse.uint32
+            Prop.req "prop" Parse.uint32
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -237,7 +237,7 @@ module ParseTests =
     let ``Should parse number as uint32 enum`` () =
         let expected = UInt32Enum.Something
         let actual =
-            Parser.req "prop" Parse.uint32Enum
+            Prop.req "prop" Parse.uint32Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -246,7 +246,7 @@ module ParseTests =
     let ``Should parse number as uint64`` () =
         let expected = 1UL
         let actual =
-            Parser.req "prop" Parse.uint64
+            Prop.req "prop" Parse.uint64
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -258,7 +258,7 @@ module ParseTests =
     let ``Should parse number as uint64 enum`` () =
         let expected = UInt64Enum.Something
         let actual =
-            Parser.req "prop" Parse.uint64Enum
+            Prop.req "prop" Parse.uint64Enum
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -267,7 +267,7 @@ module ParseTests =
     let ``Should parse number as float`` () =
         let expected = 1.1
         let actual =
-            Parser.req "prop" Parse.float
+            Prop.req "prop" Parse.float
             |> Parser.parse """{ "prop": 1.1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -276,7 +276,7 @@ module ParseTests =
     let ``Should parse number as float32`` () =
         let expected = 1.1f
         let actual =
-            Parser.req "prop" Parse.float32
+            Prop.req "prop" Parse.float32
             |> Parser.parse """{ "prop": 1.1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -285,7 +285,7 @@ module ParseTests =
     let ``Should parse number as decimal`` () =
         let expected = 1.1m
         let actual =
-            Parser.req "prop" Parse.decimal
+            Prop.req "prop" Parse.decimal
             |> Parser.parse """{ "prop": 1.1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -294,7 +294,7 @@ module ParseTests =
     let ``Should parse string as char`` () =
         let expected = 'c'
         let actual =
-            Parser.req "prop" Parse.char
+            Prop.req "prop" Parse.char
             |> Parser.parse """{ "prop": "c" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -303,7 +303,7 @@ module ParseTests =
     let ``Should parse string as string`` () =
         let expected = "text"
         let actual =
-            Parser.req "prop" Parse.string
+            Prop.req "prop" Parse.string
             |> Parser.parse """{ "prop": "text" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -312,7 +312,7 @@ module ParseTests =
     let ``Should parse string as BigInteger`` () =
         let expected = BigInteger.Parse "1234567890123456789012345678901234567890"
         let actual =
-            Parser.req "prop" Parse.bigInt
+            Prop.req "prop" Parse.bigInt
             |> Parser.parse """{ "prop": "1234567890123456789012345678901234567890" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -321,7 +321,7 @@ module ParseTests =
     let ``Should parse bool as bool`` () =
         let expected = true
         let actual =
-            Parser.req "prop" Parse.bool
+            Prop.req "prop" Parse.bool
             |> Parser.parse """{ "prop": true }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -330,7 +330,7 @@ module ParseTests =
     let ``Should parse string as Guid`` () =
         let expected = Guid.Empty
         let actual =
-            Parser.req "prop" Parse.guid
+            Prop.req "prop" Parse.guid
             |> Parser.parse """{ "prop": "00000000-0000-0000-0000-000000000000" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -339,7 +339,7 @@ module ParseTests =
     let ``Should parse null as unit`` () =
         let expected = ()
         let actual =
-            Parser.req "prop" Parse.unit
+            Prop.req "prop" Parse.unit
             |> Parser.parse """{ "prop": null }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -348,7 +348,7 @@ module ParseTests =
     let ``Should parse string as TimeOnly`` () =
         let expected = TimeOnly.Parse("17:28:45")
         let actual =
-            Parser.req "prop" Parse.timeOnly
+            Prop.req "prop" Parse.timeOnly
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -357,7 +357,7 @@ module ParseTests =
     let ``Should parse string as TimeOnly exact`` () =
         let expected = TimeOnly.Parse("17:28:45")
         let actual =
-            Parser.req "prop" (Parse.timeOnlyExact "HHmmss")
+            Prop.req "prop" (Parse.timeOnlyExact "HHmmss")
             |> Parser.parse """{ "prop": "172845" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -366,7 +366,7 @@ module ParseTests =
     let ``Should parse string as TimeSpan`` () =
         let expected = TimeSpan.Parse("1:23:45")
         let actual =
-            Parser.req "prop" Parse.timeSpan
+            Prop.req "prop" Parse.timeSpan
             |> Parser.parse """{ "prop": "1:23:45" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -375,7 +375,7 @@ module ParseTests =
     let ``Should parse string as TimeSpan exact`` () =
         let expected = TimeSpan.Parse("01:23:45")
         let actual =
-            Parser.req "prop" (Parse.timeSpanExact "hhmmss")
+            Prop.req "prop" (Parse.timeSpanExact "hhmmss")
             |> Parser.parse """{ "prop": "012345" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -384,7 +384,7 @@ module ParseTests =
     let ``Should parse string as DateOnly`` () =
         let expected = DateOnly.Parse("2025-05-13")
         let actual =
-            Parser.req "prop" Parse.dateOnly
+            Prop.req "prop" Parse.dateOnly
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -393,7 +393,7 @@ module ParseTests =
     let ``Should parse string as DateOnly exact`` () =
         let expected = DateOnly.Parse("2025-05-13")
         let actual =
-            Parser.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
+            Prop.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
             |> Parser.parse """{ "prop": "20250513" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -402,7 +402,7 @@ module ParseTests =
     let ``Should parse string as DateTime`` () =
         let expected = DateTime.Parse("2025-05-13T17:28:45")
         let actual =
-            Parser.req "prop" Parse.dateTime
+            Prop.req "prop" Parse.dateTime
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -412,7 +412,7 @@ module ParseTests =
         let now = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00))
         let expected = now.ToUniversalTime()
         let actual =
-            Parser.req "prop" Parse.dateTimeUtc
+            Prop.req "prop" Parse.dateTimeUtc
             |> Parser.parse $$"""{ "prop": "%%s{{now.ToString("yyyy-MM-ddTHH:mm")}}" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -421,7 +421,7 @@ module ParseTests =
     let ``Should parse string as DateTime exact`` () =
         let expected = DateTime.Parse("2025-05-13T17:28:45")
         let actual =
-            Parser.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
+            Prop.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
             |> Parser.parse """{ "prop": "2025-05-13 17:28:45" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -430,7 +430,7 @@ module ParseTests =
     let ``Should parse string as DateTimeOffset`` () =
         let expected = DateTime.Parse("2025-05-13T17:28:45+02:00")
         let actual =
-            Parser.req "prop" Parse.dateTime
+            Prop.req "prop" Parse.dateTime
             |> Parser.parse """{ "prop": "2025-05-13T17:28:45+02:00" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -439,7 +439,7 @@ module ParseTests =
     let ``Should parse string as DateTimeOffset exact`` () =
         let expected = DateTimeOffset.Parse("2025-05-13T17:28:00+02:00")
         let actual =
-            Parser.req "prop" (Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz")
+            Prop.req "prop" (Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz")
             |> Parser.parse """{ "prop": "2025-05-13 17:28 +02:00" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -448,7 +448,7 @@ module ParseTests =
     let ``Should parse array as list`` () =
         let expected = [ 1; 2; 3; ]
         let actual: _ list =
-            Parser.req "prop" (Parse.list Parse.int)
+            Prop.req "prop" (Parse.list Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -457,7 +457,7 @@ module ParseTests =
     let ``Should parse array as array`` () =
         let expected = [| 1; 2; 3; |]
         let actual: _ array =
-            Parser.req "prop" (Parse.array Parse.int)
+            Prop.req "prop" (Parse.array Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -466,7 +466,7 @@ module ParseTests =
     let ``Should parse array as Set`` () =
         let expected = set [ 1; 2; 3; ]
         let actual: _ Set =
-            Parser.req "prop" (Parse.set Parse.int)
+            Prop.req "prop" (Parse.set Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -475,7 +475,7 @@ module ParseTests =
     let ``Should parse array as seq`` () =
         let expected = seq [ 1; 2; 3; ]
         let actual: _ seq =
-            Parser.req "prop" (Parse.seq Parse.int)
+            Prop.req "prop" (Parse.seq Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equalSeq actual expected
@@ -484,7 +484,7 @@ module ParseTests =
     let ``Should parse array at index`` () =
         let expected = 1
         let actual =
-            Parser.req "prop" (Parse.index 0 Parse.int)
+            Prop.req "prop" (Parse.index 0 Parse.int)
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -493,7 +493,7 @@ module ParseTests =
     let ``Should parse object as Map`` () =
         let expected = Map.ofSeq [ "key1", 1; "key2", 2; "key3", 3; ]
         let actual: Map<_,_> =
-            Parser.req "prop" (Parse.map Parse.int)
+            Prop.req "prop" (Parse.map Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -502,7 +502,7 @@ module ParseTests =
     let ``Should parse object as Dictionary`` () =
         let expected = dict [ "key1", 1; "key2", 2; "key3", 3; ]
         let actual: IDictionary<_,_> =
-            Parser.req "prop" (Parse.dict Parse.int)
+            Prop.req "prop" (Parse.dict Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equalSeq actual expected
@@ -511,7 +511,7 @@ module ParseTests =
     let ``Should parse object as KeyValuePair seq`` () =
         let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ] |> Seq.map KeyValuePair
         let actual: _ seq =
-            Parser.req "prop" (Parse.keyValuePairs Parse.int)
+            Prop.req "prop" (Parse.keyValuePairs Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equalSeq actual expected
@@ -520,7 +520,7 @@ module ParseTests =
     let ``Should parse object as tuple seq`` () =
         let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ]
         let actual: _ seq =
-            Parser.req "prop" (Parse.tuples Parse.int)
+            Prop.req "prop" (Parse.tuples Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equalSeq actual expected
@@ -529,7 +529,7 @@ module ParseTests =
     let ``Should parse objects keys as string seq`` () =
         let expected = seq [ "key1"; "key2"; "key3" ]
         let actual: _ seq =
-            Parser.req "prop" Parse.keys
+            Prop.req "prop" Parse.keys
             |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
             |> Expect.ok
         Expect.equalSeq actual expected
@@ -538,7 +538,7 @@ module ParseTests =
     let ``Should parse array as tuple`` () =
         let expected = "1", 1
         let actual =
-            Parser.req "prop" (Parse.tuple2 Parse.string Parse.int)
+            Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ "1", 1 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -547,7 +547,7 @@ module ParseTests =
     let ``Should parse array as tuple of three`` () =
         let expected = "1", 1, 1
         let actual =
-            Parser.req "prop" (Parse.tuple3 Parse.string Parse.int Parse.int)
+            Prop.req "prop" (Parse.tuple3 Parse.string Parse.int Parse.int)
             |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -556,7 +556,7 @@ module ParseTests =
     let ``Should parse array length as int`` () =
         let expected = 3
         let actual =
-            Parser.req "prop" Parse.arrayLength
+            Prop.req "prop" Parse.arrayLength
             |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -565,7 +565,7 @@ module ParseTests =
     let ``Should parse object property count as int`` () =
         let expected = 3
         let actual =
-            Parser.req "prop" Parse.propertyCount
+            Prop.req "prop" Parse.propertyCount
             |> Parser.parse """{ "prop": { "one": 1, "two": 2, "three": 3 } }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -574,7 +574,7 @@ module ParseTests =
     let ``Should parse element kind as JsonValueKind`` () =
         let expected = JsonValueKind.Number
         let actual =
-            Parser.req "prop" Parse.kind
+            Prop.req "prop" Parse.kind
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -583,7 +583,7 @@ module ParseTests =
     let ``Should parse element as JsonElement`` () =
         let expected = JsonDocument.Parse("""{ "prop2": 1 }""").RootElement
         let actual =
-            Parser.req "prop" Parse.element
+            Prop.req "prop" Parse.element
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.ok
         Expect.isTrue <| JsonElement.DeepEquals(expected, actual)
@@ -592,7 +592,7 @@ module ParseTests =
     let ``Should parse element as string`` () =
         let expected = """{ "prop2": 1 }"""
         let actual =
-            Parser.req "prop" Parse.rawText
+            Prop.req "prop" Parse.rawText
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -604,7 +604,7 @@ module ParseTests =
     let ``Should parse string as enum`` () =
         let expected = StringEnum.Something
         let actual =
-            Parser.req "prop" Parse.enum
+            Prop.req "prop" Parse.enum
             |> Parser.parse """{ "prop": "something" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -613,7 +613,7 @@ module ParseTests =
     let ``Should not parse element and return unit`` () =
         let expected = ()
         let actual =
-            Parser.req "prop" Parse.none
+            Prop.req "prop" Parse.none
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -622,7 +622,7 @@ module ParseTests =
     let ``Should parse optional null value as None`` () =
         let expected = None
         let actual =
-            Parser.req "prop" (Parse.optional Parse.int)
+            Prop.req "prop" (Parse.optional Parse.int)
             |> Parser.parse """{ "prop": null }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -631,7 +631,7 @@ module ParseTests =
     let ``Should parse optional value as Some int`` () =
         let expected = Some 1
         let actual =
-            Parser.req "prop" (Parse.optional Parse.int)
+            Prop.req "prop" (Parse.optional Parse.int)
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -646,7 +646,7 @@ module ParseTests =
             ) ExpectedKind.Number
         let expected = 2
         let actual =
-            Parser.req "prop" parser
+            Prop.req "prop" parser
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal expected actual
@@ -656,7 +656,7 @@ module ParseTests =
         let fromInt (x:int) = Ok x
         let expected = 1
         let actual =
-            Parser.req "prop" (Parse.valid Parse.int fromInt)
+            Prop.req "prop" (Parse.valid Parse.int fromInt)
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -664,6 +664,6 @@ module ParseTests =
     [<Fact>]
     let ``Should Error when value is not valid`` () =
         let fromInt (_:int) = Error "Not valid."
-        Parser.req "prop" (Parse.valid Parse.int fromInt)
+        Prop.req "prop" (Parse.valid Parse.int fromInt)
         |> Parser.parse """{ "prop": 1 }"""
         |> Expect.error
