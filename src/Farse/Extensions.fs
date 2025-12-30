@@ -3,9 +3,7 @@ namespace Farse
 #nowarn 104
 
 open System
-open System.Collections.Generic
 open System.Text.Json
-open System.Text.Json.Nodes
 
 [<RequireQualifiedAccess>]
 type ExpectedKind =
@@ -105,27 +103,29 @@ module internal Extensions =
 
         type StringBuilder() =
 
-            member _.Yield(line:string) = [ line ]
+            member inline _.Yield(line:string) = [ line ]
 
-            member _.Yield(line:string option) =
+            member inline _.Yield(line:string option) =
                 line
                 |> Option.map List.singleton
                 |> Option.defaultValue []
 
-            member _.YieldFrom(lines:string list) = lines
+            member inline _.YieldFrom(lines:string list) = lines
 
-            member _.Combine(a, b) = a @ b
+            member inline _.Combine(a, b) = a @ b
 
-            member _.Delay(fn) = fn()
+            member inline _.Delay([<InlineIfLambda>] fn) = fn ()
 
-            member _.Zero() = []
+            member inline _.Zero() = []
 
-            member _.Run(lines) =
+            member inline _.Run(lines) =
                 lines
                 |> Seq.filter (String.IsNullOrWhiteSpace >> not)
                 |> String.concat "\n"
 
         type ResultBuilder() =
+
+            member inline _.Bind(x, [<InlineIfLambda>] fn) = Result.bind fn x
 
             member inline _.Return(x) = Ok x
 
@@ -134,8 +134,6 @@ module internal Extensions =
             member inline _.Delay([<InlineIfLambda>] fn) = fn ()
 
             member inline _.Zero() = Ok ()
-
-            member inline _.Bind(x, [<InlineIfLambda>] fn) = Result.bind fn x
 
         let string = StringBuilder()
 
