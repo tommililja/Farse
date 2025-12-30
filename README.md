@@ -319,7 +319,9 @@ module User =
                 user.Age
                 |> JNum.nil Age.asByte
             "email", JStr <| Email.asString user.Email
-            "profiles", JStr.arr ProfileId.asString user.Profiles
+            "profiles",
+                user.Profiles
+                |> JStr.arr ProfileId.asString 
             "subscription",
                 JObj [
                     "plan", JStr <| Plan.asString user.Subscription.Plan
