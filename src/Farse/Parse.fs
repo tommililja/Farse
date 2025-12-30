@@ -283,6 +283,11 @@ module Parse =
 
     // Sequences
 
+    let inline private parseItem i parser (element:JsonElement) =
+        match element.Item i |> parser with
+        | Ok x -> Ok x
+        | Error e -> Error <| ArrayItem (i, element, e)
+
     let inline private arr ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<_> =
         fun element ->
             match element.ValueKind with
@@ -331,12 +336,7 @@ module Parse =
         fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when i >= 0 && arrayLength >= i + 1 ->
-                match element.Item i |> parser with
-                | Ok x -> Ok x
-                | Error e ->
-                    ArrayItem (i, element, e)
-                    |> Error
+            | Kind.Array when i >= 0 && arrayLength >= i + 1 -> parseItem i parser element
             | Kind.Array ->
                 ArrayItem (i, element, ArrayLength)
                 |> Error
@@ -399,11 +399,6 @@ module Parse =
     let keys = keyValue (Seq.map fst) none
 
     // Tuples
-
-    let inline private parseItem i parser (element:JsonElement) =
-        element.Item i
-        |> parser
-        |> Result.mapError (fun e -> ArrayItem (i, element, e))
 
     let inline private tuple length fn : Parser<'b> =
         fun (element:JsonElement) ->
