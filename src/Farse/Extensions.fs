@@ -1,5 +1,6 @@
 namespace Farse
 
+//  Ignore warning for enum match.
 #nowarn 104
 
 open System
