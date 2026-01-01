@@ -76,7 +76,7 @@ let (&=) = Prop.req
 let (?=) = Prop.opt
 ```
 
-We can create a simple parser.
+We can create this simple parser.
 
 ```fsharp
 open Farse
@@ -121,7 +121,7 @@ module User =
         }
 ```
 
-> Note: In this example, our custom parsers are defined under the same module name as included parsers.
+> Note: Our custom parsers are defined under the same module name as included parsers.
 
 With the following types.
 
