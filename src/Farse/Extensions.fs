@@ -1,10 +1,10 @@
 namespace Farse
 
-//  Ignore warning for enum match.
-#nowarn 104
-
 open System
 open System.Text.Json
+
+//  Ignore warning for enum match.
+#nowarn 104
 
 [<RequireQualifiedAccess>]
 type ExpectedKind =
