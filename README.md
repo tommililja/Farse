@@ -235,12 +235,11 @@ module Parse =
 
 ## Validation
 
-There is a few different options available depending on your use case.
+There are a few different options available depending on your use case.
 
 #### Parser.validate 
 
-Passes along the error string from the validation function.  
-Works for both optional and non-optional values (SRTP).
+Passes along the error string from the validation function.
 
 ```fsharp
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
@@ -273,17 +272,9 @@ Details: The lowest allowed age is '12'.
 
 #### Parse.custom
 
-Produces detailed error messages when validation fails.  
-Helpful error messages are recommended for when parsing fails.
+Produces detailed error messages when validation fails.
 
 ```fsharp
-let age =
-    Parse.custom (fun element ->
-        match e.TryGetByte() with
-        | true, byte -> Age.fromByte byte |> Result.mapError Some
-        | _ -> Error <| Some "Invalid byte."
-    ) ExpectedKind.Number
-
 let! age = "age" ?= age
 ```
 
