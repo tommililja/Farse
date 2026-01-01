@@ -3,7 +3,7 @@
         <AssemblyName>Farse</AssemblyName>
         <Authors>Tommi Lilja</Authors>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        <Copyright>Copyright © Tommi Lilja 2025</Copyright>
+        <Copyright>Copyright © Tommi Lilja 2026</Copyright>
         <DebugType>embedded</DebugType>
         <Description>Simple parsing library for F# using System.Text.Json.</Description>
         <EmbedAllSources>true</EmbedAllSources>
