@@ -77,7 +77,7 @@ module Parser =
         ((^T or Validate) : (static member Validate : ^T * (_ -> Result<_, string>) -> Parser<_>) (parser, fn))
 
     /// <summary>Ignores the parsed value.</summary>
-    /// <code>do! "prop" &amp;= Parse.string |> Parser.ignore</code>
+    /// <code>do! "prop" &amp;= Parse.int |> Parser.ignore</code>
     /// <param name="parser">The parser to ignore.</param>
     let inline ignore (parser:Parser<_>) : Parser<_> =
         fun element ->
