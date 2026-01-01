@@ -42,7 +42,7 @@ module internal Error =
     let invalidIndex =
         "Index out of range."
 
-    let couldNotRead name (element:JsonElement) =
+    let couldNotRead name element =
         string {
             $"Error: Could not read property '%s{name}'."
             $"Message: %s{invalidKind ExpectedKind.Object element}"
@@ -63,7 +63,7 @@ module internal Error =
             print parent
         }
 
-    let notObject name (parent:JsonElement) (element:JsonElement) =
+    let notObject name parent element =
         string {
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{invalidKind ExpectedKind.Object element}"

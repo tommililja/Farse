@@ -20,11 +20,11 @@ type Age = Age of byte
 module Age =
 
     [<Literal>]
-    let private AllowedAge = 12uy
+    let private MinAge = 12uy
 
     let fromByte = function
-        | age when age >= AllowedAge -> Ok <| Age age
-        | _ -> Error $"The lowest allowed age is '%u{AllowedAge}'."
+        | age when age >= MinAge -> Ok <| Age age
+        | _ -> Error $"The minimum age is '%u{MinAge}'."
 
     let asByte (Age x) = x
 

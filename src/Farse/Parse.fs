@@ -6,7 +6,7 @@ open System.Globalization
 open System.Numerics
 open System.Text.Json
 
-// Ignore warning for type alias fix (|> id).
+// Ignore type alias fix (|> id) warning.
 // ReSharper disable FSharpRedundantApplication
 
 module Parse =

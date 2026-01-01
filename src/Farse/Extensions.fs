@@ -3,7 +3,7 @@ namespace Farse
 open System
 open System.Text.Json
 
-//  Ignore warning for enum match.
+// Ignore enum match warning.
 #nowarn 104
 
 [<RequireQualifiedAccess>]
@@ -43,8 +43,7 @@ module internal Extensions =
             | Kind.Array -> ExpectedKind.Array
             | Kind.String -> ExpectedKind.String
             | Kind.Number -> ExpectedKind.Number
-            | Kind.True -> ExpectedKind.Bool
-            | Kind.False -> ExpectedKind.Bool
+            | Kind.True | Kind.False -> ExpectedKind.Bool
             | Kind.Null -> ExpectedKind.Null
 
         let inline asString expectedKind =

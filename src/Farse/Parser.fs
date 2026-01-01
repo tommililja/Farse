@@ -4,7 +4,7 @@ open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
-// Ignore warning for type alias fix (|> id).
+// Ignore type alias fix (|> id) warning.
 // ReSharper disable FSharpRedundantApplication
 
 type Validate =

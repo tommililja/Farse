@@ -138,11 +138,11 @@ type Age = Age of byte
 module Age =
 
     [<Literal>]
-    let private AllowedAge = 12uy
+    let private MinAge = 12uy
 
     let fromByte = function
-        | age when age >= AllowedAge -> Ok <| Age age
-        | _ -> Error $"The lowest allowed age is '%u{AllowedAge}'."
+        | age when age >= MinAge -> Ok <| Age age
+        | _ -> Error $"The minimum age is '%u{MinAge}'."
         
     let asByte (Age x) = x
 
@@ -246,7 +246,7 @@ let! age = "age" ?= byte |> Parser.validate Age.fromByte
 ```
 
 ```fsharp
-The lowest allowed age is '12'.
+The minimum age is '12'.
 ```
 
 #### Parse.valid
@@ -260,7 +260,7 @@ let! age = "age" ?= valid byte Age.fromByte
 ```code
 Error: Could not parse property 'age'.
 Message: Tried parsing '10' to Age.
-Details: The lowest allowed age is '12'.
+Details: The minimum age is '12'.
 ```
 ```json
 {
@@ -281,7 +281,7 @@ let! age = "age" ?= age
 ```code
 Error: Could not parse property 'age'.
 Message: Tried parsing '10' to Age.
-Details: The lowest allowed age is '12'.
+Details: The minimum age is '12'.
 ```
 ```json
 {
