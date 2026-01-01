@@ -4,6 +4,9 @@ open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
+// Ignore warning for type alias fix (|> id).
+// ReSharper disable FSharpRedundantApplication
+
 type Validate =
 
     static member inline Validate(parser:Parser<_ option>, fn) =
