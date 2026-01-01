@@ -30,8 +30,7 @@ module internal Extensions =
             | Kind.Array -> "Array"
             | Kind.String -> "String"
             | Kind.Number -> "Number"
-            | Kind.True
-            | Kind.False -> "Bool"
+            | Kind.True | Kind.False -> "Bool"
             | Kind.Null -> "Null"
 
     module ExpectedKind =
