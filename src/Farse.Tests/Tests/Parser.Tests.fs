@@ -73,3 +73,15 @@ module ParserTests =
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should return Ok when parsing JSON async`` () =
+        task {
+            let expected = 1
+            let! actual =
+                Prop.req "prop" Parse.int
+                |> Parser.parseAsync (MemoryStream.create """{ "prop": 1 }""")
+                |> Task.map Expect.ok
+            Expect.equal actual expected
+        }
+

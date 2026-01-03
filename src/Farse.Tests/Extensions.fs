@@ -1,6 +1,9 @@
 namespace Farse.Tests
 
 open System
+open System.IO
+open System.Text
+open System.Threading.Tasks
 open Expecto
 open VerifyTests
 open VerifyXunit
@@ -30,3 +33,24 @@ module Expect =
 
     let equalSeq actual expected =
         Expect.sequenceEqual actual expected String.Empty
+
+module MemoryStream =
+
+    let create (str:string) =
+        str
+        |> Encoding.UTF8.GetBytes
+        |> fun bytes -> new MemoryStream(bytes)
+
+module Task =
+
+    let map fn x =
+        task {
+            let! x = x
+            return fn x
+        }
+
+    let bind (fn:'a -> Task<'b>) x =
+        task {
+            let! x = x
+            return! fn x
+        }

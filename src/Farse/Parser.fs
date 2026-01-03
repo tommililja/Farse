@@ -2,6 +2,7 @@ namespace Farse
 
 open System
 open System.Diagnostics.CodeAnalysis
+open System.IO
 open System.Text.Json
 
 // Ignore type alias fix (|> id) warning.
@@ -100,3 +101,22 @@ module Parser =
                 json
                 |> Error.invalidJson exn
                 |> Error
+
+    /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
+    /// <param name="stream">The JSON stream to parse.</param>
+    /// <param name="parser">The parser used to parse the JSON stream.</param>
+    let parseAsync (stream:Stream) (parser:Parser<_>) =
+        task {
+            try
+                use! document = JsonDocument.ParseAsync(stream)
+                return
+                    parser document.RootElement
+                    |> Result.mapError ParserError.asString
+            with
+                | :? JsonException
+                | :? ArgumentNullException as exn ->
+                    return
+                        "<stream>"
+                        |> Error.invalidJson exn
+                        |> Error
+        }
