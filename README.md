@@ -121,7 +121,7 @@ module User =
         }
 ```
 
-> Note: Our custom parsers are defined under the same module name as included parsers.
+> Note: The custom parsers are defined under the same module name as included parsers.
 
 With the following types.
 
@@ -294,8 +294,6 @@ Details: The minimum age is '12'.
 ## Creating JSON
 
 We can create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
-
-This creates an object, but you can create any type and convert it with Json.asString.
 
 ```fsharp
 open Farse
