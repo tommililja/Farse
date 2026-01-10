@@ -72,8 +72,17 @@ module internal Error =
         }
 
     let invalidJson (exn:exn) json =
+        let name =
+            match json with
+            | Some _ -> "string"
+            | None -> "stream"
+
         string {
-            "Error: Could not parse JSON string."
+            $"Error: Could not parse JSON %s{name}."
             $"Message: %s{exn.Message}"
-            $"JSON: '%s{json}'."
+
+            json
+            |> Option.map (fun json ->
+                $"JSON: '%s{json}'."
+            )
         }
