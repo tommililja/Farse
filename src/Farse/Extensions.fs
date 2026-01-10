@@ -100,7 +100,7 @@ module internal Extensions =
         let inline (|Null|Empty|String|) (str:string) =
             match str with
             | null -> Null
-            | str when String.IsNullOrWhiteSpace(str) -> Empty
+            | str when String.IsNullOrWhiteSpace(str) -> Empty str
             | str -> String str
 
     [<AutoOpen>]

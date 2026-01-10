@@ -77,7 +77,6 @@ module internal Error =
             json
             |> Option.map (function
                 | Null -> "JSON: null"
-                | Empty -> @"JSON: """""
-                | String json -> $"JSON: %s{json}"
+                | str -> $"JSON: \"%s{str}\""
             )
         }

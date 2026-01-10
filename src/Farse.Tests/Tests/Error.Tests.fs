@@ -11,7 +11,7 @@ module ErrorTests =
         [<Fact>]
         let ``Should return Error when parsing invalid JSON`` () =
             Parse.none
-            |> Parser.parse "invalid"
+            |> Parser.parse """{ "prop" 1 }"""
             |> Expect.errorString
 
         [<Fact>]
