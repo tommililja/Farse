@@ -56,9 +56,7 @@ module internal Error =
             $"Message: %s{msg}"
 
             details
-            |> Option.map (fun msg ->
-                $"Details: %s{msg}"
-            )
+            |> Option.map (sprintf "Details: %s")
 
             print parent
         }
@@ -71,18 +69,15 @@ module internal Error =
             print parent
         }
 
-    let invalidJson (exn:exn) json =
-        let name =
-            match json with
-            | Some _ -> "string"
-            | None -> "stream"
-
+    let invalidJson name (exn:exn) json =
         string {
             $"Error: Could not parse JSON %s{name}."
             $"Message: %s{exn.Message}"
 
             json
-            |> Option.map (fun json ->
-                $"JSON: '%s{json}'."
+            |> Option.map (function
+                | Null -> "JSON: null"
+                | Empty -> @"JSON: """""
+                | String json -> $"JSON: %s{json}"
             )
         }

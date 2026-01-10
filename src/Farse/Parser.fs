@@ -99,7 +99,7 @@ module Parser =
             | :? JsonException
             | :? ArgumentNullException as exn ->
                 Some json
-                |> Error.invalidJson exn
+                |> Error.invalidJson "string" exn
                 |> Error
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
@@ -117,6 +117,6 @@ module Parser =
                 | :? ArgumentNullException as exn ->
                     return
                         None
-                        |> Error.invalidJson exn
+                        |> Error.invalidJson "stream" exn
                         |> Error
         }
