@@ -75,8 +75,8 @@ module internal Error =
             $"Message: %s{exn.Message}"
 
             json
-            |> Option.map (function
-                | Null -> "JSON: null"
-                | str -> $"JSON: \"%s{str}\""
+            |> Option.map (Option.ofObj >> function
+                | Some str -> $"JSON: \"%s{str}\""
+                | None -> "JSON: null"
             )
         }

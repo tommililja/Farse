@@ -97,12 +97,6 @@ module internal Extensions =
             then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Flat str
 
-        let inline (|Null|Empty|String|) (str:string) =
-            match str with
-            | null -> Null
-            | str when String.IsNullOrWhiteSpace(str) -> Empty str
-            | str -> String str
-
     [<AutoOpen>]
     module Builders =
 
