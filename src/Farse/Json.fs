@@ -11,7 +11,7 @@ type Json =
     | JBit of bool
     | JObj of (string * Json) seq
     | JArr of Json seq
-    | JNil of Json option
+    | JNil
 
 type JsonFormat =
     | Indented
@@ -27,10 +27,9 @@ type JNum =
 
 module JNil =
 
-    let none = JNil None
-
-    let inline internal from fn =
-        Option.map fn >> JNil
+    let inline internal from fn = function
+        | Some x -> fn x
+        | None -> JNil
 
 module JArr =
 
@@ -80,10 +79,7 @@ module Json =
             |> Seq.map getJsonNode
             |> Seq.toArray
             |> JsonArray :> JsonNode
-        | JNil nil ->
-            nil
-            |> Option.map getJsonNode
-            |> Option.defaultValue null
+        | JNil -> null
 
     /// <summary>Converts the Json to a JSON string with the given format.</summary>
     /// <param name="format">The format to use.</param>

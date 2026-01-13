@@ -115,6 +115,6 @@ module JsonTests =
     module JNil =
 
         let ``Should create null value`` () =
-            JNil.none
+            JNil
             |> Json.asString Indented
             |> Expect.string
