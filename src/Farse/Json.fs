@@ -3,7 +3,6 @@ namespace Farse
 open System.Numerics
 open System.Text.Json
 open System.Text.Json.Nodes
-open System.Collections.Generic
 
 type Json =
     | JStr of string
