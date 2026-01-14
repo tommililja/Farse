@@ -41,8 +41,8 @@ type JsonBenchmarks() =
             "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
             "name", JStr "Alice"
             "age",
-                None
-                |> JNum.nil<int, int> id
+                Some 10
+                |> JNum.nil id
             "email", JStr "alice@domain.com"
             "profiles",
                 [
@@ -57,7 +57,7 @@ type JsonBenchmarks() =
                     "isCanceled", JBit false
                     "renewsAt",
                         Some "2026-12-25T10:30:00Z"
-                        |> JStr.nil _.ToString()
+                        |> JStr.nil id
                 ]
         ]
 
