@@ -68,17 +68,15 @@ module Json =
         | JBit bit -> JsonValue.Create(bit).Root
         | JNum num -> num
         | JObj obj ->
-            obj
-            |> Seq.map (fun (name, json) ->
-                let node = getJsonNode json
-                KeyValuePair(name, node)
-            )
-            |> JsonObject :> JsonNode
+            let object = JsonObject()
+            for (name, json) in obj do
+                object.Add(name, getJsonNode json)
+            object :> JsonNode
         | JArr arr ->
-            arr
-            |> Seq.map getJsonNode
-            |> Seq.toArray
-            |> JsonArray :> JsonNode
+            let array = JsonArray()
+            for json in arr do
+                array.Add(getJsonNode json)
+            array :> JsonNode
         | JNil -> null
 
     /// <summary>Converts the Json to a JSON string with the given format.</summary>
