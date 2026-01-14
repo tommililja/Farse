@@ -60,6 +60,7 @@ type JsonBenchmarks() =
                         |> JStr.nil id
                 ]
         ]
+        |> Json.asString Indented
 
 [<MemoryDiagnoser(true)>]
 [<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
