@@ -322,7 +322,7 @@ module User =
         ]
 ```
 
-> Note: Use JNum<'a> and JNum.nil<'a> to be explicit.
+> Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
 ## Errors
 
