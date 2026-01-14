@@ -1,4 +1,4 @@
-﻿open System
+open System
 open System.IO
 open System.Text.Json
 open BenchmarkDotNet.Attributes
@@ -33,7 +33,37 @@ type User = {
 
 [<MemoryDiagnoser(true)>]
 [<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
-type Benchmarks() =
+type JsonBenchmarks() =
+
+    [<Benchmark(Description = "Farse")>]
+    member _.Farse() =
+        JObj [
+            "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
+            "name", JStr "Alice"
+            "age",
+                None
+                |> JNum.nil<int, int> id
+            "email", JStr "alice@domain.com"
+            "profiles",
+                [
+                    "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
+                    "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
+                    "bf00d1e2-ee53-4969-9507-86bed7e96432"
+                ]
+                |> JStr.arr id
+            "subscription",
+                JObj [
+                    "plan", JStr "Pro"
+                    "isCanceled", JBit false
+                    "renewsAt",
+                        Some "2026-12-25T10:30:00Z"
+                        |> JStr.nil _.ToString()
+                ]
+        ]
+
+[<MemoryDiagnoser(true)>]
+[<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
+type ParserBenchmarks() =
 
     let mutable json = String.Empty
 
