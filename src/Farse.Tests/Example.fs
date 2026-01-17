@@ -137,21 +137,14 @@ module User =
         JObj [
             "id", JStr <| UserId.asString user.Id
             "name", JStr user.Name
-            "age",
-                user.Age
-                |> JNum.nil Age.asByte
+            "age", JNum.nil Age.asByte user.Age
             "email", JStr <| Email.asString user.Email
-            "profiles",
-                user.Profiles
-                |> JStr.arr ProfileId.asString
-            "subscription",
-                JObj [
-                    "plan", JStr <| Plan.asString user.Subscription.Plan
-                    "isCanceled", JBit user.Subscription.IsCanceled
-                    "renewsAt",
-                        user.Subscription.RenewsAt
-                        |> JStr.nil _.ToString()
-                ]
+            "profiles", JStr.arr ProfileId.asString user.Profiles
+            "subscription", JObj [
+                "plan", JStr <| Plan.asString user.Subscription.Plan
+                "isCanceled", JBit user.Subscription.IsCanceled
+                "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
+            ]
         ]
 
 module Example =
