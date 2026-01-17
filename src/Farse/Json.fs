@@ -20,7 +20,7 @@ type JsonFormat =
 [<AutoOpen>]
 type JNum =
 
-    static member JNum<'a when 'a :> INumber<'a>>(x) =
+    static member inline JNum<'a when 'a :> INumber<'a>>(x) =
         JsonValue.Create<'a>(x).Root
         |> Json.JNum
 
@@ -37,28 +37,28 @@ module JArr =
 
 module JStr =
 
-    let nil fn = JNil.from (fn >> JStr)
+    let inline nil fn = JNil.from (fn >> JStr)
 
-    let arr fn = JArr.from (fn >> JStr)
+    let inline arr fn = JArr.from (fn >> JStr)
 
 module JNum =
 
-    let nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
+    let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
         JNil.from (fn >> JNum)
 
-    let arr fn = JArr.from (fn >> JNum)
+    let inline arr fn = JArr.from (fn >> JNum)
 
 module JBit =
 
-    let nil fn = JNil.from (fn >> JBit)
+    let inline nil fn = JNil.from (fn >> JBit)
 
-    let arr fn = JArr.from (fn >> JBit)
+    let inline arr fn = JArr.from (fn >> JBit)
 
 module JObj =
 
-    let nil fn = JNil.from (fn >> JObj)
+    let inline nil fn = JNil.from (fn >> JObj)
 
-    let arr fn = JArr.from (fn >> JObj)
+    let inline arr fn = JArr.from (fn >> JObj)
 
 module Json =
 
@@ -68,7 +68,7 @@ module Json =
         | JNum num -> num
         | JObj obj ->
             let object = JsonObject()
-            for (name, json) in obj do
+            for name, json in obj do
                 object.Add(name, getJsonNode json)
             object :> JsonNode
         | JArr arr ->
