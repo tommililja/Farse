@@ -1,4 +1,1 @@
-﻿Error: Could not read property 'prop'.
-Message: Expected Object, but got Array.
-
-[]
+﻿Expected Object, but got Array.

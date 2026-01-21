@@ -22,7 +22,7 @@ module Prop =
                         |> ParserError.enrich name element
                         |> Error
                 | _ ->
-                   CouldNotRead (name, element)
+                   InvalidKind (ExpectedKind.Object, element)
                    |> Error
         | Nested path ->
             fun element ->
@@ -53,7 +53,8 @@ module Prop =
                         |> ParserError.enrich name object
                         |> Error
                 | Error element ->
-                    NotObject (name, object, element)
+                    InvalidKind (ExpectedKind.Object, element)
+                    |> ParserError.enrich name object
                     |> Error
 
     /// <summary>Parses an optional property with the given parser.</summary>
@@ -77,7 +78,7 @@ module Prop =
                             |> Error
                     | None -> Ok None
                 | _ ->
-                    CouldNotRead (name, element)
+                    InvalidKind (ExpectedKind.Object, element)
                     |> Error
         | Nested path ->
             fun element ->
@@ -109,5 +110,6 @@ module Prop =
                         |> Error
                 | Ok None -> Ok None
                 | Error element ->
-                    NotObject (name, object, element)
+                    InvalidKind (ExpectedKind.Object, element)
+                    |> ParserError.enrich name object
                     |> Error

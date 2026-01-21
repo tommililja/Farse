@@ -42,14 +42,6 @@ module internal Error =
     let invalidIndex =
         "Index out of range."
 
-    let couldNotRead name element =
-        string {
-            $"Error: Could not read property '%s{name}'."
-            $"Message: %s{invalidKind ExpectedKind.Object element}"
-
-            print element
-        }
-
     let couldNotParse name msg details parent =
         string {
             $"Error: Could not parse property '%s{name}'."
@@ -57,14 +49,6 @@ module internal Error =
 
             details
             |> Option.map (sprintf "Details: %s")
-
-            print parent
-        }
-
-    let notObject name parent element =
-        string {
-            $"Error: Could not parse property '%s{name}'."
-            $"Message: %s{invalidKind ExpectedKind.Object element}"
 
             print parent
         }
