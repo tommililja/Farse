@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
 Message: Tried parsing Object to IEnumerable<KeyValuePair<String, Int32>>.
 Details: Duplicate key 'key2'.
+Path: $.prop
 
 {
     "prop": {

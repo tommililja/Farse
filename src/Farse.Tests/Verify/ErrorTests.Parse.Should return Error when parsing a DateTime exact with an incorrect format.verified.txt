@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
 Message: Tried parsing '2025-05-13T17:28:45' to DateTime.
 Details: Expected 'yyyy-MM-dd HH:mm:ss'.
+Path: $.prop
 
 {
     "prop": "2025-05-13T17:28:45"

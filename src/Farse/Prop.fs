@@ -19,16 +19,18 @@ module Prop =
                     | Ok x -> Ok x
                     | Error error ->
                         error
-                        |> ParserError.enrich name element
+                        |> ParserError.enrich name (JsonPath.prop name) element
                         |> Error
                 | _ ->
                    InvalidKind (ExpectedKind.Object, element)
+                   |> ParserError.fromType
                    |> Error
         | Nested path ->
             fun element ->
                 let mutable prop = Ok element
                 let mutable name = path[0]
                 let mutable object = element
+                let mutable jsonPath = JsonPath.empty
 
                 for segment in path do
                     prop <- prop
@@ -37,6 +39,7 @@ module Prop =
                         | Kind.Object ->
                             name <- segment
                             object <- element
+                            jsonPath <- JsonPath.append jsonPath (JsonPath.prop name)
 
                             element
                             |> JsonElement.getProperty name
@@ -50,11 +53,11 @@ module Prop =
                     | Ok x -> Ok x
                     | Error error ->
                         error
-                        |> ParserError.enrich name object
+                        |> ParserError.enrich name jsonPath object
                         |> Error
                 | Error element ->
                     InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enrich name object
+                    |> ParserError.enriched name jsonPath object
                     |> Error
 
     /// <summary>Parses an optional property with the given parser.</summary>
@@ -74,17 +77,19 @@ module Prop =
                         | Ok x -> Ok <| Some x
                         | Error error ->
                             error
-                            |> ParserError.enrich name element
+                            |> ParserError.enrich name (JsonPath.prop name) element
                             |> Error
                     | None -> Ok None
                 | _ ->
                     InvalidKind (ExpectedKind.Object, element)
+                    |> ParserError.fromType
                     |> Error
         | Nested path ->
             fun element ->
                 let mutable prop = Ok <| Some element
                 let mutable name = path[0]
                 let mutable object = element
+                let mutable jsonPath = JsonPath.empty
 
                 for segment in path do
                     prop <- prop
@@ -93,6 +98,7 @@ module Prop =
                         | Kind.Object ->
                             name <- segment
                             object <- element
+                            jsonPath <- JsonPath.append jsonPath (JsonPath.prop name)
 
                             element
                             |> JsonElement.tryGetProperty name
@@ -106,10 +112,10 @@ module Prop =
                     | Ok x -> Ok <| Some x
                     | Error error ->
                         error
-                        |> ParserError.enrich name object
+                        |> ParserError.enrich name jsonPath object
                         |> Error
                 | Ok None -> Ok None
                 | Error element ->
                     InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enrich name object
+                    |> ParserError.enriched name jsonPath object
                     |> Error

@@ -1,5 +1,6 @@
 ﻿Error: Could not parse property 'prop2'.
 Message: Expected Array, but got Object.
+Path: $.prop.prop2
 
 {
     "prop2": {

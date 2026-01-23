@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
-| System.Text.Json       | 108.0 us |  0.85 |  4.1504 |       - |  25.85 KB |        0.60 |
-| System.Text.Json*      | 108.8 us |  0.86 | 12.9395 |  1.5869 |  79.97 KB |        1.86 |
-| Farse                  | 127.1 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
-| Newtonsoft.Json*       | 193.8 us |  1.53 | 42.7246 |  5.8594 | 262.27 KB |        6.10 |
-| Thoth.System.Text.Json | 215.0 us |  1.69 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
-| Newtonsoft.Json        | 223.3 us |  1.76 | 75.6836 | 23.9258 | 464.07 KB |       10.79 |
-| Thoth.Json.Net         | 308.1 us |  2.42 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
+| System.Text.Json       | 106.9 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.60 |
+| System.Text.Json*      | 107.2 us |  0.84 | 12.9395 |  1.5869 |  79.97 KB |        1.86 |
+| Farse                  | 128.2 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
+| Newtonsoft.Json*       | 195.9 us |  1.53 | 42.7246 |  5.8594 | 262.27 KB |        6.10 |
+| Thoth.System.Text.Json | 217.1 us |  1.69 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
+| Newtonsoft.Json        | 224.1 us |  1.75 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
+| Thoth.Json.Net         | 307.0 us |  2.40 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
 
 * Serialization
 ```
@@ -261,6 +261,7 @@ let! age = "age" ?= valid byte Age.fromByte
 Error: Could not parse property 'age'.
 Message: Tried parsing '10' to Age.
 Details: The minimum age is '12'.
+Path: $.age
 ```
 ```json
 {
@@ -282,6 +283,7 @@ let! age = "age" ?= age
 Error: Could not parse property 'age'.
 Message: Tried parsing '10' to Age.
 Details: The minimum age is '12'.
+Path: $.age
 ```
 ```json
 {
@@ -327,6 +329,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 Error: Could not parse property 'renewsAt'.
 Message: Tried parsing '202612-25T10:30:00Z' to Instant.
 Details: The value string does not [...]
+Path: $.subscription.renewsAt
 ```
 ```json
 {
@@ -341,6 +344,7 @@ Details: The value string does not [...]
 ```code
 Error: Could not parse property 'profiles[1]'.
 Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId.
+Path: $.profiles[1]
 ```
 ```json
 [

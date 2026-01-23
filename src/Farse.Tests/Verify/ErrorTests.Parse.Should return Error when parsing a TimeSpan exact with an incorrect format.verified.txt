@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
 Message: Tried parsing '01:28:45' to TimeSpan.
 Details: Expected 'hh\mm\ss'.
+Path: $.prop
 
 {
     "prop": "01:28:45"

@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
 Message: Tried parsing '2025-05-13 17:28 +02:00' to DateTimeOffset.
 Details: Expected 'yyyyMMdd HH:mm:ss zzz'.
+Path: $.prop
 
 {
     "prop": "2025-05-13 17:28 \u002B02:00"

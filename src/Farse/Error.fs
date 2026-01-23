@@ -40,15 +40,17 @@ module internal Error =
         $"Expected a tuple of %i{expected}, but got %i{actual}."
 
     let invalidIndex =
-        "Index out of range."
+        "Index was out of range."
 
-    let couldNotParse name msg details parent =
+    let couldNotParse name path msg details parent =
         string {
             $"Error: Could not parse property '%s{name}'."
             $"Message: %s{msg}"
 
             details
             |> Option.map (sprintf "Details: %s")
+
+            $"Path: %s{JsonPath.asString path}"
 
             print parent
         }

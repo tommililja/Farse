@@ -1,5 +1,6 @@
 ﻿Error: Could not parse property 'prop[3]'.
-Message: Index out of range.
+Message: Index was out of range.
+Path: $.prop[3]
 
 [
     1,

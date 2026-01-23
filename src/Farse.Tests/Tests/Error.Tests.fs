@@ -98,6 +98,12 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when parsing a multiple nested property from an element that is not an object`` () =
+            Prop.req "prop.prop2.prop3" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": [] } }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when try parsing a property from an element that is not an object`` () =
             Prop.opt "prop" Parse.int
             |> Parser.parse """[]"""

@@ -1,6 +1,7 @@
 ﻿Error: Could not parse property 'prop'.
 Message: Tried parsing '17:28:45' to TimeOnly.
 Details: Expected 'HHmmss'.
+Path: $.prop
 
 {
     "prop": "17:28:45"

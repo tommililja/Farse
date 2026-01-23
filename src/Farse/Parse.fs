@@ -6,9 +6,6 @@ open System.Globalization
 open System.Numerics
 open System.Text.Json
 
-// Ignore type alias fix (|> id) warning.
-// ReSharper disable FSharpRedundantApplication
-
 module Parse =
 
     /// Always succeeds and returns FSharp.Core.Unit.
@@ -40,6 +37,7 @@ module Parse =
                 | Ok x -> Ok x
                 | Error msg ->
                     InvalidValue (Some msg, typeof<'b>, element)
+                    |> ParserError.fromType
                     |> Error
             | Error e -> Error e
         |> id
@@ -63,13 +61,16 @@ module Parse =
                     | Ok x -> Ok x
                     | Error msg ->
                         InvalidValue (msg, typeof<'a>, element)
+                        |> ParserError.fromType
                         |> Error
                 with ex ->
                     InvalidValue (Some ex.Message, typeof<'a>, element)
+                    |> ParserError.fromType
                     |> Error
             else
-                 InvalidKind (expectedKind, element)
-                 |> Error
+                InvalidKind (expectedKind, element)
+                |> ParserError.fromType
+                |> Error
         |> id
 
     // Basic types
@@ -286,10 +287,14 @@ module Parse =
 
     // Sequences
 
-    let inline private parseItem i parser (element:JsonElement) =
+    let inline private parseIndex i parser (element:JsonElement) =
         match element.Item i |> parser with
         | Ok x -> Ok x
-        | Error e -> Error <| ArrayItem (i, element, e)
+        | Error e ->
+            let path = JsonPath.append (JsonPath.index i) e.Path
+            ArrayItem (i, element, e.ErrorType)
+            |> ParserError.create path
+            |> Error
 
     let inline private arr ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<_> =
         fun element ->
@@ -310,10 +315,13 @@ module Parse =
                 match error with
                 | None -> Ok <| convert (array :> seq<_>)
                 | Some error ->
-                    ArrayItem (array.Count, element, error)
+                    let path = JsonPath.append (JsonPath.index array.Count) error.Path
+                    ArrayItem (array.Count, element, error.ErrorType)
+                    |> ParserError.create path
                     |> Error
             | _ ->
                 InvalidKind (ExpectedKind.Array, element)
+                |> ParserError.fromType
                 |> Error
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
@@ -339,12 +347,14 @@ module Parse =
         fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when i >= 0 && arrayLength >= i + 1 -> parseItem i parser element
+            | Kind.Array when i >= 0 && arrayLength >= i + 1 -> parseIndex i parser element
             | Kind.Array ->
-                ArrayItem (i, element, ArrayLength)
+                ArrayItem (i, element, ArrayIndex)
+                |> ParserError.create (JsonPath.index i)
                 |> Error
             | _ ->
                 InvalidKind (ExpectedKind.Array, element)
+                |> ParserError.fromType
                 |> Error
         |> id
 
@@ -370,17 +380,28 @@ module Parse =
                     |> ResizeArray
 
                 while error.IsNone && enumerator.MoveNext() do
+                    let name = enumerator.Current.Name
                     match parser enumerator.Current.Value with
-                    | Ok x -> array.Add(enumerator.Current.Name, x)
-                    | Error e -> error <- Some <| KeyValue (enumerator.Current.Name, e, element)
+                    | Ok x -> array.Add(name, x)
+                    | Error e -> error <- Some (name, e.ErrorType, element)
 
                 match error with
                 | None ->
                     match getDuplicateKey array with
-                    | Some key -> Error <| InvalidValue (Some <| Error.duplicateKey key, typeof<'b>, element)
+                    | Some key ->
+                        let message = Error.duplicateKey key
+                        InvalidValue (Some message, typeof<'b>, element)
+                        |> ParserError.fromType
+                        |> Error
                     | None -> Ok <| convert (array :> seq<_>)
-                | Some e -> Error e
-            | _ -> Error <| InvalidKind (ExpectedKind.Object, element)
+                | Some x ->
+                    KeyValue x
+                    |> ParserError.create (JsonPath.prop (fst3 x))
+                    |> Error
+            | _ ->
+                InvalidKind (ExpectedKind.Object, element)
+                |> ParserError.fromType
+                |> Error
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <param name="parser">The parser used for every property value.</param>
@@ -403,7 +424,7 @@ module Parse =
 
     // Tuples
 
-    let inline private tuple length fn : Parser<'b> =
+    let inline private tuple length ([<InlineIfLambda>] fn) : Parser<'b> =
         fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
@@ -411,9 +432,11 @@ module Parse =
             | Kind.Array ->
                 let details = Error.invalidTuple length arrayLength
                 InvalidValue (Some details, typeof<'b>, element)
+                |> ParserError.fromType
                 |> Error
             | _ ->
                 InvalidKind (ExpectedKind.Array, element)
+                |> ParserError.fromType
                 |> Error
 
     /// <summary>Parses an array with two values as a tuple.</summary>
@@ -422,8 +445,8 @@ module Parse =
     let tuple2 (a:Parser<_>) (b:Parser<_>) =
         tuple 2 (fun e ->
             result {
-                let! a = parseItem 0 a e
-                let! b = parseItem 1 b e
+                let! a = parseIndex 0 a e
+                let! b = parseIndex 1 b e
 
                 return a, b
             }
@@ -436,9 +459,9 @@ module Parse =
     let tuple3 (a:Parser<_>) (b:Parser<_>) (c:Parser<_>) =
         tuple 3 (fun e ->
             result {
-                let! a = parseItem 0 a e
-                let! b = parseItem 1 b e
-                let! c = parseItem 2 c e
+                let! a = parseIndex 0 a e
+                let! b = parseIndex 1 b e
+                let! c = parseIndex 2 c e
 
                 return a, b, c
             }

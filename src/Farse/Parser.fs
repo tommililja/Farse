@@ -5,9 +5,6 @@ open System.Diagnostics.CodeAnalysis
 open System.IO
 open System.Text.Json
 
-// Ignore type alias fix (|> id) warning.
-// ReSharper disable FSharpRedundantApplication
-
 type Validate =
 
     static member inline Validate(parser:Parser<_ option>, fn) =
@@ -16,7 +13,10 @@ type Validate =
             | Ok (Some x) ->
                 match fn x with
                 | Ok x -> Ok <| Some x
-                | Error msg -> Error <| Other msg
+                | Error msg ->
+                    Other msg
+                    |> ParserError.fromType
+                    |> Error
             | Ok None -> Ok None
             | Error e -> Error e
 
@@ -26,7 +26,10 @@ type Validate =
             | Ok x ->
                 match fn x with
                 | Ok x -> Ok x
-                | Error msg -> Error <| Other msg
+                | Error msg ->
+                    Other msg
+                    |> ParserError.fromType
+                    |> Error
             | Error e -> Error e
 
 and Parser<'a> = JsonElement -> Result<'a, ParserError>
@@ -44,7 +47,7 @@ module Parser =
     /// <code>let! int = Ok 1 |> Parser.fromResult</code>
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<_> =
-        fun _ -> Result.mapError Other x
+        fun _ -> Result.mapError (Other >> ParserError.fromType) x
         |> id
 
     /// <summary>Binds the parsed value with the given function.</summary>

@@ -1,5 +1,6 @@
 ﻿Error: Could not parse property 'prop2'.
 Message: Expected Number, but got String.
+Path: $.prop.prop2
 
 {
     "prop2": "1"

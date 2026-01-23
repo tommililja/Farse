@@ -17,6 +17,25 @@ type ExpectedKind =
     | Null
     | Any
 
+type JsonPath = JsonPath of string list
+
+module JsonPath =
+
+    let prop name = JsonPath [ $".%s{name}" ]
+
+    let index n = JsonPath [ $"[%i{n}]" ]
+
+    let empty = JsonPath []
+
+    let append (JsonPath a) (JsonPath b) =
+        List.append a b
+        |> JsonPath
+
+    let asString (JsonPath list) =
+        list
+        |> List.append [ "$" ]
+        |> String.concat String.Empty
+
 [<AutoOpen>]
 module internal Extensions =
 
@@ -96,6 +115,11 @@ module internal Extensions =
             if str.Contains('.')
             then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Flat str
+
+    [<AutoOpen>]
+    module General =
+
+        let fst3 (a, _, _) = a
 
     [<AutoOpen>]
     module Builders =
