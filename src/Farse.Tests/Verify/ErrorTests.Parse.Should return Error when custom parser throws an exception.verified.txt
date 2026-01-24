@@ -1,7 +1,6 @@
-﻿Error: Could not parse property 'prop'.
+﻿Error at: $.prop
 Message: Tried parsing '1' to Int32.
 Details: Failed.
-Path: $.prop
 
 {
     "prop": 1

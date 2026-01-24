@@ -1,6 +1,5 @@
-﻿Error: Could not parse property 'prop2[1]'.
+﻿Error at: $.prop.prop2[1]
 Message: Expected Object, but got Number.
-Path: $.prop.prop2[1]
 
 [
     {

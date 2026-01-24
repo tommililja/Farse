@@ -1,7 +1,6 @@
-﻿Error: Could not parse property 'prop'.
+﻿Error at: $.prop
 Message: Tried parsing '2025-05-13' to DateOnly.
 Details: Expected 'yyyyMMdd'.
-Path: $.prop
 
 {
     "prop": "2025-05-13"

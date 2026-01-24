@@ -117,11 +117,6 @@ module internal Extensions =
             else Flat str
 
     [<AutoOpen>]
-    module General =
-
-        let fst3 (a, _, _) = a
-
-    [<AutoOpen>]
     module Builders =
 
         type StringBuilder() =

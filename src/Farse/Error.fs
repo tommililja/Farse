@@ -5,10 +5,11 @@ open System.Text.Json
 
 module internal Error =
 
-    let private print (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.Null | Kind.Undefined -> String.Empty
-        | _ -> $"\n%s{JsonElement.asJsonString element}"
+    let private print (element:JsonElement option) =
+        match element with
+        | Some kind when kind.ValueKind = Kind.Null || kind.ValueKind = Kind.Undefined -> String.Empty
+        | Some element -> $"\n%s{JsonElement.asJsonString element}"
+        | None -> String.Empty
 
     let rec private getTypeName (x:Type) =
         match x with
@@ -42,15 +43,13 @@ module internal Error =
     let invalidIndex =
         "Index was out of range."
 
-    let couldNotParse name path msg details parent =
+    let message path msg details parent =
         string {
-            $"Error: Could not parse property '%s{name}'."
+            $"Error at: %s{JsonPath.asString path}"
             $"Message: %s{msg}"
 
             details
             |> Option.map (sprintf "Details: %s")
-
-            $"Path: %s{JsonPath.asString path}"
 
             print parent
         }

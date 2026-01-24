@@ -1,6 +1,5 @@
-﻿Error: Could not parse property 'missing'.
+﻿Error at: $.prop.missing
 Message: Expected Number, but got Undefined.
-Path: $.prop.missing
 
 {
     "prop2": 1

@@ -1,1 +1,2 @@
-﻿Expected Object, but got Array.
+﻿Error at: $
+Message: Expected Object, but got Array.

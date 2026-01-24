@@ -258,10 +258,9 @@ let! age = "age" ?= valid byte Age.fromByte
 ```
 
 ```code
-Error: Could not parse property 'age'.
+Error at: $.age
 Message: Tried parsing '10' to Age.
 Details: The minimum age is '12'.
-Path: $.age
 ```
 ```json
 {
@@ -280,10 +279,9 @@ let! age = "age" ?= age
 ```
 
 ```code
-Error: Could not parse property 'age'.
+Error at: $.age
 Message: Tried parsing '10' to Age.
 Details: The minimum age is '12'.
-Path: $.age
 ```
 ```json
 {
@@ -326,10 +324,9 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 #### Object
 
 ```code
-Error: Could not parse property 'renewsAt'.
+Error at: $.subscription.renewsAt
 Message: Tried parsing '202612-25T10:30:00Z' to Instant.
 Details: The value string does not [...]
-Path: $.subscription.renewsAt
 ```
 ```json
 {
@@ -342,9 +339,8 @@ Path: $.subscription.renewsAt
 #### Array
 
 ```code
-Error: Could not parse property 'profiles[1]'.
+Error at: $.profiles[1]
 Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId.
-Path: $.profiles[1]
 ```
 ```json
 [

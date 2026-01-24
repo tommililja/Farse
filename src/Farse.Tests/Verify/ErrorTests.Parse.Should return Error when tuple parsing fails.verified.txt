@@ -1,6 +1,5 @@
-﻿Error: Could not parse property 'prop[0]'.
+﻿Error at: $.prop[0]
 Message: Tried parsing '1' to Guid.
-Path: $.prop[0]
 
 [
     "1",

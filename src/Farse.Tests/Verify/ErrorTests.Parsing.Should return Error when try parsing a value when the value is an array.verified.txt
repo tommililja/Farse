@@ -1,6 +1,5 @@
-﻿Error: Could not parse property 'prop'.
+﻿Error at: $.prop
 Message: Expected Number, but got Array.
-Path: $.prop
 
 {
     "prop": []
