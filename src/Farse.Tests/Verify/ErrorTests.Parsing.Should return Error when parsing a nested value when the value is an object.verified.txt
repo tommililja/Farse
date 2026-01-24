@@ -1,4 +1,4 @@
-﻿Error at: $.prop.prop2
+﻿Path: $.prop.prop2
 Message: Expected Number, but got Object.
 
 {

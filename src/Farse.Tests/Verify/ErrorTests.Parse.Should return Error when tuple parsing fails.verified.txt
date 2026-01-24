@@ -1,4 +1,4 @@
-﻿Error at: $.prop[0]
+﻿Path: $.prop[0]
 Message: Tried parsing '1' to Guid.
 
 [

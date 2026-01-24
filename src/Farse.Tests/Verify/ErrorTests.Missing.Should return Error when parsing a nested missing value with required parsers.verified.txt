@@ -1,4 +1,4 @@
-﻿Error at: $.prop.prop2.missing
+﻿Path: $.prop.prop2.missing
 Message: Expected Number, but got Undefined.
 
 {

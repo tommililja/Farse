@@ -258,7 +258,7 @@ let! age = "age" ?= valid byte Age.fromByte
 ```
 
 ```code
-Error at: $.age
+Path: $.age
 Message: Tried parsing '10' to Age.
 Details: The minimum age is '12'.
 ```
@@ -279,7 +279,7 @@ let! age = "age" ?= age
 ```
 
 ```code
-Error at: $.age
+Path: $.age
 Message: Tried parsing '10' to Age.
 Details: The minimum age is '12'.
 ```
@@ -324,7 +324,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 #### Object
 
 ```code
-Error at: $.subscription.renewsAt
+Path: $.subscription.renewsAt
 Message: Tried parsing '202612-25T10:30:00Z' to Instant.
 Details: The value string does not [...]
 ```
@@ -339,7 +339,7 @@ Details: The value string does not [...]
 #### Array
 
 ```code
-Error at: $.profiles[1]
+Path: $.profiles[1]
 Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId.
 ```
 ```json

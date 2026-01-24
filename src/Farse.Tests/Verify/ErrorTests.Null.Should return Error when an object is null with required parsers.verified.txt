@@ -1,4 +1,4 @@
-﻿Error at: $.prop
+﻿Path: $.prop
 Message: Expected Object, but got Null.
 
 {

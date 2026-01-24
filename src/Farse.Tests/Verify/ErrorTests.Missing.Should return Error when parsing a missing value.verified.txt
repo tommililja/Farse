@@ -1,4 +1,4 @@
-﻿Error at: $.missing
+﻿Path: $.missing
 Message: Expected Number, but got Undefined.
 
 {

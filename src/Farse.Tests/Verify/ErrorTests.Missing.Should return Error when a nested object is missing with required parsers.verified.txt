@@ -1,4 +1,4 @@
-﻿Error at: $.prop.missing
+﻿Path: $.prop.missing
 Message: Expected Object, but got Undefined.
 
 {

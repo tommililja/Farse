@@ -1,4 +1,4 @@
-﻿Error at: $.prop.prop2.prop3
+﻿Path: $.prop.prop2.prop3
 Message: Expected Number, but got Null.
 
 {

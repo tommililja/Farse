@@ -1,4 +1,4 @@
-﻿Error at: $.prop[1]
+﻿Path: $.prop[1]
 Message: Expected Number, but got String.
 
 [

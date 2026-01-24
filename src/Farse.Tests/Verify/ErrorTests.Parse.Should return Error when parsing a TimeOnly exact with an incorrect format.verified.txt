@@ -1,4 +1,4 @@
-﻿Error at: $.prop
+﻿Path: $.prop
 Message: Tried parsing '17:28:45' to TimeOnly.
 Details: Expected 'HHmmss'.
 

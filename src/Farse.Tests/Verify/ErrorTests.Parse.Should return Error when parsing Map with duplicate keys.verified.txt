@@ -1,4 +1,4 @@
-﻿Error at: $.prop
+﻿Path: $.prop
 Message: Tried parsing Object to FSharpMap<String, Int32>.
 Details: Duplicate key 'key2'.
 

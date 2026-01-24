@@ -45,7 +45,7 @@ module internal Error =
 
     let message path msg details parent =
         string {
-            $"Error at: %s{JsonPath.asString path}"
+            $"Path: %s{JsonPath.asString path}"
             $"Message: %s{msg}"
 
             details

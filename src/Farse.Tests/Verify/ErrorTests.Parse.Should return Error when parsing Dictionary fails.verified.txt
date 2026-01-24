@@ -1,4 +1,4 @@
-﻿Error at: $.prop.key2
+﻿Path: $.prop.key2
 Message: Expected Number, but got String.
 
 {

@@ -1,4 +1,4 @@
-﻿Error at: $.prop
+﻿Path: $.prop
 Message: Tried parsing '1' to Int32.
 Details: Failed.
 

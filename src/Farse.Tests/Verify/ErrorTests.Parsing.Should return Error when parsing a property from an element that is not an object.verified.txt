@@ -1,2 +1,2 @@
-﻿Error at: $
+﻿Path: $
 Message: Expected Object, but got Array.

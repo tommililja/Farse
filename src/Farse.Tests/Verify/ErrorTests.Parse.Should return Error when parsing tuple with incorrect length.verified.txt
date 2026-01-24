@@ -1,4 +1,4 @@
-﻿Error at: $.prop
+﻿Path: $.prop
 Message: Tried parsing Array to Tuple<String, Int32>.
 Details: Expected a tuple of 2, but got 3.
 
