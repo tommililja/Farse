@@ -221,7 +221,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error None // No details.
+            | _ -> Error <| Some "Invalid guid."
         ) ExpectedKind.String
 
     let instant =
@@ -314,6 +314,7 @@ Value: "202612-25T10:30:00Z"
 ```code
 Path: $.profiles[1]
 Message: Tried parsing ProfileId.
+Details: Invalid guid.
 Value: "927eb20f-cd62-470c-aafc-c3ce6b9"
 ```
 
