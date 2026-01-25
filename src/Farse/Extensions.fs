@@ -99,15 +99,6 @@ module internal Extensions =
             | JsonValueKind.Undefined -> None
             | _ -> Some <| element.GetRawText()
 
-    module ResultOption =
-
-        let inline bind fn = function
-            | Ok x ->
-                match x with
-                | Some x -> fn x
-                | None -> Ok None
-            | Error e -> Error e
-
     module Type =
 
         let rec getFullName (x:Type) =

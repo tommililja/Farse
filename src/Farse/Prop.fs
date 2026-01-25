@@ -27,23 +27,19 @@ module Prop =
                    |> Error
         | Nested path ->
             fun element ->
-                let mutable prop = Ok element
-                let mutable jsonPath = JsonPath.empty
-
-                for name in path do
-                    prop <- prop
-                    |> Result.bind (fun element ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            jsonPath <-
-                                JsonPath.prop name
-                                |> JsonPath.append jsonPath
-
-                            element
-                            |> JsonElement.getProperty name
-                            |> Ok
-                        | _ -> Error element
-                    )
+                let prop, path =
+                    path
+                    |> Seq.fold (fun (prop, path) name ->
+                        match prop with
+                        | Ok (element:JsonElement) ->
+                            match element.ValueKind with
+                            | Kind.Object ->
+                                element
+                                |> JsonElement.getProperty name
+                                |> Ok, JsonPath.append path (JsonPath.prop name)
+                            | _ -> Error element, path
+                        | Error e -> Error e, path
+                    ) (Ok element, JsonPath.empty)
 
                 match prop with
                 | Ok prop ->
@@ -51,11 +47,11 @@ module Prop =
                     | Ok x -> Ok x
                     | Error error ->
                         error
-                        |> ParserError.enrich jsonPath
+                        |> ParserError.enrich path
                         |> Error
                 | Error element ->
                     InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enriched jsonPath
+                    |> ParserError.enriched path
                     |> Error
 
     /// <summary>Parses an optional property with the given parser.</summary>
@@ -84,23 +80,19 @@ module Prop =
                     |> Error
         | Nested path ->
             fun element ->
-                let mutable prop = Ok <| Some element
-                let mutable jsonPath = JsonPath.empty
-
-                for name in path do
-                    prop <- prop
-                    |> ResultOption.bind (fun element ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            jsonPath <-
-                                JsonPath.prop name
-                                |> JsonPath.append jsonPath
-
-                            element
-                            |> JsonElement.tryGetProperty name
-                            |> Ok
-                        | _ -> Error element
-                    )
+                let prop, path =
+                    path
+                    |> Seq.fold (fun (prop, path) name ->
+                        match prop with
+                        | Ok (Some (element:JsonElement)) ->
+                            match element.ValueKind with
+                            | Kind.Object ->
+                                element
+                                |> JsonElement.tryGetProperty name
+                                |> Ok, JsonPath.append path (JsonPath.prop name)
+                            | _ -> Error element, path
+                        | _ -> prop, path
+                    ) (Ok (Some element), JsonPath.empty)
 
                 match prop with
                 | Ok (Some prop) ->
@@ -108,10 +100,10 @@ module Prop =
                     | Ok x -> Ok <| Some x
                     | Error error ->
                         error
-                        |> ParserError.enrich jsonPath
+                        |> ParserError.enrich path
                         |> Error
                 | Ok None -> Ok None
                 | Error element ->
                     InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enriched jsonPath
+                    |> ParserError.enriched path
                     |> Error
