@@ -243,13 +243,6 @@ Both methods produce detailed error messages when validation fails.
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
 ```
 
-```code
-Path: $.age
-Message: Tried parsing Age.
-Details: The minimum age is '12'.
-Value: 10
-```
-
 #### Parse.custom
 
 ```fsharp
@@ -262,6 +255,8 @@ let age =
     
 let! age = "age" ?= age
 ```
+
+#### Error
 
 ```code
 Path: $.age
