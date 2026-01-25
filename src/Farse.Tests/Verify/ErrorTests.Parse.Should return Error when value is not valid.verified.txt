@@ -1,4 +1,0 @@
-﻿Path: $.prop
-Message: Tried parsing Int32.
-Details: Not valid.
-Value: 1
