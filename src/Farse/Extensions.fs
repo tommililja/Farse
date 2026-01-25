@@ -99,7 +99,7 @@ module internal Extensions =
             | true, prop when prop.ValueKind <> Kind.Null -> Some prop
             | _ -> None
 
-        let getValue (element:JsonElement) =
+        let inline getValue (element:JsonElement) =
             match element.ValueKind with
             | JsonValueKind.Null
             | JsonValueKind.Undefined -> None
@@ -107,7 +107,7 @@ module internal Extensions =
 
     module Type =
 
-        let rec getFullName (x:Type) =
+        let rec inline getFullName (x:Type) =
             match x with
             | x when x.IsGenericType ->
                 let genericName = x.Name.Substring(0, x.Name.IndexOf('`'))
