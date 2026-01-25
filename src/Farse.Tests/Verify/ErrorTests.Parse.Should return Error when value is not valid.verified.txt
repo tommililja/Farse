@@ -1,7 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing '1' to String.
+Message: Tried parsing Int32.
 Details: Not valid.
-
-{
-    "prop": 1
-}
+Value: 1

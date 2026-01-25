@@ -1,7 +1,3 @@
 ﻿Path: $.prop[0]
-Message: Tried parsing '1' to Guid.
-
-[
-    "1",
-    1
-]
+Message: Tried parsing Guid.
+Value: "1"

@@ -1,6 +1,3 @@
 ﻿Path: $.prop
-Message: Tried parsing '1' to Int32.
-
-{
-    "prop": 1
-}
+Message: Tried parsing Int32.
+Value: 1

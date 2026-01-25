@@ -1,10 +1,2 @@
 ﻿Path: $.missing
 Message: Expected Object, but got Undefined.
-
-{
-    "prop": {
-        "prop2": {
-            "prop3": 1
-        }
-    }
-}

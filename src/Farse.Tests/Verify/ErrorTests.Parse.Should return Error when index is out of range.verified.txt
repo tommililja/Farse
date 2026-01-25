@@ -1,8 +1,2 @@
 ﻿Path: $.prop[3]
 Message: Index was out of range.
-
-[
-    1,
-    2,
-    3
-]

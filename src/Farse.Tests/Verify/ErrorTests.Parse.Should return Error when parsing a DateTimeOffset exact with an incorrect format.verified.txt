@@ -1,7 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing '2025-05-13 17:28 +02:00' to DateTimeOffset.
+Message: Tried parsing DateTimeOffset.
 Details: Expected 'yyyyMMdd HH:mm:ss zzz'.
-
-{
-    "prop": "2025-05-13 17:28 \u002B02:00"
-}
+Value: "2025-05-13 17:28 +02:00"

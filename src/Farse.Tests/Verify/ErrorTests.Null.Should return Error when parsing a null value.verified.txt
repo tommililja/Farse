@@ -1,6 +1,2 @@
 ﻿Path: $.prop
 Message: Expected Number, but got Null.
-
-{
-    "prop": null
-}

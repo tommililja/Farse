@@ -1,11 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing Object to IDictionary<String, Int32>.
+Message: Tried parsing IDictionary<String, Int32>.
 Details: Duplicate key 'key2'.
-
-{
-    "prop": {
-        "key2": 1,
-        "key2": 2,
-        "key3": 3
-    }
-}
+Value: { "key2": 1, "key2": 2, "key3": 3 }

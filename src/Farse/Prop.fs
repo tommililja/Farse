@@ -19,7 +19,7 @@ module Prop =
                     | Ok x -> Ok x
                     | Error error ->
                         error
-                        |> ParserError.enrich (JsonPath.prop name) element
+                        |> ParserError.enrich (JsonPath.prop name)
                         |> Error
                 | _ ->
                    InvalidKind (ExpectedKind.Object, element)
@@ -28,7 +28,6 @@ module Prop =
         | Nested path ->
             fun element ->
                 let mutable prop = Ok element
-                let mutable object = element
                 let mutable jsonPath = JsonPath.empty
 
                 for name in path do
@@ -36,8 +35,9 @@ module Prop =
                     |> Result.bind (fun element ->
                         match element.ValueKind with
                         | Kind.Object ->
-                            object <- element
-                            jsonPath <- JsonPath.append jsonPath (JsonPath.prop name)
+                            jsonPath <-
+                                JsonPath.prop name
+                                |> JsonPath.append jsonPath
 
                             element
                             |> JsonElement.getProperty name
@@ -51,11 +51,11 @@ module Prop =
                     | Ok x -> Ok x
                     | Error error ->
                         error
-                        |> ParserError.enrich jsonPath object
+                        |> ParserError.enrich jsonPath
                         |> Error
                 | Error element ->
                     InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enriched jsonPath object
+                    |> ParserError.enriched jsonPath
                     |> Error
 
     /// <summary>Parses an optional property with the given parser.</summary>
@@ -75,7 +75,7 @@ module Prop =
                         | Ok x -> Ok <| Some x
                         | Error error ->
                             error
-                            |> ParserError.enrich (JsonPath.prop name) element
+                            |> ParserError.enrich (JsonPath.prop name)
                             |> Error
                     | None -> Ok None
                 | _ ->
@@ -85,7 +85,6 @@ module Prop =
         | Nested path ->
             fun element ->
                 let mutable prop = Ok <| Some element
-                let mutable object = element
                 let mutable jsonPath = JsonPath.empty
 
                 for name in path do
@@ -93,8 +92,9 @@ module Prop =
                     |> ResultOption.bind (fun element ->
                         match element.ValueKind with
                         | Kind.Object ->
-                            object <- element
-                            jsonPath <- JsonPath.append jsonPath (JsonPath.prop name)
+                            jsonPath <-
+                                JsonPath.prop name
+                                |> JsonPath.append jsonPath
 
                             element
                             |> JsonElement.tryGetProperty name
@@ -108,10 +108,10 @@ module Prop =
                     | Ok x -> Ok <| Some x
                     | Error error ->
                         error
-                        |> ParserError.enrich jsonPath object
+                        |> ParserError.enrich jsonPath
                         |> Error
                 | Ok None -> Ok None
                 | Error element ->
                     InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enriched jsonPath object
+                    |> ParserError.enriched jsonPath
                     |> Error

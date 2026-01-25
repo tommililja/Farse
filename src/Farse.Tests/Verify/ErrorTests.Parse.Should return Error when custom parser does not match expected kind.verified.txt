@@ -1,6 +1,3 @@
 ﻿Path: $.prop
 Message: Expected Number, but got String.
-
-{
-    "prop": "1"
-}
+Value: "1"

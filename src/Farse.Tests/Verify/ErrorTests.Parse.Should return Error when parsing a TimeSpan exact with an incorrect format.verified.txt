@@ -1,7 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing '01:28:45' to TimeSpan.
+Message: Tried parsing TimeSpan.
 Details: Expected 'hh\mm\ss'.
-
-{
-    "prop": "01:28:45"
-}
+Value: "01:28:45"

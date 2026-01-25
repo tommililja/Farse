@@ -1,7 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing '2025-05-13T17:28:45' to DateTime.
+Message: Tried parsing DateTime.
 Details: Expected 'yyyy-MM-dd HH:mm:ss'.
-
-{
-    "prop": "2025-05-13T17:28:45"
-}
+Value: "2025-05-13T17:28:45"

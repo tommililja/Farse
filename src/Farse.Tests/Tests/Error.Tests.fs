@@ -445,7 +445,7 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when value is not valid`` () =
-            let fromInt (_:int) : Result<string, _> = Error "Not valid."
+            let fromInt (_:int) : Result<int, _> = Error "Not valid."
             Prop.req "prop" (Parse.valid Parse.int fromInt)
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
@@ -495,7 +495,7 @@ module ErrorTests =
         [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
             Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
-            |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
+            |> Parser.parse """{ "prop": [ 1, 1, 1 ] }"""
             |> Expect.errorString
 
         [<Fact>]

@@ -1,6 +1,2 @@
 ﻿Path: $.missing
 Message: Expected Number, but got Undefined.
-
-{
-    "prop": "1"
-}

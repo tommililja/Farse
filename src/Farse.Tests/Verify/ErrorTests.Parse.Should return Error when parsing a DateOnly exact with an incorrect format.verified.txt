@@ -1,7 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing '2025-05-13' to DateOnly.
+Message: Tried parsing DateOnly.
 Details: Expected 'yyyyMMdd'.
-
-{
-    "prop": "2025-05-13"
-}
+Value: "2025-05-13"

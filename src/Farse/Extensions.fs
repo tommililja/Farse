@@ -93,11 +93,11 @@ module internal Extensions =
             | true, prop when prop.ValueKind <> Kind.Null -> Some prop
             | _ -> None
 
-        let inline asString (element:JsonElement) =
-            element.ToString()
-
-        let inline asJsonString (element:JsonElement) =
-            JsonSerializer.Serialize(element, JsonSerializerOptions.preset)
+        let getValue (element:JsonElement) =
+            match element.ValueKind with
+            | JsonValueKind.Null
+            | JsonValueKind.Undefined -> None
+            | _ -> Some <| element.GetRawText()
 
     module ResultOption =
 
@@ -107,6 +107,20 @@ module internal Extensions =
                 | Some x -> fn x
                 | None -> Ok None
             | Error e -> Error e
+
+    module Type =
+
+        let rec getFullName (x:Type) =
+            match x with
+            | x when x.IsGenericType ->
+                let genericName = x.Name.Substring(0, x.Name.IndexOf('`'))
+                let args =
+                    x.GetGenericArguments()
+                    |> Array.map getFullName
+                    |> String.concat ", "
+
+                $"%s{genericName}<%s{args}>"
+            | x -> x.Name
 
     [<AutoOpen>]
     module ActivePatterns =

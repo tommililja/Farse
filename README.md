@@ -259,15 +259,9 @@ let! age = "age" ?= valid byte Age.fromByte
 
 ```code
 Path: $.age
-Message: Tried parsing '10' to Age.
+Message: Tried parsing Age.
 Details: The minimum age is '12'.
-```
-```json
-{
-    "id": "c8eae96a-025d-4bc9-88f8-f204e95f2883",
-    "name": "Alice",
-    "age": 10
-}
+Value: 10
 ```
 
 #### Parse.custom
@@ -280,15 +274,9 @@ let! age = "age" ?= age
 
 ```code
 Path: $.age
-Message: Tried parsing '10' to Age.
+Message: Tried parsing Age.
 Details: The minimum age is '12'.
-```
-```json
-{
-    "id": "c8eae96a-025d-4bc9-88f8-f204e95f2883",
-    "name": "Alice",
-    "age": 10
-}
+Value: 10
 ```
 
 ## Creating JSON
@@ -325,29 +313,17 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 
 ```code
 Path: $.subscription.renewsAt
-Message: Tried parsing '202612-25T10:30:00Z' to Instant.
+Message: Tried parsing Instant.
 Details: The value string does not [...]
-```
-```json
-{
-    "plan": "Pro",
-    "isCanceled": false,
-    "renewsAt": "202612-25T10:30:00Z"
-}
+Value: "202612-25T10:30:00Z"
 ```
 
 #### Array
 
 ```code
 Path: $.profiles[1]
-Message: Tried parsing '927eb20f-cd62-470c-aafc-c3ce6b9' to ProfileId.
-```
-```json
-[
-    "01458283-b6e3-4ae7-ae54-a68eb587cdc0",
-    "927eb20f-cd62-470c-aafc-c3ce6b9",
-    "bf00d1e2-ee53-4969-9507-86bed7e9643c"
-]
+Message: Tried parsing ProfileId.
+Value: "927eb20f-cd62-470c-aafc-c3ce6b9"
 ```
 
 > Note: Farse does not throw exceptions unless something unexpected occurs.

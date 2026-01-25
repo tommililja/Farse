@@ -1,6 +1,3 @@
 ﻿Path: $.prop.prop2
 Message: Expected Number, but got Array.
-
-{
-    "prop2": []
-}
+Value: []

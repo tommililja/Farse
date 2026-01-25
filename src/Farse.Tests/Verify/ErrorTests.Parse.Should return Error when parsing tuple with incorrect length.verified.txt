@@ -1,11 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing Array to Tuple<String, Int32>.
+Message: Tried parsing Tuple<String, Int32>.
 Details: Expected a tuple of 2, but got 3.
-
-{
-    "prop": [
-        "1",
-        1,
-        1
-    ]
-}
+Value: [ 1, 1, 1 ]

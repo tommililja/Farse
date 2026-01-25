@@ -292,7 +292,7 @@ module Parse =
         | Ok x -> Ok x
         | Error e ->
             let path = JsonPath.append (JsonPath.index i) e.Path
-            ArrayItem (element, e.ErrorType)
+            ArrayItem e.ErrorType
             |> ParserError.create path
             |> Error
 
@@ -316,7 +316,7 @@ module Parse =
                 | None -> Ok <| convert (array :> seq<_>)
                 | Some error ->
                     let path = JsonPath.append (JsonPath.index array.Count) error.Path
-                    ArrayItem (element, error.ErrorType)
+                    ArrayItem error.ErrorType
                     |> ParserError.create path
                     |> Error
             | _ ->
@@ -349,8 +349,7 @@ module Parse =
             match element.ValueKind with
             | Kind.Array when i >= 0 && arrayLength >= i + 1 -> parseIndex i parser element
             | Kind.Array ->
-                let error = ArrayIndex element
-                ArrayItem (element, error)
+                ArrayItem ArrayIndex
                 |> ParserError.create (JsonPath.index i)
                 |> Error
             | _ ->
@@ -384,7 +383,7 @@ module Parse =
                     let name = enumerator.Current.Name
                     match parser enumerator.Current.Value with
                     | Ok x -> array.Add(name, x)
-                    | Error e -> error <- Some (name, e.ErrorType, element)
+                    | Error e -> error <- Some (name, e.ErrorType)
 
                 match error with
                 | None ->
@@ -395,8 +394,8 @@ module Parse =
                         |> ParserError.fromType
                         |> Error
                     | None -> Ok <| convert (array :> seq<_>)
-                | Some (name, error, element) ->
-                    KeyValue (error, element)
+                | Some (name, error) ->
+                    KeyValue error
                     |> ParserError.create (JsonPath.prop name)
                     |> Error
             | _ ->

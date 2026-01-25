@@ -4,12 +4,12 @@ open System
 open System.Text.Json
 
 type ParserErrorType =
-    | ArrayItem of array:JsonElement * error:ParserErrorType
-    | ArrayIndex of array:JsonElement
-    | CouldNotParse of msg:string * details:string option * parent:JsonElement option
+    | ArrayItem of error:ParserErrorType
+    | ArrayIndex
+    | CouldNotParse of msg:string * details:string option * element:JsonElement option
     | InvalidKind of expected:ExpectedKind * element:JsonElement
     | InvalidValue of details:string option * expected:Type * element:JsonElement
-    | KeyValue of error:ParserErrorType * object:JsonElement
+    | KeyValue of error:ParserErrorType
     | Other of msg:string
 
 type ParserError = {
@@ -29,51 +29,51 @@ module ParserError =
         ErrorType = errorType
     }
 
-    let internal enrich path parent error =
-        let rec getError parent = function
-            | ArrayItem (array, error) ->
-                getError array error
-            | ArrayIndex _ ->
+    let internal enrich path error =
+        let rec getError = function
+            | ArrayItem error ->
+                getError error
+            | ArrayIndex ->
                 let msg = Error.invalidIndex
-                CouldNotParse (msg, None, Some parent)
-            | CouldNotParse(msg, details, parent) ->
-                CouldNotParse (msg, details, parent)
+                CouldNotParse (msg, None, None)
+            | CouldNotParse(msg, details, element) ->
+                CouldNotParse (msg, details, element)
             | InvalidKind (expected, actual) ->
-                let msg = Error.invalidKind expected actual
-                CouldNotParse (msg, None, Some parent)
+                let msg = Error.invalidKind expected actual.ValueKind
+                CouldNotParse (msg, None, Some actual)
             | InvalidValue (details, expected, element) ->
-                let msg = Error.invalidValue expected element
-                CouldNotParse (msg, details, Some parent)
-            | KeyValue (error, parent) ->
-                getError parent error
+                let msg = Error.invalidValue expected
+                CouldNotParse (msg, details, Some element)
+            | KeyValue error ->
+                getError error
             | Other msg -> Other msg
 
         {
             error with
                 Path = JsonPath.append path error.Path
-                ErrorType = getError parent error.ErrorType
+                ErrorType = getError error.ErrorType
         }
 
-    let internal enriched path parent =
-        fromType >> enrich path parent
+    let internal enriched path =
+        fromType >> enrich path
 
     let asString x =
-        let rec getMessage path parent = function
-            | ArrayItem (array, error) ->
-                getMessage path (Some array) error
-            | ArrayIndex array ->
+        let rec getMessage path = function
+            | ArrayItem error ->
+                getMessage path error
+            | ArrayIndex ->
                 let msg = Error.invalidIndex
-                Error.message path msg None (Some array)
-            | CouldNotParse (msg, details, parent) ->
-                Error.message path msg details parent
+                Error.message path msg None None
+            | CouldNotParse (msg, details, element) ->
+                Error.message path msg details element
             | InvalidKind (expected, actual) ->
-                let msg = Error.invalidKind expected actual
-                Error.message path msg None parent
+                let msg = Error.invalidKind expected actual.ValueKind
+                Error.message path msg None (Some actual)
             | InvalidValue (details, expected, element) ->
-                let msg = Error.invalidValue expected element
-                Error.message path msg details parent
-            | KeyValue (error, object) ->
-                getMessage path (Some object) error
+                let msg = Error.invalidValue expected
+                Error.message path msg details (Some element)
+            | KeyValue error ->
+                getMessage path error
             | Other msg -> msg
 
-        getMessage x.Path None x.ErrorType
+        getMessage x.Path x.ErrorType

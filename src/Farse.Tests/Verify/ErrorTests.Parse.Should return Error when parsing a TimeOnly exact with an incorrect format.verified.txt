@@ -1,7 +1,4 @@
 ﻿Path: $.prop
-Message: Tried parsing '17:28:45' to TimeOnly.
+Message: Tried parsing TimeOnly.
 Details: Expected 'HHmmss'.
-
-{
-    "prop": "17:28:45"
-}
+Value: "17:28:45"
