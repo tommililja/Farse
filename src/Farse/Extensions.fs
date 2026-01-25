@@ -107,7 +107,7 @@ module internal Extensions =
 
     module Type =
 
-        let rec inline getFullName (x:Type) =
+        let rec getFullName (x:Type) =
             match x with
             | x when x.IsGenericType ->
                 let genericName = x.Name.Substring(0, x.Name.IndexOf('`'))
