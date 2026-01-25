@@ -650,20 +650,3 @@ module ParseTests =
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal expected actual
-
-    [<Fact>]
-    let ``Should Ok when value is valid`` () =
-        let fromInt (x:int) = Ok x
-        let expected = 1
-        let actual =
-            Prop.req "prop" (Parse.valid Parse.int fromInt)
-            |> Parser.parse """{ "prop": 1 }"""
-            |> Expect.ok
-        Expect.equal actual expected
-
-    [<Fact>]
-    let ``Should Error when value is not valid`` () =
-        let fromInt (_:int) = Error "Not valid."
-        Prop.req "prop" (Parse.valid Parse.int fromInt)
-        |> Parser.parse """{ "prop": 1 }"""
-        |> Expect.error

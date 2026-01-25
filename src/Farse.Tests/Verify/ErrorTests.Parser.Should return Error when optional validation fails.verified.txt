@@ -1,1 +1,4 @@
-﻿Value too small.
+﻿Path: $
+Message: Tried parsing Int32.
+Details: Value too small.
+Value: 1

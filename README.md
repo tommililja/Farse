@@ -235,26 +235,12 @@ module Parse =
 
 ## Validation
 
-There are a few different options available depending on your use case.
+Both methods produce detailed error messages when validation fails.
 
 #### Parser.validate 
 
-Passes along the error string from the validation function.
-
 ```fsharp
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
-```
-
-```fsharp
-The minimum age is '12'.
-```
-
-#### Parse.valid
-
-Produces detailed error messages when validation fails.
-
-```fsharp
-let! age = "age" ?= valid byte Age.fromByte
 ```
 
 ```code
@@ -266,9 +252,14 @@ Value: 10
 
 #### Parse.custom
 
-Produces detailed error messages when validation fails.
-
 ```fsharp
+let age =
+    Parse.custom (fun element ->
+        match element.TryGetByte() with
+        | true, byte -> Age.fromByte byte |> Result.mapError Some
+        | _ -> Error None
+    ) ExpectedKind.String
+    
 let! age = "age" ?= age
 ```
 

@@ -10,7 +10,6 @@ type ParserErrorType =
     | InvalidKind of expected:ExpectedKind * element:JsonElement
     | InvalidValue of details:string option * expected:Type * element:JsonElement
     | KeyValue of error:ParserErrorType
-    | Other of msg:string
 
 type ParserError = {
     Path: JsonPath
@@ -46,7 +45,6 @@ module ParserError =
                 CouldNotParse (msg, details, Some element)
             | KeyValue error ->
                 getError error
-            | Other msg -> Other msg
 
         {
             error with
@@ -74,6 +72,5 @@ module ParserError =
                 Error.message path msg details (Some element)
             | KeyValue error ->
                 getMessage path error
-            | Other msg -> msg
 
         getMessage x.Path x.ErrorType

@@ -1,1 +1,4 @@
-﻿Error
+﻿Path: $
+Message: Tried parsing Object.
+Details: Error
+Value: 1

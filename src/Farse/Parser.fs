@@ -7,27 +7,27 @@ open System.Text.Json
 
 type Validate =
 
-    static member inline Validate(parser:Parser<_ option>, fn) =
+    static member inline Validate(parser, fn) : Parser<'b option> =
         fun element ->
             match parser element with
             | Ok (Some x) ->
                 match fn x with
                 | Ok x -> Ok <| Some x
                 | Error msg ->
-                    Other msg
+                    InvalidValue (Some msg, typeof<'b>, JsonElement.create x)
                     |> ParserError.fromType
                     |> Error
             | Ok None -> Ok None
             | Error e -> Error e
 
-    static member inline Validate(parser:Parser<_>, fn) =
+    static member inline Validate(parser, fn) : Parser<'b> =
         fun element ->
             match parser element with
             | Ok x ->
                 match fn x with
                 | Ok x -> Ok x
                 | Error msg ->
-                    Other msg
+                    InvalidValue (Some msg, typeof<'b>, JsonElement.create x)
                     |> ParserError.fromType
                     |> Error
             | Error e -> Error e
@@ -46,8 +46,14 @@ module Parser =
     /// <summary>Returns a parser with the given result.</summary>
     /// <code>let! int = Ok 1 |> Parser.fromResult</code>
     /// <param name="x">The result to return.</param>
-    let inline fromResult x : Parser<_> =
-        fun _ -> Result.mapError (Other >> ParserError.fromType) x
+    let inline fromResult x : Parser<'a> =
+        fun element ->
+            match x with
+            | Ok x -> Ok x
+            | Error msg ->
+                InvalidValue (Some msg, typeof<'a>, element)
+                |> ParserError.fromType
+                |> Error
         |> id
 
     /// <summary>Binds the parsed value with the given function.</summary>
@@ -73,8 +79,12 @@ module Parser =
         |> id
 
     /// <summary>Validates the parsed value with the given function.</summary>
-    /// <remarks>Works with both required and optional values.</remarks>
-    /// <code>let! email = "prop" &amp;= Parse.string |> Parser.validate Email.fromString</code>
+    /// <remarks>
+    ///     <para>Produces detailed error messages when validation fails.</para>
+    ///     <para>Works with both required and optional values.</para>
+    /// </remarks>
+    /// <code>let! age = "age" ?= Parse.byte |> Parser.validate Age.fromByte</code>
+    /// <code>let! email = "email" &amp;= Parse.string |> Parser.validate Email.fromString</code>
     /// <param name="fn">The validation function.</param>
     /// <param name="parser">The parser to validate.</param>
     let inline validate ([<InlineIfLambda>] fn) parser =

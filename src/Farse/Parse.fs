@@ -24,24 +24,6 @@ module Parse =
                 | Error e -> Error e
         |> id
 
-    /// <summary>Validates the parsed value with the given function.</summary>
-    /// <remarks>Produces detailed error messages when validation fails.</remarks>
-    /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
-    /// <param name="parser">The parser to validate.</param>
-    /// <param name="fn">The validation function.</param>
-    let inline valid (parser:Parser<_>) ([<InlineIfLambda>] fn) : Parser<'b> =
-        fun element ->
-            match parser element with
-            | Ok x ->
-                match fn x with
-                | Ok x -> Ok x
-                | Error msg ->
-                    InvalidValue (Some msg, typeof<'b>, element)
-                    |> ParserError.fromType
-                    |> Error
-            | Error e -> Error e
-        |> id
-
     /// <summary>Creates a custom parser with the given function.</summary>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
