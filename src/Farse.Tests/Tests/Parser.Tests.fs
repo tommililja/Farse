@@ -49,7 +49,7 @@ module ParserTests =
         let expected = ()
         let actual =
             Parse.int
-            |> Parser.ignore
+            |> Parser.ignore<int>
             |> Parser.parse "1"
             |> Expect.ok
         Expect.equal actual expected
