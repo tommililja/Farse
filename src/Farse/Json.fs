@@ -32,6 +32,8 @@ module JNil =
 
 module JArr =
 
+    let empty = JArr Seq.empty
+
     let inline internal from fn =
         Seq.map fn >> JArr
 
