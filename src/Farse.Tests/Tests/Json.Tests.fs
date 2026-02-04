@@ -35,6 +35,12 @@ module JsonTests =
     module JStr =
 
         [<Fact>]
+        let ``Should create empty string`` () =
+            JStr.empty
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
         let ``Should create string when Some`` () =
             JStr.nil id (Some "1")
             |> Json.asString Indented
@@ -95,6 +101,12 @@ module JsonTests =
     module JObj =
 
         [<Fact>]
+        let ``Should create empty object`` () =
+            JObj.empty
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
         let ``Should create object when Some`` () =
             JObj.nil (fun x -> [ "value", JStr x ]) (Some "1")
             |> Json.asString Indented
@@ -109,6 +121,14 @@ module JsonTests =
         [<Fact>]
         let ``Should create object array`` () =
             JObj.arr (fun x -> [ "value", JStr x ]) [ "1"; "2"; "3" ]
+            |> Json.asString Indented
+            |> Expect.string
+
+    module JArr =
+
+        [<Fact>]
+        let ``Should create empty array`` () =
+            JArr.empty
             |> Json.asString Indented
             |> Expect.string
 

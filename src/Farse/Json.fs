@@ -1,5 +1,6 @@
 namespace Farse
 
+open System
 open System.Numerics
 open System.Text.Json
 open System.Text.Json.Nodes
@@ -39,6 +40,8 @@ module JArr =
 
 module JStr =
 
+    let empty = JStr String.Empty
+
     let inline nil fn = JNil.from (fn >> JStr)
 
     let inline arr fn = JArr.from (fn >> JStr)
@@ -57,6 +60,8 @@ module JBit =
     let inline arr fn = JArr.from (fn >> JBit)
 
 module JObj =
+
+    let empty = JObj Seq.empty
 
     let inline nil fn = JNil.from (fn >> JObj)
 
