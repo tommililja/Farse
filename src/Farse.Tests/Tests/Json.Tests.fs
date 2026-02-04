@@ -61,6 +61,12 @@ module JsonTests =
     module JNum =
 
         [<Fact>]
+        let ``Should create number with zero`` () =
+            JNum.zero
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
         let ``Should create number when Some`` () =
             JNum.nil id (Some 1)
             |> Json.asString Indented

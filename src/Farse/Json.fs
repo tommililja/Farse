@@ -48,6 +48,8 @@ module JStr =
 
 module JNum =
 
+    let zero = JNum 0
+
     let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
         JNil.from (fn >> JNum)
 
