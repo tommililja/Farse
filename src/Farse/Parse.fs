@@ -2,6 +2,7 @@ namespace Farse
 
 open System
 open System.Collections.Generic
+open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
 open System.Text.Json
@@ -179,7 +180,7 @@ module Parse =
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let timeOnlyExact (format:string) =
+    let timeOnlyExact ([<StringSyntax("TimeOnlyFormat")>] format:string) =
         custom (fun element ->
             let str = element.GetString()
             match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
@@ -198,7 +199,7 @@ module Parse =
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let timeSpanExact (format:string) =
+    let timeSpanExact ([<StringSyntax("TimeSpanFormat")>] format:string) =
         custom (fun element ->
             let str = element.GetString()
             match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
@@ -217,7 +218,7 @@ module Parse =
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateOnlyExact (format:string) =
+    let dateOnlyExact ([<StringSyntax("DateOnlyFormat")>] format:string) =
         custom (fun element ->
             let str = element.GetString()
             match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
@@ -238,7 +239,7 @@ module Parse =
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeExact (format:string) =
+    let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
             let str = element.GetString()
             match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
@@ -251,7 +252,7 @@ module Parse =
 
     /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
     /// <param name="format">The required format.</param>
-    let dateTimeOffsetExact (format:string) =
+    let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
             let str = element.GetString()
             match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
