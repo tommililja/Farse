@@ -17,7 +17,9 @@ module Expect =
         settings
 
     let string (actual:string) =
-        Verifier.Verify(actual, settings).ToTask()
+        Verifier
+            .Verify(actual, settings)
+            .ToTask()
 
     let ok x = Expect.wantOk x String.Empty
 
@@ -37,9 +39,8 @@ module Expect =
 module MemoryStream =
 
     let create (str:string) =
-        str
-        |> Encoding.UTF8.GetBytes
-        |> fun bytes -> new MemoryStream(bytes)
+        let bytes = Encoding.UTF8.GetBytes(str)
+        new MemoryStream(bytes)
 
 module Task =
 

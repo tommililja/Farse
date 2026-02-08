@@ -10,25 +10,21 @@ module Prop =
     /// <param name="parser">The parser used to parse the property value.</param>
     let req path (parser:Parser<_>) : Parser<_> =
         match path with
-        | Flat name ->
+        | Prop name ->
             fun (element:JsonElement) ->
                 match element.ValueKind with
                 | Kind.Object ->
                     let prop = JsonElement.getProperty name element
-                    match parser prop with
-                    | Ok x -> Ok x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich (JsonPath.prop name)
-                        |> Error
-                | _ ->
-                   InvalidKind (ExpectedKind.Object, element)
-                   |> ParserError.fromType
-                   |> Error
-        | Nested path ->
+                    parser prop
+                    |> Result.bindError (fun error ->
+                        let path = JsonPath.prop name
+                        ParserError.enrich path error
+                    )
+                | _ -> InvalidKind.create ExpectedKind.Object element
+        | Path arr ->
             fun element ->
                 let prop, path =
-                    path
+                    arr
                     |> Seq.fold (fun (prop, path) name ->
                         match prop with
                         | Ok (element:JsonElement) ->
@@ -43,16 +39,11 @@ module Prop =
 
                 match prop with
                 | Ok prop ->
-                    match parser prop with
-                    | Ok x -> Ok x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich path
-                        |> Error
+                    parser prop
+                    |> Result.bindError (ParserError.enrich path)
                 | Error element ->
-                    InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enriched path
-                    |> Error
+                    ExpectedKind.Object
+                    |> CouldNotParse.invalidKind path element
 
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <code>let! int = Prop.opt "prop.prop2" Parse.int</code>
@@ -60,7 +51,7 @@ module Prop =
     /// <param name="parser">The parser used to parse the property value.</param>
     let opt path (parser:Parser<_>) : Parser<_> =
         match path with
-        | Flat name ->
+        | Prop name ->
             fun (element:JsonElement) ->
                 match element.ValueKind with
                 | Kind.Object ->
@@ -70,18 +61,14 @@ module Prop =
                         match parser prop with
                         | Ok x -> Ok <| Some x
                         | Error error ->
-                            error
-                            |> ParserError.enrich (JsonPath.prop name)
-                            |> Error
+                            let path = JsonPath.prop name
+                            ParserError.enrich path error
                     | None -> Ok None
-                | _ ->
-                    InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.fromType
-                    |> Error
-        | Nested path ->
+                | _ -> InvalidKind.create ExpectedKind.Object element
+        | Path arr ->
             fun element ->
                 let prop, path =
-                    path
+                    arr
                     |> Seq.fold (fun (prop, path) name ->
                         match prop with
                         | Ok (Some (element:JsonElement)) ->
@@ -98,12 +85,8 @@ module Prop =
                 | Ok (Some prop) ->
                     match parser prop with
                     | Ok x -> Ok <| Some x
-                    | Error error ->
-                        error
-                        |> ParserError.enrich path
-                        |> Error
+                    | Error error -> ParserError.enrich path error
                 | Ok None -> Ok None
                 | Error element ->
-                    InvalidKind (ExpectedKind.Object, element)
-                    |> ParserError.enriched path
-                    |> Error
+                    ExpectedKind.Object
+                    |> CouldNotParse.invalidKind path element

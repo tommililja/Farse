@@ -84,4 +84,3 @@ module ParserTests =
                 |> Task.map Expect.ok
             Expect.equal actual expected
         }
-

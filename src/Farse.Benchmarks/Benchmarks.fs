@@ -215,4 +215,6 @@ let config =
         .WithSummaryStyle(SummaryStyle.Default)
         .HideColumns("Error", "StdDev", "RatioSD")
 
-let summary = BenchmarkRunner.Run<ParserBenchmarks>(config)
+let summary =
+    BenchmarkRunner
+        .Run<ParserBenchmarks>(config)

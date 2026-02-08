@@ -9,28 +9,25 @@ type Validate =
 
     static member inline Validate(parser, fn) : Parser<'b option> =
         fun element ->
-            match parser element with
-            | Ok (Some x) ->
+            parser element
+            |> ResultOption.bind (fun x ->
                 match fn x with
                 | Ok x -> Ok <| Some x
                 | Error msg ->
-                    InvalidValue (Some msg, typeof<'b>, JsonElement.create x)
-                    |> ParserError.fromType
-                    |> Error
-            | Ok None -> Ok None
-            | Error e -> Error e
+                    let element = JsonElement.create x
+                    InvalidValue.create (Some msg) typeof<'b> element
+            )
 
     static member inline Validate(parser, fn) : Parser<'b> =
         fun element ->
-            match parser element with
-            | Ok x ->
-                match fn x with
-                | Ok x -> Ok x
-                | Error msg ->
-                    InvalidValue (Some msg, typeof<'b>, JsonElement.create x)
-                    |> ParserError.fromType
-                    |> Error
-            | Error e -> Error e
+            parser element
+            |> Result.bind (fun x ->
+                fn x
+                |> Result.bindError (fun msg ->
+                    let element = JsonElement.create x
+                    InvalidValue.create (Some msg) typeof<'b> element
+                )
+            )
 
 and Parser<'a> = JsonElement -> Result<'a, ParserError>
 
@@ -48,12 +45,9 @@ module Parser =
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<'a> =
         fun element ->
-            match x with
-            | Ok x -> Ok x
-            | Error msg ->
-                InvalidValue (Some msg, typeof<'a>, element)
-                |> ParserError.fromType
-                |> Error
+            Result.bindError (fun msg ->
+                InvalidValue.create (Some msg) typeof<'a> element
+            ) x
         |> id
 
     /// <summary>Binds the parsed value with the given function.</summary>
@@ -62,9 +56,10 @@ module Parser =
     /// <param name="parser">The parser to bind.</param>
     let inline bind ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
         fun element ->
-            match parser element with
-            | Ok x -> element |> fn x
-            | Error e -> Error e
+            result {
+                let! x = parser element
+                return! element |> fn x
+            }
         |> id
 
     /// <summary>Maps the parsed value with the given function.</summary>
@@ -72,11 +67,13 @@ module Parser =
     /// <param name="fn">The mapping function.</param>
     /// <param name="parser">The parser to map.</param>
     let inline map ([<InlineIfLambda>] fn) (parser:Parser<_>) : Parser<_> =
-        fun element ->
-            match parser element with
-            | Ok x -> Ok <| fn x
-            | Error e -> Error e
-        |> id
+        parser >> Result.map fn
+
+    /// <summary>Ignores the parsed value.</summary>
+    /// <code>do! "prop" &amp;= Parse.int |> Parser.ignore</code>
+    /// <param name="parser">The parser to ignore.</param>
+    let inline ignore<'a> (parser:Parser<'a>) : Parser<_> =
+        parser >> Result.map ignore<'a>
 
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>
@@ -90,16 +87,6 @@ module Parser =
     let inline validate ([<InlineIfLambda>] fn) parser =
         ((^T or Validate) : (static member Validate : ^T * (_ -> Result<_, string>) -> Parser<_>) (parser, fn))
 
-    /// <summary>Ignores the parsed value.</summary>
-    /// <code>do! "prop" &amp;= Parse.int |> Parser.ignore</code>
-    /// <param name="parser">The parser to ignore.</param>
-    let inline ignore<'a> (parser:Parser<'a>) : Parser<_> =
-        fun element ->
-            match parser element with
-            | Ok _ -> Ok ()
-            | Error e -> Error e
-        |> id
-
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
     /// <param name="parser">The parser used to parse the JSON string.</param>
@@ -111,9 +98,7 @@ module Parser =
         with
             | :? JsonException
             | :? ArgumentNullException as exn ->
-                Some json
-                |> Error.invalidJson "string" exn
-                |> Error
+                Error.invalidJson exn json
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
@@ -128,8 +113,5 @@ module Parser =
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn ->
-                    return
-                        None
-                        |> Error.invalidJson "stream" exn
-                        |> Error
+                    return Error.invalidStream exn
         }

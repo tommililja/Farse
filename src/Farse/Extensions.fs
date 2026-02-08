@@ -44,8 +44,7 @@ module internal Extensions =
 
     module Kind =
 
-        let inline asString kind =
-            match kind with
+        let asString = function
             | Kind.Undefined -> "Undefined"
             | Kind.Object -> "Object"
             | Kind.Array -> "Array"
@@ -66,8 +65,7 @@ module internal Extensions =
             | Kind.True | Kind.False -> ExpectedKind.Bool
             | Kind.Null -> ExpectedKind.Null
 
-        let inline asString expectedKind =
-            match expectedKind with
+        let asString = function
             | ExpectedKind.Undefined -> "Undefined"
             | ExpectedKind.Object -> "Object"
             | ExpectedKind.Array -> "Array"
@@ -105,27 +103,43 @@ module internal Extensions =
             | JsonValueKind.Undefined -> None
             | _ -> Some <| element.GetRawText()
 
+        let inline isBool (element:JsonElement) =
+            element.ValueKind = Kind.True || element.ValueKind = Kind.False
+
     module Type =
 
-        let rec getFullName (x:Type) =
+        let rec getName (x:Type) =
             match x with
             | x when x.IsGenericType ->
-                let genericName = x.Name.Substring(0, x.Name.IndexOf('`'))
+                let name = x.Name.Substring(0, x.Name.IndexOf('`'))
                 let args =
                     x.GetGenericArguments()
-                    |> Array.map getFullName
+                    |> Array.map getName
                     |> String.concat ", "
 
-                $"%s{genericName}<%s{args}>"
+                $"%s{name}<%s{args}>"
             | x -> x.Name
+
+    module Result =
+
+        let inline bindError fn = function
+            | Ok x -> Ok x
+            | Error e -> fn e
+
+    module ResultOption =
+
+        let inline bind fn = function
+            | Ok (Some x) -> fn x
+            | Ok None -> Ok None
+            | Error e -> Error e
 
     [<AutoOpen>]
     module ActivePatterns =
 
-        let inline (|Flat|Nested|) (str:string) =
+        let inline (|Prop|Path|) (str:string) =
             if str.Contains('.')
-            then Nested (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
-            else Flat str
+            then Path (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
+            else Prop str
 
     [<AutoOpen>]
     module Builders =

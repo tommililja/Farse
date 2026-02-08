@@ -19,40 +19,32 @@ module Parse =
             match element.ValueKind with
             | Kind.Null -> Ok None
             | _ ->
-                match parser element with
-                | Ok x -> Ok <| Some x
-                | Error e -> Error e
+                parser element
+                |> Result.map Some
         |> id
 
     /// <summary>Creates a custom parser with the given function.</summary>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let inline custom (fn:JsonElement -> Result<'a, _>) expectedKind : Parser<_> =
-        fun (element:JsonElement) ->
+    let inline custom ([<InlineIfLambda>] fn:JsonElement -> Result<'a, _>) expectedKind : Parser<_> =
+        fun element ->
             let isExpectedKind =
                 match expectedKind with
                 | ExpectedKind.Any -> true
-                | ExpectedKind.Bool -> element.ValueKind = Kind.True || element.ValueKind = Kind.False
+                | ExpectedKind.Bool -> JsonElement.isBool element
                 | kind ->
                     element.ValueKind
                     |> ExpectedKind.fromKind
                     |> (=) kind
 
             if isExpectedKind then
-                try match fn element with
-                    | Ok x -> Ok x
-                    | Error msg ->
-                        InvalidValue (msg, typeof<'a>, element)
-                        |> ParserError.fromType
-                        |> Error
-                with ex ->
-                    InvalidValue (Some ex.Message, typeof<'a>, element)
-                    |> ParserError.fromType
-                    |> Error
-            else
-                InvalidKind (expectedKind, element)
-                |> ParserError.fromType
-                |> Error
+                try
+                    fn element
+                    |> Result.bindError (fun msg ->
+                        InvalidValue.create msg typeof<'a> element
+                    )
+                with ex -> InvalidValue.create (Some ex.Message) typeof<'a> element
+            else InvalidKind.create expectedKind element
         |> id
 
     // Basic types
@@ -269,14 +261,9 @@ module Parse =
 
     // Sequences
 
-    let inline private parseIndex i parser (element:JsonElement) =
-        match element.Item i |> parser with
-        | Ok x -> Ok x
-        | Error e ->
-            let path = JsonPath.append (JsonPath.index i) e.Path
-            ArrayItem e.ErrorType
-            |> ParserError.create path
-            |> Error
+    let inline private parseIndex n parser (element:JsonElement) =
+        parser (element.Item n)
+        |> Result.bindError (ArrayItem.create n)
 
     let inline private arr ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<_> =
         fun element ->
@@ -296,15 +283,8 @@ module Parse =
 
                 match error with
                 | None -> Ok <| convert (array :> seq<_>)
-                | Some error ->
-                    let path = JsonPath.append (JsonPath.index array.Count) error.Path
-                    ArrayItem error.ErrorType
-                    |> ParserError.create path
-                    |> Error
-            | _ ->
-                InvalidKind (ExpectedKind.Array, element)
-                |> ParserError.fromType
-                |> Error
+                | Some error -> ArrayItem.create array.Count error
+            | _ -> InvalidKind.create ExpectedKind.Array element
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
@@ -323,21 +303,15 @@ module Parse =
     let seq parser = arr id parser
 
     /// <summary>Parses an array at a specific index.</summary>
-    /// <param name="i">The index to parse in the array.</param>
+    /// <param name="n">The index to parse in the array.</param>
     /// <param name="parser">The parser used for the element.</param>
-    let index i (parser:Parser<_>) : Parser<_> =
+    let index n (parser:Parser<_>) : Parser<_> =
         fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when i >= 0 && arrayLength >= i + 1 -> parseIndex i parser element
-            | Kind.Array ->
-                ArrayItem ArrayIndex
-                |> ParserError.create (JsonPath.index i)
-                |> Error
-            | _ ->
-                InvalidKind (ExpectedKind.Array, element)
-                |> ParserError.fromType
-                |> Error
+            | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
+            | Kind.Array -> ArrayIndex.create n
+            | _ -> InvalidKind.create ExpectedKind.Array element
         |> id
 
     // Key/Value
@@ -372,18 +346,10 @@ module Parse =
                     match getDuplicateKey array with
                     | Some key ->
                         let message = Error.duplicateKey key
-                        InvalidValue (Some message, typeof<'b>, element)
-                        |> ParserError.fromType
-                        |> Error
+                        InvalidValue.create (Some message) typeof<'b> element
                     | None -> Ok <| convert (array :> seq<_>)
-                | Some (name, error) ->
-                    KeyValue error
-                    |> ParserError.create (JsonPath.prop name)
-                    |> Error
-            | _ ->
-                InvalidKind (ExpectedKind.Object, element)
-                |> ParserError.fromType
-                |> Error
+                | Some (name, error) -> KeyValue.create name error
+            | _ -> InvalidKind.create ExpectedKind.Object element
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <param name="parser">The parser used for every property value.</param>
@@ -406,20 +372,15 @@ module Parse =
 
     // Tuples
 
-    let inline private tuple length ([<InlineIfLambda>] fn) : Parser<'b> =
+    let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'b> =
         fun (element:JsonElement) ->
-            let arrayLength = element.GetArrayLength()
+            let actual = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when arrayLength = length -> fn element
+            | Kind.Array when actual = expected -> fn element
             | Kind.Array ->
-                let details = Error.invalidTuple length arrayLength
-                InvalidValue (Some details, typeof<'b>, element)
-                |> ParserError.fromType
-                |> Error
-            | _ ->
-                InvalidKind (ExpectedKind.Array, element)
-                |> ParserError.fromType
-                |> Error
+                let details = Error.invalidTuple expected actual
+                InvalidValue.create (Some details) typeof<'b> element
+            | _ -> InvalidKind.create ExpectedKind.Array element
 
     /// <summary>Parses an array with two values as a tuple.</summary>
     /// <param name="a">The parser used for the first value.</param>
