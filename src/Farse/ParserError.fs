@@ -20,7 +20,7 @@ module internal Error =
     let duplicateKey key =
         $"Duplicate key '%s{key}'."
 
-    let message path msg details element =
+    let message path msg details value =
         string {
             $"Path: %s{JsonPath.asString path}"
             $"Message: %s{msg}"
@@ -28,11 +28,8 @@ module internal Error =
             details
             |> Option.map (sprintf "Details: %s")
 
-            element
-            |> Option.bind (
-                JsonElement.getValue
-                >> Option.map (sprintf "Value: %s")
-            )
+            value
+            |> Option.map (sprintf "Value: %s")
         }
 
     let invalidStream (exn:exn) =
@@ -54,9 +51,9 @@ module internal Error =
 type ParserErrorType =
     | ArrayItem of error:ParserErrorType
     | ArrayIndex
-    | CouldNotParse of msg:string * details:string option * element:JsonElement option
-    | InvalidKind of expected:ExpectedKind * element:JsonElement
-    | InvalidValue of details:string option * expected:Type * element:JsonElement
+    | CouldNotParse of msg:string * details:string option * value:string option
+    | InvalidKind of expected:ExpectedKind * actual:Kind * value:string option
+    | InvalidValue of details:string option * type':Type * value:string option
     | KeyValue of error:ParserErrorType
 
 type ParserError = {
@@ -75,9 +72,10 @@ module InvalidValue =
 module InvalidKind =
 
     let create expected element =
+        let value = JsonElement.getValue element
         Error {
             Path = JsonPath.empty
-            ErrorType = InvalidKind (expected, element)
+            ErrorType = InvalidKind (expected, element.ValueKind, value)
         }
 
 module ArrayItem =
@@ -108,9 +106,10 @@ module CouldNotParse =
 
     let invalidKind path (element:JsonElement) expected =
         let msg = Error.invalidKind expected element.ValueKind
+        let value = JsonElement.getValue element
         Error {
             Path = path
-            ErrorType = CouldNotParse (msg, None, Some element)
+            ErrorType = CouldNotParse (msg, None, value)
         }
 
 module ParserError =
@@ -122,14 +121,14 @@ module ParserError =
             | ArrayIndex ->
                 let msg = Error.invalidIndex
                 CouldNotParse (msg, None, None)
-            | CouldNotParse (msg, details, element) ->
-                CouldNotParse (msg, details, element)
-            | InvalidKind (expected, actual) ->
-                let msg = Error.invalidKind expected actual.ValueKind
-                CouldNotParse (msg, None, Some actual)
-            | InvalidValue (details, expected, element) ->
-                let msg = Error.triedParsing expected
-                CouldNotParse (msg, details, Some element)
+            | CouldNotParse (msg, details, value) ->
+                CouldNotParse (msg, details, value)
+            | InvalidKind (expected, actual, value) ->
+                let msg = Error.invalidKind expected actual
+                CouldNotParse (msg, None, value)
+            | InvalidValue (details, type', value) ->
+                let msg = Error.triedParsing type'
+                CouldNotParse (msg, details, value)
             | KeyValue error ->
                 getError error
 
@@ -146,14 +145,14 @@ module ParserError =
             | ArrayIndex ->
                 let msg = Error.invalidIndex
                 Error.message path msg None None
-            | CouldNotParse (msg, details, element) ->
-                Error.message path msg details element
-            | InvalidKind (expected, actual) ->
-                let msg = Error.invalidKind expected actual.ValueKind
-                Error.message path msg None (Some actual)
-            | InvalidValue (details, expected, element) ->
-                let msg = Error.triedParsing expected
-                Error.message path msg details (Some element)
+            | CouldNotParse (msg, details, value) ->
+                Error.message path msg details value
+            | InvalidKind (expected, actual, value) ->
+                let msg = Error.invalidKind expected actual
+                Error.message path msg None value
+            | InvalidValue (details, type', value) ->
+                let msg = Error.triedParsing type'
+                Error.message path msg details value
             | KeyValue error ->
                 getMessage path error
 

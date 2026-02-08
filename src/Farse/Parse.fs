@@ -42,9 +42,12 @@ module Parse =
                 try
                     fn element
                     |> Result.bindError (fun msg ->
-                        InvalidValue.create msg typeof<'a> element
+                        let value = JsonElement.getValue element
+                        InvalidValue.create msg typeof<'a> value
                     )
-                with ex -> InvalidValue.create (Some ex.Message) typeof<'a> element
+                with ex ->
+                    let value = JsonElement.getValue element
+                    InvalidValue.create (Some ex.Message) typeof<'a> value
             else InvalidKind.create expectedKind element
         |> id
 
@@ -347,7 +350,8 @@ module Parse =
                     match getDuplicateKey array with
                     | Some key ->
                         let message = Error.duplicateKey key
-                        InvalidValue.create (Some message) typeof<'b> element
+                        let value = JsonElement.getValue element
+                        InvalidValue.create (Some message) typeof<'b> value
                     | None -> Ok <| convert (array :> seq<_>)
                 | Some (name, error) -> KeyValue.create name error
             | _ -> InvalidKind.create ExpectedKind.Object element
@@ -380,7 +384,8 @@ module Parse =
             | Kind.Array when actual = expected -> fn element
             | Kind.Array ->
                 let details = Error.invalidTuple expected actual
-                InvalidValue.create (Some details) typeof<'b> element
+                let value = JsonElement.getValue element
+                InvalidValue.create (Some details) typeof<'b> value
             | _ -> InvalidKind.create ExpectedKind.Array element
 
     /// <summary>Parses an array with two values as a tuple.</summary>

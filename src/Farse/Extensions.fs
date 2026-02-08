@@ -2,7 +2,6 @@ namespace Farse
 
 open System
 open System.Text.Json
-open System.Text.Json.Nodes
 
 // Ignore enum match warning.
 #nowarn 104
@@ -83,11 +82,6 @@ module internal Extensions =
         )
 
     module JsonElement =
-
-        let inline create x =
-            let json = JsonValue.Create<'a>(x).ToJsonString()
-            use document = JsonDocument.Parse(json)
-            document.RootElement.Clone()
 
         let inline getProperty (name:string) (element:JsonElement) =
             element.TryGetProperty(name) |> snd

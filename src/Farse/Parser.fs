@@ -14,8 +14,8 @@ type Validate =
                 match fn x with
                 | Ok x -> Ok <| Some x
                 | Error msg ->
-                    let element = JsonElement.create x
-                    InvalidValue.create (Some msg) typeof<'b> element
+                    let value = Some $"%A{x}"
+                    InvalidValue.create (Some msg) typeof<'b> value
             )
 
     static member inline Validate(parser, fn) : Parser<'b> =
@@ -24,8 +24,8 @@ type Validate =
             |> Result.bind (fun x ->
                 fn x
                 |> Result.bindError (fun msg ->
-                    let element = JsonElement.create x
-                    InvalidValue.create (Some msg) typeof<'b> element
+                    let value = Some $"%A{x}"
+                    InvalidValue.create (Some msg) typeof<'b> value
                 )
             )
 
@@ -46,7 +46,8 @@ module Parser =
     let inline fromResult x : Parser<'a> =
         fun element ->
             Result.bindError (fun msg ->
-                InvalidValue.create (Some msg) typeof<'a> element
+                let value = JsonElement.getValue element
+                InvalidValue.create (Some msg) typeof<'a> value
             ) x
         |> id
 
