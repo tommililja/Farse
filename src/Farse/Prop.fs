@@ -7,11 +7,11 @@ module Prop =
     /// <summary>Parses a required property with the given parser.</summary>
     /// <code>let! int = Prop.req "prop.prop2" Parse.int</code>
     /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
-    let req path (parser:Parser<_>) : Parser<_> =
+    /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
+    let req path (Parser parser) =
         match path with
         | Prop name ->
-            fun (element:JsonElement) ->
+            Parser (fun (element:JsonElement) ->
                 match element.ValueKind with
                 | Kind.Object ->
                     let prop = JsonElement.getProperty name element
@@ -21,8 +21,9 @@ module Prop =
                         ParserError.enrich path error
                     )
                 | _ -> InvalidKind.create ExpectedKind.Object element
+            )
         | Path arr ->
-            fun element ->
+            Parser (fun element ->
                 let prop, path =
                     arr
                     |> Seq.fold (fun (prop, path) name ->
@@ -44,15 +45,16 @@ module Prop =
                 | Error element ->
                     ExpectedKind.Object
                     |> CouldNotParse.invalidKind path element
+            )
 
     /// <summary>Parses an optional property with the given parser.</summary>
     /// <code>let! int = Prop.opt "prop.prop2" Parse.int</code>
     /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
-    let opt path (parser:Parser<_>) : Parser<_> =
+    /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
+    let opt path (Parser parser) =
         match path with
         | Prop name ->
-            fun (element:JsonElement) ->
+            Parser (fun (element:JsonElement) ->
                 match element.ValueKind with
                 | Kind.Object ->
                     let prop = JsonElement.tryGetProperty name element
@@ -65,8 +67,9 @@ module Prop =
                             ParserError.enrich path error
                     | None -> Ok None
                 | _ -> InvalidKind.create ExpectedKind.Object element
+            )
         | Path arr ->
-            fun element ->
+            Parser (fun element ->
                 let prop, path =
                     arr
                     |> Seq.fold (fun (prop, path) name ->
@@ -90,3 +93,4 @@ module Prop =
                 | Error element ->
                     ExpectedKind.Object
                     |> CouldNotParse.invalidKind path element
+            )

@@ -14,21 +14,21 @@ module Parse =
 
     /// <summary>Parses an optional value with the given parser.</summary>
     /// <code>let! int = "prop" &amp;= Parse.optional Parse.int</code>
-    /// <param name="parser">The parser used to parse the property value.</param>
-    let optional (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
+    /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
+    let optional (Parser parser) =
+        Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Null -> Ok None
             | _ ->
                 parser element
                 |> Result.map Some
-        |> id
+        )
 
     /// <summary>Creates a custom parser with the given function.</summary>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let inline custom ([<InlineIfLambda>] fn:JsonElement -> Result<'a, _>) expectedKind : Parser<_> =
-        fun element ->
+    let inline custom ([<InlineIfLambda>] fn) expectedKind : Parser<'a> =
+        Parser (fun element ->
             let isExpectedKind =
                 match expectedKind with
                 | ExpectedKind.Any -> true
@@ -49,7 +49,7 @@ module Parse =
                     let value = JsonElement.getValue element
                     InvalidValue.create (Some ex.Message) typeof<'a> value
             else InvalidKind.create expectedKind element
-        |> id
+        )
 
     // Basic types
 
@@ -269,8 +269,8 @@ module Parse =
         parser (element.Item n)
         |> Result.bindError (ArrayItem.create n)
 
-    let inline private arr ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<_> =
-        fun element ->
+    let inline private arr ([<InlineIfLambda>] convert) (Parser parser) =
+        Parser (fun element ->
             match element.ValueKind with
             | Kind.Array ->
                 let mutable error = None
@@ -289,6 +289,7 @@ module Parse =
                 | None -> Ok <| convert (array :> seq<_>)
                 | Some error -> ArrayItem.create array.Count error
             | _ -> InvalidKind.create ExpectedKind.Array element
+        )
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <param name="parser">The parser used for every element.</param>
@@ -308,15 +309,15 @@ module Parse =
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <param name="n">The index to parse in the array.</param>
-    /// <param name="parser">The parser used for the element.</param>
-    let index n (parser:Parser<_>) : Parser<_> =
-        fun (element:JsonElement) ->
+    /// <typeparam name="parser">The parser used for the element.</typeparam>
+    let index n (Parser parser) =
+        Parser (fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
             | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
             | Kind.Array -> ArrayIndex.create n
             | _ -> InvalidKind.create ExpectedKind.Array element
-        |> id
+        )
 
     // Key/Value
 
@@ -328,8 +329,8 @@ module Parse =
             else Some k
         )
 
-    let inline private keyValue ([<InlineIfLambda>] convert) (parser:Parser<_>) : Parser<'b> =
-        fun (element:JsonElement) ->
+    let inline private keyValue ([<InlineIfLambda>] convert) (Parser parser) : Parser<'b> =
+        Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
                 let mutable error = None
@@ -355,6 +356,7 @@ module Parse =
                     | None -> Ok <| convert (array :> seq<_>)
                 | Some (name, error) -> KeyValue.create name error
             | _ -> InvalidKind.create ExpectedKind.Object element
+        )
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <param name="parser">The parser used for every property value.</param>
@@ -378,7 +380,7 @@ module Parse =
     // Tuples
 
     let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'b> =
-        fun (element:JsonElement) ->
+        Parser (fun (element:JsonElement) ->
             let actual = element.GetArrayLength()
             match element.ValueKind with
             | Kind.Array when actual = expected -> fn element
@@ -387,11 +389,12 @@ module Parse =
                 let value = JsonElement.getValue element
                 InvalidValue.create (Some details) typeof<'b> value
             | _ -> InvalidKind.create ExpectedKind.Array element
+        )
 
     /// <summary>Parses an array with two values as a tuple.</summary>
-    /// <param name="a">The parser used for the first value.</param>
-    /// <param name="b">The parser used for the second value.</param>
-    let tuple2 (a:Parser<_>) (b:Parser<_>) =
+    /// <typeparam name="a">The parser used for the first value.</typeparam>
+    /// <typeparam name="b">The parser used for the second value.</typeparam>
+    let tuple2 (Parser a) (Parser b) =
         tuple 2 (fun e ->
             result {
                 let! a = parseIndex 0 a e
@@ -402,10 +405,10 @@ module Parse =
         )
 
     /// <summary>Parses an array with three values as a tuple of three.</summary>
-    /// <param name="a">The parser used for the first value.</param>
-    /// <param name="b">The parser used for the second value.</param>
-    /// <param name="c">The parser used for the third value.</param>
-    let tuple3 (a:Parser<_>) (b:Parser<_>) (c:Parser<_>) =
+    /// <typeparam name="a">The parser used for the first value.</typeparam>
+    /// <typeparam name="b">The parser used for the second value.</typeparam>
+    /// <typeparam name="c">The parser used for the third value.</typeparam>
+    let tuple3 (Parser a) (Parser b) (Parser c) =
         tuple 3 (fun e ->
             result {
                 let! a = parseIndex 0 a e
