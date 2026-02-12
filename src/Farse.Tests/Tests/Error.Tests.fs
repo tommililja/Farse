@@ -34,12 +34,12 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when validation fails`` () =
-            Parse.int
+            Prop.req "prop" Parse.int
             |> Parser.validate (fun int ->
                 if int > 1 then Ok int
                 else Error "Value too small."
             )
-            |> Parser.parse "1"
+            |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
         [<Fact>]
