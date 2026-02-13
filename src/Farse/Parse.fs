@@ -15,12 +15,12 @@ module Parse =
     /// <summary>Parses an optional value with the given parser.</summary>
     /// <code>let! int = "prop" &amp;= Parse.optional Parse.int</code>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
-    let optional (Parser parser) =
+    let optional (Parser parse) =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Null -> Ok None
             | _ ->
-                parser element
+                parse element
                 |> Result.map Some
         )
 
@@ -265,11 +265,11 @@ module Parse =
 
     // Sequences
 
-    let inline private parseIndex n parser (element:JsonElement) =
-        parser (element.Item n)
+    let inline private parseIndex n (Parser parse) (element:JsonElement) =
+        parse (element.Item n)
         |> Result.bindError (ArrayItem.create n)
 
-    let inline private arr ([<InlineIfLambda>] convert) (Parser parser) =
+    let inline private arr ([<InlineIfLambda>] convert) (Parser parse) =
         Parser (fun element ->
             match element.ValueKind with
             | Kind.Array ->
@@ -281,7 +281,7 @@ module Parse =
                     |> ResizeArray
 
                 while error.IsNone && enumerator.MoveNext() do
-                    match parser enumerator.Current with
+                    match parse enumerator.Current with
                     | Ok x -> array.Add x
                     | Error e -> error <- Some e
 
@@ -309,8 +309,8 @@ module Parse =
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <param name="n">The index to parse in the array.</param>
-    /// <typeparam name="parser">The parser used for the element.</typeparam>
-    let index n (Parser parser) =
+    /// <param name="parser">The parser used for the element.</param>
+    let index n parser =
         Parser (fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
@@ -329,7 +329,7 @@ module Parse =
             else Some k
         )
 
-    let inline private keyValue ([<InlineIfLambda>] convert) (Parser parser) : Parser<'b> =
+    let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'b> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -342,7 +342,7 @@ module Parse =
 
                 while error.IsNone && enumerator.MoveNext() do
                     let name = enumerator.Current.Name
-                    match parser enumerator.Current.Value with
+                    match parse enumerator.Current.Value with
                     | Ok x -> array.Add(name, x)
                     | Error e -> error <- Some (name, e.ErrorType)
 
@@ -394,7 +394,7 @@ module Parse =
     /// <summary>Parses an array with two values as a tuple.</summary>
     /// <typeparam name="a">The parser used for the first value.</typeparam>
     /// <typeparam name="b">The parser used for the second value.</typeparam>
-    let tuple2 (Parser a) (Parser b) =
+    let tuple2 a b =
         tuple 2 (fun e ->
             result {
                 let! a = parseIndex 0 a e
@@ -408,7 +408,7 @@ module Parse =
     /// <typeparam name="a">The parser used for the first value.</typeparam>
     /// <typeparam name="b">The parser used for the second value.</typeparam>
     /// <typeparam name="c">The parser used for the third value.</typeparam>
-    let tuple3 (Parser a) (Parser b) (Parser c) =
+    let tuple3 a b c =
         tuple 3 (fun e ->
             result {
                 let! a = parseIndex 0 a e

@@ -4,12 +4,12 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private parse name (Parser parser) =
+    let inline private parse name (Parser parse) =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
                 let prop = JsonElement.getProperty name element
-                parser prop
+                parse prop
                 |> Result.bindError (fun error ->
                     let path = JsonPath.prop name
                     ParserError.enrich path error
@@ -17,14 +17,14 @@ module Prop =
             | _ -> InvalidKind.create ExpectedKind.Object element
         )
 
-    let inline private tryParse name (Parser parser) =
+    let inline private tryParse name (Parser parse) =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
                 let prop = JsonElement.tryGetProperty name element
                 match prop with
                 | Some prop ->
-                    match parser prop with
+                    match parse prop with
                     | Ok x -> Ok <| Some x
                     | Error error ->
                         let path = JsonPath.prop name
@@ -33,7 +33,7 @@ module Prop =
             | _ -> InvalidKind.create ExpectedKind.Object element
         )
 
-    let inline private traverse path (Parser parser) =
+    let inline private traverse path (Parser parse) =
         Parser (fun element ->
             let prop, path =
                 path
@@ -51,14 +51,14 @@ module Prop =
 
             match prop with
             | Ok prop ->
-                parser prop
+                parse prop
                 |> Result.bindError (ParserError.enrich path)
             | Error element ->
                 ExpectedKind.Object
                 |> CouldNotParse.invalidKind path element
         )
 
-    let inline private tryTraverse path (Parser parser) =
+    let inline private tryTraverse path (Parser parse) =
         Parser (fun element ->
             let prop, path =
                 path
@@ -76,7 +76,7 @@ module Prop =
 
             match prop with
             | Ok (Some prop) ->
-                match parser prop with
+                match parse prop with
                 | Ok x -> Ok <| Some x
                 | Error error -> ParserError.enrich path error
             | Ok None -> Ok None
