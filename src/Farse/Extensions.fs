@@ -140,20 +140,21 @@ module internal Extensions =
 
         type StringBuilder() =
 
-            member inline _.Yield(line:string) = [ line ]
+            member inline _.Yield(line:string) =
+                Seq.singleton line
 
             member inline _.Yield(line:string option) =
                 line
-                |> Option.map List.singleton
-                |> Option.defaultValue []
+                |> Option.map Seq.singleton
+                |> Option.defaultValue Seq.empty
 
-            member inline _.YieldFrom(lines:string list) = lines
+            member inline _.YieldFrom(lines:string seq) = lines
 
-            member inline _.Combine(a, b) = a @ b
+            member inline _.Combine(a, b) = Seq.append a b
 
             member inline _.Delay([<InlineIfLambda>] fn) = fn ()
 
-            member inline _.Zero() = []
+            member inline _.Zero() = Seq.empty
 
             member inline _.Run(lines) =
                 lines
