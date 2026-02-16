@@ -1,0 +1,4 @@
+﻿Path: $.prop
+Message: Tried parsing Object.
+Details: Not valid.
+Value: 1
