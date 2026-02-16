@@ -89,13 +89,13 @@ module User =
         parser {
             let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= byte |> Parser.validate Age.fromByte
-            and! email = "email" &= string |> Parser.validate Email.fromString
+            and! age = "age" ?= valid byte Age.fromByte
+            and! email = "email" &= valid string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= string |> Parser.validate Plan.fromString
+                let! plan = "plan" &= valid string Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
@@ -235,15 +235,7 @@ module Parse =
 
 ## Validation
 
-Both methods produce detailed error messages when validation fails.
-
-#### Parser.validate 
-
-```fsharp
-let! age = "age" ?= byte |> Parser.validate Age.fromByte
-```
-
-#### Parse.custom
+There are a few different options for validating parsed values.
 
 ```fsharp
 let age =
@@ -252,8 +244,13 @@ let age =
         | true, byte -> Age.fromByte byte |> Result.mapError Some
         | _ -> Error None
     ) ExpectedKind.String
-    
+
+// Produces detailed error messages when validation fails.
 let! age = "age" ?= age
+let! age = "age" ?= valid byte Age.fromByte
+
+// Preserves the original error message.
+let! age = "age" ?= byte |> Parser.validate Age.fromByte
 ```
 
 #### Error

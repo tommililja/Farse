@@ -102,13 +102,13 @@ module User =
         parser {
             let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= byte |> Parser.validate Age.fromByte
-            and! email = "email" &= string |> Parser.validate Email.fromString
+            and! age = "age" ?= valid byte Age.fromByte
+            and! email = "email" &= valid string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= string |> Parser.validate Plan.fromString
+                let! plan = "plan" &= valid string Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 

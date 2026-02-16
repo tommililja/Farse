@@ -75,6 +75,46 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should return Ok with expected value when list validation succeeds`` () =
+        let expected = [ 1; 2; 3 ]
+        let actual: _ list =
+            Prop.req "prop" (Parse.list Parse.string)
+            |> Parser.validate (fun x -> Ok <| int x)
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should return Ok with expected value when array validation succeeds`` () =
+        let expected = [| 1; 2; 3 |]
+        let actual: _ array =
+            Prop.req "prop" (Parse.array Parse.string)
+            |> Parser.validate (fun x -> Ok <| int x)
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should return Ok with expected value when Set validation succeeds`` () =
+        let expected = set [ 1; 2; 3 ]
+        let actual: _ Set =
+            Prop.req "prop" (Parse.set Parse.string)
+            |> Parser.validate (fun x -> Ok <| int x)
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
+    let ``Should return Ok with expected value when seq validation succeeds`` () =
+        let expected = seq [ 1; 2; 3 ]
+        let actual: _ seq =
+            Prop.req "prop" (Parse.seq Parse.string)
+            |> Parser.validate (fun x -> Ok <| int x)
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
     let ``Should return Ok when parsing JSON async`` () =
         task {
             let expected = 1

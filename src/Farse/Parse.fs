@@ -24,7 +24,25 @@ module Parse =
                 |> Result.map Some
         )
 
+    /// <summary>Validates the parsed value with the given function.</summary>
+    /// <remarks>Produces detailed error messages when validation fails.</remarks>
+    /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
+    /// <typeparam name="parser">The parser to validate.</typeparam>
+    /// <param name="fn">The validation function.</param>
+    let inline valid (Parser parse) ([<InlineIfLambda>] fn) : Parser<'b> =
+        Parser (fun element ->
+            parse element
+            |> Result.bind (fun x ->
+                match fn x with
+                | Ok x -> Ok x
+                | Error msg ->
+                    let value = Some $"%A{x}"
+                    InvalidValue.create (Some msg) typeof<'b> value
+            )
+        )
+
     /// <summary>Creates a custom parser with the given function.</summary>
+    /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
     let inline custom ([<InlineIfLambda>] fn) expectedKind : Parser<'a> =

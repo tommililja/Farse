@@ -40,7 +40,7 @@ module internal Error =
 
     let invalidJson (exn:exn) json =
         string {
-            $"Error: Could not parse JSON string."
+            "Error: Could not parse JSON string."
             $"Message: %s{exn.Message}"
 
             match json with
@@ -55,6 +55,7 @@ type ParserErrorType =
     | InvalidKind of expected:ExpectedKind * actual:Kind * value:string option
     | InvalidValue of details:string option * type':Type * value:string option
     | KeyValue of error:ParserErrorType
+    | Other of msg:string
 
 type ParserError = {
     Path: JsonPath
@@ -102,6 +103,14 @@ module KeyValue =
             ErrorType = KeyValue error
         }
 
+module Other =
+
+    let create msg =
+        Error {
+            Path = JsonPath.empty
+            ErrorType = Other msg
+        }
+
 module CouldNotParse =
 
     let invalidKind path (element:JsonElement) expected =
@@ -131,6 +140,7 @@ module ParserError =
                 CouldNotParse (msg, details, value)
             | KeyValue error ->
                 getError error
+            | Other msg -> Other msg
 
         Error {
             error with
@@ -155,5 +165,6 @@ module ParserError =
                 Error.message path msg details value
             | KeyValue error ->
                 getMessage path error
+            | Other msg -> msg
 
         getMessage x.Path x.ErrorType

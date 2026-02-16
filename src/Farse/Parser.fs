@@ -13,9 +13,7 @@ type Validate =
             |> ResultOption.bind (fun x ->
                 match fn x with
                 | Ok x -> Ok <| Some x
-                | Error msg ->
-                    let value = Some $"%A{x}"
-                    InvalidValue.create (Some msg) typeof<'b> value
+                | Error msg -> Other.create msg
             )
         )
 
@@ -24,12 +22,44 @@ type Validate =
             parse element
             |> Result.bind (fun x ->
                 fn x
-                |> Result.bindError (fun msg ->
-                    let value = Some $"%A{x}"
-                    InvalidValue.create (Some msg) typeof<'b> value
-                )
+                |> Result.bindError Other.create
             )
         )
+
+    static member inline Seq(Parser parse, fn, convert) =
+        Parser (fun element ->
+            parse element
+            |> Result.bind (fun (items:#seq<_>) ->
+                let mutable error = None
+                let mutable enumerator = items.GetEnumerator()
+
+                let array =
+                    Seq.length items
+                    |> ResizeArray
+
+                while error.IsNone && enumerator.MoveNext() do
+                    let item = enumerator.Current
+                    match fn item with
+                    | Ok x -> array.Add x
+                    | Error e -> error <- Some e
+
+                match error with
+                | None -> Ok <| convert (array :> seq<_>)
+                | Some msg -> Other.create msg
+            )
+        )
+
+    static member inline Validate(parser:Parser<'a list>, fn) : Parser<'b list> =
+        Validate.Seq(parser, fn, List.ofSeq)
+
+    static member inline Validate(parser:Parser<'a array>, fn) : Parser<'b array> =
+        Validate.Seq(parser, fn, Array.ofSeq)
+
+    static member inline Validate(parser:Parser<'a Set>, fn) : Parser<'b Set> =
+        Validate.Seq(parser, fn, Set.ofSeq)
+
+    static member inline Validate(parser:Parser<'a seq>, fn) : Parser<'b seq> =
+        Validate.Seq(parser, fn, id)
 
 and [<Struct>] Parser<'a> = Parser of (JsonElement -> Result<'a, ParserError>)
 
@@ -79,10 +109,7 @@ module Parser =
         Parser (parse >> Result.map ignore<'a>)
 
     /// <summary>Validates the parsed value with the given function.</summary>
-    /// <remarks>
-    ///     <para>Produces detailed error messages when validation fails.</para>
-    ///     <para>Works with both required and optional values.</para>
-    /// </remarks>
+    /// <remarks>Works with options and sequences.</remarks>
     /// <code>let! age = "age" ?= Parse.byte |> Parser.validate Age.fromByte</code>
     /// <code>let! email = "email" &amp;= Parse.string |> Parser.validate Email.fromString</code>
     /// <param name="fn">The validation function.</param>

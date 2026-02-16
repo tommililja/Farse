@@ -53,6 +53,34 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when list validation fails`` () =
+            Prop.req "prop" (Parse.list Parse.string)
+            |> Parser.validate (fun (_:string) -> Error "Invalid")
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when array validation fails`` () =
+            Prop.req "prop" (Parse.array Parse.string)
+            |> Parser.validate (fun (_:string) -> Error "Invalid")
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when Set validation fails`` () =
+            Prop.req "prop" (Parse.set Parse.string)
+            |> Parser.validate (fun (_:string) -> Error "Invalid")
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when seq validation fails`` () =
+            Prop.req "prop" (Parse.seq Parse.string)
+            |> Parser.validate (fun (_:string) -> Error "Invalid")
+            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when creating a Parser from an Error`` () =
             Error "Error"
             |> Parser.fromResult
@@ -440,6 +468,12 @@ module ErrorTests =
                     Error <| None
                 ) ExpectedKind.Number
             Prop.req "prop" parser
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when value is not valid`` () =
+            Prop.req "prop" (Parse.valid Parse.int (fun _ -> Error "Not valid."))
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
