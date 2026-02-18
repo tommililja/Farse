@@ -5,7 +5,7 @@
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <Copyright>Copyright © Tommi Lilja 2026</Copyright>
         <DebugType>embedded</DebugType>
-        <Description>Simple parsing library for F# using System.Text.Json.</Description>
+        <Description>Simple, explicit JSON parsing for F# using System.Text.Json.</Description>
         <EmbedAllSources>true</EmbedAllSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>Farse</PackageId>
