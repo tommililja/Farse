@@ -38,6 +38,7 @@ module Parse =
                 | Error msg ->
                     let value = Some $"%A{x}"
                     InvalidValue.create (Some msg) typeof<'b> value
+                    |> Error.list
             )
         )
 
@@ -62,11 +63,15 @@ module Parse =
                     |> Result.bindError (fun msg ->
                         let value = JsonElement.getValue element
                         InvalidValue.create msg typeof<'a> value
+                        |> Error.list
                     )
                 with ex ->
                     let value = JsonElement.getValue element
                     InvalidValue.create (Some ex.Message) typeof<'a> value
-            else InvalidKind.create expectedKind element
+                    |> Error.list
+            else
+                InvalidKind.create expectedKind element
+                |> Error.list
         )
 
     // Basic types
@@ -285,7 +290,11 @@ module Parse =
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =
         parse (element.Item n)
-        |> Result.bindError (ArrayItem.create n)
+        |> Result.bindError (fun errors ->
+            errors
+            |> List.map (ArrayItem.create n)
+            |> Error
+        )
 
     let inline private arr ([<InlineIfLambda>] convert) (Parser parse) =
         Parser (fun element ->
@@ -300,13 +309,33 @@ module Parse =
 
                 while error.IsNone && enumerator.MoveNext() do
                     match parse enumerator.Current with
-                    | Ok x -> array.Add x
-                    | Error e -> error <- Some e
+                    | Ok x -> array.Add(x)
+                    | Error e -> error <- Some (e, array.Count)
 
                 match error with
                 | None -> Ok <| convert (array :> seq<_>)
-                | Some error -> ArrayItem.create array.Count error
-            | _ -> InvalidKind.create ExpectedKind.Array element
+                | Some (error, index) ->
+                    let errors = ResizeArray()
+                    errors.Add(error, index)
+
+                    let mutable i = index + 1
+                    while enumerator.MoveNext() do
+                        match parse enumerator.Current with
+                        | Ok _ -> ()
+                        | Error e -> errors.Add(e, i)
+                        i <- i + 1
+
+                    errors
+                    |> List.ofSeq
+                    |> List.map (fun (errors, n) ->
+                        errors
+                        |> List.map (ArrayItem.create n)
+                    )
+                    |> List.concat
+                    |> Error
+            | _ ->
+                InvalidKind.create ExpectedKind.Array element
+                |> Error.list
         )
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
@@ -333,8 +362,12 @@ module Parse =
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
             | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
-            | Kind.Array -> ArrayIndex.create n
-            | _ -> InvalidKind.create ExpectedKind.Array element
+            | Kind.Array ->
+                ArrayIndex.create n
+                |> Error.list
+            | _ ->
+                InvalidKind.create ExpectedKind.Array element
+                |> Error.list
         )
 
     // Key/Value
@@ -362,7 +395,7 @@ module Parse =
                     let name = enumerator.Current.Name
                     match parse enumerator.Current.Value with
                     | Ok x -> array.Add(name, x)
-                    | Error e -> error <- Some (name, e.ErrorType)
+                    | Error e -> error <- Some (e, name, array.Count)
 
                 match error with
                 | None ->
@@ -371,9 +404,30 @@ module Parse =
                         let message = Error.duplicateKey key
                         let value = JsonElement.getValue element
                         InvalidValue.create (Some message) typeof<'b> value
+                        |> Error.list
                     | None -> Ok <| convert (array :> seq<_>)
-                | Some (name, error) -> KeyValue.create name error
-            | _ -> InvalidKind.create ExpectedKind.Object element
+                | Some (error, name, index) ->
+                    let errors = ResizeArray()
+                    errors.Add(error, name)
+
+                    let mutable i = index + 1
+                    while enumerator.MoveNext() do
+                        match parse enumerator.Current.Value with
+                        | Ok _ -> ()
+                        | Error e -> errors.Add(e, name)
+                        i <- i + 1
+
+                    errors
+                    |> List.ofSeq
+                    |> List.map (fun (errors, name) ->
+                        errors
+                        |> List.map (KeyValue.create name)
+                    )
+                    |> List.concat
+                    |> Error
+            | _ ->
+                InvalidKind.create ExpectedKind.Object element
+                |> Error.list
         )
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
@@ -406,7 +460,10 @@ module Parse =
                 let details = Error.invalidTuple expected actual
                 let value = JsonElement.getValue element
                 InvalidValue.create (Some details) typeof<'b> value
-            | _ -> InvalidKind.create ExpectedKind.Array element
+                |> Error.list
+            | _ ->
+                InvalidKind.create ExpectedKind.Array element
+                |> Error.list
         )
 
     /// <summary>Parses an array with two values as a tuple.</summary>

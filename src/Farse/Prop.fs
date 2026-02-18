@@ -10,11 +10,15 @@ module Prop =
             | Kind.Object ->
                 let prop = JsonElement.getProperty name element
                 parse prop
-                |> Result.bindError (fun error ->
+                |> Result.bindError (fun errors ->
                     let path = JsonPath.prop name
-                    ParserError.enrich path error
+                    errors
+                    |> List.map (ParserError.enrich path)
+                    |> Error
                 )
-            | _ -> InvalidKind.create ExpectedKind.Object element
+            | _ ->
+                InvalidKind.create ExpectedKind.Object element
+                |> Error.list
         )
 
     let inline private tryParse name (Parser parse) =
@@ -26,11 +30,15 @@ module Prop =
                 | Some prop ->
                     match parse prop with
                     | Ok x -> Ok <| Some x
-                    | Error error ->
+                    | Error errors ->
                         let path = JsonPath.prop name
-                        ParserError.enrich path error
+                        errors
+                        |> List.map (ParserError.enrich path)
+                        |> Error
                 | None -> Ok None
-            | _ -> InvalidKind.create ExpectedKind.Object element
+            | _ ->
+                InvalidKind.create ExpectedKind.Object element
+                |> Error.list
         )
 
     let inline private traverse path (Parser parse) =
@@ -52,10 +60,14 @@ module Prop =
             match prop with
             | Ok prop ->
                 parse prop
-                |> Result.bindError (ParserError.enrich path)
+                |> Result.mapError (fun errors ->
+                    errors
+                    |> List.map (ParserError.enrich path)
+                )
             | Error element ->
                 ExpectedKind.Object
                 |> CouldNotParse.invalidKind path element
+                |> Error.list
         )
 
     let inline private tryTraverse path (Parser parse) =
@@ -78,11 +90,15 @@ module Prop =
             | Ok (Some prop) ->
                 match parse prop with
                 | Ok x -> Ok <| Some x
-                | Error error -> ParserError.enrich path error
+                | Error errors ->
+                    errors
+                    |> List.map (ParserError.enrich path)
+                    |> Error
             | Ok None -> Ok None
             | Error element ->
                 ExpectedKind.Object
                 |> CouldNotParse.invalidKind path element
+                |> Error.list
         )
 
     /// <summary>Parses a required property with the given parser.</summary>

@@ -249,17 +249,20 @@ let age =
 let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
 
-// Preserves the original error message.
+// Produces an error message without details.
 let! age = "age" ?= byte |> Parser.validate Age.fromByte
 ```
 
 #### Error
 
 ```code
-Path: $.age
-Message: Tried parsing Age.
-Details: The minimum age is '12'.
-Value: 10
+Error: Parser failed with [1] error[s].
+
+error[1]:
+  at $.age
+   | Tried parsing Age.
+   | The minimum age is '12'.
+   = 10
 ```
 
 ## Creating JSON
@@ -295,19 +298,25 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 #### Object
 
 ```code
-Path: $.subscription.renewsAt
-Message: Tried parsing Instant.
-Details: The value string does not [...]
-Value: "202612-25T10:30:00Z"
+Parser failed with [1] error[s].
+
+error[1]:
+  at $.subscription.renewsAt
+   | Tried parsing Instant.
+   | The value string does not [...]
+   = "202612-25T10:30:00Z"
 ```
 
 #### Array
 
 ```code
-Path: $.profiles[1]
-Message: Tried parsing ProfileId.
-Details: Invalid guid.
-Value: "927eb20f-cd62-470c-aafc-c3ce6b9"
+Parser failed with [1] error[s].
+
+error[1]:
+  at $.profiles[1]
+   | Tried parsing ProfileId.
+   | Invalid guid.
+   = "927eb20f-cd62-470c-aafc-c3ce6b9248b"
 ```
 
 > Note: Farse does not throw exceptions unless something unexpected occurs.

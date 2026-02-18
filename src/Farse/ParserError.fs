@@ -2,8 +2,13 @@ namespace Farse
 
 open System
 open System.Text.Json
+open Farse
 
 module internal Error =
+
+    let inline list x =
+        List.singleton x
+        |> Error
 
     let triedParsing type' =
         $"Tried parsing %s{Type.getName type'}."
@@ -22,21 +27,21 @@ module internal Error =
 
     let message path msg details value =
         string {
-            $"Path: %s{JsonPath.asString path}"
-            $"Message: %s{msg}"
+            $"  at %s{JsonPath.asString path}"
+            $"   | %s{msg}"
 
             details
-            |> Option.map (sprintf "Details: %s")
+            |> Option.map (sprintf "   | %s")
 
             value
-            |> Option.map (sprintf "Value: %s")
+            |> Option.map (sprintf "   = %s")
         }
 
     let invalidStream (exn:exn) =
         string {
             "Error: Could not parse JSON stream."
             $"Message: %s{exn.Message}"
-        } |> Error
+        }
 
     let invalidJson (exn:exn) json =
         string {
@@ -46,7 +51,7 @@ module internal Error =
             match json with
             | null -> "JSON: null"
             | str -> $"JSON: \"%s{str}\""
-        } |> Error
+        }
 
 type ParserErrorType =
     | ArrayItem of error:ParserErrorType
@@ -64,91 +69,84 @@ type ParserError = {
 
 module InvalidValue =
 
-    let create msg type' element =
-        Error {
-            Path = JsonPath.empty
-            ErrorType = InvalidValue (msg, type', element)
-        }
+    let create msg type' element = {
+        Path = JsonPath.empty
+        ErrorType = InvalidValue (msg, type', element)
+    }
 
 module InvalidKind =
 
     let create expected element =
         let value = JsonElement.getValue element
-        Error {
+        {
             Path = JsonPath.empty
             ErrorType = InvalidKind (expected, element.ValueKind, value)
         }
 
 module ArrayItem =
 
-    let create n error =
-        Error {
-            Path = JsonPath.append (JsonPath.index n) error.Path
-            ErrorType = ArrayItem error.ErrorType
-        }
+    let create n error = {
+        Path = JsonPath.append (JsonPath.index n) error.Path
+        ErrorType = ArrayItem error.ErrorType
+    }
 
 module ArrayIndex =
 
-    let create n =
-        Error {
-            Path = JsonPath.index n
-            ErrorType = ArrayIndex
-        }
+    let create n = {
+        Path = JsonPath.index n
+        ErrorType = ArrayIndex
+    }
 
 module KeyValue =
 
-    let create name error =
-        Error {
-            Path = JsonPath.prop name
-            ErrorType = KeyValue error
-        }
+    let create name error = {
+        Path = JsonPath.prop name
+        ErrorType = KeyValue error.ErrorType
+    }
 
 module Other =
 
-    let create msg =
-        Error {
-            Path = JsonPath.empty
-            ErrorType = Other msg
-        }
+    let create msg = {
+        Path = JsonPath.empty
+        ErrorType = Other msg
+    }
 
 module CouldNotParse =
 
     let invalidKind path (element:JsonElement) expected =
         let msg = Error.invalidKind expected element.ValueKind
         let value = JsonElement.getValue element
-        Error {
+        {
             Path = path
             ErrorType = CouldNotParse (msg, None, value)
         }
 
 module ParserError =
 
-    let internal enrich path error =
-        let rec getError = function
-            | ArrayItem error ->
-                getError error
-            | ArrayIndex ->
-                let msg = Error.invalidIndex
-                CouldNotParse (msg, None, None)
-            | CouldNotParse (msg, details, value) ->
-                CouldNotParse (msg, details, value)
-            | InvalidKind (expected, actual, value) ->
-                let msg = Error.invalidKind expected actual
-                CouldNotParse (msg, None, value)
-            | InvalidValue (details, type', value) ->
-                let msg = Error.triedParsing type'
-                CouldNotParse (msg, details, value)
-            | KeyValue error ->
-                getError error
-            | Other msg -> Other msg
+    let rec private getError = function
+        | ArrayItem error -> getError error
+        | ArrayIndex ->
+            let msg = Error.invalidIndex
+            CouldNotParse (msg, None, None)
+        | CouldNotParse (msg, details, value) ->
+            CouldNotParse (msg, details, value)
+        | InvalidKind (expected, actual, value) ->
+            let msg = Error.invalidKind expected actual
+            CouldNotParse (msg, None, value)
+        | InvalidValue (details, type', value) ->
+            let msg = Error.triedParsing type'
+            CouldNotParse (msg, details, value)
+        | KeyValue error -> getError error
+        | Other msg -> Other msg
 
-        Error {
+    let internal enrich path error =
+        {
             error with
                 Path = JsonPath.append path error.Path
                 ErrorType = getError error.ErrorType
         }
 
-    let asString x =
+    let asString error =
         let rec getMessage path = function
             | ArrayItem error ->
                 getMessage path error
@@ -165,6 +163,17 @@ module ParserError =
                 Error.message path msg details value
             | KeyValue error ->
                 getMessage path error
-            | Other msg -> msg
+            | Other msg -> $"   | %s{msg}"
 
-        getMessage x.Path x.ErrorType
+        getMessage error.Path error.ErrorType
+
+module ParserErrors =
+
+    let asString errors =
+        string {
+            $"Parser failed with [%i{List.length errors}] error[s].\n"
+
+            errors
+            |> List.mapi (fun i x -> $"error[%i{i + 1}]:\n%s{ParserError.asString x}")
+            |> String.concat "\n\n"
+        }

@@ -13,7 +13,9 @@ type Validate =
             |> ResultOption.bind (fun x ->
                 match fn x with
                 | Ok x -> Ok <| Some x
-                | Error msg -> Other.create msg
+                | Error msg ->
+                    Other.create msg
+                    |> Error.list
             )
         )
 
@@ -22,7 +24,7 @@ type Validate =
             parse element
             |> Result.bind (fun x ->
                 fn x
-                |> Result.bindError Other.create
+                |> Result.bindError (Other.create >> Error.list)
             )
         )
 
@@ -45,7 +47,9 @@ type Validate =
 
                 match error with
                 | None -> Ok <| convert (array :> seq<_>)
-                | Some msg -> Other.create msg
+                | Some msg ->
+                    Other.create msg
+                    |> Error.list
             )
         )
 
@@ -61,7 +65,7 @@ type Validate =
     static member inline Validate(parser:Parser<'a seq>, fn) : Parser<'b seq> =
         Validate.Seq(parser, fn, id)
 
-and [<Struct>] Parser<'a> = Parser of (JsonElement -> Result<'a, ParserError>)
+and [<Struct>] Parser<'a> = Parser of (JsonElement -> Result<'a, ParserError list>)
 
 module Parser =
 
@@ -76,10 +80,12 @@ module Parser =
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<'a> =
         Parser (fun element ->
-            Result.bindError (fun msg ->
+            match x with
+            | Ok x -> Ok x
+            | Error msg ->
                 let value = JsonElement.getValue element
                 InvalidValue.create (Some msg) typeof<'a> value
-            ) x
+                |> Error.list
         )
 
     /// <summary>Binds the parsed value with the given function.</summary>
@@ -88,11 +94,11 @@ module Parser =
     /// <typeparam name="parser">The parser to bind.</typeparam>
     let inline bind ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
-            result {
-                let! x = parse element
+            match parse element with
+            | Ok x ->
                 let (Parser next) = fn x
-                return! next element
-            }
+                next element
+            | Error e -> Error e
         )
 
     /// <summary>Maps the parsed value with the given function.</summary>
@@ -124,11 +130,13 @@ module Parser =
         try
             use document = JsonDocument.Parse(json)
             parse document.RootElement
-            |> Result.mapError ParserError.asString
+            |> Result.mapError ParserErrors.asString
         with
             | :? JsonException
             | :? ArgumentNullException as exn ->
-                Error.invalidJson exn json
+                json
+                |> Error.invalidJson exn
+                |> Error
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
@@ -139,9 +147,12 @@ module Parser =
                 use! document = JsonDocument.ParseAsync(stream)
                 return
                     parse document.RootElement
-                    |> Result.mapError ParserError.asString
+                    |> Result.mapError ParserErrors.asString
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn ->
-                    return Error.invalidStream exn
+                    return
+                        exn
+                        |> Error.invalidStream
+                        |> Error
         }
