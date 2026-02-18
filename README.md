@@ -3,7 +3,7 @@
 
 # Farse
 
-> Simple parsing library for F# using System.Text.Json.
+> Simple, explicit JSON parsing for F# using System.Text.Json.
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
@@ -260,7 +260,7 @@ Error: Parser failed with [1] error[s].
 
 error[1]:
   at $.age
-   | Tried parsing Age.
+   | Tried parsing 'Age.
    | The minimum age is '12'.
    = 10
 ```
@@ -302,7 +302,7 @@ Parser failed with [1] error[s].
 
 error[1]:
   at $.subscription.renewsAt
-   | Tried parsing Instant.
+   | Tried parsing 'Instant.
    | The value string does not [...]
    = "202612-25T10:30:00Z"
 ```
@@ -314,7 +314,7 @@ Parser failed with [1] error[s].
 
 error[1]:
   at $.profiles[1]
-   | Tried parsing ProfileId.
+   | Tried parsing 'ProfileId.
    | Invalid guid.
    = "927eb20f-cd62-470c-aafc-c3ce6b9248b"
 ```
