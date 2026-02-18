@@ -1,2 +1,5 @@
-﻿Path: $.prop.prop2.missing
-Message: Expected Number, but got Undefined.
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop.prop2.missing
+   | Expected Number, but got Undefined.

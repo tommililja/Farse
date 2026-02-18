@@ -1,2 +1,5 @@
-﻿Path: $.prop
-Message: Expected Number, but got Null.
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Expected Number, but got Null.

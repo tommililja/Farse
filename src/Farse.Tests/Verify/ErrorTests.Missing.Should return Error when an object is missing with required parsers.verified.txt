@@ -1,2 +1,5 @@
-﻿Path: $.missing
-Message: Expected Object, but got Undefined.
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.missing
+   | Expected Object, but got Undefined.

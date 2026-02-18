@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing DateTimeOffset.
-Details: Expected 'yyyyMMdd HH:mm:ss zzz'.
-Value: "2025-05-13 17:28 +02:00"
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'DateTimeOffset.
+   | Expected 'yyyyMMdd HH:mm:ss zzz'.
+   = "2025-05-13 17:28 +02:00"

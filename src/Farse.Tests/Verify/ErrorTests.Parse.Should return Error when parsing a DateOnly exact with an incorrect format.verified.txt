@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing DateOnly.
-Details: Expected 'yyyyMMdd'.
-Value: "2025-05-13"
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'DateOnly.
+   | Expected 'yyyyMMdd'.
+   = "2025-05-13"

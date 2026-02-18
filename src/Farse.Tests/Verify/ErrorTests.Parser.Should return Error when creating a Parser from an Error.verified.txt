@@ -1,4 +1,7 @@
-﻿Path: $
-Message: Tried parsing Object.
-Details: Error
-Value: 1
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $
+   | Tried parsing 'Object.
+   | Error
+   = 1

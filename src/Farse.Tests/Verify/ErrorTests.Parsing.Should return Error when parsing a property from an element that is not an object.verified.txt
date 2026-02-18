@@ -1,3 +1,6 @@
-﻿Path: $
-Message: Expected Object, but got Array.
-Value: []
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $
+   | Expected Object, but got Array.
+   = []

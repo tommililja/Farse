@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing TimeSpan.
-Details: Expected 'hh\mm\ss'.
-Value: "01:28:45"
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'TimeSpan.
+   | Expected 'hh\mm\ss'.
+   = "01:28:45"

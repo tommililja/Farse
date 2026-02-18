@@ -1,3 +1,11 @@
-﻿Path: $.prop.prop2[1]
-Message: Expected Object, but got Number.
-Value: 2
+﻿Parser failed with [2] error[s].
+
+error[1]:
+  at $.prop.prop2[1]
+   | Expected Object, but got Number.
+   = 2
+
+error[2]:
+  at $.prop.prop2[2]
+   | Expected Object, but got Number.
+   = 3

@@ -1,1 +1,4 @@
-﻿Value too small.
+﻿Parser failed with [1] error[s].
+
+error[1]:
+   | Value too small.

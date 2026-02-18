@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing IEnumerable<Tuple<String, Int32>>.
-Details: Duplicate key 'key2'.
-Value: { "key2": 1, "key2": 2, "key3": 3 }
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'IEnumerable<Tuple<String, Int32>>.
+   | Duplicate key 'key2'.
+   = { "key2": 1, "key2": 2, "key3": 3 }

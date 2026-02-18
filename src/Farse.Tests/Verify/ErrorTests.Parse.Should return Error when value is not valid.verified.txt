@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing Object.
-Details: Not valid.
-Value: 1
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'Object.
+   | Not valid.
+   = 1

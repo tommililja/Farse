@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing TimeOnly.
-Details: Expected 'HHmmss'.
-Value: "17:28:45"
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'TimeOnly.
+   | Expected 'HHmmss'.
+   = "17:28:45"

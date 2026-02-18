@@ -1,2 +1,5 @@
-﻿Path: $.prop.prop2
-Message: Expected String, but got Null.
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop.prop2
+   | Expected String, but got Null.

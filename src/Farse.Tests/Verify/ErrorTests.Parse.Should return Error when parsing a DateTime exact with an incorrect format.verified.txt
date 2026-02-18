@@ -1,4 +1,7 @@
-﻿Path: $.prop
-Message: Tried parsing DateTime.
-Details: Expected 'yyyy-MM-dd HH:mm:ss'.
-Value: "2025-05-13T17:28:45"
+﻿Parser failed with [1] error[s].
+
+error[1]:
+  at $.prop
+   | Tried parsing 'DateTime.
+   | Expected 'yyyy-MM-dd HH:mm:ss'.
+   = "2025-05-13T17:28:45"
