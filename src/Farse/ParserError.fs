@@ -11,7 +11,7 @@ module internal Error =
         |> Error
 
     let triedParsing type' =
-        $"Tried parsing %s{Type.getName type'}."
+        $"Tried parsing '%s{Type.getName type'}."
 
     let invalidKind expected actual =
         $"Expected %s{ExpectedKind.asString expected}, but got %s{Kind.asString actual}."
