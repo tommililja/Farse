@@ -171,9 +171,9 @@ module ParserErrors =
 
     let asString errors =
         string {
-            $"Parser failed with [%i{List.length errors}] error[s].\n"
+            $"Parser failed with %i{List.length errors} error[s].\n"
 
             errors
-            |> List.mapi (fun i x -> $"error[%i{i + 1}]:\n%s{ParserError.asString x}")
+            |> List.mapi (fun i x -> $"error[%i{i}]:\n%s{ParserError.asString x}")
             |> String.concat "\n\n"
         }
