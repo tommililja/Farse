@@ -40,16 +40,25 @@ type Validate =
                     |> ResizeArray
 
                 while error.IsNone && enumerator.MoveNext() do
-                    let item = enumerator.Current
-                    match fn item with
+                    match fn enumerator.Current with
                     | Ok x -> array.Add x
-                    | Error e -> error <- Some e
+                    | Error msg -> error <- Some msg
 
                 match error with
                 | None -> Ok <| convert (array :> seq<_>)
                 | Some msg ->
-                    Other.create msg
-                    |> Error.list
+                    let array = ResizeArray()
+                    array.Add(msg)
+
+                    while enumerator.MoveNext() do
+                        match fn enumerator.Current with
+                        | Ok _ -> ()
+                        | Error msg -> array.Add(msg)
+
+                    array
+                    |> List.ofSeq
+                    |> List.map Other.create
+                    |> Error
             )
         )
 

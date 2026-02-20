@@ -310,22 +310,22 @@ module Parse =
                 while error.IsNone && enumerator.MoveNext() do
                     match parse enumerator.Current with
                     | Ok x -> array.Add(x)
-                    | Error e -> error <- Some (e, array.Count)
+                    | Error errors -> error <- Some (errors, array.Count)
 
                 match error with
                 | None -> Ok <| convert (array :> seq<_>)
-                | Some (error, index) ->
-                    let errors = ResizeArray()
-                    errors.Add(error, index)
+                | Some (errors, index) ->
+                    let array = ResizeArray()
+                    array.Add(errors, index)
 
                     let mutable i = index + 1
                     while enumerator.MoveNext() do
                         match parse enumerator.Current with
                         | Ok _ -> ()
-                        | Error e -> errors.Add(e, i)
+                        | Error errors -> array.Add(errors, i)
                         i <- i + 1
 
-                    errors
+                    array
                     |> List.ofSeq
                     |> List.map (fun (errors, n) ->
                         errors
@@ -392,10 +392,10 @@ module Parse =
                     |> ResizeArray
 
                 while error.IsNone && enumerator.MoveNext() do
-                    let name = enumerator.Current.Name
-                    match parse enumerator.Current.Value with
-                    | Ok x -> array.Add(name, x)
-                    | Error e -> error <- Some (e, name, array.Count)
+                    let current = enumerator.Current
+                    match parse current.Value with
+                    | Ok x -> array.Add(current.Name, x)
+                    | Error errors -> error <- Some (errors, current.Name)
 
                 match error with
                 | None ->
@@ -406,18 +406,16 @@ module Parse =
                         InvalidValue.create (Some message) typeof<'b> value
                         |> Error.list
                     | None -> Ok <| convert (array :> seq<_>)
-                | Some (error, name, index) ->
-                    let errors = ResizeArray()
-                    errors.Add(error, name)
+                | Some (errors, name) ->
+                    let array = ResizeArray()
+                    array.Add(errors, name)
 
-                    let mutable i = index + 1
                     while enumerator.MoveNext() do
                         match parse enumerator.Current.Value with
                         | Ok _ -> ()
-                        | Error e -> errors.Add(e, name)
-                        i <- i + 1
+                        | Error errors -> array.Add(errors, name)
 
-                    errors
+                    array
                     |> List.ofSeq
                     |> List.map (fun (errors, name) ->
                         errors

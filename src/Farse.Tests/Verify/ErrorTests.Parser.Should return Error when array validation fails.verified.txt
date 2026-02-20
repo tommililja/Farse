@@ -1,4 +1,10 @@
-﻿Parser failed with 1 error[s].
+﻿Parser failed with 3 error[s].
 
 error[0]:
+   | Invalid
+
+error[1]:
+   | Invalid
+
+error[2]:
    | Invalid
