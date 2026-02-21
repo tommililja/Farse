@@ -256,7 +256,7 @@ let! age = "age" ?= byte |> Parser.validate Age.fromByte
 #### Error
 
 ```code
-Error: Parser failed with 1 error[s].
+Parser failed with 1 error[s].
 
 error[0]:
   at $.age
