@@ -17,7 +17,8 @@ module Prop =
                     |> Error
                 )
             | _ ->
-                InvalidKind.create ExpectedKind.Object element
+                element
+                |> InvalidKind.create ExpectedKind.Object
                 |> Error.list
         )
 
@@ -37,7 +38,8 @@ module Prop =
                         |> Error
                 | None -> Ok None
             | _ ->
-                InvalidKind.create ExpectedKind.Object element
+                element
+                |> InvalidKind.create ExpectedKind.Object
                 |> Error.list
         )
 

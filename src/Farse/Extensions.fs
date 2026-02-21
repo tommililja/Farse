@@ -120,6 +120,10 @@ module internal Extensions =
             | Ok x -> Ok x
             | Error e -> fn e
 
+        let inline tapError fn = function
+            | Ok x -> Ok x
+            | Error e -> fn e; Error e
+
     module ResultOption =
 
         let inline bind fn = function

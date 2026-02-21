@@ -2,7 +2,6 @@ namespace Farse
 
 open System
 open System.Text.Json
-open Farse
 
 module internal Error =
 
@@ -69,10 +68,18 @@ type ParserError = {
 
 module InvalidValue =
 
-    let create msg type' element = {
-        Path = JsonPath.empty
-        ErrorType = InvalidValue (msg, type', element)
-    }
+    let create msg type' element =
+        let value = JsonElement.getValue element
+        {
+            Path = JsonPath.empty
+            ErrorType = InvalidValue (msg, type', value)
+        }
+
+    let fromValue msg type' value =
+        {
+            Path = JsonPath.empty
+            ErrorType = InvalidValue (msg, type', value)
+        }
 
 module InvalidKind =
 

@@ -36,8 +36,8 @@ module Parse =
                 match fn x with
                 | Ok x -> Ok x
                 | Error msg ->
-                    let value = Some $"%A{x}"
-                    InvalidValue.create (Some msg) typeof<'b> value
+                    Some $"%A{x}"
+                    |> InvalidValue.fromValue (Some msg) typeof<'b>
                     |> Error.list
             )
         )
@@ -61,16 +61,17 @@ module Parse =
                 try
                     fn element
                     |> Result.bindError (fun msg ->
-                        let value = JsonElement.getValue element
-                        InvalidValue.create msg typeof<'a> value
+                        element
+                        |> InvalidValue.create msg typeof<'a>
                         |> Error.list
                     )
                 with ex ->
-                    let value = JsonElement.getValue element
-                    InvalidValue.create (Some ex.Message) typeof<'a> value
+                    element
+                    |> InvalidValue.create (Some ex.Message) typeof<'a>
                     |> Error.list
             else
-                InvalidKind.create expectedKind element
+                element
+                |> InvalidKind.create expectedKind
                 |> Error.list
         )
 
@@ -334,7 +335,8 @@ module Parse =
                     |> List.concat
                     |> Error
             | _ ->
-                InvalidKind.create ExpectedKind.Array element
+                element
+                |> InvalidKind.create ExpectedKind.Array
                 |> Error.list
         )
 
@@ -362,11 +364,10 @@ module Parse =
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
             | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
-            | Kind.Array ->
-                ArrayIndex.create n
-                |> Error.list
+            | Kind.Array -> Error.list <| ArrayIndex.create n
             | _ ->
-                InvalidKind.create ExpectedKind.Array element
+                element
+                |> InvalidKind.create ExpectedKind.Array
                 |> Error.list
         )
 
@@ -402,8 +403,8 @@ module Parse =
                     match getDuplicateKey array with
                     | Some key ->
                         let message = Error.duplicateKey key
-                        let value = JsonElement.getValue element
-                        InvalidValue.create (Some message) typeof<'b> value
+                        element
+                        |> InvalidValue.create (Some message) typeof<'b>
                         |> Error.list
                     | None -> Ok <| convert (array :> seq<_>)
                 | Some (errors, name) ->
@@ -424,7 +425,8 @@ module Parse =
                     |> List.concat
                     |> Error
             | _ ->
-                InvalidKind.create ExpectedKind.Object element
+                element
+                |> InvalidKind.create ExpectedKind.Object
                 |> Error.list
         )
 
@@ -456,11 +458,12 @@ module Parse =
             | Kind.Array when actual = expected -> fn element
             | Kind.Array ->
                 let details = Error.invalidTuple expected actual
-                let value = JsonElement.getValue element
-                InvalidValue.create (Some details) typeof<'b> value
+                element
+                |> InvalidValue.create (Some details) typeof<'b>
                 |> Error.list
             | _ ->
-                InvalidKind.create ExpectedKind.Array element
+                element
+                |> InvalidKind.create ExpectedKind.Array
                 |> Error.list
         )
 

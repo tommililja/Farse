@@ -13,9 +13,7 @@ type Validate =
             |> ResultOption.bind (fun x ->
                 match fn x with
                 | Ok x -> Ok <| Some x
-                | Error msg ->
-                    Other.create msg
-                    |> Error.list
+                | Error msg -> Error.list <| Other.create msg
             )
         )
 
@@ -92,8 +90,8 @@ module Parser =
             match x with
             | Ok x -> Ok x
             | Error msg ->
-                let value = JsonElement.getValue element
-                InvalidValue.create (Some msg) typeof<'a> value
+                element
+                |> InvalidValue.create (Some msg) typeof<'a>
                 |> Error.list
         )
 
@@ -103,11 +101,11 @@ module Parser =
     /// <typeparam name="parser">The parser to bind.</typeparam>
     let inline bind ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
-            match parse element with
-            | Ok x ->
+            parse element
+            |> Result.bind (fun x ->
                 let (Parser next) = fn x
                 next element
-            | Error e -> Error e
+            )
         )
 
     /// <summary>Maps the parsed value with the given function.</summary>
