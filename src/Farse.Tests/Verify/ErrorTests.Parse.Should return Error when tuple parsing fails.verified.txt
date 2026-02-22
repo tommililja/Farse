@@ -1,6 +1,0 @@
-﻿Parser failed with 1 error[s].
-
-Error[0]:
-  at $.prop[0]
-   | Tried parsing 'Guid.
-   = "1"

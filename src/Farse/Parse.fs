@@ -474,7 +474,7 @@ module Parse =
         tuple 2 (fun e ->
             result {
                 let! a = parseIndex 0 a e
-                let! b = parseIndex 1 b e
+                and! b = parseIndex 1 b e
 
                 return a, b
             }
@@ -488,8 +488,8 @@ module Parse =
         tuple 3 (fun e ->
             result {
                 let! a = parseIndex 0 a e
-                let! b = parseIndex 1 b e
-                let! c = parseIndex 2 c e
+                and! b = parseIndex 1 b e
+                and! c = parseIndex 2 c e
 
                 return a, b, c
             }

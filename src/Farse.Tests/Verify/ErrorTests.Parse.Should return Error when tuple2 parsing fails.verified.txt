@@ -1,0 +1,11 @@
+﻿Parser failed with 2 error[s].
+
+Error[0]:
+  at $.prop[0]
+   | Expected Number, but got String.
+   = "1"
+
+Error[1]:
+  at $.prop[1]
+   | Expected Number, but got String.
+   = "1"
