@@ -1,6 +1,11 @@
-﻿Parser failed with 1 error[s].
+﻿Parser failed with 2 error[s].
 
 Error[0]:
+  at $.prop
+   | Tried parsing 'IDictionary<String, Int32>.
+   | Duplicate key 'key1'.
+
+Error[1]:
   at $.prop
    | Tried parsing 'IDictionary<String, Int32>.
    | Duplicate key 'key2'.

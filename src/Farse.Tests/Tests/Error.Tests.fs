@@ -480,7 +480,7 @@ module ErrorTests =
         [<Fact>]
         let ``Should return Error when parsing Map with duplicate keys`` () =
             Prop.req "prop" (Parse.map Parse.int)
-            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
@@ -492,25 +492,25 @@ module ErrorTests =
         [<Fact>]
         let ``Should return Error when parsing Dictionary with duplicate keys`` () =
             Prop.req "prop" (Parse.dict Parse.int)
-            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing KeyValuePair seq with duplicate keys`` () =
             Prop.req "prop" (Parse.keyValuePairs Parse.int)
-            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing tuple seq with duplicate keys`` () =
             Prop.req "prop" (Parse.tuples Parse.int)
-            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when trying to parse string seq with duplicate keys`` () =
             Prop.req "prop" Parse.keys
-            |> Parser.parse """{ "prop": { "key2": 1, "key2": 2, "key3": 3 } }"""
+            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]

@@ -373,13 +373,15 @@ module Parse =
 
     // Key/Value
 
-    let inline private getDuplicateKey (pairs:('k * 'v) seq) =
+    let inline private getDuplicateKeys (pairs:('k * 'v) seq) =
         let seen = HashSet<'k>()
         pairs
-        |> Seq.tryPick (fun (k, _) ->
+        |> Seq.choose (fun (k, _) ->
             if seen.Add(k) then None
             else Some k
         )
+        |> Seq.distinct
+        |> List.ofSeq
 
     let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'b> =
         Parser (fun (element:JsonElement) ->
@@ -400,13 +402,16 @@ module Parse =
 
                 match error with
                 | None ->
-                    match getDuplicateKey array with
-                    | Some key ->
-                        let message = Error.duplicateKey key
-                        element
-                        |> InvalidValue.create (Some message) typeof<'b>
-                        |> Error.list
-                    | None -> Ok <| convert (array :> seq<_>)
+                    match getDuplicateKeys array with
+                    | [] -> Ok <| convert (array :> seq<_>)
+                    | keys ->
+                        keys
+                        |> List.map (fun key ->
+                            let message = Error.duplicateKey key
+                            element
+                            |> InvalidValue.create (Some message) typeof<'b>
+                        )
+                        |> Error
                 | Some (errors, name) ->
                     let array = ResizeArray()
                     array.Add(errors, name)
