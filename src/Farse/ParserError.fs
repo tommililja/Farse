@@ -181,6 +181,6 @@ module ParserErrors =
             $"Parser failed with %i{List.length errors} error[s].\n"
 
             errors
-            |> List.mapi (fun i x -> $"error[%i{i}]:\n%s{ParserError.asString x}")
+            |> List.mapi (fun i x -> $"Error[%i{i}]:\n%s{ParserError.asString x}")
             |> String.concat "\n\n"
         }

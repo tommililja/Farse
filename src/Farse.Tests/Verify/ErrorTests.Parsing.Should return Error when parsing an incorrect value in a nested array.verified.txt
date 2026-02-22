@@ -1,6 +1,6 @@
 ﻿Parser failed with 1 error[s].
 
-error[0]:
+Error[0]:
   at $.prop[1][1]
    | Expected String, but got Number.
    = 2

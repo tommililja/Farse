@@ -1,4 +1,4 @@
 ﻿Parser failed with 1 error[s].
 
-error[0]:
+Error[0]:
    | Value too small.

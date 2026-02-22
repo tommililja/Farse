@@ -1,5 +1,5 @@
 ﻿Parser failed with 1 error[s].
 
-error[0]:
+Error[0]:
   at $.prop.missing
    | Expected String, but got Undefined.

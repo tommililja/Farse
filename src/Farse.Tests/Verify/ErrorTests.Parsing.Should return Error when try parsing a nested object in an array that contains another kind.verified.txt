@@ -1,11 +1,11 @@
 ﻿Parser failed with 2 error[s].
 
-error[0]:
+Error[0]:
   at $.prop.prop2[1]
    | Expected Object, but got Number.
    = 2
 
-error[1]:
+Error[1]:
   at $.prop.prop2[2]
    | Expected Object, but got Number.
    = 3

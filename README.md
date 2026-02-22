@@ -258,7 +258,7 @@ let! age = "age" ?= byte |> Parser.validate Age.fromByte
 ```code
 Parser failed with 1 error[s].
 
-error[0]:
+Error[0]:
   at $.age
    | Tried parsing 'Age.
    | The minimum age is '12'.
@@ -300,7 +300,7 @@ More examples can be found [here](https://github.com/tommililja/Farse/blob/main/
 ```code
 Parser failed with 1 error[s].
 
-error[0]:
+Error[0]:
   at $.subscription.renewsAt
    | Tried parsing 'Instant.
    | The value string does not [...]
@@ -312,7 +312,7 @@ error[0]:
 ```code
 Parser failed with 1 error[s].
 
-error[0]:
+Error[0]:
   at $.profiles[1]
    | Tried parsing 'ProfileId.
    | Invalid guid.
