@@ -3,4 +3,3 @@
 Error[0]:
   at $
    | Expected Object, but got Array.
-   = []

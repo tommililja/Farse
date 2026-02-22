@@ -3,4 +3,3 @@
 Error[0]:
   at $.prop
    | Expected Number, but got Object.
-   = { "prop2": null }

@@ -3,4 +3,3 @@
 Error[0]:
   at $.prop.prop2
    | Expected Object, but got Array.
-   = []

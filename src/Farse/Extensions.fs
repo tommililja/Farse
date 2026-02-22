@@ -93,8 +93,10 @@ module internal Extensions =
 
         let inline getValue (element:JsonElement) =
             match element.ValueKind with
-            | JsonValueKind.Null
-            | JsonValueKind.Undefined -> None
+            | Kind.Null
+            | Kind.Undefined
+            | Kind.Object
+            | Kind.Array -> None
             | _ -> Some <| element.GetRawText()
 
         let inline isBool (element:JsonElement) =
