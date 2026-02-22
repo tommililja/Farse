@@ -235,7 +235,13 @@ module Parse =
 
 ## Validation
 
-There are a few different options for validating parsed values.
+Produces an error message without details.
+
+```fsharp
+let! age = "age" ?= byte |> Parser.validate Age.fromByte
+```
+
+Produces detailed error messages when validation fails.
 
 ```fsharp
 let age =
@@ -244,13 +250,11 @@ let age =
         | true, byte -> Age.fromByte byte |> Result.mapError Some
         | _ -> Error None
     ) ExpectedKind.String
+```
 
-// Produces detailed error messages when validation fails.
+```fsharp
 let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
-
-// Produces an error message without details.
-let! age = "age" ?= byte |> Parser.validate Age.fromByte
 ```
 
 #### Error
