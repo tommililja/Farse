@@ -486,7 +486,25 @@ module ErrorTests =
         [<Fact>]
         let ``Should return Error when parsing Dictionary fails`` () =
             Prop.req "prop" (Parse.dict Parse.int)
-            |> Parser.parse """{ "prop": { "key1": 1, "key2": "2", "key3": 3 } }"""
+            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when parsing Map fails`` () =
+            Prop.req "prop" (Parse.map Parse.int)
+            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when parsing KeyValuePairs fails`` () =
+            Prop.req "prop" (Parse.keyValuePairs Parse.int)
+            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when parsing tuples fails`` () =
+            Prop.req "prop" (Parse.tuples Parse.int)
+            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
             |> Expect.errorString
 
         [<Fact>]
