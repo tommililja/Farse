@@ -20,7 +20,7 @@ dotnet package add Farse
 The benchmarks can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.8, macOS Tahoe 26.2 (25C56) [Darwin 25.2.0]
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.3 (25D125) [Darwin 25.3.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 .NET SDK 10.0.100
   [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a DEBUG
@@ -30,13 +30,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
-| System.Text.Json       | 106.9 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.60 |
-| System.Text.Json*      | 107.2 us |  0.84 | 12.9395 |  1.5869 |  79.97 KB |        1.86 |
-| Farse                  | 128.2 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
-| Newtonsoft.Json*       | 195.9 us |  1.53 | 42.7246 |  5.8594 | 262.27 KB |        6.10 |
-| Thoth.System.Text.Json | 217.1 us |  1.69 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
-| Newtonsoft.Json        | 224.1 us |  1.75 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
-| Thoth.Json.Net         | 307.0 us |  2.40 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
+| System.Text.Json       | 106.4 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.60 |
+| Farse                  | 127.9 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
+| System.Text.Json*      | 105.4 us |  0.82 | 12.9395 |  1.5869 |  79.97 KB |        1.86 |
+| Newtonsoft.Json*       | 194.0 us |  1.52 | 42.7246 |  5.8594 | 262.27 KB |        6.10 |
+| Thoth.System.Text.Json | 215.3 us |  1.68 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
+| Newtonsoft.Json        | 214.9 us |  1.68 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
+| Thoth.Json.Net         | 307.5 us |  2.40 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
 
 * Serialization
 ```
