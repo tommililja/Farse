@@ -12,7 +12,7 @@
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/tommililja/Farse</PackageProjectUrl>
         <PackageReadMeFile>README.md</PackageReadMeFile>
-        <PackageTags>fsharp;parsing;json</PackageTags>
+        <PackageTags>json;parsing;fsharp</PackageTags>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/tommililja/Farse</RepositoryUrl>
