@@ -2,7 +2,6 @@
     <PropertyGroup>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <WarnOn>$(WarnOn);1182;3579</WarnOn>
-        <NoWarn>$(NoWarn);NU1510</NoWarn>
         <Features>strict</Features>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
