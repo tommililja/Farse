@@ -544,6 +544,18 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when tuple4 parsing fails`` () =
+            Prop.req "prop" (Parse.tuple4 Parse.int Parse.int Parse.int Parse.int)
+            |> Parser.parse """{ "prop": [ "1", "1", 1, 1 ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when tuple5 parsing fails`` () =
+            Prop.req "prop" (Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int)
+            |> Parser.parse """{ "prop": [ "1", "1", 1, 1, 1 ] }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
             Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ 1, 1, 1 ] }"""
