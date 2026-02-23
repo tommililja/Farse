@@ -130,28 +130,11 @@ module CouldNotParse =
 
 module ParserError =
 
-    let rec private getError = function
-        | ArrayItem error -> getError error
-        | ArrayIndex ->
-            let msg = Error.invalidIndex
-            CouldNotParse (msg, None, None)
-        | CouldNotParse (msg, details, value) ->
-            CouldNotParse (msg, details, value)
-        | InvalidKind (expected, actual, value) ->
-            let msg = Error.invalidKind expected actual
-            CouldNotParse (msg, None, value)
-        | InvalidValue (details, type', value) ->
-            let msg = Error.triedParsing type'
-            CouldNotParse (msg, details, value)
-        | KeyValue error -> getError error
-        | Other msg -> Other msg
+    let internal appendProp name error =
+        { error with Path = JsonPath.append (JsonPath.prop name) error.Path }
 
-    let internal enrich path error =
-        {
-            error with
-                Path = JsonPath.append path error.Path
-                ErrorType = getError error.ErrorType
-        }
+    let internal appendPath path error =
+        { error with Path = JsonPath.append path error.Path }
 
     let asString error =
         let rec getMessage path = function

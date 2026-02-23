@@ -11,9 +11,8 @@ module Prop =
                 let prop = JsonElement.getProperty name element
                 parse prop
                 |> Result.bindError (fun errors ->
-                    let path = JsonPath.prop name
                     errors
-                    |> List.map (ParserError.enrich path)
+                    |> List.map (ParserError.appendProp name)
                     |> Error
                 )
             | _ ->
@@ -32,9 +31,8 @@ module Prop =
                     match parse prop with
                     | Ok x -> Ok <| Some x
                     | Error errors ->
-                        let path = JsonPath.prop name
                         errors
-                        |> List.map (ParserError.enrich path)
+                        |> List.map (ParserError.appendProp name)
                         |> Error
                 | None -> Ok None
             | _ ->
@@ -64,7 +62,7 @@ module Prop =
                 parse prop
                 |> Result.mapError (fun errors ->
                     errors
-                    |> List.map (ParserError.enrich path)
+                    |> List.map (ParserError.appendPath path)
                 )
             | Error element ->
                 ExpectedKind.Object
@@ -94,7 +92,7 @@ module Prop =
                 | Ok x -> Ok <| Some x
                 | Error errors ->
                     errors
-                    |> List.map (ParserError.enrich path)
+                    |> List.map (ParserError.appendPath path)
                     |> Error
             | Ok None -> Ok None
             | Error element ->
