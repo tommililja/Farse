@@ -553,6 +553,24 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse array as tuple of four`` () =
+        let expected = "1", 1, 1, 1
+        let actual =
+            Prop.req "prop" (Parse.tuple4 Parse.string Parse.int Parse.int Parse.int)
+            |> Parser.parse """{ "prop": [ "1", 1, 1, 1 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse array as tuple of five`` () =
+        let expected = "1", 1, 1, 1, 1
+        let actual =
+            Prop.req "prop" (Parse.tuple5 Parse.string Parse.int Parse.int Parse.int Parse.int)
+            |> Parser.parse """{ "prop": [ "1", 1, 1, 1, 1 ] }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse array length as int`` () =
         let expected = 3
         let actual =

@@ -473,8 +473,8 @@ module Parse =
         )
 
     /// <summary>Parses an array with two values as a tuple.</summary>
-    /// <typeparam name="a">The parser used for the first value.</typeparam>
-    /// <typeparam name="b">The parser used for the second value.</typeparam>
+    /// <param name="a">The parser used for the first value.</param>
+    /// <param name="b">The parser used for the second value.</param>
     let tuple2 a b =
         tuple 2 (fun e ->
             result {
@@ -486,9 +486,9 @@ module Parse =
         )
 
     /// <summary>Parses an array with three values as a tuple of three.</summary>
-    /// <typeparam name="a">The parser used for the first value.</typeparam>
-    /// <typeparam name="b">The parser used for the second value.</typeparam>
-    /// <typeparam name="c">The parser used for the third value.</typeparam>
+    /// <param name="a">The parser used for the first value.</param>
+    /// <param name="b">The parser used for the second value.</param>
+    /// <param name="c">The parser used for the third value.</param>
     let tuple3 a b c =
         tuple 3 (fun e ->
             result {
@@ -497,6 +497,42 @@ module Parse =
                 and! c = parseIndex 2 c e
 
                 return a, b, c
+            }
+        )
+
+    /// <summary>Parses an array with four values as a tuple of four.</summary>
+    /// <param name="a">The parser used for the first value.</param>
+    /// <param name="b">The parser used for the second value.</param>
+    /// <param name="c">The parser used for the third value.</param>
+    /// <param name="d">The parser used for the fourth value.</param>
+    let tuple4 a b c d =
+        tuple 4 (fun e ->
+            result {
+                let! a = parseIndex 0 a e
+                and! b = parseIndex 1 b e
+                and! c = parseIndex 2 c e
+                and! d = parseIndex 3 d e
+
+                return a, b, c, d
+            }
+        )
+
+    /// <summary>Parses an array with five values as a tuple of five.</summary>
+    /// <param name="a">The parser used for the first value.</param>
+    /// <param name="b">The parser used for the second value.</param>
+    /// <param name="c">The parser used for the third value.</param>
+    /// <param name="d">The parser used for the fourth value.</param>
+    /// <param name="e">The parser used for the fifth value.</param>
+    let tuple5 a b c d e =
+        tuple 5 (fun el ->
+            result {
+                let! a = parseIndex 0 a el
+                and! b = parseIndex 1 b el
+                and! c = parseIndex 2 c el
+                and! d = parseIndex 3 d el
+                and! e = parseIndex 4 e el
+
+                return a, b, c, d, e
             }
         )
 
