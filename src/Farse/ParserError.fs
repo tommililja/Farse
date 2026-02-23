@@ -107,7 +107,7 @@ module ArrayIndex =
 module KeyValue =
 
     let create name error = {
-        Path = JsonPath.prop name
+        Path = JsonPath.append (JsonPath.prop name) error.Path
         ErrorType = KeyValue error.ErrorType
     }
 
