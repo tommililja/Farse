@@ -87,12 +87,11 @@ module Parser =
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<'a> =
         Parser (fun element ->
-            match x with
-            | Ok x -> Ok x
-            | Error msg ->
+            Result.bindError (fun msg ->
                 element
-                |> InvalidValue.create (Some msg) typeof<'a>
+                |> InvalidValue.fromElement (Some msg) typeof<'a>
                 |> Error.list
+            ) x
         )
 
     /// <summary>Binds the parsed value with the given function.</summary>
@@ -142,7 +141,7 @@ module Parser =
             | :? JsonException
             | :? ArgumentNullException as exn ->
                 json
-                |> Error.invalidJson exn
+                |> Error.invalidString exn
                 |> Error
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>

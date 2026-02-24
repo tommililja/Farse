@@ -16,8 +16,8 @@ module Prop =
                     |> Error
                 )
             | _ ->
-                element
-                |> InvalidKind.create ExpectedKind.Object
+                ExpectedKind.Object
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 
@@ -36,8 +36,8 @@ module Prop =
                         |> Error
                 | None -> Ok None
             | _ ->
-                element
-                |> InvalidKind.create ExpectedKind.Object
+                ExpectedKind.Object
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 
@@ -66,7 +66,7 @@ module Prop =
                 )
             | Error element ->
                 ExpectedKind.Object
-                |> CouldNotParse.invalidKind path element
+                |> InvalidKind.create path element
                 |> Error.list
         )
 
@@ -97,7 +97,7 @@ module Prop =
             | Ok None -> Ok None
             | Error element ->
                 ExpectedKind.Object
-                |> CouldNotParse.invalidKind path element
+                |> InvalidKind.create path element
                 |> Error.list
         )
 

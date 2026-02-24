@@ -33,12 +33,12 @@ module Parse =
         Parser (fun element ->
             parse element
             |> Result.bind (fun x ->
-                match fn x with
-                | Ok x -> Ok x
-                | Error msg ->
+                fn x
+                |> Result.bindError (fun msg ->
                     Some $"%A{x}"
-                    |> InvalidValue.fromValue (Some msg) typeof<'b>
+                    |> InvalidValue.create (Some msg) typeof<'b>
                     |> Error.list
+                )
             )
         )
 
@@ -62,16 +62,16 @@ module Parse =
                     fn element
                     |> Result.bindError (fun msg ->
                         element
-                        |> InvalidValue.create msg typeof<'a>
+                        |> InvalidValue.fromElement msg typeof<'a>
                         |> Error.list
                     )
                 with ex ->
                     element
-                    |> InvalidValue.create (Some ex.Message) typeof<'a>
+                    |> InvalidValue.fromElement (Some ex.Message) typeof<'a>
                     |> Error.list
             else
-                element
-                |> InvalidKind.create expectedKind
+                expectedKind
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 
@@ -335,8 +335,8 @@ module Parse =
                     |> List.concat
                     |> Error
             | _ ->
-                element
-                |> InvalidKind.create ExpectedKind.Array
+                ExpectedKind.Array
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 
@@ -366,8 +366,8 @@ module Parse =
             | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
             | Kind.Array -> Error.list <| ArrayIndex.create n
             | _ ->
-                element
-                |> InvalidKind.create ExpectedKind.Array
+                ExpectedKind.Array
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 
@@ -409,7 +409,7 @@ module Parse =
                         |> List.map (fun key ->
                             let message = Error.duplicateKey key
                             element
-                            |> InvalidValue.create (Some message) typeof<'b>
+                            |> InvalidValue.fromElement (Some message) typeof<'b>
                         )
                         |> Error
                 | Some (errors, name) ->
@@ -430,8 +430,8 @@ module Parse =
                     |> List.concat
                     |> Error
             | _ ->
-                element
-                |> InvalidKind.create ExpectedKind.Object
+                ExpectedKind.Array
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 
@@ -464,11 +464,11 @@ module Parse =
             | Kind.Array ->
                 let details = Error.invalidTuple expected actual
                 element
-                |> InvalidValue.create (Some details) typeof<'b>
+                |> InvalidValue.fromElement (Some details) typeof<'b>
                 |> Error.list
             | _ ->
-                element
-                |> InvalidKind.create ExpectedKind.Array
+                ExpectedKind.Array
+                |> InvalidKind.create JsonPath.empty element
                 |> Error.list
         )
 

@@ -1,3 +1,3 @@
 ﻿Error: Could not parse JSON string.
 Message: '1' is invalid after a property name. Expected a ':'. LineNumber: 0 | BytePositionInLine: 9.
-JSON: "{ "prop" 1 }"
+String: "{ "prop" 1 }"

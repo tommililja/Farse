@@ -42,14 +42,14 @@ module internal Error =
             $"Message: %s{exn.Message}"
         }
 
-    let invalidJson (exn:exn) json =
+    let invalidString (exn:exn) str =
         string {
             "Error: Could not parse JSON string."
             $"Message: %s{exn.Message}"
 
-            match json with
-            | null -> "JSON: null"
-            | str -> $"JSON: \"%s{str}\""
+            match str with
+            | null -> "String: null"
+            | str -> $"String: \"%s{str}\""
         }
 
 type ParserErrorType =
@@ -68,27 +68,22 @@ type ParserError = {
 
 module InvalidValue =
 
-    let create msg type' element =
-        let value = JsonElement.getValue element
-        {
-            Path = JsonPath.empty
-            ErrorType = InvalidValue (msg, type', value)
-        }
+    let create msg type' value = {
+        Path = JsonPath.empty
+        ErrorType = InvalidValue (msg, type', value)
+    }
 
-    let fromValue msg type' value =
-        {
-            Path = JsonPath.empty
-            ErrorType = InvalidValue (msg, type', value)
-        }
+    let fromElement msg type' element = {
+        Path = JsonPath.empty
+        ErrorType = InvalidValue (msg, type', JsonElement.getValue element)
+    }
 
 module InvalidKind =
 
-    let create expected element =
-        let value = JsonElement.getValue element
-        {
-            Path = JsonPath.empty
-            ErrorType = InvalidKind (expected, element.ValueKind, value)
-        }
+    let create path (element:JsonElement) expected = {
+        Path = path
+        ErrorType = InvalidKind (expected, element.ValueKind, JsonElement.getValue element)
+    }
 
 module ArrayItem =
 
@@ -117,16 +112,6 @@ module Other =
         Path = JsonPath.empty
         ErrorType = Other msg
     }
-
-module CouldNotParse =
-
-    let invalidKind path (element:JsonElement) expected =
-        let msg = Error.invalidKind expected element.ValueKind
-        let value = JsonElement.getValue element
-        {
-            Path = path
-            ErrorType = CouldNotParse (msg, None, value)
-        }
 
 module ParserError =
 
