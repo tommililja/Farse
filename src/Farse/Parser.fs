@@ -96,9 +96,9 @@ module Parser =
 
     /// <summary>Returns a parser that will fail.</summary>
     /// <code>do! Parser.fail "message"</code>
-    /// <param name="message">The error message to return.</param>
-    let inline fail message =
-        Error message
+    /// <param name="msg">The error message to return.</param>
+    let inline fail msg =
+        Error msg
         |> fromResult
 
     /// <summary>Binds the parsed value with the given function.</summary>

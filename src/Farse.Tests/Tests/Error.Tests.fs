@@ -88,7 +88,7 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when creating a Parser fails`` () =
+        let ``Should return Error when Parser fails`` () =
             "error"
             |> Parser.fail
             |> Parser.parse "1"
