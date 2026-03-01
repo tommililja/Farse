@@ -13,6 +13,17 @@ module Parse =
     let none = Parser.from ()
 
     /// <summary>Parses an optional value with the given parser.</summary>
+    /// <remarks>Returns a default value when the value is null.</remarks>
+    /// <code>let! int = "prop" &amp;= Parse.def Parse.int 1</code>
+    /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
+    let def (Parser parse) x =
+        Parser (fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Null -> Ok x
+            | _ -> parse element
+        )
+
+    /// <summary>Parses an optional value with the given parser.</summary>
     /// <code>let! int = "prop" &amp;= Parse.optional Parse.int</code>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
     let optional (Parser parse) =
@@ -534,6 +545,27 @@ module Parse =
 
                 return a, b, c, d, e
             }
+        )
+
+    // One of
+
+    /// <summary>Parses an object's property with a specific name.</summary>'
+    let oneOf disc cases =
+        Parser (fun element ->
+            match element.ValueKind with
+            | Kind.Object ->
+                result {
+                    let (Parser parser) = Prop.req disc string
+
+                    let! disc = parser element
+                    match List.tryFind (fun (key, _) -> key = disc) cases with
+                    | Some (_, Parser p) -> return! p element
+                    | None -> return! Error.list <| Other.create $"Discriminator %A{disc} not found."
+                }
+            | _ ->
+                ExpectedKind.Object
+                |> InvalidKind.create JsonPath.empty element
+                |> Error.list
         )
 
     // Json
