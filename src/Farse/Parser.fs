@@ -127,6 +127,15 @@ module Parser =
     let inline ignore<'a> (Parser parse) =
         Parser (parse >> Result.map ignore<'a>)
 
+    /// <summary>Sets a default value for the parsed optional value.</summary>
+    /// <code>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</code>
+    /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
+    let defaultValue x (Parser parse) =
+        Parser (fun (element:JsonElement) ->
+            parse element
+            |> Result.map (Option.defaultValue x)
+        )
+
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Works with options and sequences.</remarks>
     /// <code>let! age = "age" ?= Parse.byte |> Parser.validate Age.fromByte</code>

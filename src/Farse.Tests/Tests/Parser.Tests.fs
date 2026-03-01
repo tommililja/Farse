@@ -55,6 +55,16 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should set default value for optional value`` () =
+        let expected = 1
+        let actual =
+            Parse.optional Parse.int
+            |> Parser.defaultValue 1
+            |> Parser.parse "null"
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should return Ok with expected value when validation succeeds`` () =
         let expected = 1
         let actual =
