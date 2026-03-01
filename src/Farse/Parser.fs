@@ -94,6 +94,13 @@ module Parser =
             ) x
         )
 
+    /// <summary>Returns a parser that will fail.</summary>
+    /// <code>do! Parser.fail "message"</code>
+    /// <param name="message">The error message to return.</param>
+    let inline fail message =
+        Error message
+        |> fromResult
+
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <code>let! int = "prop" &amp;= Parse.int |> Parser.bind Parser.from</code>
     /// <param name="fn">The binding function.</param>
