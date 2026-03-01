@@ -129,6 +129,9 @@ module internal Extensions =
             | Ok None -> Ok None
             | Error e -> Error e
 
+        let inline defaultValue x =
+            Result.map (Option.defaultValue x)
+
     [<AutoOpen>]
     module ActivePatterns =
 

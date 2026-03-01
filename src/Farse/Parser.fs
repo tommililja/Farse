@@ -131,10 +131,7 @@ module Parser =
     /// <code>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</code>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
     let defaultValue x (Parser parse) =
-        Parser (fun (element:JsonElement) ->
-            parse element
-            |> Result.map (Option.defaultValue x)
-        )
+        Parser (parse >> ResultOption.defaultValue x)
 
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Works with options and sequences.</remarks>
