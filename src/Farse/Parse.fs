@@ -547,27 +547,6 @@ module Parse =
             }
         )
 
-    // One of
-
-    /// <summary>Parses an object's property with a specific name.</summary>'
-    let oneOf disc cases =
-        Parser (fun element ->
-            match element.ValueKind with
-            | Kind.Object ->
-                result {
-                    let (Parser parser) = Prop.req disc string
-
-                    let! disc = parser element
-                    match List.tryFind (fun (key, _) -> key = disc) cases with
-                    | Some (_, Parser p) -> return! p element
-                    | None -> return! Error.list <| Other.create $"Discriminator %A{disc} not found."
-                }
-            | _ ->
-                ExpectedKind.Object
-                |> InvalidKind.create JsonPath.empty element
-                |> Error.list
-        )
-
     // Json
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.
