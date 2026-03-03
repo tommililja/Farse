@@ -12,11 +12,10 @@ module Parse =
     /// Always succeeds and returns FSharp.Core.Unit.
     let none = Parser.from ()
 
-    /// <summary>Parses an optional value with the given parser.</summary>
-    /// <remarks>Returns a default value when the value is null.</remarks>
+    /// <summary>Parses an optional value with the given parser but returns a default value when null.</summary>
     /// <code>let! int = "prop" &amp;= Parse.def Parse.int 1</code>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
-    let def (Parser parse) x =
+    let nil (Parser parse) x =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Null -> Ok x

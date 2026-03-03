@@ -640,7 +640,7 @@ module ParseTests =
     let ``Should return default value when value is null`` () =
         let expected = 1
         let actual =
-            Prop.req "prop" (Parse.def Parse.int 1)
+            Prop.req "prop" (Parse.nil Parse.int 1)
             |> Parser.parse """{ "prop": null }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -649,7 +649,7 @@ module ParseTests =
     let ``Should not return default value when value is not null`` () =
         let expected = 2
         let actual =
-            Prop.req "prop" (Parse.def Parse.int 1)
+            Prop.req "prop" (Parse.nil Parse.int 1)
             |> Parser.parse """{ "prop": 2 }"""
             |> Expect.ok
         Expect.equal actual expected
