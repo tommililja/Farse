@@ -233,6 +233,25 @@ module Parse =
         ) ExpectedKind.String
 ```
 
+## One-of
+
+Parse.oneOf works if the discriminator property is inside the object.
+
+```fsharp
+let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
+```
+
+For everything else, a simple match will do.
+
+```fsharp
+let! disc = "prop.disc" &= string
+let! x =
+    match disc with
+    | "a" -> "prop" &= a
+    | "b" -> "prop" &= b
+    | x -> Parser.fail $"No matching parser found for discriminator '%s{x}'."
+```
+
 ## Validation
 
 Produces an error message without details.

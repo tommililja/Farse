@@ -26,8 +26,8 @@
         <Compile Include="ParserError.fs" />
         <Compile Include="Parser.fs"/>
         <Compile Include="Parser.Builder.fs" />
-        <Compile Include="Parse.fs" />
         <Compile Include="Prop.fs" />
+        <Compile Include="Parse.fs" />
         <Compile Include="Operators.fs" />
         <Compile Include="Json.fs" />
     </ItemGroup>

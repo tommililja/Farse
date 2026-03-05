@@ -546,6 +546,32 @@ module Parse =
             }
         )
 
+    // One-of
+
+    /// <summary>Parses an object based on a discriminator property.</summary>
+    /// <param name="name">The discriminator property name.</param>
+    /// <param name="parsers">The parsers to match the discriminator property against.</param>
+    let oneOf name parsers : Parser<'b> =
+        Parser (fun element ->
+            match element.ValueKind with
+            | Kind.Object ->
+                result {
+                    let (Parser parse) = Prop.req name string
+                    let! value = parse element
+                    match List.tryFind (fun (key, _) -> key = value) parsers with
+                    | Some (_, Parser parse) -> return! parse element
+                    | None ->
+                        return!
+                            None
+                            |> InvalidValue.create (Some $"No matching parser found for discriminator '%s{value}'.") typeof<'b>
+                            |> Error.list
+                }
+            | _ ->
+                ExpectedKind.Object
+                |> InvalidKind.create JsonPath.empty element
+                |> Error.list
+        )
+
     // Json
 
     /// Parses an element's kind as System.Text.Json.JsonValueKind.

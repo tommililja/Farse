@@ -563,6 +563,37 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when one-of discriminator is not matched`` () =
+            Prop.req "prop" (Parse.oneOf "disc" [ "missing", Parse.none ])
+            |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when one-of discriminator is not found`` () =
+            Prop.req "prop" (Parse.oneOf "missing" [ "a", Parse.none ])
+            |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when one-of parser fails`` () =
+            let a =
+                parser {
+                    let! a = Prop.req "prop2" Parse.int
+                    let! b = Prop.req "prop3" Parse.int
+
+                    return a, b
+                }
+            Prop.req "prop" (Parse.oneOf "disc" [ "a", a ])
+            |> Parser.parse """{ "prop": { "disc": "a", "prop2": "1", "prop3": 2 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when one-of is not an object`` () =
+            Prop.req "prop" (Parse.oneOf "disc" [ "missing", Parse.none ])
+            |> Parser.parse """{ "prop": [] }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
             Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ 1, 1, 1 ] }"""
