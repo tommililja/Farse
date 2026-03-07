@@ -235,13 +235,15 @@ module Parse =
 
 ## One-of
 
-Parse.oneOf works if the discriminator property is inside the object.
+There is still limited one-of support.
+
+We can use this if the discriminator property is inside the object.
 
 ```fsharp
 let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
 ```
 
-For everything else, a simple match will do.
+Which is equal to this match expression, but less flexible.
 
 ```fsharp
 let! disc = "prop.disc" &= string
