@@ -7,6 +7,7 @@ open System.Threading.Tasks
 open Expecto
 open VerifyTests
 open VerifyXunit
+open Farse
 
 module Expect =
 
@@ -25,7 +26,10 @@ module Expect =
 
     let error x = Expect.wantError x String.Empty
 
-    let errorString x = error x |> string
+    let errorString x =
+        Result.mapError ParserError.asStringList x
+        |> error
+        |> string
 
     let isTrue actual =
         Expect.isTrue actual String.Empty

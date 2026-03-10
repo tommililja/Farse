@@ -2,6 +2,6 @@
 
 Error[0]:
   at $
-   | Tried parsing 'Object.
+   | Tried parsing 'Object
    | Error
    = 1

@@ -2,6 +2,6 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'TimeSpan.
+   | Tried parsing 'TimeSpan
    | Expected 'hh\mm\ss'.
    = "01:28:45"

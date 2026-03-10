@@ -2,6 +2,6 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'DateOnly.
+   | Tried parsing 'DateOnly
    | Expected 'yyyyMMdd'.
    = "2025-05-13"

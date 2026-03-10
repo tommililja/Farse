@@ -13,7 +13,7 @@ module Parse =
     let none = Parser.from ()
 
     /// <summary>Parses an optional value with the given parser but returns a default value when null.</summary>
-    /// <code>let! int = "prop" &amp;= Parse.def Parse.int 1</code>
+    /// <code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
     let nil (Parser parse) x =
         Parser (fun (element:JsonElement) ->
@@ -44,10 +44,10 @@ module Parse =
             parse element
             |> Result.bind (fun x ->
                 fn x
-                |> Result.bindError (fun msg ->
-                    Some $"%A{x}"
-                    |> InvalidValue.create (Some msg) typeof<'b>
-                    |> Error.list
+                |> Result.mapError (fun msg ->
+                    $"%A{x}"
+                    |> ParserError.invalid msg typeof<'b> element
+                    |> List.singleton
                 )
             )
         )
@@ -56,7 +56,7 @@ module Parse =
     /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let inline custom ([<InlineIfLambda>] fn) expectedKind : Parser<'a> =
+    let inline custom ([<InlineIfLambda>] fn) expectedKind : Parser<'b> =
         Parser (fun element ->
             let isExpectedKind =
                 match expectedKind with
@@ -70,18 +70,18 @@ module Parse =
             if isExpectedKind then
                 try
                     fn element
-                    |> Result.bindError (fun msg ->
+                    |> Result.mapError (fun msg ->
                         element
-                        |> InvalidValue.fromElement msg typeof<'a>
-                        |> Error.list
+                        |> ParserError.fromElement JsonPath.empty msg typeof<'b>
+                        |> List.singleton
                     )
                 with ex ->
                     element
-                    |> InvalidValue.fromElement (Some ex.Message) typeof<'a>
+                    |> ParserError.fromElement JsonPath.empty (Some ex.Message) typeof<'b>
                     |> Error.list
             else
-                expectedKind
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind expectedKind JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -301,13 +301,12 @@ module Parse =
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =
         parse (element.Item n)
-        |> Result.bindError (fun errors ->
+        |> Result.mapError (fun errors ->
             errors
-            |> List.map (ArrayItem.create n)
-            |> Error
+            |> List.map (ParserError.withIndex n)
         )
 
-    let inline private arr ([<InlineIfLambda>] convert) (Parser parse) =
+    let inline private arr ([<InlineIfLambda>] convert) (Parser parse) : Parser<'b> =
         Parser (fun element ->
             match element.ValueKind with
             | Kind.Array ->
@@ -340,13 +339,13 @@ module Parse =
                     |> List.ofSeq
                     |> List.map (fun (errors, n) ->
                         errors
-                        |> List.map (ArrayItem.create n)
+                        |> List.map (ParserError.withIndex n)
                     )
                     |> List.concat
                     |> Error
             | _ ->
-                ExpectedKind.Array
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -369,15 +368,18 @@ module Parse =
     /// <summary>Parses an array at a specific index.</summary>
     /// <param name="n">The index to parse in the array.</param>
     /// <param name="parser">The parser used for the element.</param>
-    let index n parser =
+    let index n parser : Parser<'b> =
         Parser (fun (element:JsonElement) ->
             let arrayLength = element.GetArrayLength()
             match element.ValueKind with
             | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
-            | Kind.Array -> Error.list <| ArrayIndex.create n
+            | Kind.Array ->
+                element
+                |> ParserError.invalidIndex n typeof<'b>
+                |> Error.list
             | _ ->
-                ExpectedKind.Array
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -416,11 +418,7 @@ module Parse =
                     | [] -> Ok <| convert (array :> seq<_>)
                     | keys ->
                         keys
-                        |> List.map (fun key ->
-                            let message = Error.duplicateKey key
-                            element
-                            |> InvalidValue.fromElement (Some message) typeof<'b>
-                        )
+                        |> List.map (fun key -> ParserError.duplicateKey key typeof<'b> element)
                         |> Error
                 | Some (errors, name) ->
                     let array = ResizeArray()
@@ -435,13 +433,13 @@ module Parse =
                     |> List.ofSeq
                     |> List.map (fun (errors, name) ->
                         errors
-                        |> List.map (KeyValue.create name)
+                        |> List.map (ParserError.withProp name)
                     )
                     |> List.concat
                     |> Error
             | _ ->
-                ExpectedKind.Array
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -472,13 +470,12 @@ module Parse =
             match element.ValueKind with
             | Kind.Array when actual = expected -> fn element
             | Kind.Array ->
-                let details = Error.invalidTuple expected actual
                 element
-                |> InvalidValue.fromElement (Some details) typeof<'b>
+                |> ParserError.invalidTuple actual expected typeof<'b>
                 |> Error.list
             | _ ->
-                ExpectedKind.Array
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -562,13 +559,13 @@ module Parse =
                     | Some (_, Parser parse) -> return! parse element
                     | None ->
                         return!
-                            None
-                            |> InvalidValue.create (Some $"No matching parser found for discriminator '%s{value}'.") typeof<'b>
+                            element
+                            |> ParserError.invalidOneOf value typeof<'b>
                             |> Error.list
                 }
             | _ ->
-                ExpectedKind.Object
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
                 |> Error.list
         )
 

@@ -2,10 +2,10 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'IDictionary<String, Int32>.
+   | Tried parsing 'IDictionary<String, Int32>
    | Duplicate key 'key1'.
 
 Error[1]:
   at $.prop
-   | Tried parsing 'IDictionary<String, Int32>.
+   | Tried parsing 'IDictionary<String, Int32>
    | Duplicate key 'key2'.

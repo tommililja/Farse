@@ -2,4 +2,5 @@
 
 Error[0]:
   at $.prop[3]
+   | Tried parsing 'Int32
    | Index was out of range.

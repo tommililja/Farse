@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'Unit.
-   | No matching parser found for discriminator 'a'.
+   | Tried parsing 'Unit
+   | Missing parser for discriminator 'a'.

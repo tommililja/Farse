@@ -87,7 +87,7 @@ module Json =
             array :> JsonNode
         | JNil -> null
 
-    /// <summary>Converts the Json to a JSON string with the given format.</summary>
+    /// <summary>Converts the Json to a formatted JSON string.</summary>
     /// <param name="format">The format to use.</param>
     /// <param name="json">The Json to convert.</param>
     let asString format json =

@@ -2,4 +2,5 @@
 
 Error[0]:
   at $.prop.prop2
+   | Tried parsing 'Int32
    | Expected Object, but got Null.

@@ -2,5 +2,6 @@
 
 Error[0]:
   at $.prop[1]
+   | Tried parsing 'Int32
    | Expected Number, but got String.
    = "2"

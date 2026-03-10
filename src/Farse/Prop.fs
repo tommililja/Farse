@@ -4,24 +4,23 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private parse name (Parser parse) =
+    let inline private parse name (Parser parse) : Parser<'b> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
                 let prop = JsonElement.getProperty name element
                 parse prop
-                |> Result.bindError (fun errors ->
+                |> Result.mapError (fun errors ->
                     errors
-                    |> List.map (ParserError.appendProp name)
-                    |> Error
+                    |> List.map (ParserError.withProp name)
                 )
             | _ ->
-                ExpectedKind.Object
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
-    let inline private tryParse name (Parser parse) =
+    let inline private tryParse name (Parser parse) : Parser<'b option> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -32,16 +31,16 @@ module Prop =
                     | Ok x -> Ok <| Some x
                     | Error errors ->
                         errors
-                        |> List.map (ParserError.appendProp name)
+                        |> List.map (ParserError.withProp name)
                         |> Error
                 | None -> Ok None
             | _ ->
-                ExpectedKind.Object
-                |> InvalidKind.create JsonPath.empty element
+                element
+                |> ParserError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
-    let inline private traverse path (Parser parse) =
+    let inline private traverse path (Parser parse) : Parser<'b> =
         Parser (fun element ->
             let prop, path =
                 path
@@ -62,15 +61,15 @@ module Prop =
                 parse prop
                 |> Result.mapError (fun errors ->
                     errors
-                    |> List.map (ParserError.appendPath path)
+                    |> List.map (ParserError.withPath path)
                 )
             | Error element ->
-                ExpectedKind.Object
-                |> InvalidKind.create path element
+                element
+                |> ParserError.expectedKind ExpectedKind.Object path typeof<'b>
                 |> Error.list
         )
 
-    let inline private tryTraverse path (Parser parse) =
+    let inline private tryTraverse path (Parser parse) : Parser<'b option> =
         Parser (fun element ->
             let prop, path =
                 path
@@ -92,12 +91,12 @@ module Prop =
                 | Ok x -> Ok <| Some x
                 | Error errors ->
                     errors
-                    |> List.map (ParserError.appendPath path)
+                    |> List.map (ParserError.withPath path)
                     |> Error
             | Ok None -> Ok None
             | Error element ->
-                ExpectedKind.Object
-                |> InvalidKind.create path element
+                element
+                |> ParserError.expectedKind ExpectedKind.Object path typeof<'b>
                 |> Error.list
         )
 

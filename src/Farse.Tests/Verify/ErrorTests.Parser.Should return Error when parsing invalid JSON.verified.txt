@@ -1,3 +1,5 @@
-﻿Error: Could not parse JSON string.
-Message: '1' is invalid after a property name. Expected a ':'. LineNumber: 0 | BytePositionInLine: 9.
-String: "{ "prop" 1 }"
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  | Could not parse JSON.
+  | '1' is invalid after a property name. Expected a ':'. LineNumber: 0 | BytePositionInLine: 9.

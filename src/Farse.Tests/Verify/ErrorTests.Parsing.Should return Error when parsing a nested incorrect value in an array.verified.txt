@@ -2,5 +2,6 @@
 
 Error[0]:
   at $.prop.prop2[1]
+   | Tried parsing 'String
    | Expected String, but got Number.
    = 2

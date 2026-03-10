@@ -5,77 +5,79 @@ open System.Diagnostics.CodeAnalysis
 open System.IO
 open System.Text.Json
 
-type Validate =
-
-    static member inline Validate(Parser parse, fn) : Parser<'b option> =
-        Parser (fun element ->
-            parse element
-            |> ResultOption.bind (fun x ->
-                match fn x with
-                | Ok x -> Ok <| Some x
-                | Error msg -> Error.list <| Other.create msg
-            )
-        )
-
-    static member inline Validate(Parser parse, fn) : Parser<'b> =
-        Parser (fun element ->
-            parse element
-            |> Result.bind (fun x ->
-                fn x
-                |> Result.bindError (Other.create >> Error.list)
-            )
-        )
-
-    static member inline Seq(Parser parse, fn, convert) =
-        Parser (fun element ->
-            parse element
-            |> Result.bind (fun (items:#seq<_>) ->
-                let mutable error = None
-                let mutable enumerator = items.GetEnumerator()
-
-                let array =
-                    Seq.length items
-                    |> ResizeArray
-
-                while error.IsNone && enumerator.MoveNext() do
-                    match fn enumerator.Current with
-                    | Ok x -> array.Add x
-                    | Error msg -> error <- Some msg
-
-                match error with
-                | None -> Ok <| convert (array :> seq<_>)
-                | Some msg ->
-                    let array = ResizeArray()
-                    array.Add(msg)
-
-                    while enumerator.MoveNext() do
-                        match fn enumerator.Current with
-                        | Ok _ -> ()
-                        | Error msg -> array.Add(msg)
-
-                    array
-                    |> List.ofSeq
-                    |> List.map Other.create
-                    |> Error
-            )
-        )
-
-    static member inline Validate(parser:Parser<'a list>, fn) : Parser<'b list> =
-        Validate.Seq(parser, fn, List.ofSeq)
-
-    static member inline Validate(parser:Parser<'a array>, fn) : Parser<'b array> =
-        Validate.Seq(parser, fn, Array.ofSeq)
-
-    static member inline Validate(parser:Parser<'a Set>, fn) : Parser<'b Set> =
-        Validate.Seq(parser, fn, Set.ofSeq)
-
-    static member inline Validate(parser:Parser<'a seq>, fn) : Parser<'b seq> =
-        Validate.Seq(parser, fn, id)
-
-and [<Struct>] Parser<'a> = Parser of (JsonElement -> Result<'a, ParserError list>)
+type [<Struct>] Parser<'a> = Parser of (JsonElement -> Result<'a, ParserError list>)
 
 module Parser =
 
+    type Validate =
+
+        static member inline Validate(Parser parse, fn) : Parser<'b option> =
+            Parser (fun element ->
+                parse element
+                |> ResultOption.bind (fun x ->
+                    match fn x with
+                    | Ok x -> Ok <| Some x
+                    | Error msg -> Error.list <| Other msg
+                )
+            )
+
+        static member inline Validate(Parser parse, fn) : Parser<'b> =
+            Parser (fun element ->
+                parse element
+                |> Result.bind (fun x ->
+                    fn x
+                    |> Result.mapError (fun msg ->
+                        Other msg
+                        |> List.singleton
+                    )
+                )
+            )
+
+        static member inline Seq(Parser parse, fn, convert) =
+            Parser (fun element ->
+                parse element
+                |> Result.bind (fun (items:#seq<_>) ->
+                    let mutable error = None
+                    let mutable enumerator = items.GetEnumerator()
+
+                    let array =
+                        Seq.length items
+                        |> ResizeArray
+
+                    while error.IsNone && enumerator.MoveNext() do
+                        match fn enumerator.Current with
+                        | Ok x -> array.Add x
+                        | Error msg -> error <- Some msg
+
+                    match error with
+                    | None -> Ok <| convert (array :> seq<_>)
+                    | Some msg ->
+                        let array = ResizeArray()
+                        array.Add(msg)
+
+                        while enumerator.MoveNext() do
+                            match fn enumerator.Current with
+                            | Ok _ -> ()
+                            | Error msg -> array.Add(msg)
+
+                        array
+                        |> List.ofSeq
+                        |> List.map Other
+                        |> Error
+                )
+            )
+
+        static member inline Validate(parser:Parser<'a list>, fn) : Parser<'b list> =
+            Validate.Seq(parser, fn, List.ofSeq)
+
+        static member inline Validate(parser:Parser<'a array>, fn) : Parser<'b array> =
+            Validate.Seq(parser, fn, Array.ofSeq)
+
+        static member inline Validate(parser:Parser<'a Set>, fn) : Parser<'b Set> =
+            Validate.Seq(parser, fn, Set.ofSeq)
+
+        static member inline Validate(parser:Parser<'a seq>, fn) : Parser<'b seq> =
+            Validate.Seq(parser, fn, id)
     /// <summary>Returns a parser with the given value.</summary>
     /// <code>let! int = Parser.from 1</code>
     /// <param name="x">The value to return.</param>
@@ -87,11 +89,12 @@ module Parser =
     /// <param name="x">The result to return.</param>
     let inline fromResult x : Parser<'a> =
         Parser (fun element ->
-            Result.bindError (fun msg ->
+            x
+            |> Result.mapError (fun msg ->
                 element
-                |> InvalidValue.fromElement (Some msg) typeof<'a>
-                |> Error.list
-            ) x
+                |> ParserError.fromElement JsonPath.empty (Some msg) typeof<'a>
+                |> List.singleton
+            )
         )
 
     /// <summary>Returns a parser that will fail.</summary>
@@ -119,19 +122,28 @@ module Parser =
     /// <param name="fn">The mapping function.</param>
     /// <typeparam name="parser">The parser to map.</typeparam>
     let inline map ([<InlineIfLambda>] fn) (Parser parse) =
-        Parser (parse >> Result.map fn)
+        Parser (fun element ->
+            parse element
+            |> Result.map fn
+        )
 
     /// <summary>Ignores the parsed value.</summary>
     /// <code>do! "prop" &amp;= Parse.int |> Parser.ignore</code>
     /// <typeparam name="parser">The parser to ignore.</typeparam>
     let inline ignore<'a> (Parser parse) =
-        Parser (parse >> Result.map ignore<'a>)
+        Parser (fun element ->
+            parse element
+            |> Result.map ignore<'a>
+        )
 
     /// <summary>Sets a default value for the parsed optional value.</summary>
     /// <code>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</code>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
-    let defaultValue x (Parser parse) =
-        Parser (parse >> ResultOption.defaultValue x)
+    let inline defaultValue x (Parser parse) =
+        Parser (fun element ->
+            parse element
+            |> ResultOption.defaultValue x
+        )
 
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Works with options and sequences.</remarks>
@@ -149,13 +161,12 @@ module Parser =
         try
             use document = JsonDocument.Parse(json)
             parse document.RootElement
-            |> Result.mapError ParserErrors.asString
         with
             | :? JsonException
             | :? ArgumentNullException as exn ->
-                json
-                |> Error.invalidString exn
-                |> Error
+                exn
+                |> Json
+                |> Error.list
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
@@ -164,14 +175,12 @@ module Parser =
         task {
             try
                 use! document = JsonDocument.ParseAsync(stream)
-                return
-                    parse document.RootElement
-                    |> Result.mapError ParserErrors.asString
+                return parse document.RootElement
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn ->
                     return
                         exn
-                        |> Error.invalidStream
-                        |> Error
+                        |> Json
+                        |> Error.list
         }

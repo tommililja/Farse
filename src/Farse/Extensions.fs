@@ -6,36 +6,6 @@ open System.Text.Json
 // Ignore enum match warning.
 #nowarn 104
 
-[<RequireQualifiedAccess>]
-type ExpectedKind =
-    | Undefined
-    | Object
-    | Array
-    | String
-    | Number
-    | Bool
-    | Null
-    | Any
-
-type JsonPath = JsonPath of string list
-
-module JsonPath =
-
-    let prop name = JsonPath [ $".%s{name}" ]
-
-    let index n = JsonPath [ $"[%i{n}]" ]
-
-    let empty = JsonPath []
-
-    let append (JsonPath a) (JsonPath b) =
-        List.append a b
-        |> JsonPath
-
-    let asString (JsonPath list) =
-        list
-        |> List.append [ "$" ]
-        |> String.concat String.Empty
-
 [<AutoOpen>]
 module internal Extensions =
 
@@ -43,7 +13,8 @@ module internal Extensions =
 
     module Kind =
 
-        let asString = function
+        let inline asString kind =
+            match kind with
             | Kind.Undefined -> "Undefined"
             | Kind.Object -> "Object"
             | Kind.Array -> "Array"
@@ -51,28 +22,6 @@ module internal Extensions =
             | Kind.Number -> "Number"
             | Kind.True | Kind.False -> "Bool"
             | Kind.Null -> "Null"
-
-    module ExpectedKind =
-
-        let inline fromKind kind =
-            match kind with
-            | Kind.Undefined -> ExpectedKind.Undefined
-            | Kind.Object -> ExpectedKind.Object
-            | Kind.Array -> ExpectedKind.Array
-            | Kind.String -> ExpectedKind.String
-            | Kind.Number -> ExpectedKind.Number
-            | Kind.True | Kind.False -> ExpectedKind.Bool
-            | Kind.Null -> ExpectedKind.Null
-
-        let asString = function
-            | ExpectedKind.Undefined -> "Undefined"
-            | ExpectedKind.Object -> "Object"
-            | ExpectedKind.Array -> "Array"
-            | ExpectedKind.String -> "String"
-            | ExpectedKind.Number -> "Number"
-            | ExpectedKind.Bool -> "Bool"
-            | ExpectedKind.Null -> "Null"
-            | ExpectedKind.Any -> "Any"
 
     module JsonSerializerOptions =
 
@@ -116,21 +65,28 @@ module internal Extensions =
                 $"%s{name}<%s{args}>"
             | x -> x.Name
 
+    module Error =
+
+        let inline list x =
+            List.singleton x
+            |> Error
+
     module Result =
 
-        let inline bindError fn = function
+        // Significantly decreases memory allocations.
+        let inline mapError ([<InlineIfLambda>] fn) = function
             | Ok x -> Ok x
-            | Error e -> fn e
+            | Error e -> Error <| fn e
 
     module ResultOption =
 
-        let inline bind fn = function
+        let inline bind ([<InlineIfLambda>] fn) = function
             | Ok (Some x) -> fn x
             | Ok None -> Ok None
             | Error e -> Error e
 
-        let inline defaultValue x =
-            Result.map (Option.defaultValue x)
+        let inline defaultValue v =
+            Result.map (Option.defaultValue v)
 
     [<AutoOpen>]
     module ActivePatterns =

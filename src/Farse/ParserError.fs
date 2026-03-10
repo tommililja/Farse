@@ -3,152 +3,160 @@ namespace Farse
 open System
 open System.Text.Json
 
-module internal Error =
+type JsonPath = JsonPath of string list
 
-    let inline list x =
-        List.singleton x
-        |> Error
+module JsonPath =
 
-    let triedParsing type' =
-        $"Tried parsing '%s{Type.getName type'}."
+    let inline internal prop name =
+        JsonPath [ $".%s{name}" ]
 
-    let invalidKind expected actual =
-        $"Expected %s{ExpectedKind.asString expected}, but got %s{Kind.asString actual}."
+    let inline internal index n =
+        JsonPath [ $"[%i{n}]" ]
 
-    let invalidTuple expected actual =
-        $"Expected a tuple of %i{expected}, but got %i{actual}."
+    let inline internal append (JsonPath a) (JsonPath b) =
+        List.append a b
+        |> JsonPath
 
-    let invalidIndex =
-        "Index was out of range."
+    let empty = JsonPath []
 
-    let duplicateKey key =
-        $"Duplicate key '%s{key}'."
+    let asString (JsonPath list) =
+        list
+        |> List.append [ "$" ]
+        |> String.concat String.Empty
 
-    let message path msg details value =
-        string {
-            $"  at %s{JsonPath.asString path}"
-            $"   | %s{msg}"
-
-            details
-            |> Option.map (sprintf "   | %s")
-
-            value
-            |> Option.map (sprintf "   = %s")
-        }
-
-    let invalidStream (exn:exn) =
-        string {
-            "Error: Could not parse JSON stream."
-            $"Message: %s{exn.Message}"
-        }
-
-    let invalidString (exn:exn) str =
-        string {
-            "Error: Could not parse JSON string."
-            $"Message: %s{exn.Message}"
-
-            match str with
-            | null -> "String: null"
-            | str -> $"String: \"%s{str}\""
-        }
-
-type ParserErrorType =
-    | ArrayItem of error:ParserErrorType
-    | ArrayIndex
-    | CouldNotParse of msg:string * details:string option * value:string option
-    | InvalidKind of expected:ExpectedKind * actual:Kind * value:string option
-    | InvalidValue of details:string option * type':Type * value:string option
-    | KeyValue of error:ParserErrorType
-    | Other of msg:string
-
-type ParserError = {
+type Details = {
     Path: JsonPath
-    ErrorType: ParserErrorType
+    Element: JsonElement
+    Details: string option
+    Value: string option
+    Type: Type
 }
 
-module InvalidValue =
-
-    let create msg type' value = {
-        Path = JsonPath.empty
-        ErrorType = InvalidValue (msg, type', value)
-    }
-
-    let fromElement msg type' element = {
-        Path = JsonPath.empty
-        ErrorType = InvalidValue (msg, type', JsonElement.getValue element)
-    }
-
-module InvalidKind =
-
-    let create path (element:JsonElement) expected = {
-        Path = path
-        ErrorType = InvalidKind (expected, element.ValueKind, JsonElement.getValue element)
-    }
-
-module ArrayItem =
-
-    let create n error = {
-        Path = JsonPath.append (JsonPath.index n) error.Path
-        ErrorType = ArrayItem error.ErrorType
-    }
-
-module ArrayIndex =
-
-    let create n = {
-        Path = JsonPath.index n
-        ErrorType = ArrayIndex
-    }
-
-module KeyValue =
-
-    let create name error = {
-        Path = JsonPath.append (JsonPath.prop name) error.Path
-        ErrorType = KeyValue error.ErrorType
-    }
-
-module Other =
-
-    let create msg = {
-        Path = JsonPath.empty
-        ErrorType = Other msg
-    }
+type ParserError =
+    | Json of exn
+    | Failure of Details
+    | Other of string
 
 module ParserError =
 
-    let internal appendProp name error =
-        { error with Path = JsonPath.append (JsonPath.prop name) error.Path }
+    // Errors
 
-    let internal appendPath path error =
-        { error with Path = JsonPath.append path error.Path }
+    let inline internal invalid details type' element value =
+        Failure {
+            Path = JsonPath.empty
+            Element = element
+            Details = Some details
+            Value = Some value
+            Type = type'
+        }
 
+    let inline internal fromElement path details type' element =
+        Failure {
+            Path = path
+            Element = element
+            Details = details
+            Value = JsonElement.getValue element
+            Type = type'
+        }
+
+    let inline internal expectedKind expectedKind path type' element =
+        Failure {
+            Path = path
+            Element = element
+            Details = Some $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
+            Type = type'
+            Value = JsonElement.getValue element
+        }
+
+    let inline internal invalidIndex n type' element =
+        Failure {
+            Path = JsonPath.index n
+            Element = element
+            Details = Some "Index was out of range."
+            Type = type'
+            Value = JsonElement.getValue element
+        }
+
+    let inline internal invalidTuple actual expected type' element =
+        Failure {
+            Path = JsonPath.empty
+            Element = element
+            Details = Some $"Expected a tuple of %i{expected}, but got %i{actual}."
+            Type = type'
+            Value = None
+        }
+
+    let inline internal invalidOneOf value type' element =
+        Failure {
+            Path = JsonPath.empty
+            Element = element
+            Details = Some $"Missing parser for discriminator '%s{value}'."
+            Type = type'
+            Value = None
+        }
+
+    let inline internal duplicateKey key type' element =
+        Failure {
+            Path = JsonPath.empty
+            Element = element
+            Details = Some $"Duplicate key '%s{key}'."
+            Type = type'
+            Value = None
+        }
+
+    // Functions for appending the path.
+
+    let inline private append path x =
+        Failure { x with Path = JsonPath.append path x.Path }
+
+    let inline internal withProp name = function
+        | Failure x -> append (JsonPath.prop name) x
+        | x -> x
+
+    let inline internal withIndex n = function
+        | Failure x -> append (JsonPath.index n) x
+        | x -> x
+
+    let inline internal withPath path = function
+        | Failure x -> append path x
+        | x -> x
+
+    // Public
+
+    /// <summary>Converts the ParserError to a formatted string.</summary>
+    /// <param name="error">The ParserError to convert.</param>
     let asString error =
-        let rec getMessage path = function
-            | ArrayItem error ->
-                getMessage path error
-            | ArrayIndex ->
-                let msg = Error.invalidIndex
-                Error.message path msg None None
-            | CouldNotParse (msg, details, value) ->
-                Error.message path msg details value
-            | InvalidKind (expected, actual, value) ->
-                let msg = Error.invalidKind expected actual
-                Error.message path msg None value
-            | InvalidValue (details, type', value) ->
-                let msg = Error.triedParsing type'
-                Error.message path msg details value
-            | KeyValue error ->
-                getMessage path error
-            | Other msg -> $"   | %s{msg}"
+        match error with
+        | Failure details ->
+            string {
+                $"at %s{JsonPath.asString details.Path}"
+                $" | Tried parsing '%s{Type.getName details.Type}"
 
-        getMessage error.Path error.ErrorType
+                Option.map (sprintf " | %s") details.Details
+                Option.map (sprintf " = %s") details.Value
+            }
+        | Json exn ->
+            string {
+                $"| Could not parse JSON."
+                $"| %s{exn.Message}"
+            }
+        | Other msg -> $"| %s{msg}"
 
-module ParserErrors =
-
-    let asString errors =
+    /// <summary>Converts the ParserError list to a formatted string.</summary>
+    /// <param name="list">The ParserError list to convert.</param>
+    let asStringList list =
         string {
-            $"Parser failed with %i{List.length errors} error[s].\n"
+            $"Parser failed with %i{List.length list} error[s].\n"
 
-            errors
-            |> List.mapi (fun i x -> $"Error[%i{i}]:\n%s{ParserError.asString x}")
+            list
+            |> List.mapi (fun i e ->
+                let error =
+                    asString e
+                    |> _.Split('\n')
+                    |> Array.map (sprintf "  %s")
+                    |> String.concat "\n"
+
+                $"Error[%i{i}]:\n%s{error}"
+            )
             |> String.concat "\n\n"
         }

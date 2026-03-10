@@ -2,4 +2,5 @@
 
 Error[0]:
   at $.prop.prop2.missing
+   | Tried parsing 'Int32
    | Expected Number, but got Undefined.

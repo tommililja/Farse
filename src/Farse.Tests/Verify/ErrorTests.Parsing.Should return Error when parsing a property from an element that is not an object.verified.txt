@@ -2,4 +2,5 @@
 
 Error[0]:
   at $
+   | Tried parsing 'Int32
    | Expected Object, but got Array.

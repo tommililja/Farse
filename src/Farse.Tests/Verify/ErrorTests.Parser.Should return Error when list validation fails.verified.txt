@@ -1,10 +1,10 @@
 ﻿Parser failed with 3 error[s].
 
 Error[0]:
-   | Invalid
+  | Invalid
 
 Error[1]:
-   | Invalid
+  | Invalid
 
 Error[2]:
-   | Invalid
+  | Invalid
