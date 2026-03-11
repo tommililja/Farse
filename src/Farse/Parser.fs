@@ -78,6 +78,7 @@ module Parser =
 
         static member inline Validate(parser:Parser<'a seq>, fn) : Parser<'b seq> =
             Validate.Seq(parser, fn, id)
+
     /// <summary>Returns a parser with the given value.</summary>
     /// <code>let! int = Parser.from 1</code>
     /// <param name="x">The value to return.</param>

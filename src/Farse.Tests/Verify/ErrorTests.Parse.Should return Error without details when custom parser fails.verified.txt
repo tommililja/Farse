@@ -3,4 +3,5 @@
 Error[0]:
   at $.prop
    | Tried parsing 'Int32
+   | Invalid value.
    = 1

@@ -27,7 +27,7 @@ module JsonPath =
 type Details = {
     Path: JsonPath
     Element: JsonElement
-    Details: string option
+    Details: string
     Value: string option
     Type: Type
 }
@@ -45,7 +45,7 @@ module ParserError =
         Failure {
             Path = JsonPath.empty
             Element = element
-            Details = Some details
+            Details = details
             Value = Some value
             Type = type'
         }
@@ -54,7 +54,7 @@ module ParserError =
         Failure {
             Path = path
             Element = element
-            Details = details
+            Details = defaultArg details "Invalid value."
             Value = JsonElement.getValue element
             Type = type'
         }
@@ -63,7 +63,7 @@ module ParserError =
         Failure {
             Path = path
             Element = element
-            Details = Some $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
+            Details = $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
             Type = type'
             Value = JsonElement.getValue element
         }
@@ -72,7 +72,7 @@ module ParserError =
         Failure {
             Path = JsonPath.index n
             Element = element
-            Details = Some "Index was out of range."
+            Details = "Index was out of range."
             Type = type'
             Value = JsonElement.getValue element
         }
@@ -81,7 +81,7 @@ module ParserError =
         Failure {
             Path = JsonPath.empty
             Element = element
-            Details = Some $"Expected a tuple of %i{expected}, but got %i{actual}."
+            Details = $"Expected a tuple of %i{expected}, but got %i{actual}."
             Type = type'
             Value = None
         }
@@ -90,7 +90,7 @@ module ParserError =
         Failure {
             Path = JsonPath.empty
             Element = element
-            Details = Some $"Missing parser for discriminator '%s{value}'."
+            Details = $"Missing parser for discriminator '%s{value}'."
             Type = type'
             Value = None
         }
@@ -99,7 +99,7 @@ module ParserError =
         Failure {
             Path = JsonPath.empty
             Element = element
-            Details = Some $"Duplicate key '%s{key}'."
+            Details = $"Duplicate key '%s{key}'."
             Type = type'
             Value = None
         }
@@ -131,8 +131,8 @@ module ParserError =
             string {
                 $"at %s{JsonPath.asString details.Path}"
                 $" | Tried parsing '%s{Type.getName details.Type}"
+                $" | %s{details.Details}"
 
-                Option.map (sprintf " | %s") details.Details
                 Option.map (sprintf " = %s") details.Value
             }
         | Json exn ->
