@@ -41,7 +41,7 @@ module ParserError =
 
     // Errors
 
-    let inline internal invalid details type' element value =
+    let inline internal validation details type' element value =
         Failure {
             Path = JsonPath.empty
             Element = element
@@ -50,9 +50,9 @@ module ParserError =
             Type = type'
         }
 
-    let inline internal fromElement path details type' element =
+    let inline internal invalid details type' element =
         Failure {
-            Path = path
+            Path = JsonPath.empty
             Element = element
             Details = defaultArg details "Invalid value."
             Value = JsonElement.getValue element

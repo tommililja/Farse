@@ -46,7 +46,7 @@ module Parse =
                 fn x
                 |> Result.mapError (fun msg ->
                     $"%A{x}"
-                    |> ParserError.invalid msg typeof<'b> element
+                    |> ParserError.validation msg typeof<'b> element
                     |> List.singleton
                 )
             )
@@ -72,12 +72,12 @@ module Parse =
                     fn element
                     |> Result.mapError (fun msg ->
                         element
-                        |> ParserError.fromElement JsonPath.empty msg typeof<'b>
+                        |> ParserError.invalid msg typeof<'b>
                         |> List.singleton
                     )
                 with ex ->
                     element
-                    |> ParserError.fromElement JsonPath.empty (Some ex.Message) typeof<'b>
+                    |> ParserError.invalid (Some ex.Message) typeof<'b>
                     |> Error.list
             else
                 element

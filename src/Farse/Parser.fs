@@ -93,7 +93,7 @@ module Parser =
             x
             |> Result.mapError (fun msg ->
                 element
-                |> ParserError.fromElement JsonPath.empty (Some msg) typeof<'a>
+                |> ParserError.invalid (Some msg) typeof<'a>
                 |> List.singleton
             )
         )
