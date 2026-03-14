@@ -12,11 +12,11 @@ module Prop =
                 parse prop
                 |> Result.mapError (fun errors ->
                     errors
-                    |> List.map (ParserError.withProp name)
+                    |> List.map (ParseError.withProp name)
                 )
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -31,12 +31,12 @@ module Prop =
                     | Ok x -> Ok <| Some x
                     | Error errors ->
                         errors
-                        |> List.map (ParserError.withProp name)
+                        |> List.map (ParseError.withProp name)
                         |> Error
                 | None -> Ok None
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -61,11 +61,11 @@ module Prop =
                 parse prop
                 |> Result.mapError (fun errors ->
                     errors
-                    |> List.map (ParserError.withPath path)
+                    |> List.map (ParseError.withPath path)
                 )
             | Error element ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Object path typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object path typeof<'b>
                 |> Error.list
         )
 
@@ -91,12 +91,12 @@ module Prop =
                 | Ok x -> Ok <| Some x
                 | Error errors ->
                     errors
-                    |> List.map (ParserError.withPath path)
+                    |> List.map (ParseError.withPath path)
                     |> Error
             | Ok None -> Ok None
             | Error element ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Object path typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object path typeof<'b>
                 |> Error.list
         )
 

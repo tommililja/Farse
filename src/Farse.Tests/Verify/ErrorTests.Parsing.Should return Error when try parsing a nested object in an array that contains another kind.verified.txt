@@ -2,12 +2,12 @@
 
 Error[0]:
   at $.prop.prop2[1]
-   | Tried parsing 'String
+   | Tried parsing 'String.
    | Expected Object, but got Number.
    = 2
 
 Error[1]:
   at $.prop.prop2[2]
-   | Tried parsing 'String
+   | Tried parsing 'String.
    | Expected Object, but got Number.
    = 3

@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'Tuple<String, Int32>
+   | Tried parsing 'Tuple<String, Int32>.
    | Expected a tuple of 2, but got 3.

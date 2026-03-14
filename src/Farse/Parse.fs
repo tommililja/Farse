@@ -45,8 +45,8 @@ module Parse =
             |> Result.bind (fun x ->
                 fn x
                 |> Result.mapError (fun msg ->
-                    $"%A{x}"
-                    |> ParserError.validation msg typeof<'b> element
+                    element
+                    |> ParseError.validation msg typeof<'b> $"%A{x}"
                     |> List.singleton
                 )
             )
@@ -72,16 +72,16 @@ module Parse =
                     fn element
                     |> Result.mapError (fun msg ->
                         element
-                        |> ParserError.invalid msg typeof<'b>
+                        |> ParseError.invalid msg typeof<'b>
                         |> List.singleton
                     )
                 with ex ->
                     element
-                    |> ParserError.invalid (Some ex.Message) typeof<'b>
+                    |> ParseError.invalidEx ex.Message typeof<'b> ex
                     |> Error.list
             else
                 element
-                |> ParserError.expectedKind expectedKind JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -90,7 +90,7 @@ module Parse =
     let inline private tryParse fn =
         match fn () with
         | true, x -> Ok x
-        | _ -> Error None
+        | _ -> Error "Invalid value."
 
     /// Parses a number as System.Int32.
     let int = custom (_.TryGetInt32 >> tryParse) ExpectedKind.Number
@@ -130,7 +130,7 @@ module Parse =
         custom (fun element ->
             match element.GetString() with
             | str when str.Length = 1 -> Ok str[0]
-            | _ -> Error <| Some "Expected a string length of 1."
+            | _ -> Error "Expected a string length of 1."
         ) ExpectedKind.String
 
     /// Parses a string as System.String.
@@ -142,7 +142,7 @@ module Parse =
             let str = element.GetString()
             match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, bigInt -> Ok bigInt
-            | false, _ -> Error None
+            | false, _ -> Error "Invalid value."
         ) ExpectedKind.String
 
     /// Parses a bool as System.Boolean.
@@ -160,8 +160,8 @@ module Parse =
         let enumType = typeof<'a>
         match fn () with
         | true, x when Enum.IsDefined(enumType, x) -> Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
-        | true, _ -> Error <| Some $"Expected %s{enumType.Name} enum."
-        | _ -> Error None
+        | true, _ -> Error $"Expected %s{enumType.Name} enum."
+        | _ -> Error "Invalid value."
 
     /// Parses a string as an enum.
     let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
@@ -169,7 +169,7 @@ module Parse =
             let str = element.GetString()
             match Enum.TryParse<'a>(str, true) with
             | true, enum -> Ok enum
-            | _ -> Error None
+            | _ -> Error "Invalid value."
         ) ExpectedKind.String
 
     /// Parses a number as a System.Int32 enum.
@@ -212,7 +212,7 @@ module Parse =
             let str = element.GetString()
             match TimeOnly.TryParse(str, CultureInfo.InvariantCulture) with
             | true, timeOnly -> Ok timeOnly
-            | _ -> Error None
+            | _ -> Error "Invalid value."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
@@ -222,7 +222,7 @@ module Parse =
             let str = element.GetString()
             match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, timeOnly -> Ok timeOnly
-            | _ -> Error <| Some $"Expected '%s{format}'."
+            | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
 
     /// Parses a string as System.TimeSpan.
@@ -231,7 +231,7 @@ module Parse =
             let str = element.GetString()
             match TimeSpan.TryParse(str, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
-            | _ -> Error None
+            | _ -> Error "Invalid value."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
@@ -241,7 +241,7 @@ module Parse =
             let str = element.GetString()
             match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
-            | _ -> Error <| Some $"Expected '%s{format}'."
+            | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
 
     /// Parses a string as System.DateOnly (ISO 8601).
@@ -250,7 +250,7 @@ module Parse =
             let str = element.GetString()
             match DateOnly.TryParse(str, CultureInfo.InvariantCulture) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error None
+            | _ -> Error "Invalid value."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
@@ -260,7 +260,7 @@ module Parse =
             let str = element.GetString()
             match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error <| Some $"Expected '%s{format}'."
+            | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
 
     /// Parses a string as System.DateTime (ISO 8601).
@@ -271,7 +271,7 @@ module Parse =
         custom (fun element ->
             match element.TryGetDateTime() with
             | true, dateTime -> Ok <| dateTime.ToUniversalTime()
-            | _ -> Error None
+            | _ -> Error "Invalid value."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
@@ -281,7 +281,7 @@ module Parse =
             let str = element.GetString()
             match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTime -> Ok dateTime
-            | _ -> Error <| Some $"Expected '%s{format}'."
+            | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
 
     /// Parses a string as System.DateTimeOffset (ISO 8601).
@@ -294,7 +294,7 @@ module Parse =
             let str = element.GetString()
             match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTimeOffset -> Ok dateTimeOffset
-            | _ -> Error <| Some $"Expected '%s{format}'."
+            | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
 
     // Sequences
@@ -303,7 +303,7 @@ module Parse =
         parse (element.Item n)
         |> Result.mapError (fun errors ->
             errors
-            |> List.map (ParserError.withIndex n)
+            |> List.map (ParseError.withIndex n)
         )
 
     let inline private arr ([<InlineIfLambda>] convert) (Parser parse) : Parser<'b> =
@@ -339,13 +339,13 @@ module Parse =
                     |> List.ofSeq
                     |> List.map (fun (errors, n) ->
                         errors
-                        |> List.map (ParserError.withIndex n)
+                        |> List.map (ParseError.withIndex n)
                     )
                     |> List.concat
                     |> Error
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -375,11 +375,11 @@ module Parse =
             | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
             | Kind.Array ->
                 element
-                |> ParserError.invalidIndex n typeof<'b>
+                |> ParseError.invalidIndex n typeof<'b>
                 |> Error.list
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -418,7 +418,7 @@ module Parse =
                     | [] -> Ok <| convert (array :> seq<_>)
                     | keys ->
                         keys
-                        |> List.map (fun key -> ParserError.duplicateKey key typeof<'b> element)
+                        |> List.map (fun key -> ParseError.duplicateKey key typeof<'b> element)
                         |> Error
                 | Some (errors, name) ->
                     let array = ResizeArray()
@@ -433,13 +433,13 @@ module Parse =
                     |> List.ofSeq
                     |> List.map (fun (errors, name) ->
                         errors
-                        |> List.map (ParserError.withProp name)
+                        |> List.map (ParseError.withProp name)
                     )
                     |> List.concat
                     |> Error
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -471,11 +471,11 @@ module Parse =
             | Kind.Array when actual = expected -> fn element
             | Kind.Array ->
                 element
-                |> ParserError.invalidTuple actual expected typeof<'b>
+                |> ParseError.invalidTuple actual expected typeof<'b>
                 |> Error.list
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'b>
                 |> Error.list
         )
 
@@ -560,12 +560,12 @@ module Parse =
                     | None ->
                         return!
                             element
-                            |> ParserError.invalidOneOf value typeof<'b>
+                            |> ParseError.invalidOneOf value typeof<'b>
                             |> Error.list
                 }
             | _ ->
                 element
-                |> ParserError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
                 |> Error.list
         )
 

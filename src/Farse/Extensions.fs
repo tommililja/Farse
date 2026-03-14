@@ -51,6 +51,14 @@ module internal Extensions =
         let inline isBool (element:JsonElement) =
             element.ValueKind = Kind.True || element.ValueKind = Kind.False
 
+    module String =
+
+        let indentLines (str:string) =
+            str
+            |> _.Split('\n')
+            |> Array.map (sprintf "  %s")
+            |> String.concat "\n"
+
     module Type =
 
         let rec getName (x:Type) =

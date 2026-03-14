@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'Int32
+   | Tried parsing 'Int32.
    | Expected Number, but got Object.

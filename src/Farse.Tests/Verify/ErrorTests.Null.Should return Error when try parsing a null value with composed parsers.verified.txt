@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop.prop2
-   | Tried parsing 'String
+   | Tried parsing 'String.
    | Expected String, but got Null.

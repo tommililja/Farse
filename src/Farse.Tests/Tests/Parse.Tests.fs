@@ -700,7 +700,7 @@ module ParseTests =
             Parse.custom (fun element ->
                 match element.TryGetInt32() with
                 | true, int -> Ok <| int + 1
-                | _ -> Error None
+                | _ -> Error "Invalid int."
             ) ExpectedKind.Number
         let expected = 2
         let actual =

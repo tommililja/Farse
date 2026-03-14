@@ -1,5 +1,1 @@
-﻿Parser failed with 1 error[s].
-
-Error[0]:
-  | Could not parse JSON.
-  | Value cannot be null. (Parameter 'json')
+﻿Could not parse JSON: Value cannot be null. (Parameter 'json')

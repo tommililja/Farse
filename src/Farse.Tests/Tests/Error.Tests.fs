@@ -33,54 +33,6 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when validation fails`` () =
-            Prop.req "prop" Parse.int
-            |> Parser.validate (fun int ->
-                if int > 1 then Ok int
-                else Error "Value too small."
-            )
-            |> Parser.parse """{ "prop": 1 }"""
-            |> Expect.errorString
-
-        [<Fact>]
-        let ``Should return Error when optional validation fails`` () =
-            Prop.opt "prop" Parse.int
-            |> Parser.validate (fun int ->
-                if int > 1 then Ok int
-                else Error "Value too small."
-            )
-            |> Parser.parse """{ "prop": 1 }"""
-            |> Expect.errorString
-
-        [<Fact>]
-        let ``Should return Error when list validation fails`` () =
-            Prop.req "prop" (Parse.list Parse.string)
-            |> Parser.validate (fun (_:string) -> Error "Invalid")
-            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
-            |> Expect.errorString
-
-        [<Fact>]
-        let ``Should return Error when array validation fails`` () =
-            Prop.req "prop" (Parse.array Parse.string)
-            |> Parser.validate (fun (_:string) -> Error "Invalid")
-            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
-            |> Expect.errorString
-
-        [<Fact>]
-        let ``Should return Error when Set validation fails`` () =
-            Prop.req "prop" (Parse.set Parse.string)
-            |> Parser.validate (fun (_:string) -> Error "Invalid")
-            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
-            |> Expect.errorString
-
-        [<Fact>]
-        let ``Should return Error when seq validation fails`` () =
-            Prop.req "prop" (Parse.seq Parse.string)
-            |> Parser.validate (fun (_:string) -> Error "Invalid")
-            |> Parser.parse """{ "prop": [ "1", "2", "3" ] }"""
-            |> Expect.errorString
-
-        [<Fact>]
         let ``Should return Error when creating a Parser from an Error`` () =
             Error "Error"
             |> Parser.fromResult
@@ -462,7 +414,7 @@ module ErrorTests =
         let ``Should return Error with details when custom parser fails`` () =
             let parser : Parser<int> =
                 Parse.custom (fun _ ->
-                    Error <| Some "Failed."
+                    Error "Invalid int."
                 ) ExpectedKind.Number
             Prop.req "prop" parser
             |> Parser.parse """{ "prop": 1 }"""
@@ -472,7 +424,7 @@ module ErrorTests =
         let ``Should return Error without details when custom parser fails`` () =
             let parser : Parser<int> =
                 Parse.custom (fun _ ->
-                    Error <| None
+                    Error "Invalid int."
                 ) ExpectedKind.Number
             Prop.req "prop" parser
             |> Parser.parse """{ "prop": 1 }"""

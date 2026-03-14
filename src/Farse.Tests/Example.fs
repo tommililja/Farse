@@ -84,7 +84,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error <| Some "Invalid guid." // Added as details.
+            | _ -> Error "Invalid guid." // Added as details.
         ) ExpectedKind.String
 
     let instant =
@@ -92,7 +92,7 @@ module Parse =
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error <| Some result.Exception.Message // Added as details.
+            | result -> Error result.Exception.Message // Added as details.
         ) ExpectedKind.String
 
 module User =

@@ -203,6 +203,7 @@ Then we can just run the parser.
 let user =
     User.parser
     |> Parser.parse json
+    |> Result.mapError ParserError.asString
     |> Result.defaultWith failwith
 
 printf "%s" user.Name
@@ -221,7 +222,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error <| Some "Invalid guid." // Added as details.
+            | _ -> Error "Invalid guid." // Added as details.
         ) ExpectedKind.String
 
     let instant =
@@ -229,7 +230,7 @@ module Parse =
             let string = element.GetString()
             match InstantPattern.General.Parse(string) with
             | result when result.Success -> Ok result.Value
-            | result -> Error <| Some result.Exception.Message // Added as details.
+            | result -> Error result.Exception.Message // Added as details.
         ) ExpectedKind.String
 ```
 
@@ -237,13 +238,13 @@ module Parse =
 
 There is still limited one-of support.
 
-We can use this if the discriminator property is inside the object.
+If the discriminator property is inside the object.
 
 ```fsharp
 let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
 ```
 
-Which is equal to this match expression, but less flexible.
+Which is equal to matching, but less flexible.
 
 ```fsharp
 let! disc = "prop.disc" &= string
@@ -256,26 +257,27 @@ let! x =
 
 ## Validation
 
-Produces an error message without details.
-
-```fsharp
-let! age = "age" ?= byte |> Parser.validate Age.fromByte
-```
-
-Produces detailed error messages when validation fails.
+Both methods produce detailed error messages when validation fails.
 
 ```fsharp
 let age =
     Parse.custom (fun element ->
         match element.TryGetByte() with
-        | true, byte -> Age.fromByte byte |> Result.mapError Some
-        | _ -> Error None
+        | true, byte -> Age.fromByte byte
+        | _ -> Error "Invalid byte."
     ) ExpectedKind.String
 ```
 
 ```fsharp
 let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
+```
+
+Both methods can also be combined with other parses, for example, sequences.
+
+```fsharp
+let! ages = "ages" ?= list age
+let! ages = "ages" ?= list (valid byte Age.fromByte)
 ```
 
 #### Error
@@ -317,6 +319,26 @@ module User =
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
 ## Errors
+
+You can convert the error to a formatted string.
+
+```fsharp
+let msg = ParserError.asString error
+```
+
+You can also build your own error message.
+
+```fsharp
+let msg =
+    match error with
+    | Json exn -> $"Parser failed: %s{exn.Message}"
+    | Errors list ->
+        list
+        |> List.map (_.Path >> JsonPath.asString >> sprintf "Parser failed at: %s")
+        |> String.concat "\n"
+```
+
+### Examples
 
 More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
 

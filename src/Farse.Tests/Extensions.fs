@@ -27,7 +27,7 @@ module Expect =
     let error x = Expect.wantError x String.Empty
 
     let errorString x =
-        Result.mapError ParserError.asStringList x
+        Result.mapError ParserError.asString x
         |> error
         |> string
 

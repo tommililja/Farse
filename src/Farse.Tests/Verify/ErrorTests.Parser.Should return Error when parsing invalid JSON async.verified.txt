@@ -1,5 +1,1 @@
-﻿Parser failed with 1 error[s].
-
-Error[0]:
-  | Could not parse JSON.
-  | 'i' is an invalid start of a value. LineNumber: 0 | BytePositionInLine: 0.
+﻿Could not parse JSON: 'i' is an invalid start of a value. LineNumber: 0 | BytePositionInLine: 0.

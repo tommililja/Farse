@@ -1,5 +1,1 @@
-﻿Parser failed with 1 error[s].
-
-Error[0]:
-  | Could not parse JSON.
-  | '1' is invalid after a property name. Expected a ':'. LineNumber: 0 | BytePositionInLine: 9.
+﻿Could not parse JSON: '1' is invalid after a property name. Expected a ':'. LineNumber: 0 | BytePositionInLine: 9.

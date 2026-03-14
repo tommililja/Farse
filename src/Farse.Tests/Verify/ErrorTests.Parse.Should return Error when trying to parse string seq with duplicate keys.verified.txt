@@ -2,10 +2,10 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'IEnumerable<String>
+   | Tried parsing 'IEnumerable<String>.
    | Duplicate key 'key1'.
 
 Error[1]:
   at $.prop
-   | Tried parsing 'IEnumerable<String>
+   | Tried parsing 'IEnumerable<String>.
    | Duplicate key 'key2'.

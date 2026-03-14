@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.missing
-   | Tried parsing 'Int32
+   | Tried parsing 'Int32.
    | Expected Object, but got Undefined.

@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'String[]
+   | Tried parsing 'String[].
    | Expected Array, but got Object.

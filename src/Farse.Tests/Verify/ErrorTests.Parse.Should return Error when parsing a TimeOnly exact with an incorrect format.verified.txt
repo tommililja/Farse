@@ -2,6 +2,6 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'TimeOnly
+   | Tried parsing 'TimeOnly.
    | Expected 'HHmmss'.
    = "17:28:45"

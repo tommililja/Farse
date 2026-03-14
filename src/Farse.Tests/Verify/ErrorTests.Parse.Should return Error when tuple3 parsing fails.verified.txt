@@ -2,12 +2,12 @@
 
 Error[0]:
   at $.prop[0]
-   | Tried parsing 'Int32
+   | Tried parsing 'Int32.
    | Expected Number, but got String.
    = "1"
 
 Error[1]:
   at $.prop[1]
-   | Tried parsing 'Int32
+   | Tried parsing 'Int32.
    | Expected Number, but got String.
    = "1"

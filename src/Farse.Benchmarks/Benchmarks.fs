@@ -207,7 +207,7 @@ type ParserBenchmarks() =
         parser
         |> Parse.array
         |> Parser.parse json
-        |> Result.mapError ParserError.asStringList
+        |> Result.mapError ParserError.asString
         |> Result.defaultWith failwith
 
 let config =
