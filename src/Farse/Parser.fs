@@ -5,7 +5,7 @@ open System.Diagnostics.CodeAnalysis
 open System.IO
 open System.Text.Json
 
-type [<Struct>] Parser<'a> = Parser of (JsonElement -> Result<'a, ParseError list>)
+type [<Struct>] Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 
 module Parser =
 
@@ -20,12 +20,12 @@ module Parser =
     /// <summary>Returns a parser with the given result.</summary>
     /// <code>let! int = Ok 1 |> Parser.fromResult</code>
     /// <param name="x">The result to return.</param>
-    let inline fromResult x : Parser<'a> =
+    let inline fromResult x : Parser<'r> =
         Parser (fun element ->
             x
             |> Result.mapError (fun msg ->
                 element
-                |> ParseError.invalid msg typeof<'a>
+                |> ParseError.invalid msg typeof<'r>
                 |> List.singleton
             )
         )
@@ -88,8 +88,7 @@ module Parser =
             |> Result.mapError Errors
         with
             | :? JsonException
-            | :? ArgumentNullException as exn ->
-                Error <| Json exn
+            | :? ArgumentNullException as exn -> Error <| Json exn
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
@@ -103,6 +102,5 @@ module Parser =
                     |> Result.mapError Errors
             with
                 | :? JsonException
-                | :? ArgumentNullException as exn ->
-                    return Error <| Json exn
+                | :? ArgumentNullException as exn -> return Error <| Json exn
         }

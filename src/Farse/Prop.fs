@@ -4,7 +4,7 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private parse name (Parser parse) : Parser<'b> =
+    let inline private parse name (Parser parse) : Parser<'r> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -16,11 +16,11 @@ module Prop =
                 )
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
-    let inline private tryParse name (Parser parse) : Parser<'b option> =
+    let inline private tryParse name (Parser parse) : Parser<'r option> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
@@ -36,11 +36,11 @@ module Prop =
                 | None -> Ok None
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
-    let inline private traverse path (Parser parse) : Parser<'b> =
+    let inline private traverse path (Parser parse) : Parser<'r> =
         Parser (fun element ->
             let prop, path =
                 path
@@ -65,11 +65,11 @@ module Prop =
                 )
             | Error element ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object path typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object path typeof<'r>
                 |> Error.list
         )
 
-    let inline private tryTraverse path (Parser parse) : Parser<'b option> =
+    let inline private tryTraverse path (Parser parse) : Parser<'r option> =
         Parser (fun element ->
             let prop, path =
                 path
@@ -96,7 +96,7 @@ module Prop =
             | Ok None -> Ok None
             | Error element ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object path typeof<'b>
+                |> ParseError.expectedKind ExpectedKind.Object path typeof<'r>
                 |> Error.list
         )
 
