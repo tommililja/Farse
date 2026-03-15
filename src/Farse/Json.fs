@@ -71,6 +71,12 @@ module JObj =
 
 module Json =
 
+    let private indentedOptions = JsonSerializerOptions(
+        WriteIndented = true,
+        IndentSize = 4,
+        NewLine = "\n"
+    )
+
     let rec private getJsonNode = function
         | JStr str -> JsonValue.Create(str).Root
         | JBit bit -> JsonValue.Create(bit).Root
@@ -96,7 +102,7 @@ module Json =
         | node ->
             let options =
                 match format with
-                | Indented -> JsonSerializerOptions.preset
+                | Indented -> indentedOptions
                 | Custom options -> options
                 | Raw -> null
 

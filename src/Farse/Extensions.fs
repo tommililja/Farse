@@ -23,13 +23,6 @@ module internal Extensions =
             | Kind.True | Kind.False -> "Bool"
             | Kind.Null -> "Null"
 
-    module JsonSerializerOptions =
-
-        let preset = JsonSerializerOptions(
-            WriteIndented = true,
-            IndentSize = 4
-        )
-
     module JsonElement =
 
         let inline getProperty (name:string) (element:JsonElement) =
