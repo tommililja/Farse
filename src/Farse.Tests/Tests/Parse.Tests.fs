@@ -577,17 +577,17 @@ module ParseTests =
 
     [<Fact>]
     let ``Should parse one-of as discriminated union`` () =
-        let a =
-            parser {
-                let! a = Prop.req "prop2" Parse.int
-                let! b = Prop.req "prop3" Parse.int
-
-                return A (a, b)
-            }
-
         let expected = A (1, 2)
         let actual =
-            Prop.req "prop" (Parse.oneOf "disc" [ "a", a ])
+            Prop.req "prop" (Parse.oneOf "disc"
+                [ "a",
+                    parser {
+                        let! a = Prop.req "prop2" Parse.int
+                        let! b = Prop.req "prop3" Parse.int
+
+                        return A (a, b)
+                    }
+                ])
             |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
             |> Expect.ok
         Expect.equal actual expected
