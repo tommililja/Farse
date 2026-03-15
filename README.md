@@ -260,6 +260,13 @@ let! x =
 Both methods produce detailed error messages when validation fails.
 
 ```fsharp
+let! age = "age" ?= age
+let! age = "age" ?= valid byte Age.fromByte
+```
+
+Where _age_ is a custom parser.
+
+```fsharp
 let age =
     Parse.custom (fun element ->
         match element.TryGetByte() with
@@ -268,12 +275,7 @@ let age =
     ) ExpectedKind.String
 ```
 
-```fsharp
-let! age = "age" ?= age
-let! age = "age" ?= valid byte Age.fromByte
-```
-
-Both methods can also be combined with sequences.
+They can also be combined with sequences.
 
 ```fsharp
 let! ages = "ages" ?= list age
@@ -320,13 +322,13 @@ module User =
 
 ## Errors
 
-You can convert ParserError to a formatted string.
+We can convert _ParserError_ to a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error
 ```
 
-You can also build your own error message.
+But we can also choose to build our own error message.
 
 ```fsharp
 let msg =
