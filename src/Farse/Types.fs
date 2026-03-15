@@ -18,8 +18,7 @@ type ExpectedKind =
 
 module ExpectedKind =
 
-    let inline fromKind kind =
-        match kind with
+    let fromKind = function
         | JsonValueKind.Undefined -> ExpectedKind.Undefined
         | JsonValueKind.Object -> ExpectedKind.Object
         | JsonValueKind.Array -> ExpectedKind.Array
@@ -28,8 +27,7 @@ module ExpectedKind =
         | JsonValueKind.True | JsonValueKind.False -> ExpectedKind.Bool
         | JsonValueKind.Null -> ExpectedKind.Null
 
-    let inline asString kind =
-        match kind with
+    let asString = function
         | ExpectedKind.Undefined -> "Undefined"
         | ExpectedKind.Object -> "Object"
         | ExpectedKind.Array -> "Array"

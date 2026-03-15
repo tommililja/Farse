@@ -39,7 +39,7 @@ module ParseError =
 
     // Errors
 
-    let inline internal validation details type' value element =
+    let internal validation details type' value element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -50,7 +50,7 @@ module ParseError =
             Exn = None
         }
 
-    let inline internal invalid details type' element =
+    let internal invalid details type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -61,7 +61,7 @@ module ParseError =
             Exn = None
         }
 
-    let inline internal invalidEx details type' exn element =
+    let internal invalidEx details type' exn element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -72,7 +72,7 @@ module ParseError =
             Exn = Some exn
         }
 
-    let internal expectedKind expectedKind path type' element =
+    let expectedKind expectedKind path type' element =
         {
             Path = path
             Element = JsonElement.clone element
@@ -83,7 +83,7 @@ module ParseError =
             Exn = None
         }
 
-    let inline internal invalidIndex n type' element =
+    let internal invalidIndex n type' element =
         {
             Path = JsonPath.index n
             Element = JsonElement.clone element
@@ -94,7 +94,7 @@ module ParseError =
             Exn = None
         }
 
-    let inline internal invalidTuple actual expected type' element =
+    let internal invalidTuple actual expected type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -105,7 +105,7 @@ module ParseError =
             Exn = None
         }
 
-    let inline internal invalidOneOf value type' element =
+    let internal invalidOneOf value type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -116,7 +116,7 @@ module ParseError =
             Exn = None
         }
 
-    let inline internal duplicateKey key type' element =
+    let internal duplicateKey key type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -129,16 +129,16 @@ module ParseError =
 
     // Functions for appending the path.
 
-    let inline private append path x =
+    let private append path x =
         { x with Path = JsonPath.append path x.Path }
 
-    let inline internal withProp name x =
+    let internal withProp name x =
         append (JsonPath.prop name) x
 
-    let inline internal withIndex n x =
+    let internal withIndex n x =
         append (JsonPath.index n) x
 
-    let inline internal withPath path x =
+    let internal withPath path x =
         append path x
 
     /// <summary>Converts the ParseError to a formatted string.</summary>

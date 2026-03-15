@@ -13,8 +13,7 @@ module internal Extensions =
 
     module Kind =
 
-        let inline asString kind =
-            match kind with
+        let asString = function
             | Kind.Undefined -> "Undefined"
             | Kind.Object -> "Object"
             | Kind.Array -> "Array"
@@ -74,7 +73,7 @@ module internal Extensions =
 
     module Error =
 
-        let inline list x =
+        let list x =
             List.singleton x
             |> Error
 

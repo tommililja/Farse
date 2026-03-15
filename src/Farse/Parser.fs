@@ -20,7 +20,7 @@ module Parser =
     /// <summary>Returns a parser with the given result.</summary>
     /// <code>let! int = Ok 1 |> Parser.fromResult</code>
     /// <param name="x">The result to return.</param>
-    let inline fromResult x : Parser<'r> =
+    let fromResult x : Parser<'r> =
         Parser (fun element ->
             x
             |> Result.mapError (fun msg ->

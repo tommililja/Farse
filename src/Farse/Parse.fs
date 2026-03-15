@@ -39,7 +39,7 @@ module Parse =
     /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
     /// <typeparam name="parser">The parser to validate.</typeparam>
     /// <param name="fn">The validation function.</param>
-    let inline valid (Parser parse) ([<InlineIfLambda>] fn) : Parser<'r> =
+    let valid (Parser parse) fn : Parser<'r> =
         Parser (fun element ->
             parse element
             |> Result.bind (fun x ->
@@ -56,7 +56,7 @@ module Parse =
     /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
-    let inline custom ([<InlineIfLambda>] fn) expectedKind : Parser<'r> =
+    let custom fn expectedKind : Parser<'r> =
         Parser (fun element ->
             let isExpectedKind =
                 match expectedKind with
