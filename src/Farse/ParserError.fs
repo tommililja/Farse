@@ -39,85 +39,93 @@ module ParseError =
 
     // Errors
 
-    let inline internal validation details type' value element = {
-        Path = JsonPath.empty
-        Element = element
-        Index = None
-        Details = details
-        Value = Some value
-        Type = type'
-        Exn = None
-    }
+    let inline internal validation details type' value element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = details
+            Value = Some value
+            Type = type'
+            Exn = None
+        }
 
-    let inline internal invalid details type' element = {
-        Path = JsonPath.empty
-        Element = element
-        Index = None
-        Details = details
-        Value = JsonElement.getValue element
-        Type = type'
-        Exn = None
-    }
+    let inline internal invalid details type' element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = details
+            Value = JsonElement.tryGetValue element
+            Type = type'
+            Exn = None
+        }
 
-    let inline internal invalidEx details type' exn element = {
-        Path = JsonPath.empty
-        Element = element
-        Index = None
-        Details = details
-        Value = JsonElement.getValue element
-        Type = type'
-        Exn = Some exn
-    }
+    let inline internal invalidEx details type' exn element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = details
+            Value = JsonElement.tryGetValue element
+            Type = type'
+            Exn = Some exn
+        }
 
-    let inline internal expectedKind expectedKind path type' element = {
-        Path = path
-        Element = element
-        Index = None
-        Details = $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
-        Type = type'
-        Value = JsonElement.getValue element
-        Exn = None
-    }
+    let internal expectedKind expectedKind path type' element =
+        {
+            Path = path
+            Element = JsonElement.clone element
+            Index = None
+            Details = $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
+            Type = type'
+            Value = JsonElement.tryGetValue element
+            Exn = None
+        }
 
-    let inline internal invalidIndex n type' element = {
-        Path = JsonPath.index n
-        Element = element
-        Index = Some n
-        Details = "Index was out of range."
-        Type = type'
-        Value = JsonElement.getValue element
-        Exn = None
-    }
+    let inline internal invalidIndex n type' element =
+        {
+            Path = JsonPath.index n
+            Element = JsonElement.clone element
+            Index = Some n
+            Details = "Index was out of range."
+            Type = type'
+            Value = JsonElement.tryGetValue element
+            Exn = None
+        }
 
-    let inline internal invalidTuple actual expected type' element = {
-        Path = JsonPath.empty
-        Element = element
-        Index = None
-        Details = $"Expected a tuple of %i{expected}, but got %i{actual}."
-        Type = type'
-        Value = JsonElement.getValue element
-        Exn = None
-    }
+    let inline internal invalidTuple actual expected type' element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = $"Expected a tuple of %i{expected}, but got %i{actual}."
+            Type = type'
+            Value = JsonElement.tryGetValue element
+            Exn = None
+        }
 
-    let inline internal invalidOneOf value type' element = {
-        Path = JsonPath.empty
-        Element = element
-        Index = None
-        Details = $"Missing parser for discriminator '%s{value}'."
-        Type = type'
-        Value = None
-        Exn = None
-    }
+    let inline internal invalidOneOf value type' element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = $"Missing parser for discriminator '%s{value}'."
+            Type = type'
+            Value = None
+            Exn = None
+        }
 
-    let inline internal duplicateKey key type' element = {
-        Path = JsonPath.empty
-        Element = element
-        Index = None
-        Details = $"Duplicate key '%s{key}'."
-        Type = type'
-        Value = None
-        Exn = None
-    }
+    let inline internal duplicateKey key type' element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = $"Duplicate key '%s{key}'."
+            Type = type'
+            Value = None
+            Exn = None
+        }
 
     // Functions for appending the path.
 

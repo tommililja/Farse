@@ -33,13 +33,19 @@ module internal Extensions =
             | true, prop when prop.ValueKind <> Kind.Null -> Some prop
             | _ -> None
 
-        let inline getValue (element:JsonElement) =
+        let inline tryGetValue (element:JsonElement) =
             match element.ValueKind with
             | Kind.Null
             | Kind.Undefined
             | Kind.Object
             | Kind.Array -> None
             | _ -> Some <| element.GetRawText()
+
+        // Undefined elements are not clonable.
+        let inline clone (element:JsonElement) =
+            match element.ValueKind with
+            | Kind.Undefined -> JsonElement() // Undefined.
+            | _ -> element.Clone()
 
         let inline isBool (element:JsonElement) =
             element.ValueKind = Kind.True || element.ValueKind = Kind.False
