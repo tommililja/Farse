@@ -2,9 +2,6 @@ namespace Farse
 
 open System.Text.Json
 
-// Ignore enum match warning.
-#nowarn 104
-
 [<RequireQualifiedAccess>]
 type ExpectedKind =
     | Undefined

@@ -3,9 +3,6 @@ namespace Farse
 open System
 open System.Text.Json
 
-// Ignore enum match warning.
-#nowarn 104
-
 [<AutoOpen>]
 module internal Extensions =
 
