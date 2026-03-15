@@ -273,7 +273,7 @@ let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
 ```
 
-Both methods can also be combined with other parses, for example, sequences.
+Both methods can also be combined with sequences.
 
 ```fsharp
 let! ages = "ages" ?= list age
@@ -320,7 +320,7 @@ module User =
 
 ## Errors
 
-You can convert the error to a formatted string.
+You can convert ParserError to a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error
