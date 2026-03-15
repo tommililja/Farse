@@ -1,0 +1,7 @@
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  at $.prop
+   | Tried parsing 'Int32.
+   | Invalid Int32.
+   = 1.5

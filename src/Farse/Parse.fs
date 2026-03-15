@@ -87,10 +87,10 @@ module Parse =
 
     // Basic types
 
-    let inline private tryParse fn =
+    let inline private tryParse fn : Result<'r, string> =
         match fn () with
         | true, x -> Ok x
-        | _ -> Error "Invalid value."
+        | _ -> Error $"Invalid %s{typeof<'r>.Name}."
 
     /// Parses a number as System.Int32.
     let int = custom (_.TryGetInt32 >> tryParse) ExpectedKind.Number
@@ -142,7 +142,7 @@ module Parse =
             let str = element.GetString()
             match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, bigInt -> Ok bigInt
-            | false, _ -> Error "Invalid value."
+            | false, _ -> Error "Invalid BigInteger."
         ) ExpectedKind.String
 
     /// Parses a bool as System.Boolean.
@@ -161,7 +161,7 @@ module Parse =
         match fn () with
         | true, x when Enum.IsDefined(enumType, x) -> Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
         | true, _ -> Error $"Expected %s{enumType.Name} enum."
-        | _ -> Error "Invalid value."
+        | _ -> Error $"Invalid %s{enumType.Name}."
 
     /// Parses a string as an enum.
     let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
@@ -169,7 +169,7 @@ module Parse =
             let str = element.GetString()
             match Enum.TryParse<'a>(str, true) with
             | true, enum -> Ok enum
-            | _ -> Error "Invalid value."
+            | _ -> Error $"Invalid %s{typeof<'a>.Name}."
         ) ExpectedKind.String
 
     /// Parses a number as a System.Int32 enum.
@@ -212,7 +212,7 @@ module Parse =
             let str = element.GetString()
             match TimeOnly.TryParse(str, CultureInfo.InvariantCulture) with
             | true, timeOnly -> Ok timeOnly
-            | _ -> Error "Invalid value."
+            | _ -> Error "Invalid TimeOnly."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
@@ -231,7 +231,7 @@ module Parse =
             let str = element.GetString()
             match TimeSpan.TryParse(str, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
-            | _ -> Error "Invalid value."
+            | _ -> Error "Invalid TimeSpan."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
@@ -250,7 +250,7 @@ module Parse =
             let str = element.GetString()
             match DateOnly.TryParse(str, CultureInfo.InvariantCulture) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error "Invalid value."
+            | _ -> Error "Invalid DateOnly."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
@@ -271,7 +271,7 @@ module Parse =
         custom (fun element ->
             match element.TryGetDateTime() with
             | true, dateTime -> Ok <| dateTime.ToUniversalTime()
-            | _ -> Error "Invalid value."
+            | _ -> Error "Invalid DateTime."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>

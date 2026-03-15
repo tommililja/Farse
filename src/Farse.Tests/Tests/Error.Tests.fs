@@ -49,6 +49,12 @@ module ErrorTests =
     module Parsing =
 
         [<Fact>]
+        let ``Should return Error when parsing an invalid value`` () =
+            Prop.req "prop" Parse.int
+            |> Parser.parse """{ "prop": 1.5 }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing an incorrect value`` () =
             Prop.req "prop" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
