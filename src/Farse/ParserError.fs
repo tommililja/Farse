@@ -162,16 +162,11 @@ module ParserError =
     let asString = function
         | Json exn -> $"Could not parse JSON: %s{exn.Message}"
         | Errors list ->
-            string {
-                $"Parser failed with %i{List.length list} error[s].\n"
-
-                list
-                |> List.mapi (fun i e ->
-                    let error =
-                        ParseError.asString e
-                        |> String.indentLines
-
-                    $"Error[%i{i}]:\n%s{error}"
-                )
-                |> String.concat "\n\n"
-            }
+            list
+            |> List.mapi (fun i e ->
+                ParseError.asString e
+                |> String.indentLines
+                |> sprintf "Error[%i]:\n%s" i
+            )
+            |> String.concat "\n\n"
+            |> sprintf "Parser failed with %i error[s].\n\n%s" (List.length list)
