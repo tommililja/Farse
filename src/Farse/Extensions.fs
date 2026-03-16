@@ -11,13 +11,13 @@ module internal Extensions =
     module Kind =
 
         let asString = function
-            | Kind.Undefined -> "Undefined"
-            | Kind.Object -> "Object"
             | Kind.Array -> "Array"
-            | Kind.String -> "String"
-            | Kind.Number -> "Number"
-            | Kind.True | Kind.False -> "Bool"
             | Kind.Null -> "Null"
+            | Kind.Number -> "Number"
+            | Kind.Object -> "Object"
+            | Kind.String -> "String"
+            | Kind.True | Kind.False -> "Bool"
+            | Kind.Undefined -> "Undefined"
 
     module JsonElement =
 

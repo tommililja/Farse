@@ -4,32 +4,32 @@ open System.Text.Json
 
 [<RequireQualifiedAccess>]
 type ExpectedKind =
-    | Undefined
-    | Object
+    | Any
     | Array
-    | String
-    | Number
     | Bool
     | Null
-    | Any
+    | Number
+    | Object
+    | String
+    | Undefined
 
 module ExpectedKind =
 
     let fromKind = function
-        | JsonValueKind.Undefined -> ExpectedKind.Undefined
-        | JsonValueKind.Object -> ExpectedKind.Object
         | JsonValueKind.Array -> ExpectedKind.Array
-        | JsonValueKind.String -> ExpectedKind.String
-        | JsonValueKind.Number -> ExpectedKind.Number
-        | JsonValueKind.True | JsonValueKind.False -> ExpectedKind.Bool
         | JsonValueKind.Null -> ExpectedKind.Null
+        | JsonValueKind.Number -> ExpectedKind.Number
+        | JsonValueKind.Object -> ExpectedKind.Object
+        | JsonValueKind.String -> ExpectedKind.String
+        | JsonValueKind.True | JsonValueKind.False -> ExpectedKind.Bool
+        | JsonValueKind.Undefined -> ExpectedKind.Undefined
 
     let asString = function
-        | ExpectedKind.Undefined -> "Undefined"
-        | ExpectedKind.Object -> "Object"
+        | ExpectedKind.Any -> "Any"
         | ExpectedKind.Array -> "Array"
-        | ExpectedKind.String -> "String"
-        | ExpectedKind.Number -> "Number"
         | ExpectedKind.Bool -> "Bool"
         | ExpectedKind.Null -> "Null"
-        | ExpectedKind.Any -> "Any"
+        | ExpectedKind.Number -> "Number"
+        | ExpectedKind.Object -> "Object"
+        | ExpectedKind.String -> "String"
+        | ExpectedKind.Undefined -> "Undefined"
