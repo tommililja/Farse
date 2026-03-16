@@ -7,8 +7,8 @@
     <ItemGroup>
         <Compile Include="Extensions.fs" />
         <Compile Include="Tests\JsonTests.fs" />
-        <Compile Include="Tests\ParserTests.fs" />
         <Compile Include="Tests\ParseTests.fs" />
+        <Compile Include="Tests\ParserTests.fs" />
         <Compile Include="Tests\ErrorTests.fs" />
         <Compile Include="Example.fs" />
     </ItemGroup>
