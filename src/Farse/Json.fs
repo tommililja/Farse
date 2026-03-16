@@ -27,67 +27,68 @@ type JNum =
 
 module JNil =
 
-    let inline internal from fn = function
-        | Some x -> fn x
+    let inline internal from map fn = function
+        | Some x -> (map >> fn) x
         | None -> JNil
 
 module JArr =
 
     let empty = JArr Seq.empty
 
-    let inline internal from fn =
-        Seq.map fn >> JArr
+    let inline internal from fn map =
+        Seq.map (fn >> map) >> JArr
 
 module JStr =
 
     let empty = JStr String.Empty
 
-    let inline nil fn = JNil.from (fn >> JStr)
+    let inline nil fn = JNil.from fn JStr
 
-    let inline arr fn = JArr.from (fn >> JStr)
+    let inline arr fn = JArr.from fn JStr
 
 module JNum =
 
     let zero = JNum 0
 
     let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
-        JNil.from (fn >> JNum)
+        JNil.from fn JNum
 
-    let inline arr fn = JArr.from (fn >> JNum)
+    let inline arr fn = JArr.from fn JNum
 
 module JBit =
 
-    let inline nil fn = JNil.from (fn >> JBit)
+    let inline nil fn = JNil.from fn JBit
 
-    let inline arr fn = JArr.from (fn >> JBit)
+    let inline arr fn = JArr.from fn JBit
 
 module JObj =
 
     let empty = JObj Seq.empty
 
-    let inline nil fn = JNil.from (fn >> JObj)
+    let inline nil fn = JNil.from fn JObj
 
-    let inline arr fn = JArr.from (fn >> JObj)
+    let inline arr fn = JArr.from fn JObj
 
 module Json =
 
-    let private indentedOptions = JsonSerializerOptions(
-        WriteIndented = true,
-        IndentSize = 4,
-        NewLine = "\n"
-    )
+    let private indented =
+        JsonSerializerOptions (
+            WriteIndented = true,
+            IndentSize = 4,
+            NewLine = "\n"
+        )
 
     let rec private getJsonNode = function
         | JStr str -> JsonValue.Create(str).Root
         | JBit bit -> JsonValue.Create(bit).Root
         | JNum num -> num
         | JObj obj ->
-            let object = JsonObject()
+            let object = JsonObject ()
             for name, json in obj do
                 object.Add(name, getJsonNode json)
             object :> JsonNode
         | JArr arr ->
-            let array = JsonArray()
+            let array = JsonArray ()
             for json in arr do
                 array.Add(getJsonNode json)
             array :> JsonNode
@@ -102,7 +103,7 @@ module Json =
         | node ->
             let options =
                 match format with
-                | Indented -> indentedOptions
+                | Indented -> indented
                 | Custom options -> options
                 | Raw -> null
 
