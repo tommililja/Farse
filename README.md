@@ -264,7 +264,7 @@ let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
 ```
 
-Where _age_ is a custom parser.
+Where 'age' is a custom parser.
 
 ```fsharp
 let age =
@@ -322,22 +322,36 @@ module User =
 
 ## Errors
 
-We can convert _ParserError_ to a formatted string.
+We can convert ParserError to a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error
 ```
 
-But we can also choose to build our own error message.
+But we can also choose to build our own error messages.
 
 ```fsharp
 let msg =
     match error with
-    | Json exn -> $"Parser failed: %s{exn.Message}"
+    | Json exn -> $"Parser failed: %s{exn.Message}" // Invalid JSON.
     | Errors list ->
         list
         |> List.map (_.Path >> JsonPath.asString >> sprintf "Parser failed at: %s")
         |> String.concat "\n"
+```
+
+With this available information.
+
+```fsharp
+type ParseError = {
+    Path: JsonPath
+    Element: JsonElement
+    Index: int option
+    Value: string option
+    Type: Type
+    Details: string
+    Exn: exn option
+}
 ```
 
 ### Examples
