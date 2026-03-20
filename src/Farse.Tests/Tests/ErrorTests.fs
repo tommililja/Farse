@@ -552,6 +552,12 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return error when all attempts fail`` () =
+            Prop.req "prop" (Parse.attempt [ Parser.fail "first"; Parser.fail "second"; Parser.fail "third" ])
+            |> Parser.parse """{ "prop": { "prop2": 1, "prop3": 2 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing tuple with incorrect length`` () =
             Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
             |> Parser.parse """{ "prop": [ 1, 1, 1 ] }"""

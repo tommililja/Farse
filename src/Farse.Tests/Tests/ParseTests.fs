@@ -593,6 +593,29 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should attempt to parse discriminated union`` () =
+        let a =
+            parser {
+                let! a = Prop.req "prop2" Parse.int
+                let! b = Prop.req "prop3" Parse.int
+
+                return A (a, b)
+            }
+
+        let b = parser {
+            let! a = Prop.req "missing" Parse.string
+
+            return B {| Prop = a |}
+        }
+
+        let expected = A (1, 2)
+        let actual =
+            Prop.req "prop" (Parse.attempt [ b; a ])
+            |> Parser.parse """{ "prop": { "prop2": 1, "prop3": 2 } }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse array length as int`` () =
         let expected = 3
         let actual =

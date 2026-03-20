@@ -116,6 +116,17 @@ module ParseError =
             Exn = None
         }
 
+    let attempt parsers type' element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Value = None
+            Type = type'
+            Details = $"Tried %i{parsers} parsers without success."
+            Exn = None
+        }
+
     let internal duplicateKey key type' element =
         {
             Path = JsonPath.empty
