@@ -236,9 +236,7 @@ module Parse =
 
 ## One-of
 
-There is still limited one-of support.
-
-If the discriminator property is inside the object.
+We can use Parse.oneOf for objects with a discriminator string.
 
 ```fsharp
 let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
@@ -253,6 +251,12 @@ let! x =
     | "a" -> "prop" &= a
     | "b" -> "prop" &= b
     | x -> Parser.fail $"No matching parser found for discriminator '%s{x}'."
+```
+
+We can also try to parse an element with a list of parsers.
+
+```fsharp
+let! x = "prop" &= attempt [ a; b ]
 ```
 
 ## Validation
