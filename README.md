@@ -211,7 +211,7 @@ printf "%s" user.Name
 
 ## Custom parsers
 
-Parse.custom can be used to build parsers for third-party types, or to just avoid unnecessary operations.
+Parse.custom can be used to build parsers for third-party types or to just avoid unnecessary operations.
 
 ```fsharp
 open Farse
@@ -236,7 +236,7 @@ module Parse =
 
 ## One-of
 
-We can use Parse.oneOf for objects with a discriminator string.
+For objects with a string discriminator.
 
 ```fsharp
 let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
@@ -253,7 +253,7 @@ let! x =
     | x -> Parser.fail $"No matching parser found for discriminator '%s{x}'."
 ```
 
-We can also try to parse an element with a list of parsers.
+We can also parse an element by trying each parser in order.
 
 ```fsharp
 let! x = "prop" &= attempt [ a; b ]
@@ -344,7 +344,7 @@ let msg =
         |> String.concat "\n"
 ```
 
-With this available information.
+With the following available information.
 
 ```fsharp
 type ParseError = {
