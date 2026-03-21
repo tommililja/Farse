@@ -326,7 +326,7 @@ module User =
 
 ## Errors
 
-We can convert ParserError to a formatted string.
+ParserError can be converted to a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error
