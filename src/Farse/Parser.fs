@@ -69,9 +69,9 @@ module Parser =
             |> Result.map ignore<'a>
         )
 
-    /// <summary>Sets a default value for the parsed optional value.</summary>
+    /// <summary>Sets a default value for a parsed option.</summary>
     /// <code>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</code>
-    /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
+    /// <typeparam name="parser">The parser with an optional value.</typeparam>
     let inline defaultValue x (Parser parse) =
         Parser (fun element ->
             parse element
