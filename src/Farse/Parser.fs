@@ -37,6 +37,16 @@ module Parser =
         Error msg
         |> fromResult
 
+    /// <summary>Recover from an error with the given value.</summary>
+    /// <code>let! int = "prop" &= Parser.fail "msg" |> Parser.recover 0</code>
+    /// <typeparam name="parser">The parser to recover from an error.</typeparam>
+    let inline recover x (Parser parse) =
+        Parser (fun element ->
+            parse element
+            |> Result.defaultValue x
+            |> Ok
+        )
+
     /// <summary>Binds the parsed value with the given function.</summary>
     /// <code>let! int = "prop" &amp;= Parse.int |> Parser.bind Parser.from</code>
     /// <param name="fn">The binding function.</param>

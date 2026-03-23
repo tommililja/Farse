@@ -65,6 +65,16 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should recover from an error with a default value`` () =
+        let expected = 1
+        let actual =
+            Parser.fail "msg"
+            |> Parser.recover 1
+            |> Parser.parse "null"
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should return Ok when parsing JSON async`` () =
         task {
             let expected = 1
