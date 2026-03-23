@@ -13,7 +13,7 @@ module Parse =
     let none = Parser.from ()
 
     /// <summary>Parses an optional value with the given parser but returns a default value when null.</summary>
-    /// <code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code>
+    /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
     let nil (Parser parse) x =
         Parser (fun (element:JsonElement) ->
@@ -23,7 +23,7 @@ module Parse =
         )
 
     /// <summary>Parses an optional value with the given parser.</summary>
-    /// <code>let! int = "prop" &amp;= Parse.optional Parse.int</code>
+    /// <example><code>let! int = "prop" &amp;= Parse.optional Parse.int</code></example>
     /// <typeparam name="parser">The parser used to parse the property value.</typeparam>
     let optional (Parser parse) =
         Parser (fun (element:JsonElement) ->
@@ -36,7 +36,7 @@ module Parse =
 
     /// <summary>Validates the parsed value with the given function.</summary>
     /// <remarks>Produces detailed error messages when validation fails.</remarks>
-    /// <code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code>
+    /// <example><code>let! email = "prop" &amp;= Parse.valid Parse.string Email.fromString</code></example>
     /// <typeparam name="parser">The parser to validate.</typeparam>
     /// <param name="fn">The validation function.</param>
     let valid (Parser parse) fn : Parser<'r> =
