@@ -654,7 +654,7 @@ module Parse =
 
     /// <summary>Parses an element as System.Text.Json.JsonElement.</summary>
     /// <example><code>let! jsonElement = "prop" &amp;= Parse.element</code></example>
-    let element = custom (_.Clone() >> Ok) ExpectedKind.Any
+    let element = custom (JsonElement.clone >> Ok) ExpectedKind.Any
 
     /// <summary>Parses an element's raw text as System.String.</summary>
     /// <example><code>let! string = "prop" &amp;= Parse.rawText</code></example>
