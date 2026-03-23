@@ -39,7 +39,7 @@ module Parser =
 
     /// <summary>Recover from an error with the given value.</summary>
     /// <example><code>let! int = "prop" &= Parser.fail "msg" |> Parser.recover 0</code></example>
-    /// <typeparam name="parser">The parser to recover from an error.</typeparam>
+    /// <param name="x">The value to return.</param>
     let inline recover x (Parser parse) =
         Parser (fun element ->
             parse element
@@ -47,10 +47,9 @@ module Parser =
             |> Ok
         )
 
-    /// <summary>Binds the parsed value with the given function.</summary>
+    /// <summary>Binds a parsed value with the given function.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.int |> Parser.bind Parser.from</code></example>
     /// <param name="fn">The binding function.</param>
-    /// <typeparam name="parser">The parser to bind.</typeparam>
     let inline bind ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
             parse element
@@ -60,19 +59,17 @@ module Parser =
             )
         )
 
-    /// <summary>Maps the parsed value with the given function.</summary>
+    /// <summary>Maps a parsed value with the given function.</summary>
     /// <example><code>let! string = "prop" &amp;= Parse.int |> Parser.map string</code></example>
     /// <param name="fn">The mapping function.</param>
-    /// <typeparam name="parser">The parser to map.</typeparam>
     let inline map ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
             parse element
             |> Result.map fn
         )
 
-    /// <summary>Ignores the parsed value.</summary>
+    /// <summary>Ignores a parsed value.</summary>
     /// <example><code>do! "prop" &amp;= Parse.int |> Parser.ignore</code></example>
-    /// <typeparam name="parser">The parser to ignore.</typeparam>
     let inline ignore<'a> (Parser parse) =
         Parser (fun element ->
             parse element
@@ -81,7 +78,7 @@ module Parser =
 
     /// <summary>Sets a default value for a parsed option.</summary>
     /// <example><code>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</code></example>
-    /// <typeparam name="parser">The parser with an optional value.</typeparam>
+    /// <param name="x">The default value.</param>
     let inline defaultValue x (Parser parse) =
         Parser (fun element ->
             parse element
@@ -90,7 +87,6 @@ module Parser =
 
     /// <summary>Parses a JSON string with the given parser.</summary>
     /// <param name="json">The JSON string to parse.</param>
-    /// <typeparam name="parser">The parser used to parse the JSON string.</typeparam>
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
             use document = JsonDocument.Parse(json, options)
@@ -102,7 +98,6 @@ module Parser =
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
-    /// <typeparam name="parser">The parser used to parse the JSON stream.</typeparam>
     let parseAsync (stream:Stream) (Parser parse) =
         task {
             try
