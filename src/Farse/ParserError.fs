@@ -158,7 +158,9 @@ module ParseError =
         string {
             $"at %s{JsonPath.asString error.Path}"
             $" | Tried parsing '%s{Type.getName error.Type}."
-            $" | %s{error.Details}"
+
+            if not (String.IsNullOrWhiteSpace error.Details) then
+                $" | %s{error.Details}"
 
             Option.map (sprintf " = %s") error.Value
         }
