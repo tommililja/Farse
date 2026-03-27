@@ -46,6 +46,10 @@ module JStr =
 
     let inline arr fn = JArr.from fn JStr
 
+    let inline singleton fn x =
+        Seq.singleton x
+        |> arr fn
+
 module JNum =
 
     let zero = JNum 0
@@ -55,11 +59,19 @@ module JNum =
 
     let inline arr fn = JArr.from fn JNum
 
+    let inline singleton fn x =
+        Seq.singleton x
+        |> arr fn
+
 module JBit =
 
     let inline nil fn = JNil.from fn JBit
 
     let inline arr fn = JArr.from fn JBit
+
+    let inline singleton fn x =
+        Seq.singleton x
+        |> arr fn
 
 module JObj =
 
@@ -68,6 +80,10 @@ module JObj =
     let inline nil fn = JNil.from fn JObj
 
     let inline arr fn = JArr.from fn JObj
+
+    let inline singleton fn x =
+        Seq.singleton x
+        |> arr fn
 
 module Json =
 

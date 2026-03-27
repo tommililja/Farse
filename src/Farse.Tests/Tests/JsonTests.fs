@@ -58,6 +58,12 @@ module JsonTests =
             |> Json.asString Indented
             |> Expect.string
 
+        [<Fact>]
+        let ``Should create string singleton`` () =
+            JStr.singleton id "1"
+            |> Json.asString Indented
+            |> Expect.string
+
     module JNum =
 
         [<Fact>]
@@ -84,6 +90,12 @@ module JsonTests =
             |> Json.asString Indented
             |> Expect.string
 
+        [<Fact>]
+        let ``Should create number singleton`` () =
+            JNum.singleton id 1
+            |> Json.asString Indented
+            |> Expect.string
+
     module JBit =
 
         [<Fact>]
@@ -101,6 +113,12 @@ module JsonTests =
         [<Fact>]
         let ``Should create bool array`` () =
             JBit.arr id [ true; false; true ]
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
+        let ``Should create bool singleton`` () =
+            JBit.singleton id true
             |> Json.asString Indented
             |> Expect.string
 
@@ -127,6 +145,12 @@ module JsonTests =
         [<Fact>]
         let ``Should create object array`` () =
             JObj.arr (fun x -> [ "value", JStr x ]) [ "1"; "2"; "3" ]
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
+        let ``Should create object singleton`` () =
+            JObj.singleton id [ "value", JStr "1" ]
             |> Json.asString Indented
             |> Expect.string
 
