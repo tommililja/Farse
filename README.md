@@ -197,7 +197,7 @@ type User = {
 }
 ```
 
-Then we can just run the parser.
+Then we can just run the parser synchronously or asynchronously.
 
 ```fsharp
 let user =
@@ -207,6 +207,19 @@ let user =
     |> Result.defaultWith failwith
 
 printf "%s" user.Name
+
+task {
+    let! result =
+        User.parser
+        |> Parser.parseAsync stream
+        
+    let user =
+        result
+        |> Result.mapError ParserError.asString
+        |> Result.defaultWith failwith
+
+    return printf "%s" user.Name
+}
 ```
 
 ## Custom parsers
@@ -242,7 +255,7 @@ For objects with a string discriminator.
 let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
 ```
 
-Which is equal to matching, but less flexible.
+Which is equal to matching but less flexible.
 
 ```fsharp
 let! disc = "prop.disc" &= string
@@ -261,7 +274,7 @@ let! x = "prop" &= attempt [ a; b ]
 
 ## Validation
 
-Both methods produce detailed error messages when validation fails.
+Validation errors produce the same information as parsing errors.
 
 ```fsharp
 let! age = "age" ?= age
@@ -332,7 +345,7 @@ ParserError can be converted to a formatted string.
 let msg = ParserError.asString error
 ```
 
-But we can also choose to build our own error messages.
+But we can also build our own error messages.
 
 ```fsharp
 let msg =
@@ -344,7 +357,7 @@ let msg =
         |> String.concat "\n"
 ```
 
-With the following available information.
+From the following available information.
 
 ```fsharp
 type ParseError = {
