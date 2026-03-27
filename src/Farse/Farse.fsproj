@@ -23,6 +23,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Types.fs" />
+        <Compile Include="Builders.fs" />
         <Compile Include="Extensions.fs"/>
         <Compile Include="ParserError.fs" />
         <Compile Include="Parser.fs"/>

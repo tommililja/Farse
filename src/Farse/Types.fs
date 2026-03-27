@@ -13,7 +13,7 @@ type ExpectedKind =
     | String
     | Undefined
 
-module ExpectedKind =
+module private ExpectedKind =
 
     let fromKind = function
         | JsonValueKind.Array -> ExpectedKind.Array
