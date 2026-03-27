@@ -66,7 +66,7 @@ Given the JSON string.
 }
 ```
 
-And the two (optional) operators.
+And the two custom operators.
 
 ```fsharp
 // Parses a required property.
@@ -75,8 +75,9 @@ let (&=) = Prop.req
 // Parses an optional property.
 let (?=) = Prop.opt
 ```
+> Note: These are optional.
 
-We can create this simple parser.
+We can create this simple parser.  
 
 ```fsharp
 open Farse
@@ -197,7 +198,7 @@ type User = {
 }
 ```
 
-Then we can just run the parser synchronously or asynchronously.
+Then we can just run the parser.
 
 ```fsharp
 let user =
@@ -207,7 +208,11 @@ let user =
     |> Result.defaultWith failwith
 
 printf "%s" user.Name
+```
 
+It can also be run asyncronously from a stream.
+
+```fsharp
 task {
     let! result =
         User.parser
@@ -246,6 +251,7 @@ module Parse =
             | result -> Error result.Exception.Message // Added as details.
         ) ExpectedKind.String
 ```
+> Note: This is recommended for frequently parsed types.
 
 ## One-of
 
@@ -266,7 +272,7 @@ let! x =
     | x -> Parser.fail $"No matching parser found for discriminator '%s{x}'."
 ```
 
-We can also parse an element by trying each parser in order.
+We can also try each parser in order.
 
 ```fsharp
 let! x = "prop" &= attempt [ a; b ]
