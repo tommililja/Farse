@@ -210,7 +210,7 @@ let user =
 printf "%s" user.Name
 ```
 
-It can also be run asyncronously from a stream.
+It can also be run asynchronously from a stream.
 
 ```fsharp
 task {
