@@ -38,7 +38,7 @@ module Parser =
         |> fromResult
 
     /// <summary>Recover from an error with the given value.</summary>
-    /// <example><code>let! int = "prop" &= Parser.fail "msg" |> Parser.recover 0</code></example>
+    /// <example><code>let! int = "prop" &amp;= Parser.fail "msg" |> Parser.recover 0</code></example>
     /// <param name="x">The value to return.</param>
     let inline recover x (Parser parse) =
         Parser (fun element ->
