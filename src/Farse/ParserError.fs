@@ -25,6 +25,7 @@ module JsonPath =
         |> List.append [ "$" ]
         |> String.concat String.Empty
 
+[<NoComparison>]
 type ParseError = {
     Path: JsonPath
     Element: JsonElement
@@ -165,6 +166,7 @@ module ParseError =
             Option.map (sprintf " = %s") error.Value
         }
 
+[<NoComparison>]
 type ParserError =
     | Json of exn
     | Errors of ParseError list

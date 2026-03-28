@@ -4,7 +4,8 @@ open System
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
-type [<Struct>] Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
+[<Struct; NoComparison; NoEquality>]
+type Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 
 module Parser =
 

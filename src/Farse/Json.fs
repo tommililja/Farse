@@ -6,14 +6,16 @@ open System.Numerics
 open System.Text.Json
 open System.Text.Json.Nodes
 
+[<NoComparison>]
 type Json =
     | JStr of string
-    | JNum of JsonNode
+    | JNum of decimal
     | JBit of bool
-    | JObj of (string * Json) seq
-    | JArr of Json seq
+    | JObj of (string * Json) list
+    | JArr of Json list
     | JNil
 
+[<NoComparison>]
 type JsonFormat =
     | Indented
     | Custom of JsonSerializerOptions
@@ -22,9 +24,14 @@ type JsonFormat =
 [<AutoOpen>]
 type JNum =
 
-    static member inline JNum<'a when 'a :> INumber<'a>>(x) =
-        JsonValue.Create<'a>(x).Root
-        |> Json.JNum
+    /// <summary>Converts a number to Json.</summary>
+    /// <remarks>
+    ///     Floating point numbers may lose precision.
+    ///     Consider rounding before passing, or use a decimal literal (e.g. 0.1m) for exact values.
+    /// </remarks>
+    /// <param name="x">The number to convert.</param>
+    static member inline JNum< ^a when ^a :> INumber< ^a> and ^a: (static member op_Explicit: ^a -> decimal)>(x:^a) =
+        Json.JNum (decimal x)
 
 module JNil =
 
@@ -34,13 +41,18 @@ module JNil =
 
 module JArr =
 
-    let empty = JArr Seq.empty
+    /// <summary>An empty JSON array.</summary>
+    let empty = JArr List.empty
 
-    let inline internal from fn map =
-        Seq.map (fn >> map) >> JArr
+    let inline internal from fn map seq =
+        seq
+        |> List.ofSeq
+        |> List.map (fn >> map)
+        |> JArr
 
 module JStr =
 
+    /// <summary>An empty JSON string.</summary>
     let empty = JStr String.Empty
 
     let inline nil fn = JNil.from fn JStr
@@ -48,20 +60,21 @@ module JStr =
     let inline arr fn = JArr.from fn JStr
 
     let inline singleton fn x =
-        Seq.singleton x
+        List.singleton x
         |> arr fn
 
 module JNum =
 
+    /// <summary>A JSON number with the value 0.</summary>
     let zero = JNum 0
 
-    let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
+    let inline nil<'a, ^b when ^b :> INumber<'b> and ^b: (static member op_Explicit: ^b -> decimal)> (fn:'a -> ^b) =
         JNil.from fn JNum
 
     let inline arr fn = JArr.from fn JNum
 
     let inline singleton fn x =
-        Seq.singleton x
+        List.singleton x
         |> arr fn
 
 module JBit =
@@ -71,19 +84,20 @@ module JBit =
     let inline arr fn = JArr.from fn JBit
 
     let inline singleton fn x =
-        Seq.singleton x
+        List.singleton x
         |> arr fn
 
 module JObj =
 
-    let empty = JObj Seq.empty
+    /// <summary>An empty JSON object.</summary>
+    let empty = JObj List.empty
 
     let inline nil fn = JNil.from fn JObj
 
     let inline arr fn = JArr.from fn JObj
 
     let inline singleton fn x =
-        Seq.singleton x
+        List.singleton x
         |> arr fn
 
 module Json =
@@ -104,7 +118,7 @@ module Json =
     let rec private getJsonNode = function
         | JStr str -> JsonValue.Create(str).Root
         | JBit bit -> JsonValue.Create(bit).Root
-        | JNum num -> num
+        | JNum num -> JsonValue.Create(num).Root
         | JObj obj ->
             let object = JsonObject ()
             for name, json in obj do
@@ -123,15 +137,17 @@ module Json =
         | node ->
             match node.GetValueKind() with
             | Kind.String -> JStr <| node.GetValue()
-            | Kind.Number -> Json.JNum node
+            | Kind.Number -> Json.JNum <| node.GetValue()
             | Kind.True | Kind.False -> JBit <| node.GetValue()
             | Kind.Object ->
                 node :?> JsonObject
                 |> Seq.map (fun kv -> kv.Key, getJson kv.Value)
+                |> Seq.toList
                 |> JObj
             | Kind.Array ->
                 node :?> JsonArray
                 |> Seq.map getJson
+                |> Seq.toList
                 |> JArr
             | Kind.Null | Kind.Undefined -> JNil
 

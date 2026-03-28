@@ -31,8 +31,7 @@ type User = {
     Subscription: Subscription
 }
 
-[<MemoryDiagnoser(true)>]
-[<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
+[<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type JsonBenchmarks() =
 
     [<Benchmark(Description = "Farse")>]
@@ -55,8 +54,7 @@ type JsonBenchmarks() =
         ]
         |> Json.asString Indented
 
-[<MemoryDiagnoser(true)>]
-[<Orderer(SummaryOrderPolicy.FastestToSlowest)>]
+[<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type ParserBenchmarks() =
 
     let mutable json = String.Empty

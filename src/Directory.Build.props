@@ -4,6 +4,6 @@
         <WarnOn>$(WarnOn);1182;3579</WarnOn>
         <NoWarn>104</NoWarn>
         <Features>strict</Features>
-        <WarningLevel>4</WarningLevel>
+        <WarningLevel>5</WarningLevel>
     </PropertyGroup>
 </Project>
