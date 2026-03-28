@@ -358,7 +358,7 @@ let json =
 
 ```fsharp
 task {
-    let! result = Json.fromStringAsync ct stream
+    let! result = Json.fromStreamAsync ct stream
     return Result.defaultWith (_.Message >> failwith) result
 }
 ```
