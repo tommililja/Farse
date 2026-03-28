@@ -6,19 +6,6 @@ open System.Text.Json
 [<AutoOpen>]
 module internal Extensions =
 
-    type Kind = JsonValueKind
-
-    module Kind =
-
-        let asString = function
-            | Kind.Array -> "Array"
-            | Kind.Null -> "Null"
-            | Kind.Number -> "Number"
-            | Kind.Object -> "Object"
-            | Kind.String -> "String"
-            | Kind.True | Kind.False -> "Bool"
-            | Kind.Undefined -> "Undefined"
-
     module JsonElement =
 
         let inline getProperty (name:string) (element:JsonElement) =

@@ -2,6 +2,19 @@ namespace Farse
 
 open System.Text.Json
 
+type internal Kind = JsonValueKind
+
+module internal Kind =
+
+    let asString = function
+        | Kind.Array -> "Array"
+        | Kind.Null -> "Null"
+        | Kind.Number -> "Number"
+        | Kind.Object -> "Object"
+        | Kind.String -> "String"
+        | Kind.True | Kind.False -> "Bool"
+        | Kind.Undefined -> "Undefined"
+
 [<RequireQualifiedAccess>]
 type ExpectedKind =
     | Any
@@ -16,13 +29,13 @@ type ExpectedKind =
 module private ExpectedKind =
 
     let fromKind = function
-        | JsonValueKind.Array -> ExpectedKind.Array
-        | JsonValueKind.Null -> ExpectedKind.Null
-        | JsonValueKind.Number -> ExpectedKind.Number
-        | JsonValueKind.Object -> ExpectedKind.Object
-        | JsonValueKind.String -> ExpectedKind.String
-        | JsonValueKind.True | JsonValueKind.False -> ExpectedKind.Bool
-        | JsonValueKind.Undefined -> ExpectedKind.Undefined
+        | Kind.Array -> ExpectedKind.Array
+        | Kind.Null -> ExpectedKind.Null
+        | Kind.Number -> ExpectedKind.Number
+        | Kind.Object -> ExpectedKind.Object
+        | Kind.String -> ExpectedKind.String
+        | Kind.True | JsonValueKind.False -> ExpectedKind.Bool
+        | Kind.Undefined -> ExpectedKind.Undefined
 
     let asString = function
         | ExpectedKind.Any -> "Any"
