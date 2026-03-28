@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Diagnostics.CodeAnalysis
 open System.Numerics
 open System.Text.Json
 open System.Text.Json.Nodes
@@ -87,11 +88,17 @@ module JObj =
 
 module Json =
 
-    let private indented =
+    let private serializerOptions =
         JsonSerializerOptions (
             WriteIndented = true,
             IndentSize = 4,
             NewLine = "\n"
+        )
+
+    let private documentOptions =
+        JsonDocumentOptions (
+            AllowTrailingCommas = true,
+            CommentHandling = JsonCommentHandling.Skip
         )
 
     let rec private getJsonNode = function
@@ -110,7 +117,48 @@ module Json =
             array :> JsonNode
         | JNil -> null
 
-    /// <summary>Converts the Json to a formatted JSON string.</summary>
+    let rec private getJson (node:JsonNode) =
+        match node with
+        | node when isNull node -> JNil
+        | node ->
+            match node.GetValueKind() with
+            | Kind.String -> JStr <| node.GetValue()
+            | Kind.Number -> Json.JNum node
+            | Kind.True | Kind.False -> JBit <| node.GetValue()
+            | Kind.Object ->
+                node :?> JsonObject
+                |> Seq.map (fun kv -> kv.Key, getJson kv.Value)
+                |> JObj
+            | Kind.Array ->
+                node :?> JsonArray
+                |> Seq.map getJson
+                |> JArr
+            | Kind.Null | Kind.Undefined -> JNil
+
+    /// <summary>Converts a JSON string to Json.</summary>
+    /// <param name="json">The JSON string to convert.</param>
+    let fromString ([<StringSyntax("Json")>] json:string) =
+        try
+            let node = JsonNode.Parse(json, documentOptions = documentOptions)
+            Ok <| getJson node
+        with
+            | :? JsonException
+            | :? ArgumentNullException as exn -> Error exn
+
+    /// <summary>Converts a JSON stream asynchronously to Json.</summary>
+    /// <param name="token">The CancellationToken to use.</param>
+    /// <param name="stream">The JSON stream to convert.</param>
+    let fromStreamAsync token stream =
+        task {
+            try
+                let! node = JsonNode.ParseAsync(stream, cancellationToken = token, documentOptions = documentOptions)
+                return Ok <| getJson node
+            with
+                | :? JsonException
+                | :? ArgumentNullException as exn -> return Error exn
+        }
+
+    /// <summary>Converts a Json to a formatted JSON string.</summary>
     /// <param name="format">The format to use.</param>
     /// <param name="json">The Json to convert.</param>
     let asString format json =
@@ -119,7 +167,7 @@ module Json =
         | node ->
             let options =
                 match format with
-                | Indented -> indented
+                | Indented -> serializerOptions
                 | Custom options -> options
                 | Raw -> null
 

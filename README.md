@@ -216,7 +216,7 @@ It can also be run asynchronously from a stream.
 task {
     let! result =
         User.parser
-        |> Parser.parseAsync stream
+        |> Parser.parseAsync stream ct
         
     let user =
         result
@@ -339,9 +339,29 @@ module User =
                 "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
             ]
         ]
+        
+    let asJsonString = asJson >> Json.asString Indented
 ```
 
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
+
+### Reading into Json
+
+Json can also be created from a string or stream.
+
+```fsharp
+let json =
+    string
+    |> Json.fromString
+    |> Result.defaultWith (_.Message >> failwith)
+```
+
+```fsharp
+task {
+    let! result = Json.fromStringAsync ct stream
+    return Result.defaultWith (_.Message >> failwith) result
+}
+```
 
 ## Errors
 

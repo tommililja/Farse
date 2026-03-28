@@ -2,14 +2,17 @@ namespace Farse
 
 open System
 open System.Diagnostics.CodeAnalysis
-open System.IO
 open System.Text.Json
 
 type [<Struct>] Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 
 module Parser =
 
-    let private options = JsonDocumentOptions(AllowTrailingCommas = true)
+    let private documentOptions =
+        JsonDocumentOptions (
+            AllowTrailingCommas = true,
+            CommentHandling = JsonCommentHandling.Skip
+        )
 
     /// <summary>Returns a parser with the given value.</summary>
     /// <example><code>let! int = Parser.from 1</code></example>
@@ -89,7 +92,7 @@ module Parser =
     /// <param name="json">The JSON string to parse.</param>
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
-            use document = JsonDocument.Parse(json, options)
+            use document = JsonDocument.Parse(json, documentOptions)
             parse document.RootElement
             |> Result.mapError Errors
         with
@@ -98,10 +101,11 @@ module Parser =
 
     /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
-    let parseAsync (stream:Stream) (Parser parse) =
+    /// <param name="token">The CancellationToken to use.</param>
+    let parseAsync stream token (Parser parse) =
         task {
             try
-                use! document = JsonDocument.ParseAsync(stream, options)
+                use! document = JsonDocument.ParseAsync(stream, documentOptions, token)
                 return
                     parse document.RootElement
                     |> Result.mapError Errors

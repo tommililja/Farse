@@ -147,6 +147,8 @@ module User =
             ]
         ]
 
+    let asJsonString = asJson >> Json.asString Indented
+
 module Example =
 
     [<Fact>]
@@ -158,9 +160,8 @@ module Example =
             |> Parser.parse expected
             |> Expect.ok
 
-        let actual =
-            user
-            |> User.asJson
-            |> Json.asString Indented
+        let test = Json.fromString "" |> Result.defaultWith (_.Message >> failwith)
+
+        let actual = User.asJsonString user
 
         Expect.equal actual expected

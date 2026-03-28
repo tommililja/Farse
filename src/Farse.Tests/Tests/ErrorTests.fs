@@ -1,6 +1,7 @@
 namespace Farse.Tests
 
 open System
+open System.Threading
 open Xunit
 open Farse
 
@@ -17,7 +18,7 @@ module ErrorTests =
         [<Fact>]
         let ``Should return Error when parsing invalid JSON async`` () =
             Parse.none
-            |> Parser.parseAsync (MemoryStream.create "invalid")
+            |> Parser.parseAsync (MemoryStream.create """{ "prop" 1 }""") CancellationToken.None
             |> Task.bind Expect.errorString
 
         [<Fact>]

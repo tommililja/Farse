@@ -1,10 +1,45 @@
 namespace Farse.Tests
 
+open System.IO
 open System.Text.Json
+open System.Threading
 open Xunit
 open Farse
 
 module JsonTests =
+
+    [<Fact>]
+    let ``Should return Ok when creating Json`` () =
+        let expected = File.ReadAllText("Example.json")
+        let actual =
+            expected
+            |> Json.fromString
+            |> Expect.ok
+            |> Json.asString Indented
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should return Ok when creating Json async`` () =
+        task {
+            let expected = File.ReadAllText("Example.json")
+            let! actual =
+                MemoryStream.create expected
+                |> Json.fromStreamAsync CancellationToken.None
+                |> Task.map (Expect.ok >> Json.asString Indented)
+            Expect.equal actual expected
+        }
+
+    [<Fact>]
+    let ``Should return Error when creating Json from invalid JSON`` () =
+        """{ "prop" 1 }"""
+        |> Json.fromString
+        |> Expect.error
+
+    [<Fact>]
+    let ``Should return Error when creating Json async from invalid JSON`` () =
+        MemoryStream.create """{ "prop" 1 }"""
+        |> Json.fromStreamAsync CancellationToken.None
+        |> Task.map Expect.error
 
     [<Fact>]
     let ``Should create indented JSON string`` () =

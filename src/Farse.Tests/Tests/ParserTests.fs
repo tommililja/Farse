@@ -1,5 +1,6 @@
 namespace Farse.Tests
 
+open System.Threading
 open Xunit
 open Farse
 
@@ -80,7 +81,7 @@ module ParserTests =
             let expected = 1
             let! actual =
                 Prop.req "prop" Parse.int
-                |> Parser.parseAsync (MemoryStream.create """{ "prop": 1 }""")
+                |> Parser.parseAsync (MemoryStream.create """{ "prop": 1 }""") CancellationToken.None
                 |> Task.map Expect.ok
             Expect.equal actual expected
         }
