@@ -160,8 +160,6 @@ module Example =
             |> Parser.parse expected
             |> Expect.ok
 
-        let test = Json.fromString "" |> Result.defaultWith (_.Message >> failwith)
-
         let actual = User.asJsonString user
 
         Expect.equal actual expected
