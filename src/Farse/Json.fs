@@ -30,7 +30,7 @@ type JNum =
     ///     Consider rounding before passing, or use a decimal literal (e.g. 0.1m) for exact values.
     /// </remarks>
     /// <param name="x">The number to convert.</param>
-    static member inline JNum< ^a when ^a :> INumber< ^a> and ^a: (static member op_Explicit: ^a -> decimal)>(x:^a) =
+    static member inline JNum<^a when ^a :> INumber<^a> and ^a: (static member op_Explicit: ^a -> decimal)>(x:^a) =
         Json.JNum (decimal x)
 
 module JNil =
@@ -44,11 +44,8 @@ module JArr =
     /// <summary>An empty JSON array.</summary>
     let empty = JArr List.empty
 
-    let inline internal from fn map seq =
-        seq
-        |> List.ofSeq
-        |> List.map (fn >> map)
-        |> JArr
+    let inline internal from fn map =
+        List.ofSeq >> List.map (fn >> map) >> JArr
 
 module JStr =
 
