@@ -19,7 +19,7 @@ module JsonPath =
         List.append a b
         |> JsonPath
 
-    /// <summary>Converts the JsonPath to a string.</summary>
+    /// <summary>Converts a JsonPath to a string.</summary>
     let asString (JsonPath list) =
         list
         |> List.append [ "$" ]
@@ -153,7 +153,7 @@ module ParseError =
     let internal withPath path x =
         append path x
 
-    /// <summary>Converts the ParseError to a formatted string.</summary>
+    /// <summary>Converts a ParseError to a formatted string.</summary>
     /// <param name="error">The ParseError to convert.</param>
     let asString error =
         string {
@@ -173,7 +173,7 @@ type ParserError =
 
 module ParserError =
 
-    /// <summary>Converts the ParserError to a formatted string.</summary>
+    /// <summary>Converts a ParserError to a formatted string.</summary>
     let asString = function
         | Json exn -> $"Could not parse JSON: %s{exn.Message}"
         | Errors list ->
