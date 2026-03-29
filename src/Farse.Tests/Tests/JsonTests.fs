@@ -67,6 +67,13 @@ module JsonTests =
         |> Json.asString Raw
         |> Expect.string
 
+    [<Fact>]
+    let ``Comparing two Json values should return true`` () =
+        let json = File.ReadAllText("Example.json")
+        let a = Json.fromString json
+        let b = Json.fromString json
+        Expect.equal a b
+
     module JStr =
 
         [<Fact>]
