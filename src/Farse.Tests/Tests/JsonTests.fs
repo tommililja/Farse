@@ -74,6 +74,24 @@ module JsonTests =
         let b = Json.fromString json
         Expect.equal a b
 
+    [<Fact>]
+    let ``Should sort properties in ascending order`` () =
+        JObj [
+            "c", JNum 3
+            "a", JNum 1
+            "b",
+                JArr [
+                    JObj [
+                        "b", JNum 2
+                        "c", JNum 3
+                        "a", JNum 1
+                    ]
+                ]
+        ]
+        |> Json.sort
+        |> Json.asString Indented
+        |> Expect.string
+
     module JStr =
 
         [<Fact>]

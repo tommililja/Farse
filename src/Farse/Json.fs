@@ -148,6 +148,19 @@ module Json =
                 |> JArr
             | Kind.Null | Kind.Undefined -> JNil
 
+    /// <summary>Sorts all properties in ascending order.</summary>
+    let rec sort = function
+        | JObj list ->
+            list
+            |> List.sortBy fst
+            |> List.map (fun (k, v) -> k, sort v)
+            |> JObj
+        | JArr list ->
+            list
+            |> List.map sort
+            |> JArr
+        | other -> other
+
     /// <summary>Converts a JSON string to Json.</summary>
     /// <param name="json">The JSON string to convert.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
