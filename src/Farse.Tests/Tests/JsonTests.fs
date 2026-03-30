@@ -76,18 +76,11 @@ module JsonTests =
 
     [<Fact>]
     let ``Should sort properties in ascending order`` () =
-        JObj [
-            "c", JNum 3
-            "a", JNum 1
-            "b",
-                JArr [
-                    JObj [
-                        "b", JNum 2
-                        "c", JNum 3
-                        "a", JNum 1
-                    ]
-                ]
-        ]
+        let json =
+            File.ReadAllText("Example.json")
+            |> Json.fromString
+            |> Expect.ok
+        json
         |> Json.sort
         |> Json.asString Indented
         |> Expect.string
