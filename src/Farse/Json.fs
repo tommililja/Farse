@@ -106,12 +106,6 @@ module Json =
             NewLine = "\n"
         )
 
-    let private documentOptions =
-        JsonDocumentOptions (
-            AllowTrailingCommas = true,
-            CommentHandling = JsonCommentHandling.Skip
-        )
-
     let rec private getJsonNode = function
         | JStr str -> JsonValue.Create(str).Root
         | JBit bit -> JsonValue.Create(bit).Root
@@ -163,7 +157,7 @@ module Json =
     /// <param name="json">The JSON string to convert.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
-            use document = JsonDocument.Parse(json, documentOptions)
+            use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
             Ok <| getJson document.RootElement
         with
             | :? JsonException
@@ -175,7 +169,7 @@ module Json =
     let fromStreamAsync token stream =
         task {
             try
-                use! document = JsonDocument.ParseAsync(stream, documentOptions, token)
+                use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
                 return Ok <| getJson document.RootElement
             with
                 | :? JsonException

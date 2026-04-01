@@ -6,6 +6,14 @@ open System.Text.Json
 [<AutoOpen>]
 module internal Extensions =
 
+    module JsonDocumentOptions =
+
+        let preset =
+            JsonDocumentOptions (
+                AllowTrailingCommas = true,
+                CommentHandling = JsonCommentHandling.Skip
+            )
+
     module JsonElement =
 
         let inline getProperty (name:string) (element:JsonElement) =

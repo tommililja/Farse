@@ -9,12 +9,6 @@ type Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 
 module Parser =
 
-    let private documentOptions =
-        JsonDocumentOptions (
-            AllowTrailingCommas = true,
-            CommentHandling = JsonCommentHandling.Skip
-        )
-
     /// <summary>Returns a parser with the given value.</summary>
     /// <example><code>let! int = Parser.from 1</code></example>
     /// <param name="x">The value to return.</param>
@@ -93,7 +87,7 @@ module Parser =
     /// <param name="json">The JSON string to parse.</param>
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
-            use document = JsonDocument.Parse(json, documentOptions)
+            use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
             parse document.RootElement
             |> Result.mapError Errors
         with
@@ -106,7 +100,7 @@ module Parser =
     let parseAsync stream token (Parser parse) =
         task {
             try
-                use! document = JsonDocument.ParseAsync(stream, documentOptions, token)
+                use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
                 return
                     parse document.RootElement
                     |> Result.mapError Errors
