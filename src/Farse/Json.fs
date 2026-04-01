@@ -128,25 +128,23 @@ module Json =
             array :> JsonNode
         | JNil -> null
 
-    let rec private getJson (node:JsonNode) =
-        match node with
-        | node when isNull node -> JNil
-        | node ->
-            match node.GetValueKind() with
-            | Kind.String -> JStr <| node.GetValue()
-            | Kind.Number -> Json.JNum <| node.GetValue()
-            | Kind.True | Kind.False -> JBit <| node.GetValue()
-            | Kind.Object ->
-                node :?> JsonObject
-                |> Seq.map (fun kv -> kv.Key, getJson kv.Value)
-                |> Seq.toList
-                |> JObj
-            | Kind.Array ->
-                node :?> JsonArray
-                |> Seq.map getJson
-                |> Seq.toList
-                |> JArr
-            | Kind.Null | Kind.Undefined -> JNil
+    let rec private getJson (element:JsonElement) =
+        match element.ValueKind with
+        | Kind.String  -> JStr <| element.GetString()
+        | Kind.Number -> Json.JNum <| element.GetDecimal()
+        | Kind.True -> JBit true
+        | Kind.False -> JBit false
+        | Kind.Object ->
+            element.EnumerateObject()
+            |> Seq.map (fun prop -> prop.Name, getJson prop.Value)
+            |> Seq.toList
+            |> JObj
+        | Kind.Array   ->
+            element.EnumerateArray()
+            |> Seq.map getJson
+            |> Seq.toList
+            |> JArr
+        | Kind.Null | Kind.Undefined -> JNil
 
     /// <summary>Sorts all properties in ascending order.</summary>
     let rec sort = function
@@ -165,8 +163,8 @@ module Json =
     /// <param name="json">The JSON string to convert.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
-            let node = JsonNode.Parse(json, documentOptions = documentOptions)
-            Ok <| getJson node
+            use document = JsonDocument.Parse(json, documentOptions)
+            Ok <| getJson document.RootElement
         with
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
@@ -177,8 +175,8 @@ module Json =
     let fromStreamAsync token stream =
         task {
             try
-                let! node = JsonNode.ParseAsync(stream, cancellationToken = token, documentOptions = documentOptions)
-                return Ok <| getJson node
+                use! document = JsonDocument.ParseAsync(stream, documentOptions, token)
+                return Ok <| getJson document.RootElement
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn -> return Error exn
