@@ -124,7 +124,7 @@ module User =
 
 > Note: The custom parsers are defined under the same module name as included parsers.
 
-With the following types.
+For the following types.
 
 ```fsharp
 type UserId = UserId of Guid
