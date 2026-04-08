@@ -20,23 +20,23 @@ dotnet package add Farse
 The benchmarks can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.8, macOS Tahoe 26.3 (25D125) [Darwin 25.3.0]
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.4 (25E246) [Darwin 25.4.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
-.NET SDK 10.0.100
-  [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a DEBUG
-  DefaultJob : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a
+.NET SDK 10.0.201
+  [Host]     : .NET 10.0.5 (10.0.5, 10.0.526.15411), Arm64 RyuJIT armv8.0-a DEBUG
+  DefaultJob : .NET 10.0.5 (10.0.5, 10.0.526.15411), Arm64 RyuJIT armv8.0-a
 ```
 
 ```shell
-| Method                 | Mean     | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
-|----------------------- |---------:|------:|--------:|--------:|----------:|------------:|
-| System.Text.Json       | 106.4 us |  0.83 |  4.1504 |       - |  25.85 KB |        0.60 |
-| Farse                  | 127.9 us |  1.00 |  6.8359 |       - |  43.02 KB |        1.00 |
-| System.Text.Json*      | 105.4 us |  0.82 | 12.9395 |  1.5869 |  79.97 KB |        1.86 |
-| Newtonsoft.Json*       | 194.0 us |  1.52 | 42.7246 |  5.8594 | 262.27 KB |        6.10 |
-| Thoth.System.Text.Json | 215.3 us |  1.68 | 55.1758 | 18.3105 | 338.76 KB |        7.87 |
-| Newtonsoft.Json        | 214.9 us |  1.68 | 75.6836 | 24.4141 | 464.07 KB |       10.79 |
-| Thoth.Json.Net         | 307.5 us |  2.40 | 94.7266 | 44.9219 | 581.86 KB |       13.52 |
+| Method                 | Mean     | Ratio | Gen0     | Gen1    | Allocated | Alloc Ratio |
+|----------------------- |---------:|------:|---------:|--------:|----------:|------------:|
+| System.Text.Json       | 123.3 us |  0.80 |   6.1035 |       - |  37.57 KB |        0.61 |
+| Farse                  | 155.1 us |  1.00 |  10.0098 |       - |  61.86 KB |        1.00 |
+| System.Text.Json*      | 129.0 us |  0.83 |  17.3340 |  2.6855 | 106.53 KB |        1.72 |
+| Newtonsoft.Json*       | 227.0 us |  1.46 |  48.8281 |  8.5449 | 299.77 KB |        4.85 |
+| Thoth.System.Text.Json | 255.0 us |  1.64 |  68.8477 | 22.4609 | 423.88 KB |        6.85 |
+| Newtonsoft.Json        | 269.5 us |  1.74 |  86.9141 | 40.0391 | 534.38 KB |        8.64 |
+| Thoth.Json.Net         | 374.9 us |  2.42 | 111.3281 | 55.6641 | 684.98 KB |       11.07 |
 
 * Serialization
 ```
@@ -59,10 +59,14 @@ Given the JSON string.
         "bf00d1e2-ee53-4969-9507-86bed7e96432"
     ],
     "subscription": {
-        "plan": "Pro",
+        "plan": "pro",
         "isCanceled": false,
         "renewsAt": "2026-12-25T10:30:00Z"
-    }
+    },
+    "tags": [ 
+        "beta", 
+        "verified"
+    ]
 }
 ```
 
@@ -93,6 +97,7 @@ module User =
             and! age = "age" ?= valid byte Age.fromByte
             and! email = "email" &= valid string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
+            and! tags = "tags" &= list (valid string Tag.fromString)
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
@@ -118,6 +123,7 @@ module User =
                 Email = email
                 Profiles = profiles
                 Subscription = subscription
+                Tags = tags
             }
         }
 ```
@@ -188,6 +194,21 @@ type Subscription = {
     RenewsAt: Instant option
 }
 
+type Tag =
+    | Beta
+    | Verified
+
+module Tag =
+
+    let fromString = function
+        | "beta" -> Ok Beta
+        | "verified" -> Ok Verified
+        | str -> Error $"Tag '%s{str}' not found."
+
+    let asString = function
+        | Beta -> "beta"
+        | Verified -> "verified"
+
 type User = {
     Id: UserId
     Name: string
@@ -195,6 +216,7 @@ type User = {
     Email: Email
     Profiles: ProfileId Set
     Subscription: Subscription
+    Tags: Tag list
 }
 ```
 
@@ -253,6 +275,32 @@ module Parse =
 ```
 > Note: This is recommended for frequently parsed types.
 
+### Errors
+
+ProfileId
+
+```code
+Parser failed with 1 error[s].
+
+Error[0]:
+  at $.profiles[1]
+   | Tried parsing 'ProfileId.
+   | Invalid guid.
+   = "927eb20f-cd62-470c-aafc-c3ce6b9248b"
+```
+
+Instant
+
+```code
+Parser failed with 1 error[s].
+
+Error[0]:
+  at $.subscription.renewsAt
+   | Tried parsing 'Instant.
+   | The value string does not [...]
+   = "202612-25T10:30:00Z"
+```
+
 ## One-of
 
 For objects with a string discriminator.
@@ -283,29 +331,20 @@ let! x = "prop" &= attempt [ a; b ]
 Validation errors produce the same information as parsing errors.
 
 ```fsharp
-let! age = "age" ?= age
+let! age = "age" ?= age // Custom parser.
 let! age = "age" ?= valid byte Age.fromByte
 ```
 
-Where 'age' is a custom parser.
+Validation can also be combined with sequences.
 
 ```fsharp
-let age =
-    Parse.custom (fun element ->
-        match element.TryGetByte() with
-        | true, byte -> Age.fromByte byte
-        | _ -> Error "Invalid byte."
-    ) ExpectedKind.String
+let! tags = "tags" ?= list tag // Custom parser.
+let! tags = "tags" ?= list (valid string Tag.fromString)
 ```
 
-They can also be combined with sequences.
+### Errors
 
-```fsharp
-let! ages = "ages" ?= list age
-let! ages = "ages" ?= list (valid byte Age.fromByte)
-```
-
-#### Error
+Age
 
 ```code
 Parser failed with 1 error[s].
@@ -315,6 +354,18 @@ Error[0]:
    | Tried parsing 'Age.
    | The minimum age is '12'.
    = 10
+```
+
+Tag
+
+```code
+Parser failed with 1 error[s].
+
+Error[0]:
+  at $.tags[0]
+   | Tried parsing 'Tag.
+   | Tag 'user' not found.
+   = "user"
 ```
 
 ## Creating JSON
@@ -338,11 +389,11 @@ module User =
                 "isCanceled", JBit user.Subscription.IsCanceled
                 "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
             ]
+            "tags", JStr.arr Tag.asString user.Tags
         ]
         
     let asJsonString = asJson >> Json.asString Indented
 ```
-
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
 ### Reading into Json
@@ -396,33 +447,4 @@ type ParseError = {
     Exn: exn option
 }
 ```
-
-### Examples
-
-More examples can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Verify).
-
-#### Object
-
-```code
-Parser failed with 1 error[s].
-
-Error[0]:
-  at $.subscription.renewsAt
-   | Tried parsing 'Instant.
-   | The value string does not [...]
-   = "202612-25T10:30:00Z"
-```
-
-#### Array
-
-```code
-Parser failed with 1 error[s].
-
-Error[0]:
-  at $.profiles[1]
-   | Tried parsing 'ProfileId.
-   | Invalid guid.
-   = "927eb20f-cd62-470c-aafc-c3ce6b9248b"
-```
-
 > Note: Farse does not throw exceptions unless something unexpected occurs.

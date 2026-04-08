@@ -53,21 +53,36 @@ type Plan =
 module Plan =
 
     let fromString = function
-        | "Pro" -> Ok Pro
-        | "Standard" -> Ok Standard
-        | "Free" -> Ok Free
+        | "pro" -> Ok Pro
+        | "standard" -> Ok Standard
+        | "free" -> Ok Free
         | str -> Error $"Plan '%s{str}' not found."
 
     let asString = function
-        | Pro -> "Pro"
-        | Standard -> "Standard"
-        | Free -> "Free"
+        | Pro -> "pro"
+        | Standard -> "standard"
+        | Free -> "free"
 
 type Subscription = {
     Plan: Plan
     IsCanceled: bool
     RenewsAt: Instant option
 }
+
+type Tag =
+    | Beta
+    | Verified
+
+module Tag =
+
+    let fromString = function
+        | "beta" -> Ok Beta
+        | "verified" -> Ok Verified
+        | str -> Error $"Tag '%s{str}' not found."
+
+    let asString = function
+        | Beta -> "beta"
+        | Verified -> "verified"
 
 type User = {
     Id: UserId
@@ -76,6 +91,7 @@ type User = {
     Email: Email
     Profiles: ProfileId Set
     Subscription: Subscription
+    Tags: Tag list
 }
 
 module Parse =
@@ -105,6 +121,7 @@ module User =
             and! age = "age" ?= valid byte Age.fromByte
             and! email = "email" &= valid string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
+            and! tags = "tags" &= list (valid string Tag.fromString)
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
@@ -130,6 +147,7 @@ module User =
                 Email = email
                 Profiles = profiles
                 Subscription = subscription
+                Tags = tags
             }
         }
 
@@ -145,6 +163,7 @@ module User =
                 "isCanceled", JBit user.Subscription.IsCanceled
                 "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
             ]
+            "tags", JStr.arr Tag.asString user.Tags
         ]
 
     let asJsonString = asJson >> Json.asString Indented
@@ -158,6 +177,7 @@ module Example =
         let user =
             User.parser
             |> Parser.parse expected
+            |> Result.mapError ParserError.asString
             |> Expect.ok
 
         let actual = User.asJsonString user

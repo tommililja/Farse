@@ -29,6 +29,7 @@ type User = {
     Email: string
     Profiles: Guid Set
     Subscription: Subscription
+    Tags: string list
 }
 
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
@@ -51,6 +52,7 @@ type JsonBenchmarks() =
                 "isCanceled", JBit false
                 "renewsAt", JStr.nil id <| Some "2026-12-25T10:30:00Z"
             ]
+            "tags", JArr [ JStr "beta"; JStr "verified" ]
         ]
         |> Json.asString Indented
 
@@ -101,6 +103,8 @@ type ParserBenchmarks() =
             let _ = subscription.GetValue("isCanceled").Value<bool>()
             let _ = subscription.GetValue("renewsAt") |> asOption _.Value<DateTime>()
 
+            let _ = user.GetValue("tags") |> Seq.map _.Value<string>()
+
             ()
 
     [<Benchmark(Description = "System.Text.Json")>]
@@ -125,6 +129,8 @@ type ParserBenchmarks() =
             let _ = subscription.GetProperty("isCanceled").GetBoolean()
             let _ = subscription.GetProperty("renewsAt") |> asOption _.GetDateTime()
 
+            let _ = user.GetProperty("tags").EnumerateArray() |> Seq.map _.GetString()
+
             ()
 
     [<Benchmark(Description = "Thoth.Json.Net")>]
@@ -146,6 +152,7 @@ type ParserBenchmarks() =
                 let _ = get.Required.Field "email" Thoth.Json.Net.Decode.string
                 let _ = get.Required.Field "profiles" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.guid)
                 let _ = get.Required.Field "subscription" subscription
+                let _ = get.Required.Field "tags" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.string)
 
                 ()
             )
@@ -173,6 +180,7 @@ type ParserBenchmarks() =
                 let _ = get.Required.Field "email" Decode.string
                 let _ = get.Required.Field "profiles" (Decode.array Decode.guid)
                 let _ = get.Required.Field "subscription" subscription
+                let _ = get.Required.Field "tags" (Decode.array Decode.string)
 
                 ()
             )
@@ -190,6 +198,7 @@ type ParserBenchmarks() =
                 and! _ = "age" ?= Parse.byte
                 and! _ = "email" &= Parse.string
                 and! _ = "profiles" &= Parse.array Parse.guid
+                and! _ = "tags" &= Parse.array Parse.string
 
                 and! _ = "subscription" &= parser {
                     let! _ = "plan" &= Parse.string
