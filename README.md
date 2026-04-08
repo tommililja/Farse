@@ -7,7 +7,7 @@
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
-Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while producing detailed and helpful error messages.
+Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while producing detailed errors.
 
 ## Installation
 
@@ -398,7 +398,7 @@ module User =
 
 ### Reading into Json
 
-Json can also be created from a string or stream.
+The Json type can be created from a string.
 
 ```fsharp
 let json =
@@ -406,6 +406,8 @@ let json =
     |> Json.fromString
     |> Result.defaultWith (_.Message >> failwith)
 ```
+
+It can also be created asynchronously from a stream.
 
 ```fsharp
 task {
