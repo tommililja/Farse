@@ -355,32 +355,31 @@ module Parse =
         Parser (fun element ->
             match element.ValueKind with
             | Kind.Array ->
-                let mutable error = None
+                let mutable error = false
                 let mutable enumerator = element.EnumerateArray()
+                let mutable i = 0
 
-                let array =
+                let items =
                     element.GetArrayLength()
-                    |> ResizeArray
+                    |> Array.zeroCreate
 
-                while error.IsNone && enumerator.MoveNext() do
+                while not error && enumerator.MoveNext() do
                     match parse enumerator.Current with
-                    | Ok x -> array.Add(x)
-                    | Error errors -> error <- Some (errors, array.Count)
+                    | Ok x -> items[i] <- x; i <- i + 1
+                    | Error _ -> error <- true
 
                 match error with
-                | None -> Ok <| convert (array :> seq<_>)
-                | Some (errors, index) ->
-                    let array = ResizeArray()
-                    array.Add(errors, index)
+                | false -> Ok <| convert items
+                | true ->
+                    let errors = ResizeArray()
+                    let elements = element.EnumerateArray () |> Seq.indexed
 
-                    let mutable i = index + 1
-                    while enumerator.MoveNext() do
-                        match parse enumerator.Current with
+                    for i, element in elements do
+                        match parse element with
                         | Ok _ -> ()
-                        | Error errors -> array.Add(errors, i)
-                        i <- i + 1
+                        | Error list -> errors.Add(list, i)
 
-                    array
+                    errors
                     |> List.ofSeq
                     |> List.map (fun (errors, n) ->
                         errors
@@ -412,7 +411,7 @@ module Parse =
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
     /// <example>let! seq = "prop" &amp;= Parse.seq Parse.int</example>
     /// <param name="parser">The parser used for every element.</param>
-    let seq parser = arr id parser
+    let seq parser = arr Seq.ofSeq parser
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <example>let! int = "prop" &amp;= Parse.index 0 Parse.int</example>
@@ -449,37 +448,37 @@ module Parse =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
-                let mutable error = None
+                let mutable error = false
                 let mutable enumerator = element.EnumerateObject()
 
-                let array =
+                let items =
                     element.GetPropertyCount()
                     |> ResizeArray
 
-                while error.IsNone && enumerator.MoveNext() do
+                while not error && enumerator.MoveNext() do
                     let current = enumerator.Current
                     match parse current.Value with
-                    | Ok x -> array.Add(current.Name, x)
-                    | Error errors -> error <- Some (errors, current.Name)
+                    | Ok x -> items.Add(current.Name, x)
+                    | Error _ -> error <- true
 
                 match error with
-                | None ->
-                    match getDuplicateKeys array with
-                    | [] -> Ok <| convert (array :> seq<_>)
+                | false ->
+                    match getDuplicateKeys items with
+                    | [] -> Ok <| convert items
                     | keys ->
                         keys
                         |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
                         |> Error
-                | Some (errors, name) ->
-                    let array = ResizeArray()
-                    array.Add(errors, name)
+                | true ->
+                    let errors = ResizeArray()
+                    let elements = element.EnumerateObject ()
 
-                    while enumerator.MoveNext() do
-                        match parse enumerator.Current.Value with
+                    for element in elements do
+                        match parse element.Value with
                         | Ok _ -> ()
-                        | Error errors -> array.Add(errors, name)
+                        | Error list -> errors.Add(list, element.Name)
 
-                    array
+                    errors
                     |> List.ofSeq
                     |> List.map (fun (errors, name) ->
                         errors
@@ -511,7 +510,7 @@ module Parse =
     /// <summary>Parses an object's properties as tuple Microsoft.FSharp.Collections.seq.</summary>
     /// <example>let! tuples = "prop" &amp;= Parse.tuples Parse.int</example>
     /// <param name="parser">The parser used for every property value.</param>
-    let tuples parser = keyValue id parser
+    let tuples parser = keyValue Seq.ofSeq parser
 
     /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq.</summary>
     /// <example>let! keys = "prop" &amp;= Parse.keys</example>

@@ -7,7 +7,7 @@ Error[0]:
    = "1"
 
 Error[1]:
-  at $.prop.key1
+  at $.prop.key2
    | Tried parsing 'Int32.
    | Expected Number, but got String.
    = "2"

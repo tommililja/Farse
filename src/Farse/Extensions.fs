@@ -86,6 +86,10 @@ module internal Extensions =
         let inline defaultValue v =
             Result.map (Option.defaultValue v)
 
+    module Seq =
+
+        let ofSeq x = x :> seq<_>
+
     [<AutoOpen>]
     module ActivePatterns =
 
