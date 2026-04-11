@@ -79,7 +79,6 @@ let (&=) = Prop.req
 // Parses an optional property.
 let (?=) = Prop.opt
 ```
-> Note: These are optional.
 
 We can create this simple parser.  
 
