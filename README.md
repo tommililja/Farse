@@ -337,8 +337,8 @@ let! age = "age" ?= valid byte Age.fromByte
 Validation can also be combined with sequences.
 
 ```fsharp
-let! tags = "tags" ?= list tag // Custom parser.
-let! tags = "tags" ?= list (valid string Tag.fromString)
+let! tags = "tags" &= list tag // Custom parser.
+let! tags = "tags" &= list (valid string Tag.fromString)
 ```
 
 ### Errors
