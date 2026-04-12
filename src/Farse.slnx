@@ -2,6 +2,7 @@
     <Folder Name="/Solution/">
         <File Path="..\LICENSE.md" />
         <File Path="..\README.md" />
+        <File Path="..\.editorconfig"/>
         <File Path="Directory.Build.props" />
     </Folder>
     <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj" />
