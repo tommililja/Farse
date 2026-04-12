@@ -330,14 +330,14 @@ let! x = "prop" &= attempt [ a; b ]
 Validation errors produce the same information as parsing errors.
 
 ```fsharp
-let! age = "age" ?= age // Custom parser.
+let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
 ```
 
 Validation can also be combined with sequences.
 
 ```fsharp
-let! tags = "tags" &= list tag // Custom parser.
+let! tags = "tags" &= list tag
 let! tags = "tags" &= list (valid string Tag.fromString)
 ```
 
