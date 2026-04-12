@@ -377,15 +377,16 @@ module Parse =
                     for i, element in elements do
                         match parse element with
                         | Ok _ -> ()
-                        | Error list -> errors.Add(list, i)
+                        | Error list ->
+                            list
+                            |> List.iter (fun error ->
+                                error
+                                |> ParseError.withIndex i
+                                |> errors.Add
+                            )
 
                     errors
                     |> List.ofSeq
-                    |> List.map (fun (errors, n) ->
-                        errors
-                        |> List.map (ParseError.withIndex n)
-                    )
-                    |> List.concat
                     |> Error
             | _ ->
                 element
@@ -450,15 +451,16 @@ module Parse =
             | Kind.Object ->
                 let mutable error = false
                 let mutable enumerator = element.EnumerateObject()
+                let mutable i = 0
 
                 let items =
                     element.GetPropertyCount()
-                    |> ResizeArray
+                    |> Array.zeroCreate
 
                 while not error && enumerator.MoveNext() do
                     let current = enumerator.Current
                     match parse current.Value with
-                    | Ok x -> items.Add(current.Name, x)
+                    | Ok x -> items[i] <- current.Name, x; i <- i + 1
                     | Error _ -> error <- true
 
                 match error with
@@ -476,15 +478,16 @@ module Parse =
                     for element in elements do
                         match parse element.Value with
                         | Ok _ -> ()
-                        | Error list -> errors.Add(list, element.Name)
+                        | Error list ->
+                            list
+                            |> List.iter (fun error ->
+                                error
+                                |> ParseError.withProp element.Name
+                                |> errors.Add
+                            )
 
                     errors
                     |> List.ofSeq
-                    |> List.map (fun (errors, name) ->
-                        errors
-                        |> List.map (ParseError.withProp name)
-                    )
-                    |> List.concat
                     |> Error
             | _ ->
                 element
