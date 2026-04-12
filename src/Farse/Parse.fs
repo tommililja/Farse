@@ -614,17 +614,17 @@ module Parse =
         Parser (fun element ->
             match element.ValueKind with
             | Kind.Object ->
-                result {
-                    let (Parser parse) = Prop.req name string
-                    let! value = parse element
-                    match List.tryFind (fun (key, _) -> key = value) parsers with
-                    | Some (_, Parser parse) -> return! parse element
+                let (Parser parse) = Prop.req name string
+                parse element
+                |> Result.bind (fun x ->
+                    let parser = List.tryFind (fun (key, _) -> key = x) parsers
+                    match parser with
+                    | Some (_, Parser parse) -> parse element
                     | None ->
-                        return!
-                            element
-                            |> ParseError.invalidOneOf value typeof<'r>
-                            |> Error.list
-                }
+                        element
+                        |> ParseError.invalidOneOf x typeof<'r>
+                        |> Error.list
+                )
             | _ ->
                 element
                 |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
