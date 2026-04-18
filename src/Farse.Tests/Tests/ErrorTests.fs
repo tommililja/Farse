@@ -617,3 +617,9 @@ module ErrorTests =
             Prop.req "prop" (Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz")
             |> Parser.parse """{ "prop": "2025-05-13 17:28 +02:00" }"""
             |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when regex does not match`` () =
+            Prop.req "prop" (Parse.stringRegex "^[0-9]+$")
+            |> Parser.parse """{ "prop": "abc" }"""
+            |> Expect.errorString

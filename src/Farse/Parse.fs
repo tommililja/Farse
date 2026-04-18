@@ -6,6 +6,7 @@ open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
 open System.Text.Json
+open System.Text.RegularExpressions
 
 module Parse =
 
@@ -163,6 +164,18 @@ module Parse =
             | str when not <| String.IsNullOrWhiteSpace(str) -> Ok str
             | _ -> Error "Expected a non-empty string."
          ) ExpectedKind.String
+
+    /// <summary>Parses a string as System.String that matches the given regular expression.</summary>
+    /// <example>let! string = "prop" &amp;= Parse.stringRegex "^[0-9]+$"</example>
+    /// <param name="regex">The regular expression to match.</param>
+    let stringRegex ([<StringSyntax("Regex")>] regex:string) =
+        custom (fun element ->
+            try
+                let str = element.GetString()
+                if Regex.IsMatch(str, regex) then Ok str
+                else Error $"Expected string to match '%s{regex}'."
+            with :? ArgumentException -> Error $"Invalid regular expression '%s{regex}'."
+        ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as System.Byte array.</summary>
     /// <example>let! bytes = "prop" &amp;= Parse.bytesFromBase64</example>

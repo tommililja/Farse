@@ -337,6 +337,15 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse string with regex`` () =
+        let expected = "12345"
+        let actual =
+            Prop.req "prop" (Parse.stringRegex "^[0-9]+$")
+            |> Parser.parse """{ "prop": "12345" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse bool as bool`` () =
         let expected = true
         let actual =
