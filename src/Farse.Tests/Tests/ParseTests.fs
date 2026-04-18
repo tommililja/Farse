@@ -309,6 +309,15 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse non-empty string as string`` () =
+        let expected = "text"
+        let actual =
+            Prop.req "prop" Parse.stringNonEmpty
+            |> Parser.parse """{ "prop": "text" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse string as BigInteger`` () =
         let expected = BigInteger.Parse "1234567890123456789012345678901234567890"
         let actual =

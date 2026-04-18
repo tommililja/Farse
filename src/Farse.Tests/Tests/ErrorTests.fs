@@ -398,6 +398,18 @@ module ErrorTests =
     module Parse =
 
         [<Fact>]
+        let ``Should return Error when parsing empty string`` () =
+            Prop.req "prop" Parse.stringNonEmpty
+            |> Parser.parse """{ "prop": "" }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when parsing whitespace string`` () =
+            Prop.req "prop" Parse.stringNonEmpty
+            |> Parser.parse """{ "prop": "  " }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when custom parser does not match expected kind`` () =
             let parser : Parser<int> =
                 Parse.custom (fun _ ->

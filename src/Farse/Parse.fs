@@ -155,6 +155,15 @@ module Parse =
     /// <example>let! string = "prop" &amp;= Parse.string</example>
     let string = custom (_.GetString() >> Ok) ExpectedKind.String
 
+    /// <summary>Parses a non-empty, non-whitespace string as System.String.</summary>
+    /// <example>let! string = "prop" &amp;= Parse.stringNonEmpty</example>
+    let stringNonEmpty =
+        custom (fun element ->
+            match element.GetString() with
+            | str when not <| String.IsNullOrWhiteSpace(str) -> Ok str
+            | _ -> Error "Expected a non-empty string."
+         ) ExpectedKind.String
+
     /// <summary>Parses a string as System.Numerics.BigInteger.</summary>
     /// <example>let! bigInt = "prop" &amp;= Parse.bigInt</example>
     let bigInt =
