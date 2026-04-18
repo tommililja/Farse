@@ -164,6 +164,10 @@ module Parse =
             | _ -> Error "Expected a non-empty string."
          ) ExpectedKind.String
 
+    /// <summary>Parses a base64 string as System.Byte array.</summary>
+    /// <example>let! bytes = "prop" &amp;= Parse.bytesFromBase64</example>
+    let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String
+
     /// <summary>Parses a string as System.Numerics.BigInteger.</summary>
     /// <example>let! bigInt = "prop" &amp;= Parse.bigInt</example>
     let bigInt =

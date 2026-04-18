@@ -3,6 +3,7 @@ namespace Farse.Tests
 open System
 open System.Collections.Generic
 open System.Numerics
+open System.Text
 open System.Text.Json
 open Xunit
 open Farse
@@ -101,6 +102,15 @@ module ParseTests =
         let actual =
             Prop.req "prop" Parse.byte
             |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse base64 string byte array`` () =
+        let expected = Convert.FromBase64String("aGVsbG8gc3RyYW5nZXIh")
+        let actual =
+            Prop.req "prop" Parse.base64Bytes
+            |> Parser.parse """{ "prop": "aGVsbG8gc3RyYW5nZXIh" }"""
             |> Expect.ok
         Expect.equal actual expected
 
