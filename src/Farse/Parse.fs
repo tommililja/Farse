@@ -515,7 +515,7 @@ module Parse =
                     |> Error
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'r>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
