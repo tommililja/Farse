@@ -34,7 +34,7 @@ module private ExpectedKind =
         | Kind.Number -> ExpectedKind.Number
         | Kind.Object -> ExpectedKind.Object
         | Kind.String -> ExpectedKind.String
-        | Kind.True | JsonValueKind.False -> ExpectedKind.Bool
+        | Kind.True | Kind.False -> ExpectedKind.Bool
         | Kind.Undefined -> ExpectedKind.Undefined
 
     let asString = function
