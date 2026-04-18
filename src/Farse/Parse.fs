@@ -36,7 +36,6 @@ module Parse =
 
     /// <summary>Validates a parsed value with the given function.</summary>
     /// <example>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</example>
-    /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <param name="fn">The validation function.</param>
     let valid (Parser parse) fn : Parser<'r> =
         Parser (fun element ->
@@ -61,7 +60,6 @@ module Parse =
     ///             | result -> Error result.Exception.Message
     ///         ) ExpectedKind.String
     /// </example>
-    /// <remarks>Produces detailed error messages when validation fails.</remarks>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
     let custom fn expectedKind : Parser<'r> =
