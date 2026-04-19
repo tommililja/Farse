@@ -46,6 +46,16 @@ module ParserTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should filter Parser value and return expected values`` () =
+        let expected = seq [ 1; 2; 3 ]
+        let actual =
+            Parse.list Parse.int
+            |> Parser.filter (fun x -> x > 0)
+            |> Parser.parse "[ -2, 1, 0, 2, 3 ]"
+            |> Expect.ok
+        Expect.equalSeq actual expected
+
+    [<Fact>]
     let ``Should ignore Parser value and return unit`` () =
         let expected = ()
         let actual =

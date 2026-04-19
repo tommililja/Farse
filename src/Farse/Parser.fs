@@ -66,6 +66,15 @@ module Parser =
             |> Result.map fn
         )
 
+    /// <summary>Filters the parsed sequence with the given predicate.</summary>
+    /// <example>let! positive = "prop" &amp;= Parse.list Parse.int |> Parser.filter (fun x -> x > 0)</example>
+    /// <param name="fn">The predicate.</param>
+    let inline filter ([<InlineIfLambda>] fn) (Parser parse) =
+        Parser (fun element ->
+            parse element
+            |> Result.map (Seq.filter fn)
+        )
+
     /// <summary>Ignores a parsed value.</summary>
     /// <example>do! "prop" &amp;= Parse.int |> Parser.ignore</example>
     let inline ignore<'a> (Parser parse) =
