@@ -768,3 +768,12 @@ module ParseTests =
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should return Ok when value is validated`` () =
+        let expected = 1
+        let actual =
+            Prop.req "prop" (Parse.validated Parse.int (fun x -> x > 0) "Error")
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected

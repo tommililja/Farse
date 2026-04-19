@@ -35,7 +35,7 @@ module Parse =
                 |> Result.map Some
         )
 
-    /// <summary>Validates a parsed value with the given function.</summary>
+    /// <summary>Validates the parsed value with the given function.</summary>
     /// <example>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</example>
     /// <param name="fn">The validation function.</param>
     let valid (Parser parse) fn : Parser<'r> =
@@ -49,6 +49,21 @@ module Parse =
                     |> List.singleton
                 )
             )
+        )
+
+    /// <summary>Validates the parsed value against the given predicate.</summary>
+    /// <example>let! int = "prop" &amp;= Parse.validated Parse.int (fun x -> x > 0) "message"</example>
+    /// <param name="fn">The predicate.</param>
+    /// <param name="msg">The error message.</param>
+    let validated (Parser parse) fn msg : Parser<'r> =
+        Parser (fun element ->
+            match parse element with
+            | Ok x when fn x -> Ok x
+            | Ok x ->
+                element
+                |> ParseError.validation msg typeof<'r> $"%A{x}"
+                |> Error.list
+            | Error e -> Error e
         )
 
     /// <summary>Creates a custom parser from the given function.</summary>

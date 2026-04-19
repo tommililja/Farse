@@ -456,6 +456,12 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
+        let ``Should return Error when value is not validated`` () =
+            Prop.req "prop" (Parse.validated Parse.int (fun x -> x > 0) "Not valid.")
+            |> Parser.parse """{ "prop": 0 }"""
+            |> Expect.errorString
+
+        [<Fact>]
         let ``Should return Error when parsing Map with duplicate keys`` () =
             Prop.req "prop" (Parse.map Parse.int)
             |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""

@@ -327,11 +327,12 @@ let! x = "prop" &= attempt [ a; b ]
 
 ## Validation
 
-Validation errors produce the same information as parsing errors.
+There are a few different ways to validate parsed values.
 
 ```fsharp
 let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
+let! age = "age" ?= validated byte (fun x -> x >= 12uy) "The minimum age is 12."
 ```
 
 Validation can also be combined with sequences.
