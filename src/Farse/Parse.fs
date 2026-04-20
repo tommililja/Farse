@@ -460,9 +460,8 @@ module Parse =
     /// <param name="parser">The parser used for the element.</param>
     let index n parser : Parser<'r> =
         Parser (fun (element:JsonElement) ->
-            let arrayLength = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when n >= 0 && arrayLength >= n + 1 -> parseIndex n parser element
+            | Kind.Array when n >= 0 && element.GetArrayLength() >= n + 1 -> parseIndex n parser element
             | Kind.Array ->
                 element
                 |> ParseError.invalidIndex n typeof<'r>
@@ -563,13 +562,14 @@ module Parse =
 
     let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'r> =
         Parser (fun (element:JsonElement) ->
-            let actual = element.GetArrayLength()
             match element.ValueKind with
-            | Kind.Array when actual = expected -> fn element
             | Kind.Array ->
-                element
-                |> ParseError.invalidTuple actual expected typeof<'r>
-                |> Error.list
+                match element.GetArrayLength() with
+                | actual when actual = expected -> fn element
+                | actual ->
+                    element
+                    |> ParseError.invalidTuple actual expected typeof<'r>
+                    |> Error.list
             | _ ->
                 element
                 |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'r>
