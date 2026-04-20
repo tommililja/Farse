@@ -3,7 +3,6 @@ namespace Farse.Tests
 open System
 open System.Collections.Generic
 open System.Numerics
-open System.Text
 open System.Text.Json
 open Xunit
 open Farse

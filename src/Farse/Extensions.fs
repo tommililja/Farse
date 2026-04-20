@@ -26,10 +26,7 @@ module internal Extensions =
 
         let inline tryGetValue (element:JsonElement) =
             match element.ValueKind with
-            | Kind.Null
-            | Kind.Undefined
-            | Kind.Object
-            | Kind.Array -> None
+            | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> None
             | _ -> Some <| element.GetRawText()
 
         // Undefined elements are not clonable.
@@ -43,6 +40,10 @@ module internal Extensions =
 
     module String =
 
+        let inline notEmpty str =
+            String.IsNullOrWhiteSpace str
+            |> not
+
         let indentLines (str:string) =
             str
             |> _.Split('\n')
@@ -51,9 +52,8 @@ module internal Extensions =
 
     module Type =
 
-        let rec getName (x:Type) =
-            match x with
-            | x when x.IsGenericType ->
+        let rec getName = function
+            | (x:Type) when x.IsGenericType ->
                 let name = x.Name.Substring(0, x.Name.IndexOf('`'))
                 let args =
                     x.GetGenericArguments()
@@ -78,17 +78,12 @@ module internal Extensions =
 
     module ResultOption =
 
-        let inline bind ([<InlineIfLambda>] fn) = function
-            | Ok (Some x) -> fn x
-            | Ok None -> Ok None
-            | Error e -> Error e
-
         let inline defaultValue v =
             Result.map (Option.defaultValue v)
 
     module Seq =
 
-        let ofSeq x = x :> seq<_>
+        let inline ofSeq x = x :> seq<_>
 
     [<AutoOpen>]
     module ActivePatterns =

@@ -1,7 +1,5 @@
 namespace Farse
 
-open System
-
 [<AutoOpen>]
 module internal Builders =
 
@@ -25,7 +23,7 @@ module internal Builders =
 
         member inline _.Run(lines) =
             lines
-            |> Seq.filter (String.IsNullOrWhiteSpace >> not)
+            |> Seq.filter String.notEmpty
             |> String.concat "\n"
 
     type ResultBuilder() =
