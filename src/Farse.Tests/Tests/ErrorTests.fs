@@ -456,8 +456,8 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when value is not validated`` () =
-            Prop.req "prop" (Parse.validated Parse.int (fun x -> x > 0) "Not valid.")
+        let ``Should return Error when value is not verified`` () =
+            Prop.req "prop" (Parse.verified Parse.int (fun x -> x > 0) "Not valid.")
             |> Parser.parse """{ "prop": 0 }"""
             |> Expect.errorString
 
