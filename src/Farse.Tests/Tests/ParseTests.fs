@@ -695,7 +695,7 @@ module ParseTests =
     let ``Should parse string as enum`` () =
         let expected = StringEnum.Something
         let actual =
-            Prop.req "prop" Parse.enum
+            Prop.req "prop" Parse.enum<StringEnum>
             |> Parser.parse """{ "prop": "something" }"""
             |> Expect.ok
         Expect.equal actual expected

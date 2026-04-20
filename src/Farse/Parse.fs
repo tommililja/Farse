@@ -227,14 +227,15 @@ module Parse =
         | true, _ -> Error $"Expected %s{enumType.Name} enum."
         | _ -> Error $"Invalid %s{enumType.Name}."
 
-    /// <summary>Parses a string as an enum.</summary>
+    /// <summary>Parses a string as an enum type.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</example>
     let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
         custom (fun element ->
             let str = element.GetString()
+            let enumType = typeof<'a>
             match Enum.TryParse<'a>(str, true) with
-            | true, enum -> Ok enum
-            | _ -> Error $"Invalid %s{typeof<'a>.Name}."
+            | true, enum when Enum.IsDefined(enumType, enum) -> Ok enum
+            | _ -> Error $"Invalid %s{enumType.Name}."
         ) ExpectedKind.String
 
     /// <summary>Parses a number as a System.Int32 enum.</summary>
