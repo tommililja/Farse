@@ -2,6 +2,7 @@ namespace Farse
 
 open System
 open System.Diagnostics.CodeAnalysis
+open System.Globalization
 open System.Numerics
 open System.Text.Json
 open System.Text.Json.Nodes
@@ -9,7 +10,7 @@ open System.Text.Json.Nodes
 [<NoComparison>]
 type Json =
     | JStr of string
-    | JNum of decimal
+    | JNum of string
     | JBit of bool
     | JObj of (string * Json) list
     | JArr of Json list
@@ -24,14 +25,11 @@ type JsonFormat =
 [<AutoOpen>]
 type JNum =
 
-    /// <summary>Converts a number to Json.</summary>
-    /// <remarks>
-    ///     Floating point numbers may lose precision.
-    ///     Consider rounding before passing, or use a decimal literal (e.g. 0.1m) for exact values.
-    /// </remarks>
-    /// <param name="x">The number to convert.</param>
-    static member inline JNum<^a when ^a :> INumber<^a> and ^a: (static member op_Explicit: ^a -> decimal)>(x:^a) =
-        Json.JNum (decimal x)
+    /// <summary>Converts a number to a Json.</summary>
+    /// <param name="number">The number to convert.</param>
+    static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
+        let string = number.ToString("R", CultureInfo.InvariantCulture)
+        Json.JNum string
 
 module JNil =
 
@@ -65,7 +63,7 @@ module JNum =
     /// <summary>A JSON number with the value 0.</summary>
     let zero = JNum 0
 
-    let inline nil<'a, ^b when ^b :> INumber<'b> and ^b: (static member op_Explicit: ^b -> decimal)> (fn:'a -> ^b) =
+    let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
         JNil.from fn JNum
 
     let inline arr fn = JArr.from fn JNum
@@ -108,8 +106,8 @@ module Json =
 
     let rec private getJsonNode = function
         | JStr str -> JsonValue.Create(str).Root
+        | JNum str -> JsonNode.Parse(str)
         | JBit bit -> JsonValue.Create(bit).Root
-        | JNum num -> JsonValue.Create(num).Root
         | JObj obj ->
             let object = JsonObject ()
             for name, json in obj do
@@ -125,7 +123,7 @@ module Json =
     let rec private getJson (element:JsonElement) =
         match element.ValueKind with
         | Kind.String  -> JStr <| element.GetString()
-        | Kind.Number -> Json.JNum <| element.GetDecimal()
+        | Kind.Number -> Json.JNum <| element.GetRawText()
         | Kind.True -> JBit true
         | Kind.False -> JBit false
         | Kind.Object ->
