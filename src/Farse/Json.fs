@@ -25,15 +25,15 @@ type JsonFormat =
 [<AutoOpen>]
 type JNum =
 
-    /// <summary>Converts a number to a Json.</summary>
-    /// <param name="number">The number to convert.</param>
+    /// <summary>Creates a Json from a number.</summary>
+    /// <param name="number">The number.</param>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
         let string = number.ToString("R", CultureInfo.InvariantCulture)
         Json.JNum string
 
-module JNil =
+module internal JNil =
 
-    let inline internal from map fn = function
+    let inline from map fn = function
         | Some x -> (map >> fn) x
         | None -> JNil
 
@@ -50,10 +50,19 @@ module JStr =
     /// <summary>An empty JSON string.</summary>
     let empty = JStr String.Empty
 
-    let inline nil fn = JNil.from fn JStr
+    /// <summary>Creates a JSON string from an optional value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline nil fn x = JNil.from fn JStr x
 
-    let inline arr fn = JArr.from fn JStr
+    /// <summary>Creates a JSON string array from a sequence.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline arr fn x = JArr.from fn JStr x
 
+    /// <summary>Creates a JSON string array from a value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
     let inline singleton fn x =
         List.singleton x
         |> arr fn
@@ -63,21 +72,39 @@ module JNum =
     /// <summary>A JSON number with the value 0.</summary>
     let zero = JNum 0
 
-    let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) =
-        JNil.from fn JNum
+    /// <summary>Creates a JSON number from an optional value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
+        JNil.from fn JNum x
 
-    let inline arr fn = JArr.from fn JNum
+    /// <summary>Creates a JSON number array from a sequence.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline arr fn x = JArr.from fn JNum x
 
+    /// <summary>Creates a JSON number array from a value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
     let inline singleton fn x =
         List.singleton x
         |> arr fn
 
 module JBit =
 
-    let inline nil fn = JNil.from fn JBit
+    /// <summary>Creates a JSON bool from an optional value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline nil fn x = JNil.from fn JBit x
 
-    let inline arr fn = JArr.from fn JBit
+    /// <summary>Creates a JSON bool array from a sequence.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline arr fn x = JArr.from fn JBit x
 
+    /// <summary>Creates a JSON bool array from a value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
     let inline singleton fn x =
         List.singleton x
         |> arr fn
@@ -87,10 +114,19 @@ module JObj =
     /// <summary>An empty JSON object.</summary>
     let empty = JObj List.empty
 
-    let inline nil fn = JNil.from fn JObj
+    /// <summary>Creates a JSON object from an optional value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline nil fn x = JNil.from fn JObj x
 
-    let inline arr fn = JArr.from fn JObj
+    /// <summary>Creates a JSON object array from a sequence.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
+    let inline arr fn x = JArr.from fn JObj x
 
+    /// <summary>Creates a JSON object array from a value.</summary>
+    /// <param name="fn">The mapping function.</param>
+    /// <param name="x">The value.</param>
     let inline singleton fn x =
         List.singleton x
         |> arr fn
@@ -139,7 +175,9 @@ module Json =
         | Kind.Null | Kind.Undefined -> JNil
 
     /// <summary>Sorts all properties in ascending order.</summary>
-    let rec sort = function
+    /// <param name="json">The Json to sort.</param>
+    let rec sort json =
+        match json with
         | JObj list ->
             list
             |> List.sortBy fst
@@ -151,8 +189,8 @@ module Json =
             |> JArr
         | other -> other
 
-    /// <summary>Converts a JSON string to Json.</summary>
-    /// <param name="json">The JSON string to convert.</param>
+    /// <summary>Parses a JSON string to Json.</summary>
+    /// <param name="json">The JSON string to parse.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
             use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
@@ -161,9 +199,9 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Converts a JSON stream asynchronously to Json.</summary>
-    /// <param name="token">The CancellationToken to use.</param>
-    /// <param name="stream">The JSON stream to convert.</param>
+    /// <summary>Parses a JSON string asynchronously to Json.</summary>
+    /// <param name="token">The CancellationToken to monitor.</param>
+    /// <param name="stream">The JSON stream to parse.</param>
     let fromStreamAsync token stream =
         task {
             try

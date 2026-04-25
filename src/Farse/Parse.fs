@@ -14,7 +14,7 @@ module Parse =
     /// <example>do! "prop" &amp;= Parse.none</example>
     let none = Parser.from ()
 
-    /// <summary>Parses an optional value with the given parser but returns a default value when null.</summary>
+    /// <summary>Parses an optional value but returns a default value when null.</summary>
     /// <example>let! int = "prop" &amp;= Parse.nil Parse.int 1</example>
     /// <param name="x">The default value.</param>
     let nil (Parser parse) x =
@@ -24,7 +24,7 @@ module Parse =
             | _ -> parse element
         )
 
-    /// <summary>Parses an optional value with the given parser.</summary>
+    /// <summary>Parses an optional value.</summary>
     /// <example>let! int = "prop" &amp;= Parse.optional Parse.int</example>
     let optional (Parser parse) =
         Parser (fun (element:JsonElement) ->
@@ -35,7 +35,7 @@ module Parse =
                 |> Result.map Some
         )
 
-    /// <summary>Validates the parsed value with the given function.</summary>
+    /// <summary>Validates a parsed value.</summary>
     /// <example>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</example>
     /// <param name="fn">The validation function.</param>
     let valid (Parser parse) fn : Parser<'r> =
@@ -51,7 +51,7 @@ module Parse =
             )
         )
 
-    /// <summary>Verifies the parsed value against the given predicate.</summary>
+    /// <summary>Verifies a parsed value.</summary>
     /// <example>let! int = "prop" &amp;= Parse.verified Parse.int (fun x -> x > 0) "message"</example>
     /// <param name="fn">The predicate.</param>
     /// <param name="msg">The error message.</param>
@@ -66,7 +66,7 @@ module Parse =
             | Error e -> Error e
         )
 
-    /// <summary>Creates a custom parser from the given function.</summary>
+    /// <summary>Creates a custom parser.</summary>
     /// <example>
     ///     let parser =
     ///         Parse.custom (fun element ->
@@ -180,7 +180,7 @@ module Parse =
             | _ -> Error "Expected a non-empty string."
          ) ExpectedKind.String
 
-    /// <summary>Parses a string as System.String that matches the given regular expression.</summary>
+    /// <summary>Parses a string as System.String that matches a regular expression.</summary>
     /// <example>let! string = "prop" &amp;= Parse.stringRegex "^[0-9]+$"</example>
     /// <param name="regex">The regular expression to match.</param>
     let stringRegex ([<StringSyntax("Regex")>] regex:string) =
@@ -680,7 +680,8 @@ module Parse =
         self.Value <- parser
         parser
 
-    /// <summary>Parses an element by trying each parser in order, returning the first success.</summary>
+    /// <summary>Parses an element by trying each parser in order.</summary>
+    /// <remarks>Returns the first that succeeds.</remarks>
     /// <example>let! x = Parse.attempt [ a; b ]</example>
     /// <param name="parsers">The list of parsers to try.</param>
     let attempt parsers : Parser<'r> =

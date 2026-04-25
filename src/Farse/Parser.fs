@@ -9,13 +9,14 @@ type Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 
 module Parser =
 
-    /// <summary>Returns a parser with the given value.</summary>
+    /// <summary>Creates a parser from a value.</summary>
+    /// <remarks>This parser will always succeed.</remarks>
     /// <example>let! int = Parser.from 1</example>
     /// <param name="x">The value to return.</param>
     let inline from x =
         Parser (fun _ -> Ok x)
 
-    /// <summary>Returns a parser with the given result.</summary>
+    /// <summary>Creates a parser from a result.</summary>
     /// <example>let! int = Ok 1 |> Parser.fromResult</example>
     /// <param name="x">The result to return.</param>
     let fromResult x : Parser<'r> =
@@ -28,16 +29,16 @@ module Parser =
             )
         )
 
-    /// <summary>Returns a parser that will fail.</summary>
+    /// <summary>Creates a parser that will fail.</summary>
     /// <example>do! Parser.fail "message"</example>
     /// <param name="msg">The error message to return.</param>
     let inline fail msg =
         Error msg
         |> fromResult
 
-    /// <summary>Recover from an error with the given value.</summary>
+    /// <summary>Recovers from an error with a default value.</summary>
     /// <example>let! int = "prop" &amp;= Parser.fail "msg" |> Parser.recover 0</example>
-    /// <param name="x">The value to return.</param>
+    /// <param name="x">The default value to return.</param>
     let inline recover x (Parser parse) =
         Parser (fun element ->
             parse element
@@ -45,7 +46,7 @@ module Parser =
             |> Ok
         )
 
-    /// <summary>Binds a parsed value with the given function.</summary>
+    /// <summary>Binds a parsed value.</summary>
     /// <example>let! int = "prop" &amp;= Parse.int |> Parser.bind Parser.from</example>
     /// <param name="fn">The binding function.</param>
     let inline bind ([<InlineIfLambda>] fn) (Parser parse) =
@@ -57,7 +58,7 @@ module Parser =
             )
         )
 
-    /// <summary>Maps a parsed value with the given function.</summary>
+    /// <summary>Maps a parsed value.</summary>
     /// <example>let! string = "prop" &amp;= Parse.int |> Parser.map string</example>
     /// <param name="fn">The mapping function.</param>
     let inline map ([<InlineIfLambda>] fn) (Parser parse) =
@@ -66,9 +67,9 @@ module Parser =
             |> Result.map fn
         )
 
-    /// <summary>Filters the parsed sequence with the given predicate.</summary>
+    /// <summary>Filters a parsed sequence.</summary>
     /// <example>let! positive = "prop" &amp;= Parse.list Parse.int |> Parser.filter (fun x -> x > 0)</example>
-    /// <param name="fn">The predicate.</param>
+    /// <param name="fn">The predicate to filter by.</param>
     let inline filter ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
             parse element
@@ -83,16 +84,16 @@ module Parser =
             |> Result.map ignore<'a>
         )
 
-    /// <summary>Sets a default value for a parsed option.</summary>
+    /// <summary>Returns the parsed value or a default value.</summary>
     /// <example>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</example>
-    /// <param name="x">The default value.</param>
+    /// <param name="x">The default value to return.</param>
     let inline defaultValue x (Parser parse) =
         Parser (fun element ->
             parse element
             |> ResultOption.defaultValue x
         )
 
-    /// <summary>Parses a JSON string with the given parser.</summary>
+    /// <summary>Parses a JSON string.</summary>
     /// <param name="json">The JSON string to parse.</param>
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
@@ -103,9 +104,9 @@ module Parser =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error <| Json exn
 
-    /// <summary>Parses a JSON stream asynchronously with the given parser.</summary>
+    /// <summary>Parses a JSON stream asynchronously.</summary>
     /// <param name="stream">The JSON stream to parse.</param>
-    /// <param name="token">The CancellationToken to use.</param>
+    /// <param name="token">The CancellationToken to monitor.</param>
     let parseAsync stream token (Parser parse) =
         task {
             try

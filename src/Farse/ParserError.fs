@@ -174,7 +174,9 @@ type ParserError =
 module ParserError =
 
     /// <summary>Converts a ParserError to a formatted string.</summary>
-    let asString = function
+    /// <param name="error">The ParserError to convert.</param>
+    let asString error =
+        match error with
         | Json exn -> $"Could not parse JSON: %s{exn.Message}"
         | Errors list ->
             list

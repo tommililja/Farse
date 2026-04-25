@@ -100,7 +100,7 @@ module Prop =
                 |> Error.list
         )
 
-    /// <summary>Parses a required property with the given parser.</summary>
+    /// <summary>Parses a required property.</summary>
     /// <example>let! int = Prop.req "prop.prop2" Parse.int</example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
@@ -109,7 +109,7 @@ module Prop =
         | Prop name -> parse name parser
         | Path path -> traverse path parser
 
-    /// <summary>Parses an optional property with the given parser.</summary>
+    /// <summary>Parses an optional property.</summary>
     /// <example>let! int = Prop.opt "prop.prop2" Parse.int</example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
