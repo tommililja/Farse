@@ -84,9 +84,9 @@ We can create this simple parser.
 
 ```fsharp
 open Farse
-open Farse.Operators
 
 module User =
+    open Operators
     open Parse
 
     let parser =

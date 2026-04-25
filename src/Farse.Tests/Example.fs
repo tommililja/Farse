@@ -1,7 +1,6 @@
 namespace Farse.Tests
 
 open Farse
-open Farse.Operators
 open NodaTime
 open NodaTime.Text
 open System
@@ -112,6 +111,7 @@ module Parse =
         ) ExpectedKind.String
 
 module User =
+    open Operators
     open Parse
 
     let parser =
