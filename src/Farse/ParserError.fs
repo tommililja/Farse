@@ -160,7 +160,7 @@ module ParseError =
             $"at %s{JsonPath.asString error.Path}"
             $" | Tried parsing '%s{Type.getName error.Type}."
 
-            if String.notEmpty error.Details then
+            if String.isNotEmpty error.Details then
                 $" | %s{error.Details}"
 
             Option.map (sprintf " = %s") error.Value

@@ -40,9 +40,7 @@ module internal Extensions =
 
     module String =
 
-        let inline notEmpty str =
-            String.IsNullOrWhiteSpace str
-            |> not
+        let isNotEmpty = String.IsNullOrWhiteSpace >> not
 
         let indentLines (str:string) =
             str

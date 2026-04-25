@@ -176,7 +176,7 @@ module Parse =
     let stringNonEmpty =
         custom (fun element ->
             match element.GetString() with
-            | str when String.notEmpty str -> Ok str
+            | str when String.isNotEmpty str -> Ok str
             | _ -> Error "Expected a non-empty string."
          ) ExpectedKind.String
 
