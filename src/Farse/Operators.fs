@@ -1,8 +1,5 @@
-namespace Farse.Operators
+namespace Farse
 
-open Farse
-
-[<AutoOpen>]
 module Operators =
 
     /// <summary>Parses a required property.</summary>
