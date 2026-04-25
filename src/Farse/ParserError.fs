@@ -7,7 +7,7 @@ type JsonPath = JsonPath of string list
 
 module JsonPath =
 
-    let empty = JsonPath []
+    let internal empty = JsonPath []
 
     let inline internal prop name =
         JsonPath [ $".%s{name}" ]
@@ -73,7 +73,7 @@ module ParseError =
             Exn = Some exn
         }
 
-    let expectedKind expectedKind path type' element =
+    let internal expectedKind expectedKind path type' element =
         {
             Path = path
             Element = JsonElement.clone element
@@ -117,7 +117,7 @@ module ParseError =
             Exn = None
         }
 
-    let attempt parsers type' element =
+    let internal attempt parsers type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element

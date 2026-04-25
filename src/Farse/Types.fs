@@ -26,7 +26,7 @@ type ExpectedKind =
     | String
     | Undefined
 
-module private ExpectedKind =
+module internal ExpectedKind =
 
     let fromKind = function
         | Kind.Array -> ExpectedKind.Array
