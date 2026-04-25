@@ -606,16 +606,53 @@ module ParseTests =
     let ``Should parse one-of as discriminated union`` () =
         let expected = A (1, 2)
         let actual =
-            Prop.req "prop" (Parse.oneOf "disc"
-                [ "a",
-                    parser {
-                        let! a = Prop.req "prop2" Parse.int
-                        let! b = Prop.req "prop3" Parse.int
+            Prop.req "prop" (Parse.oneOf "disc" [
+                "a", parser {
+                    let! a = Prop.req "prop2" Parse.int
+                    let! b = Prop.req "prop3" Parse.int
 
-                        return A (a, b)
-                    }
-                ])
+                    return A (a, b)
+                }
+            ])
             |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    type Tree =
+        | Leaf of int
+        | Branch of Tree * Tree
+
+    [<Fact>]
+    let ``Should parse one-of as recursive discriminated union`` () =
+        let expected = Branch (Leaf 1, Branch (Leaf 2, Leaf 3))
+        let actual =
+            Parse.self (fun self ->
+                Parse.oneOf "type" [
+                    "leaf",
+                        parser {
+                            let! value = Prop.req "value" Parse.int
+                            return Leaf value
+                        }
+                    "branch",
+                        parser {
+                            let! left = Prop.req "left" self
+                            let! right = Prop.req "right" self
+                            return Branch (left, right)
+                        }
+                ]
+            )
+            |> Parser.parse
+               """
+                    {
+                        "type": "branch",
+                        "left": { "type": "leaf", "value": 1 },
+                        "right": {
+                            "type": "branch",
+                            "left": { "type": "leaf", "value": 2 },
+                            "right": { "type": "leaf", "value": 3 }
+                        }
+                    }
+               """
             |> Expect.ok
         Expect.equal actual expected
 

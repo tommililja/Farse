@@ -647,7 +647,7 @@ module Parse =
     // One-of
 
     /// <summary>Parses an object based on a discriminator property.</summary>
-    /// <example>let! x = Parse.oneOf "type" [ "A", a; "B", b ]</example>
+    /// <example>let! x = Parse.oneOf "type" [ "a", a; "b", b ]</example>
     /// <param name="name">The discriminator property name.</param>
     /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
@@ -670,6 +670,15 @@ module Parse =
                 |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
+
+    /// <summary>Creates a recursive parser that allows a parser to reference itself.</summary>
+    /// <example>let! x = Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</example>
+    /// <param name="fn">A function that receives a self-referencing parser.</param>
+    let self (fn:Parser<'r> -> Parser<'r>) : Parser<'r> =
+        let self = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
+        let parser = fn (Parser (fun element -> let (Parser parse) = self.Value in parse element))
+        self.Value <- parser
+        parser
 
     /// <summary>Parses an element by trying each parser in order, returning the first success.</summary>
     /// <example>let! x = Parse.attempt [ a; b ]</example>
