@@ -52,12 +52,12 @@ module JStr =
 
     /// <summary>Creates a JSON string from an optional value.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The optional value.</param>
     let inline nil fn x = JNil.from fn JStr x
 
     /// <summary>Creates a JSON string array from a sequence.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JStr x
 
     /// <summary>Creates a JSON string array from a value.</summary>
@@ -74,13 +74,13 @@ module JNum =
 
     /// <summary>Creates a JSON number from an optional value.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The optional value.</param>
     let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JNil.from fn JNum x
 
     /// <summary>Creates a JSON number array from a sequence.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JNum x
 
     /// <summary>Creates a JSON number array from a value.</summary>
@@ -94,12 +94,12 @@ module JBit =
 
     /// <summary>Creates a JSON bool from an optional value.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The optional value.</param>
     let inline nil fn x = JNil.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a sequence.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a value.</summary>
@@ -116,12 +116,12 @@ module JObj =
 
     /// <summary>Creates a JSON object from an optional value.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The optional value.</param>
     let inline nil fn x = JNil.from fn JObj x
 
     /// <summary>Creates a JSON object array from a sequence.</summary>
     /// <param name="fn">The mapping function.</param>
-    /// <param name="x">The value.</param>
+    /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JObj x
 
     /// <summary>Creates a JSON object array from a value.</summary>
