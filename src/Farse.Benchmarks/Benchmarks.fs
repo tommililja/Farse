@@ -52,7 +52,10 @@ type JsonBenchmarks() =
                 "isCanceled", JBit false
                 "renewsAt", JStr.nil id <| Some "2026-12-25T10:30:00Z"
             ]
-            "tags", JArr [ JStr "beta"; JStr "verified" ]
+            "tags", JArr [
+                JStr "beta"
+                JStr "verified"
+            ]
         ]
         |> Json.asString Indented
 

@@ -226,3 +226,28 @@ module Json =
                 | Raw -> null
 
             node.ToJsonString(options)
+
+    /// <summary>Writes a Json as a JSON string to a writer.</summary>
+    /// <remarks>The JSON string written raw and not formatted.</remarks>
+    /// <param name="writer">The writer to write to.</param>
+    /// <param name="json">The Json to write.</param>
+    let asStringTo (writer:Utf8JsonWriter) json =
+        let rec write = function
+            | JStr str -> writer.WriteStringValue(str)
+            | JNum str -> writer.WriteRawValue(str)
+            | JBit bit -> writer.WriteBooleanValue(bit)
+            | JObj obj ->
+                writer.WriteStartObject()
+                obj
+                |> List.iter (fun (k, v) ->
+                    writer.WritePropertyName(k)
+                    write v
+                )
+                writer.WriteEndObject()
+            | JArr arr ->
+                writer.WriteStartArray()
+                List.iter write arr
+                writer.WriteEndArray()
+            | JNil -> writer.WriteNullValue()
+
+        write json

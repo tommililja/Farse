@@ -1,12 +1,35 @@
 namespace Farse.Tests
 
 open System.IO
+open System.Text
 open System.Text.Json
 open System.Threading
 open Xunit
 open Farse
 
 module JsonTests =
+
+    let private json =
+        JObj [
+            "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
+            "name", JStr "Alice"
+            "age", JNum 12
+            "email", JStr "alice@domain.com"
+            "profiles", JStr.arr id [
+                "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
+                "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
+                "bf00d1e2-ee53-4969-9507-86bed7e96432"
+            ]
+            "subscription", JObj [
+                "plan", JStr "Pro"
+                "isCanceled", JBit false
+                "renewsAt", JStr "2026-12-25T10:30:00Z"
+            ]
+            "tags", JArr [
+                JStr "beta"
+                JStr "verified"
+            ]
+        ]
 
     [<Fact>]
     let ``Should return Ok when creating Json`` () =
@@ -43,7 +66,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create indented JSON string`` () =
-        JObj [ "value", JNum 1 ]
+        json
         |> Json.asString Indented
         |> Expect.string
 
@@ -57,15 +80,25 @@ module JsonTests =
             )
             |> Custom
 
-        JObj [ "value", JNum 1 ]
+        json
         |> Json.asString options
         |> Expect.string
 
     [<Fact>]
     let ``Should create raw JSON string`` () =
-        JObj [ "value", JNum 1 ]
+        json
         |> Json.asString Raw
         |> Expect.string
+
+    [<Fact>]
+    let ``Should write JSON string to writer`` () =
+        let stream = new MemoryStream()
+        use writer = new Utf8JsonWriter(stream)
+        Json.asStringTo writer json
+        writer.Flush()
+        let expected = Json.asString Raw json
+        let actual = Encoding.UTF8.GetString(stream.ToArray())
+        Expect.equal actual expected
 
     [<Fact>]
     let ``Comparing two Json values should return true`` () =
