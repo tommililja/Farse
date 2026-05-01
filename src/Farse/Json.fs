@@ -240,7 +240,6 @@ module Json =
             node.ToJsonString(options)
 
     /// <summary>Writes a Json as a JSON string to a writer.</summary>
-    /// <remarks>The JSON string is written raw and not formatted.</remarks>
     /// <param name="writer">The writer to write to.</param>
     /// <param name="json">The Json to write.</param>
     let asStringTo (writer:Utf8JsonWriter) json =
