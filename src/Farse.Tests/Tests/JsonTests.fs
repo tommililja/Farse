@@ -53,6 +53,12 @@ module JsonTests =
         }
 
     [<Fact>]
+    let ``Should return Ok when creating Json from bytes`` () =
+        let bytes = Json.asString Indented json |> Encoding.UTF8.GetBytes
+        let actual = Json.fromBytes bytes |> Expect.ok
+        Expect.equal actual json
+
+    [<Fact>]
     let ``Should return Error when creating Json from invalid JSON`` () =
         """{ "prop" 1 }"""
         |> Json.fromString
@@ -92,12 +98,20 @@ module JsonTests =
 
     [<Fact>]
     let ``Should write JSON string to writer`` () =
-        let stream = new MemoryStream()
-        use writer = new Utf8JsonWriter(stream)
-        Json.asStringTo writer json
-        writer.Flush()
-        let expected = Json.asString Raw json
-        let actual = Encoding.UTF8.GetString(stream.ToArray())
+        task {
+            let stream = new MemoryStream()
+            use writer = new Utf8JsonWriter(stream)
+            Json.asStringTo writer json
+            do! writer.FlushAsync()
+            let expected = Json.asString Raw json
+            let actual = Encoding.UTF8.GetString(stream.ToArray())
+            Expect.equal actual expected
+        }
+
+    [<Fact>]
+    let ``Should return bytes from JSON string`` () =
+        let expected = Json.asString Indented json |> Encoding.UTF8.GetBytes
+        let actual = Json.asBytes Indented json
         Expect.equal actual expected
 
     [<Fact>]

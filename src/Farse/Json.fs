@@ -4,6 +4,7 @@ open System
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
+open System.Text
 open System.Text.Json
 open System.Text.Json.Nodes
 
@@ -140,40 +141,6 @@ module Json =
             NewLine = "\n"
         )
 
-    let rec private getJsonNode = function
-        | JStr str -> JsonValue.Create(str).Root
-        | JNum str -> JsonNode.Parse(str)
-        | JBit bit -> JsonValue.Create(bit).Root
-        | JObj obj ->
-            let object = JsonObject ()
-            for name, json in obj do
-                object.Add(name, getJsonNode json)
-            object :> JsonNode
-        | JArr arr ->
-            let array = JsonArray ()
-            for json in arr do
-                array.Add(getJsonNode json)
-            array :> JsonNode
-        | JNil -> null
-
-    let rec private getJson (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.String  -> JStr <| element.GetString()
-        | Kind.Number -> Json.JNum <| element.GetRawText()
-        | Kind.True -> JBit true
-        | Kind.False -> JBit false
-        | Kind.Object ->
-            element.EnumerateObject()
-            |> Seq.map (fun prop -> prop.Name, getJson prop.Value)
-            |> Seq.toList
-            |> JObj
-        | Kind.Array   ->
-            element.EnumerateArray()
-            |> Seq.map getJson
-            |> Seq.toList
-            |> JArr
-        | Kind.Null | Kind.Undefined -> JNil
-
     /// <summary>Sorts all properties in ascending order.</summary>
     /// <param name="json">The Json to sort.</param>
     let rec sort json =
@@ -189,34 +156,79 @@ module Json =
             |> JArr
         | other -> other
 
-    /// <summary>Parses a JSON string to Json.</summary>
+    /// <summary>Converts a JsonElement to a Json.</summary>
+    /// <param name="element">The JsonElement to convert.</param>
+    let rec fromElement (element:JsonElement) =
+        match element.ValueKind with
+        | Kind.String  -> JStr <| element.GetString()
+        | Kind.Number -> Json.JNum <| element.GetRawText()
+        | Kind.True -> JBit true
+        | Kind.False -> JBit false
+        | Kind.Object ->
+            element.EnumerateObject()
+            |> Seq.map (fun prop -> prop.Name, fromElement prop.Value)
+            |> Seq.toList
+            |> JObj
+        | Kind.Array   ->
+            element.EnumerateArray()
+            |> Seq.map fromElement
+            |> Seq.toList
+            |> JArr
+        | Kind.Null | Kind.Undefined -> JNil
+
+    /// <summary>Parses a JSON string to a Json.</summary>
     /// <param name="json">The JSON string to parse.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
             use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
-            Ok <| getJson document.RootElement
+            Ok <| fromElement document.RootElement
         with
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Parses a JSON string asynchronously to Json.</summary>
+    /// <summary>Parses a JSON string asynchronously to a Json.</summary>
     /// <param name="token">The CancellationToken to monitor.</param>
     /// <param name="stream">The JSON stream to parse.</param>
     let fromStreamAsync token stream =
         task {
             try
                 use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
-                return Ok <| getJson document.RootElement
+                return Ok <| fromElement document.RootElement
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn -> return Error exn
         }
 
+    /// <summary>Parses a byte array to a Json.</summary>
+    /// <param name="bytes">The byte array to parse.</param>
+    let fromBytes (bytes:byte array) =
+        Encoding.UTF8.GetString(bytes)
+        |> fromString
+
+    /// <summary>Converts a Json to a JsonNode.</summary>
+    /// <param name="json">The Json to convert.</param>
+    let rec asJsonNode json =
+        match json with
+        | JStr str -> JsonValue.Create(str).Root
+        | JNum str -> JsonNode.Parse(str)
+        | JBit bit -> JsonValue.Create(bit).Root
+        | JObj obj ->
+            let object = JsonObject ()
+            for name, json in obj do
+                object.Add(name, asJsonNode json)
+            object :> JsonNode
+        | JArr arr ->
+            let array = JsonArray ()
+            for json in arr do
+                array.Add(asJsonNode json)
+            array :> JsonNode
+        | JNil -> null
+
     /// <summary>Converts a Json to a formatted JSON string.</summary>
     /// <param name="format">The format to use.</param>
     /// <param name="json">The Json to convert.</param>
     let asString format json =
-        match getJsonNode json with
+        match asJsonNode json with
         | node when isNull node -> "null"
         | node ->
             let options =
@@ -228,7 +240,7 @@ module Json =
             node.ToJsonString(options)
 
     /// <summary>Writes a Json as a JSON string to a writer.</summary>
-    /// <remarks>The JSON string written raw and not formatted.</remarks>
+    /// <remarks>The JSON string is written raw and not formatted.</remarks>
     /// <param name="writer">The writer to write to.</param>
     /// <param name="json">The Json to write.</param>
     let asStringTo (writer:Utf8JsonWriter) json =
@@ -251,3 +263,10 @@ module Json =
             | JNil -> writer.WriteNullValue()
 
         write json
+
+    /// <summary>Converts a Json to a byte array.</summary>
+    /// <param name="format">The format to use.</param>
+    /// <param name="json">The Json to convert.</param>
+    let asBytes format json =
+        asString format json
+        |> Encoding.UTF8.GetBytes
