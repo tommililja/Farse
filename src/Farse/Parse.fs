@@ -67,7 +67,7 @@ module Parse =
         )
 
     /// <summary>Creates a custom parser.</summary>
-    /// <example>
+    /// <example><code>
     ///     let parser =
     ///         Parse.custom (fun element ->
     ///             let string = element.GetString()
@@ -75,7 +75,7 @@ module Parse =
     ///             | result when result.Success -> Ok result.Value
     ///             | result -> Error result.Exception.Message
     ///         ) ExpectedKind.String
-    /// </example>
+    /// </code></example>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
     let custom fn expectedKind : Parser<'r> =
