@@ -227,6 +227,7 @@ module JsonTests =
             JNum Decimal.MinValue, "-79228162514264337593543950335"
             JNum (Decimal.Parse("12345678900.12345678900", CultureInfo.InvariantCulture)), "12345678900.12345678900"
             JNum (BigInteger.Parse("99999999999999999999999999999")), "99999999999999999999999999999"
+            JNum (BigInteger.Parse("-99999999999999999999999999999")), "-99999999999999999999999999999"
         ]
         |> List.iter (fun (json, expected) ->
             let actual = Json.asString Raw json
