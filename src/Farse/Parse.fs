@@ -197,12 +197,12 @@ module Parse =
     let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String
 
     /// <summary>Parses a string as System.Numerics.BigInteger.</summary>
-    /// <example>let! bigInt = "prop" &amp;= Parse.bigInt</example>
-    let bigInt =
+    /// <example>let! bigint = "prop" &amp;= Parse.bigint</example>
+    let bigint : Parser<bigint> =
         custom (fun element ->
             let str = element.GetString()
             match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
-            | true, bigInt -> Ok bigInt
+            | true, bigint -> Ok bigint
             | false, _ -> Error "Invalid BigInteger."
         ) ExpectedKind.String
 

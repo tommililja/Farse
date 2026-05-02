@@ -330,7 +330,7 @@ module ParseTests =
     let ``Should parse string as BigInteger`` () =
         let expected = BigInteger.Parse "1234567890123456789012345678901234567890"
         let actual =
-            Prop.req "prop" Parse.bigInt
+            Prop.req "prop" Parse.bigint
             |> Parser.parse """{ "prop": "1234567890123456789012345678901234567890" }"""
             |> Expect.ok
         Expect.equal actual expected
