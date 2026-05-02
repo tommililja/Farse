@@ -1,6 +1,9 @@
 namespace Farse.Tests
 
+open System
+open System.Globalization
 open System.IO
+open System.Numerics
 open System.Text
 open System.Text.Json
 open System.Threading
@@ -13,7 +16,7 @@ module JsonTests =
         JObj [
             "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
             "name", JStr "Alice"
-            "age", JNum 12
+            "age", JNil
             "email", JStr "alice@domain.com"
             "profiles", JStr.arr id [
                 "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
@@ -201,6 +204,34 @@ module JsonTests =
             JNum.singleton id 1
             |> Json.asString Indented
             |> Expect.string
+
+    [<Fact>]
+    let ``Should format numbers correctly when converting to string`` () =
+        [
+            JNum Int16.MaxValue, "32767"
+            JNum Int32.MaxValue, "2147483647"
+            JNum Int64.MaxValue, "9223372036854775807"
+            JNum Int16.MinValue, "-32768"
+            JNum Int32.MinValue, "-2147483648"
+            JNum Int64.MinValue, "-9223372036854775808"
+            JNum UInt16.MaxValue, "65535"
+            JNum UInt32.MaxValue, "4294967295"
+            JNum UInt64.MaxValue, "18446744073709551615"
+            JNum Byte.MaxValue, "255"
+            JNum SByte.MaxValue, "127"
+            JNum Single.MaxValue, "3.40282347E+38"
+            JNum Single.MinValue, "-3.40282347E+38"
+            JNum Double.MaxValue, "1.7976931348623157E+308"
+            JNum Double.MinValue, "-1.7976931348623157E+308"
+            JNum Decimal.MaxValue, "79228162514264337593543950335"
+            JNum Decimal.MinValue, "-79228162514264337593543950335"
+            JNum (Decimal.Parse("12345678900.12345678900", CultureInfo.InvariantCulture)), "12345678900.12345678900"
+            JNum (BigInteger.Parse("99999999999999999999999999999")), "99999999999999999999999999999"
+        ]
+        |> List.iter (fun (json, expected) ->
+            let actual = Json.asString Raw json
+            Expect.equal actual expected
+        )
 
     module JBit =
 

@@ -1,7 +1,7 @@
 ﻿{
 	"id": "c8eae96a-025d-4bc9-88f8-f204e95f2883",
 	"name": "Alice",
-	"age": 12,
+	"age": null,
 	"email": "alice@domain.com",
 	"profiles": [
 		"01458283-b6e3-4ae7-ae54-a68eb587cdc0",

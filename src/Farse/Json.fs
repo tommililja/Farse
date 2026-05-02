@@ -29,8 +29,13 @@ type JNum =
     /// <summary>Creates a Json from a number.</summary>
     /// <param name="number">The number.</param>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
-        let string = number.ToString("R", CultureInfo.InvariantCulture)
-        Json.JNum string
+        match typeof<'a> with
+        | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
+        | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
+        | x when x = typeof<decimal> -> number.ToString(null, CultureInfo.InvariantCulture)
+        | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
+        | _ -> number.ToString("D", CultureInfo.InvariantCulture)
+        |> Json.JNum
 
 module internal JNil =
 
@@ -82,7 +87,8 @@ module JNum =
     /// <summary>Creates a JSON number array from a sequence.</summary>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The sequence.</param>
-    let inline arr fn x = JArr.from fn JNum x
+    let inline arr<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
+        JArr.from fn JNum x
 
     /// <summary>Creates a JSON number array from a value.</summary>
     /// <param name="fn">The mapping function.</param>
