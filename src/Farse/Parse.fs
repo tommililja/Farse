@@ -192,6 +192,23 @@ module Parse =
             with :? ArgumentException -> Error $"Invalid regular expression '%s{regex}'."
         ) ExpectedKind.String
 
+    /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
+    let stringNumber<'r when 'r :> INumberBase<'r>> : Parser<'r> =
+        Parser (fun element ->
+            match element.ValueKind with
+            | Kind.String ->
+                match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
+                | true, number -> Ok number
+                | false, _ ->
+                    element
+                    |> ParseError.invalid "Expected a number string." typeof<'r>
+                    |> Error.list
+            | _ ->
+               element
+               |> ParseError.expectedKind ExpectedKind.String JsonPath.empty typeof<'r>
+               |> Error.list
+        )
+
     /// <summary>Parses a base64 string as System.Byte array.</summary>
     /// <example>let! bytes = "prop" &amp;= Parse.bytesFromBase64</example>
     let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String

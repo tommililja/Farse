@@ -336,6 +336,15 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should parse string as int`` () =
+        let expected = BigInteger.Parse("1")
+        let actual =
+            Prop.req "prop" Parse.stringNumber<bigint>
+            |> Parser.parse """{ "prop": "1" }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse string with regex`` () =
         let expected = "12345"
         let actual =

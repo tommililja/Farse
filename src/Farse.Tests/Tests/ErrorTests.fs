@@ -629,3 +629,9 @@ module ErrorTests =
             Prop.req "prop" (Parse.stringRegex "^[0-9]+$")
             |> Parser.parse """{ "prop": "abc" }"""
             |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when string is not a number`` () =
+            Prop.req "prop" Parse.stringNumber<int>
+            |> Parser.parse """{ "prop": "invalid" }"""
+            |> Expect.errorString
