@@ -107,6 +107,29 @@ module Parse =
                 |> Error.list
         )
 
+    let inline internal customInternal fn expectedKind : Parser<'r> =
+        Parser (fun element ->
+            let isExpectedKind =
+                match expectedKind with
+                | ExpectedKind.Any -> true
+                | ExpectedKind.Bool -> JsonElement.isBool element
+                | kind ->
+                    element.ValueKind
+                    |> ExpectedKind.fromKind
+                    |> (=) kind
+
+            if isExpectedKind then
+                try fn element
+                with ex ->
+                    element
+                    |> ParseError.invalidEx ex.Message typeof<'r> ex
+                    |> Error.list
+            else
+                element
+                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
+                |> Error.list
+        )
+
     // Basic types
 
     let inline private tryParse fn : Result<'r, string> =
@@ -194,34 +217,28 @@ module Parse =
 
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
     let stringNumber<'r when 'r :> INumberBase<'r>> : Parser<'r> =
-        Parser (fun element ->
-            match element.ValueKind with
-            | Kind.String ->
-                match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
-                | true, number -> Ok number
-                | false, _ ->
-                    element
-                    |> ParseError.invalid "Expected a number string." typeof<'r>
-                    |> Error.list
-            | _ ->
-               element
-               |> ParseError.expectedKind ExpectedKind.String JsonPath.empty typeof<'r>
-               |> Error.list
-        )
+        customInternal (fun element ->
+            match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
+            | true, number -> Ok number
+            | false, _ ->
+                element
+                |> ParseError.invalid "Expected a number string." typeof<'r>
+                |> Error.list
+        ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as System.Byte array.</summary>
     /// <example>let! bytes = "prop" &amp;= Parse.bytesFromBase64</example>
     let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String
 
-    /// <summary>Parses a string as System.Numerics.BigInteger.</summary>
+    /// <summary>Parses a number as System.Numerics.BigInteger.</summary>
     /// <example>let! bigint = "prop" &amp;= Parse.bigint</example>
     let bigint : Parser<bigint> =
         custom (fun element ->
-            let str = element.GetString()
+            let str = element.GetRawText()
             match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, bigint -> Ok bigint
             | false, _ -> Error "Invalid BigInteger."
-        ) ExpectedKind.String
+        ) ExpectedKind.Number
 
     /// <summary>Parses a bool as System.Boolean.</summary>
     /// <example>let! bool = "prop" &amp;= Parse.bool</example>
