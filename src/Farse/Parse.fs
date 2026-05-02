@@ -426,47 +426,41 @@ module Parse =
         )
 
     let inline private arr ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        Parser (fun element ->
-            match element.ValueKind with
-            | Kind.Array ->
-                let mutable error = false
-                let mutable enumerator = element.EnumerateArray()
-                let mutable i = 0
+        customInternal (fun element ->
+            let mutable error = false
+            let mutable enumerator = element.EnumerateArray()
+            let mutable i = 0
 
-                let items =
-                    element.GetArrayLength()
-                    |> Array.zeroCreate
+            let items =
+                element.GetArrayLength()
+                |> Array.zeroCreate
 
-                while not error && enumerator.MoveNext() do
-                    match parse enumerator.Current with
-                    | Ok x -> items[i] <- x; i <- i + 1
-                    | Error _ -> error <- true
+            while not error && enumerator.MoveNext() do
+                match parse enumerator.Current with
+                | Ok x -> items[i] <- x; i <- i + 1
+                | Error _ -> error <- true
 
-                match error with
-                | false -> Ok <| convert items
-                | true ->
-                    let errors = ResizeArray()
-                    let elements = element.EnumerateArray () |> Seq.indexed
+            match error with
+            | false -> Ok <| convert items
+            | true ->
+                let errors = ResizeArray()
+                let elements = element.EnumerateArray () |> Seq.indexed
 
-                    for i, element in elements do
-                        match parse element with
-                        | Ok _ -> ()
-                        | Error list ->
-                            list
-                            |> List.iter (fun error ->
-                                error
-                                |> ParseError.withIndex i
-                                |> errors.Add
-                            )
+                for i, element in elements do
+                    match parse element with
+                    | Ok _ -> ()
+                    | Error list ->
+                        list
+                        |> List.iter (fun error ->
+                            error
+                            |> ParseError.withIndex i
+                            |> errors.Add
+                        )
 
-                    errors
-                    |> List.ofSeq
-                    |> Error
-            | _ ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'r>
-                |> Error.list
-        )
+                errors
+                |> List.ofSeq
+                |> Error
+        ) ExpectedKind.Array
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <example>let! list = "prop" &amp;= Parse.list Parse.int</example>
@@ -493,18 +487,14 @@ module Parse =
     /// <param name="n">The index to parse in the array.</param>
     /// <param name="parser">The parser used for the element.</param>
     let index n parser : Parser<'r> =
-        Parser (fun (element:JsonElement) ->
-            match element.ValueKind with
-            | Kind.Array when n >= 0 && element.GetArrayLength() >= n + 1 -> parseIndex n parser element
-            | Kind.Array ->
+        customInternal (fun (element:JsonElement) ->
+            match element.GetArrayLength() with
+            | length when n >= 0 && length >= n + 1 -> parseIndex n parser element
+            | _ ->
                 element
                 |> ParseError.invalidIndex n typeof<'r>
                 |> Error.list
-            | _ ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'r>
-                |> Error.list
-        )
+        ) ExpectedKind.Array
 
     // Key/Value
 
@@ -519,54 +509,48 @@ module Parse =
         |> List.ofSeq
 
     let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        Parser (fun (element:JsonElement) ->
-            match element.ValueKind with
-            | Kind.Object ->
-                let mutable error = false
-                let mutable enumerator = element.EnumerateObject()
-                let mutable i = 0
+        customInternal (fun (element:JsonElement) ->
+            let mutable error = false
+            let mutable enumerator = element.EnumerateObject()
+            let mutable i = 0
 
-                let items =
-                    element.GetPropertyCount()
-                    |> Array.zeroCreate
+            let items =
+                element.GetPropertyCount()
+                |> Array.zeroCreate
 
-                while not error && enumerator.MoveNext() do
-                    let current = enumerator.Current
-                    match parse current.Value with
-                    | Ok x -> items[i] <- current.Name, x; i <- i + 1
-                    | Error _ -> error <- true
+            while not error && enumerator.MoveNext() do
+                let current = enumerator.Current
+                match parse current.Value with
+                | Ok x -> items[i] <- current.Name, x; i <- i + 1
+                | Error _ -> error <- true
 
-                match error with
-                | false ->
-                    match getDuplicateKeys items with
-                    | [] -> Ok <| convert items
-                    | keys ->
-                        keys
-                        |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
-                        |> Error
-                | true ->
-                    let errors = ResizeArray()
-                    let elements = element.EnumerateObject ()
-
-                    for element in elements do
-                        match parse element.Value with
-                        | Ok _ -> ()
-                        | Error list ->
-                            list
-                            |> List.iter (fun error ->
-                                error
-                                |> ParseError.withProp element.Name
-                                |> errors.Add
-                            )
-
-                    errors
-                    |> List.ofSeq
+            match error with
+            | false ->
+                match getDuplicateKeys items with
+                | [] -> Ok <| convert items
+                | keys ->
+                    keys
+                    |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
                     |> Error
-            | _ ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
-                |> Error.list
-        )
+            | true ->
+                let errors = ResizeArray()
+                let elements = element.EnumerateObject ()
+
+                for element in elements do
+                    match parse element.Value with
+                    | Ok _ -> ()
+                    | Error list ->
+                        list
+                        |> List.iter (fun error ->
+                            error
+                            |> ParseError.withProp element.Name
+                            |> errors.Add
+                        )
+
+                errors
+                |> List.ofSeq
+                |> Error
+        ) ExpectedKind.Object
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <example>let! map = "prop" &amp;= Parse.map Parse.int</example>
@@ -595,20 +579,14 @@ module Parse =
     // Tuples
 
     let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'r> =
-        Parser (fun (element:JsonElement) ->
-            match element.ValueKind with
-            | Kind.Array ->
-                match element.GetArrayLength() with
-                | actual when actual = expected -> fn element
-                | actual ->
-                    element
-                    |> ParseError.invalidTuple actual expected typeof<'r>
-                    |> Error.list
-            | _ ->
+        customInternal (fun (element:JsonElement) ->
+            match element.GetArrayLength() with
+            | actual when actual = expected -> fn element
+            | actual ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Array JsonPath.empty typeof<'r>
+                |> ParseError.invalidTuple actual expected typeof<'r>
                 |> Error.list
-        )
+        ) ExpectedKind.Array
 
     /// <summary>Parses an array with two values as a tuple.</summary>
     /// <example>let! tuple = "prop" &amp;= Parse.tuple2 Parse.int Parse.string</example>
@@ -685,25 +663,19 @@ module Parse =
     /// <param name="name">The discriminator property name.</param>
     /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
-        Parser (fun element ->
-            match element.ValueKind with
-            | Kind.Object ->
-                let (Parser parse) = Prop.req name string
-                parse element
-                |> Result.bind (fun x ->
-                    let parser = List.tryFind (fun (key, _) -> key = x) parsers
-                    match parser with
-                    | Some (_, Parser parse) -> parse element
-                    | None ->
-                        element
-                        |> ParseError.invalidOneOf x typeof<'r>
-                        |> Error.list
-                )
-            | _ ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
-                |> Error.list
-        )
+        customInternal (fun element ->
+            let (Parser parse) = Prop.req name string
+            parse element
+            |> Result.bind (fun x ->
+                let parser = List.tryFind (fun (key, _) -> key = x) parsers
+                match parser with
+                | Some (_, Parser parse) -> parse element
+                | None ->
+                    element
+                    |> ParseError.invalidOneOf x typeof<'r>
+                    |> Error.list
+            )
+        ) ExpectedKind.Object
 
     /// <summary>Creates a recursive parser that allows a parser to reference itself.</summary>
     /// <example>let! x = Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</example>
