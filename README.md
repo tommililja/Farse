@@ -396,9 +396,9 @@ module User =
 ```
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
-### Reading into Json
+### Parsing into Json
 
-The Json type can be created from a string.
+The Json type can be parsed from a string.
 
 ```fsharp
 let json =
@@ -407,7 +407,7 @@ let json =
     |> Result.defaultWith (_.Message >> failwith)
 ```
 
-It can also be created asynchronously from a stream.
+It can also be parsed asynchronously from a stream.
 
 ```fsharp
 task {
@@ -417,6 +417,8 @@ task {
 ```
 
 ## Errors
+
+More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
 ParserError can be converted to a formatted string.
 
