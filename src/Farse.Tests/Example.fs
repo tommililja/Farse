@@ -4,7 +4,6 @@ open Farse
 open NodaTime
 open NodaTime.Text
 open System
-open System.IO
 open Xunit
 
 type UserId = UserId of Guid
@@ -153,13 +152,13 @@ module User =
 
     let asJson user =
         JObj [
-            "id", JStr <| UserId.asString user.Id
+            "id", JStr (UserId.asString user.Id)
             "name", JStr user.Name
             "age", JNum.nil Age.asByte user.Age
-            "email", JStr <| Email.asString user.Email
+            "email", JStr (Email.asString user.Email)
             "profiles", JStr.arr ProfileId.asString user.Profiles
             "subscription", JObj [
-                "plan", JStr <| Plan.asString user.Subscription.Plan
+                "plan", JStr (Plan.asString user.Subscription.Plan)
                 "isCanceled", JBit user.Subscription.IsCanceled
                 "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
             ]
@@ -171,7 +170,7 @@ module User =
 module Example =
 
     [<Fact>]
-    let ``Should parse and create example JSON`` () =
+    let ``Should parse and create example JSON string`` () =
         let expected =
             JsonTests.example
             |> Json.asString Indented
