@@ -9,7 +9,7 @@
         "bf00d1e2-ee53-4969-9507-86bed7e96432"
     ],
     "subscription": {
-        "plan": "Pro",
+        "plan": "pro",
         "isCanceled": false,
         "renewsAt": "2026-12-25T10:30:00Z"
     },

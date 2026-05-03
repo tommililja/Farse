@@ -12,7 +12,7 @@ open Farse
 
 module JsonTests =
 
-    let private json =
+    let example =
         JObj [
             "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
             "name", JStr "Alice"
@@ -24,7 +24,7 @@ module JsonTests =
                 "bf00d1e2-ee53-4969-9507-86bed7e96432"
             ]
             "subscription", JObj [
-                "plan", JStr "Pro"
+                "plan", JStr "pro"
                 "isCanceled", JBit false
                 "renewsAt", JStr "2026-12-25T10:30:00Z"
             ]
@@ -36,7 +36,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should return Ok when creating Json`` () =
-        let expected = File.ReadAllText("Example.json")
+        let expected = Json.asString Indented example
         let actual =
             expected
             |> Json.fromString
@@ -47,7 +47,7 @@ module JsonTests =
     [<Fact>]
     let ``Should return Ok when creating Json async`` () =
         task {
-            let expected = File.ReadAllText("Example.json")
+            let expected = Json.asString Indented example
             let! actual =
                 MemoryStream.create expected
                 |> Json.fromStreamAsync CancellationToken.None
@@ -57,9 +57,9 @@ module JsonTests =
 
     [<Fact>]
     let ``Should return Ok when creating Json from bytes`` () =
-        let bytes = Json.asString Indented json |> Encoding.UTF8.GetBytes
+        let bytes = Json.asString Indented example |> Encoding.UTF8.GetBytes
         let actual = Json.fromBytes bytes |> Expect.ok
-        Expect.equal actual json
+        Expect.equal actual example
 
     [<Fact>]
     let ``Should return Error when creating Json from invalid JSON`` () =
@@ -75,7 +75,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create indented JSON string`` () =
-        json
+        example
         |> Json.asString Indented
         |> Expect.string
 
@@ -89,13 +89,13 @@ module JsonTests =
             )
             |> Custom
 
-        json
+        example
         |> Json.asString options
         |> Expect.string
 
     [<Fact>]
     let ``Should create raw JSON string`` () =
-        json
+        example
         |> Json.asString Raw
         |> Expect.string
 
@@ -104,33 +104,35 @@ module JsonTests =
         task {
             let stream = new MemoryStream()
             use writer = new Utf8JsonWriter(stream)
-            Json.asStringTo writer json
+            Json.asStringTo writer example
             do! writer.FlushAsync()
-            let expected = Json.asString Raw json
+            let expected = Json.asString Raw example
             let actual = Encoding.UTF8.GetString(stream.ToArray())
             Expect.equal actual expected
         }
 
     [<Fact>]
     let ``Should return bytes from JSON string`` () =
-        let expected = Json.asString Indented json |> Encoding.UTF8.GetBytes
-        let actual = Json.asBytes Indented json
+        let expected = Json.asString Indented example |> Encoding.UTF8.GetBytes
+        let actual = Json.asBytes Indented example
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Comparing two Json values should return true`` () =
-        let json = File.ReadAllText("Example.json")
+    let ``Comparing two equal Json values should return true`` () =
+        let json = Json.asString Indented example
         let a = Json.fromString json
         let b = Json.fromString json
         Expect.equal a b
 
     [<Fact>]
+    let ``Comparing two non-equal Json values should return false`` () =
+        let a = JObj [ "value", JNum 1 ]
+        let b = JObj [ "value", JNum 2 ]
+        Expect.notEqual a b
+
+    [<Fact>]
     let ``Should sort properties in ascending order`` () =
-        let json =
-            File.ReadAllText("Example.json")
-            |> Json.fromString
-            |> Expect.ok
-        json
+        example
         |> Json.sort
         |> Json.asString Indented
         |> Expect.string

@@ -172,7 +172,9 @@ module Example =
 
     [<Fact>]
     let ``Should parse and create example JSON`` () =
-        let expected = File.ReadAllText("Example.json")
+        let expected =
+            JsonTests.example
+            |> Json.asString Indented
 
         let user =
             User.parser

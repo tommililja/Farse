@@ -32,11 +32,6 @@
         <ProjectReference Include="..\Farse\Farse.fsproj"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Example.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-    <ItemGroup>
       <EmbeddedResource Remove="Verify\**" />
     </ItemGroup>
     <ItemGroup>
