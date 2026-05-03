@@ -2,8 +2,10 @@
     <Folder Name="/Solution/">
         <File Path="..\LICENSE.md" />
         <File Path="..\README.md" />
-        <File Path="..\.editorconfig"/>
+        <File Path="..\.editorconfig" />
+        <File Path="..\.github\workflows\dotnet.yml"/>
         <File Path="Directory.Build.props" />
+        <File Path="global.json" />
     </Folder>
     <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj" />
     <Project Path="Farse.Tests/Farse.Tests.fsproj" />
