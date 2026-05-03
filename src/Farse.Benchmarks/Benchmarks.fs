@@ -1,5 +1,4 @@
 open System
-open System.IO
 open System.Text.Json
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Configs
@@ -32,31 +31,41 @@ type User = {
     Tags: string list
 }
 
+module BenchmarkData =
+
+    let json n =
+        seq { 1 .. n }
+        |> List.ofSeq
+        |> List.map (fun _ ->
+            JObj [
+                "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
+                "name", JStr "Alice"
+                "age", JNil
+                "email", JStr "alice@domain.com"
+                "profiles", JStr.arr id [
+                    "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
+                    "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
+                    "bf00d1e2-ee53-4969-9507-86bed7e96432"
+                ]
+                "subscription", JObj [
+                    "plan", JStr "pro"
+                    "isCanceled", JBit false
+                    "renewsAt", JStr.nil id (Some "2026-12-25T10:30:00Z")
+                ]
+                "tags", JArr [
+                    JStr "beta"
+                    JStr "verified"
+                ]
+            ]
+        )
+        |> JArr
+
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type JsonBenchmarks() =
 
     [<Benchmark(Description = "Farse")>]
     member _.Farse() =
-        JObj [
-            "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
-            "name", JStr "Alice"
-            "age", JNil
-            "email", JStr "alice@domain.com"
-            "profiles", JStr.arr id [
-                "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
-                "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
-                "bf00d1e2-ee53-4969-9507-86bed7e96432"
-            ]
-            "subscription", JObj [
-                "plan", JStr "Pro"
-                "isCanceled", JBit false
-                "renewsAt", JStr.nil id <| Some "2026-12-25T10:30:00Z"
-            ]
-            "tags", JArr [
-                JStr "beta"
-                JStr "verified"
-            ]
-        ]
+        BenchmarkData.json 1
         |> Json.asString Indented
 
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
@@ -74,7 +83,10 @@ type ParserBenchmarks() =
         settings
 
     [<GlobalSetup>]
-    member _.Setup() = json <- File.ReadAllText("Benchmarks.100.json")
+    member _.Setup() =
+        json <-
+            BenchmarkData.json 100
+            |> Json.asString Indented
 
     [<Benchmark(Description = "Newtonsoft.Json*")>]
     member _.NewtonsoftJsonSerialization() =
