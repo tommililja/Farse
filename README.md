@@ -177,15 +177,15 @@ type Plan =
 module Plan =
 
     let fromString = function
-        | "Pro" -> Ok Pro
-        | "Standard" -> Ok Standard
-        | "Free" -> Ok Free
+        | "pro" -> Ok Pro
+        | "standard" -> Ok Standard
+        | "free" -> Ok Free
         | str -> Error $"Plan '%s{str}' not found."
 
     let asString = function
-        | Pro -> "Pro"
-        | Standard -> "Standard"
-        | Free -> "Free"
+        | Pro -> "pro"
+        | Standard -> "standard"
+        | Free -> "free"
 
 type Subscription = {
     Plan: Plan
