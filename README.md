@@ -398,7 +398,7 @@ module User =
 
 ### From a string
 
-Parsing a string to a Json.
+Parsing a string.
 
 ```fsharp
 let json =
@@ -407,7 +407,7 @@ let json =
     |> Result.defaultWith (_.Message >> failwith)
 ```
 
-It can also be parsed asynchronously from a stream.
+Parsing asynchronously from a stream.
 
 ```fsharp
 task {
@@ -429,11 +429,11 @@ type JsonFormat =
 let string = Json.asString Indented json
 ```
 
-It can also be written directly to a stream or buffer writer.
+Writing directly to a stream or buffer writer.
 
 ```fsharp
 task {
-    use jsonWriter = new Utf8JsonWriter(writer)
+    use jsonWriter = new Utf8JsonWriter(ctx.Response.BodyWriter)
     Json.asStringTo jsonWriter json
     do! jsonWriter.FlushAsync()
 }
@@ -443,13 +443,13 @@ task {
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
-ParserError can be converted to a formatted string.
+Converting ParserError to a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error
 ```
 
-But we can also build our own error messages.
+Building custom error messages.
 
 ```fsharp
 let msg =
