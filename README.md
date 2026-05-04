@@ -398,7 +398,7 @@ module User =
 
 ### From a string
 
-Parsing a string.
+Parsing a string to a Json.
 
 ```fsharp
 let json =
@@ -443,13 +443,13 @@ task {
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
-Converting ParserError to a formatted string.
+ParserError can be converted to a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error
 ```
 
-Building custom error messages.
+We can also build custom error messages.
 
 ```fsharp
 let msg =
