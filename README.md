@@ -396,9 +396,9 @@ module User =
 ```
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
-### Parsing into Json
+### From a string
 
-The Json type can be parsed from a string.
+Parsing a string to a Json.
 
 ```fsharp
 let json =
@@ -413,6 +413,29 @@ It can also be parsed asynchronously from a stream.
 task {
     let! result = Json.fromStreamAsync ct stream
     return Result.defaultWith (_.Message >> failwith) result
+}
+```
+
+### To a string
+
+Converting a Json to a string.
+
+```fsharp
+type JsonFormat =
+    | Indented
+    | Custom of JsonSerializerOptions
+    | Raw
+
+let string = Json.asString Indented json
+```
+
+It can also be written directly to a stream or buffer writer.
+
+```fsharp
+task {
+    use jsonWriter = new Utf8JsonWriter(writer)
+    Json.asStringTo jsonWriter json
+    do! jsonWriter.FlushAsync()
 }
 ```
 
