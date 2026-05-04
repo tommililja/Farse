@@ -433,9 +433,9 @@ Writing directly to a stream or buffer writer.
 
 ```fsharp
 task {
-    use jsonWriter = new Utf8JsonWriter(ctx.Response.BodyWriter)
-    Json.asStringTo jsonWriter json
-    do! jsonWriter.FlushAsync()
+    use writer = new Utf8JsonWriter(ctx.Response.BodyWriter)
+    Json.asStringTo writer json
+    do! writer.FlushAsync()
 }
 ```
 
@@ -461,7 +461,7 @@ let msg =
         |> String.concat "\n"
 ```
 
-From the following available information.
+From the following information.
 
 ```fsharp
 type ParseError = {
