@@ -162,7 +162,7 @@ module Json =
             |> JArr
         | other -> other
 
-    /// <summary>Converts a JsonElement to a Json.</summary>
+    /// <summary>Converts a JsonElement to Json.</summary>
     /// <param name="element">The JsonElement to convert.</param>
     let rec fromElement (element:JsonElement) =
         match element.ValueKind with
@@ -182,7 +182,7 @@ module Json =
             |> JArr
         | Kind.Null | Kind.Undefined -> JNil
 
-    /// <summary>Parses a JSON string to a Json.</summary>
+    /// <summary>Parses a JSON string to Json.</summary>
     /// <param name="json">The JSON string to parse.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
@@ -192,7 +192,7 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Parses a JSON string asynchronously to a Json.</summary>
+    /// <summary>Parses a JSON string asynchronously to Json.</summary>
     /// <param name="token">The CancellationToken to monitor.</param>
     /// <param name="stream">The JSON stream to parse.</param>
     let fromStreamAsync token stream =
@@ -205,7 +205,7 @@ module Json =
                 | :? ArgumentNullException as exn -> return Error exn
         }
 
-    /// <summary>Parses a byte array to a Json.</summary>
+    /// <summary>Parses a byte array to Json.</summary>
     /// <param name="bytes">The byte array to parse.</param>
     let fromBytes (bytes:byte array) =
         Encoding.UTF8.GetString(bytes)
