@@ -40,6 +40,17 @@ module ParseError =
 
     // Errors
 
+    let internal required path type' element  =
+        {
+            Path = path
+            Element = JsonElement.clone element
+            Index = None
+            Details = "Required property was not found."
+            Value = None
+            Type = type'
+            Exn = None
+        }
+
     let internal validation details type' value element =
         {
             Path = JsonPath.empty

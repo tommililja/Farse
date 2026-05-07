@@ -755,6 +755,12 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should fail when required property is missing`` () =
+        Prop.req "missing" Parse.none
+        |> Parser.parse """{ "prop": 1 }"""
+        |> Expect.errorString
+
+    [<Fact>]
     let ``Should return default value when value is null`` () =
         let expected = 1
         let actual =
@@ -789,6 +795,12 @@ module ParseTests =
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should fail when parsing optional value when a required property is missing`` () =
+        Prop.req "missing" (Parse.optional Parse.int)
+        |> Parser.parse """{ "prop": null }"""
+        |> Expect.errorString
 
     [<Fact>]
     let ``Should parse value with custom Parser`` () =

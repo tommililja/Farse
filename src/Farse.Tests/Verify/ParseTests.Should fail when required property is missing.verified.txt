@@ -1,6 +1,6 @@
 ﻿Parser failed with 1 error[s].
 
 Error[0]:
-  at $.prop.prop2.missing
-   | Tried parsing 'Int32.
+  at $.missing
+   | Tried parsing 'Unit.
    | Required property was not found.

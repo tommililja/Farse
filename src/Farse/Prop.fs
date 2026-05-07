@@ -8,12 +8,17 @@ module Prop =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
-                let prop = JsonElement.getProperty name element
-                parse prop
-                |> Result.mapError (fun errors ->
-                    errors
-                    |> List.map (ParseError.withProp name)
-                )
+                match JsonElement.getProperty name element with
+                | prop when prop.ValueKind <> Kind.Undefined ->
+                    parse prop
+                    |> Result.mapError (fun errors ->
+                        errors
+                        |> List.map (ParseError.withProp name)
+                    )
+                | prop ->
+                    prop
+                    |> ParseError.required (JsonPath.prop name) typeof<'r>
+                    |> Error.list
             | _ ->
                 element
                 |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
@@ -24,8 +29,7 @@ module Prop =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object ->
-                let prop = JsonElement.tryGetProperty name element
-                match prop with
+                match JsonElement.tryGetProperty name element with
                 | Some prop ->
                     match parse prop with
                     | Ok x -> Ok <| Some x
@@ -49,10 +53,11 @@ module Prop =
                     | Ok (element:JsonElement) ->
                         match element.ValueKind with
                         | Kind.Object ->
-                            element
-                            |> JsonElement.getProperty name
-                            |> Ok, JsonPath.append path (JsonPath.prop name)
-                        | _ -> Error element, path
+                            let path = JsonPath.append path (JsonPath.prop name)
+                            match JsonElement.getProperty name element with
+                            | prop when prop.ValueKind <> Kind.Undefined -> Ok prop, path
+                            | prop -> Error (prop, true), path
+                        | _ -> Error (element, false), path
                     | Error e -> Error e, path
                 ) (Ok element, JsonPath.empty)
 
@@ -63,7 +68,11 @@ module Prop =
                     errors
                     |> List.map (ParseError.withPath path)
                 )
-            | Error element ->
+            | Error (element, true) ->
+                element
+                |> ParseError.required path typeof<'r>
+                |> Error.list
+            | Error (element, false) ->
                 element
                 |> ParseError.expectedKind ExpectedKind.Object path typeof<'r>
                 |> Error.list
