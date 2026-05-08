@@ -216,6 +216,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
+    /// <example>let! int = "prop" &amp;= Parse.stringNumber&lt;int&gt;</example>
     let stringNumber<'r when 'r :> INumberBase<'r>> : Parser<'r> =
         customInternal (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
@@ -227,7 +228,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as System.Byte array.</summary>
-    /// <example>let! bytes = "prop" &amp;= Parse.bytesFromBase64</example>
+    /// <example>let! bytes = "prop" &amp;= Parse.base64Bytes</example>
     let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String
 
     /// <summary>Parses a number as System.Numerics.BigInteger.</summary>
