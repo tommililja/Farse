@@ -444,9 +444,7 @@ module Parse =
             | false -> Ok <| convert items
             | true ->
                 let errors = ResizeArray()
-                let elements = element.EnumerateArray () |> Seq.indexed
-
-                for i, element in elements do
+                for i, element in element.EnumerateArray () |> Seq.indexed do
                     match parse element with
                     | Ok _ -> ()
                     | Error list ->
@@ -534,9 +532,7 @@ module Parse =
                     |> Error
             | true ->
                 let errors = ResizeArray()
-                let elements = element.EnumerateObject ()
-
-                for element in elements do
+                for element in element.EnumerateObject() do
                     match parse element.Value with
                     | Ok _ -> ()
                     | Error list ->
