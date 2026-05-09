@@ -190,13 +190,17 @@ module ParserError =
         match error with
         | Json exn -> $"Could not parse JSON: %s{exn.Message}"
         | Errors list ->
-            list
-            |> List.mapi (fun i e ->
-                ParseError.asString e
-                |> _.Split('\n')
-                |> Array.map (sprintf "  %s")
-                |> String.concat "\n"
-                |> sprintf "Error[%i]:\n%s" i
-            )
-            |> String.concat "\n\n"
-            |> sprintf "Parser failed with %i error[s].\n\n%s" (List.length list)
+            let errors =
+                list
+                |> List.mapi (fun i e ->
+                    let string = ParseError.asString e
+                    let error =
+                        string.Split('\n')
+                        |> Array.map (sprintf "  %s")
+                        |> String.concat "\n"
+
+                    $"Error[%i{i}]:\n%s{error}"
+                )
+                |> String.concat "\n\n"
+
+            $"Parser failed with %i{List.length list} error[s].\n\n%s{errors}"
