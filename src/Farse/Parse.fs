@@ -444,20 +444,19 @@ module Parse =
             match error with
             | false -> Ok <| convert items
             | true ->
-                let errors = ResizeArray()
-                for i, element in element.EnumerateArray () |> Seq.indexed do
+                element.EnumerateArray()
+                |> List.ofSeq
+                |> List.indexed
+                |> List.collect (fun (i, element) ->
                     match parse element with
-                    | Ok _ -> ()
+                    | Ok _ -> List.empty
                     | Error list ->
                         list
-                        |> List.iter (fun error ->
+                        |> List.map (fun error ->
                             error
                             |> ParseError.withIndex i
-                            |> errors.Add
                         )
-
-                errors
-                |> List.ofSeq
+                )
                 |> Error
         ) ExpectedKind.Array
 
@@ -532,20 +531,18 @@ module Parse =
                     |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
                     |> Error
             | true ->
-                let errors = ResizeArray()
-                for element in element.EnumerateObject() do
-                    match parse element.Value with
-                    | Ok _ -> ()
+                element.EnumerateObject()
+                |> List.ofSeq
+                |> List.collect (fun prop ->
+                    match parse prop.Value with
+                    | Ok _ -> List.empty
                     | Error list ->
                         list
-                        |> List.iter (fun error ->
+                        |> List.map (fun error ->
                             error
-                            |> ParseError.withProp element.Name
-                            |> errors.Add
+                            |> ParseError.withProp prop.Name
                         )
-
-                errors
-                |> List.ofSeq
+                )
                 |> Error
         ) ExpectedKind.Object
 
