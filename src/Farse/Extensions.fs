@@ -17,27 +17,27 @@ module internal Extensions =
     module JsonElement =
 
         // Returns Null and Undefined elements.
-        let inline getProperty (name:string) (element:JsonElement) =
-            element.TryGetProperty(name) |> snd
+        let inline getProperty (name:string) (e:JsonElement) =
+            e.TryGetProperty(name) |> snd
 
-        let inline tryGetProperty (name:string) (element:JsonElement) =
-            match element.TryGetProperty(name) with
+        let inline tryGetProperty (name:string) (e:JsonElement) =
+            match e.TryGetProperty(name) with
             | true, prop when prop.ValueKind <> Kind.Null -> Some prop
             | _ -> None
 
-        let inline tryGetValue (element:JsonElement) =
-            match element.ValueKind with
+        let inline tryGetValue (e:JsonElement) =
+            match e.ValueKind with
             | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> None
-            | _ -> Some <| element.GetRawText()
+            | _ -> Some <| e.GetRawText()
 
         // Undefined elements are not clonable.
-        let inline clone (element:JsonElement) =
-            match element.ValueKind with
+        let inline clone (e:JsonElement) =
+            match e.ValueKind with
             | Kind.Undefined -> JsonElement() // Undefined.
-            | _ -> element.Clone()
+            | _ -> e.Clone()
 
-        let inline isBool (element:JsonElement) =
-            element.ValueKind = Kind.True || element.ValueKind = Kind.False
+        let inline isBool (e:JsonElement) =
+            e.ValueKind = Kind.True || e.ValueKind = Kind.False
 
     module String =
 
@@ -71,8 +71,8 @@ module internal Extensions =
 
     module ResultOption =
 
-        let inline defaultValue v =
-            Result.map (Option.defaultValue v)
+        let inline defaultValue x =
+            Result.map (Option.defaultValue x)
 
     module Seq =
 
