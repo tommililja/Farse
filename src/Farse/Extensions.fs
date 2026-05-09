@@ -43,12 +43,6 @@ module internal Extensions =
 
         let isNotEmpty = String.IsNullOrWhiteSpace >> not
 
-        let indentLines (str:string) =
-            str
-            |> _.Split('\n')
-            |> Array.map (sprintf "  %s")
-            |> String.concat "\n"
-
     module Type =
 
         let rec getName = function

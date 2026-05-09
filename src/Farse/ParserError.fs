@@ -193,7 +193,9 @@ module ParserError =
             list
             |> List.mapi (fun i e ->
                 ParseError.asString e
-                |> String.indentLines
+                |> _.Split('\n')
+                |> Array.map (sprintf "  %s")
+                |> String.concat "\n"
                 |> sprintf "Error[%i]:\n%s" i
             )
             |> String.concat "\n\n"
