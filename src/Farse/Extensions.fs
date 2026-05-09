@@ -16,6 +16,7 @@ module internal Extensions =
 
     module JsonElement =
 
+        // Returns Null and Undefined elements.
         let inline getProperty (name:string) (element:JsonElement) =
             element.TryGetProperty(name) |> snd
 
