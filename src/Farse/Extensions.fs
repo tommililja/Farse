@@ -14,12 +14,6 @@ module internal Extensions =
                 CommentHandling = JsonCommentHandling.Skip
             )
 
-    [<Struct; NoComparison>]
-    type JsonElementType =
-        | Element of JsonElement
-        | Undefined of JsonElement
-        | Null of JsonElement
-
     module JsonElement =
 
         let inline tryGetProperty (name:string) (e:JsonElement) =

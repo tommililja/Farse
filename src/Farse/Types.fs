@@ -2,6 +2,12 @@ namespace Farse
 
 open System.Text.Json
 
+[<Struct; NoComparison>]
+type internal JsonElementType =
+    | Element of JsonElement
+    | Undefined of JsonElement
+    | Null of JsonElement
+
 type internal Kind = JsonValueKind
 
 module internal Kind =
