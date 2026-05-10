@@ -58,7 +58,10 @@ module internal Extensions =
                     |> Array.map getName
                     |> String.concat ", "
 
-                $"%s{name}<%s{args}>"
+                match name with
+                | "FSharpOption" -> $"%s{args} option"
+                | name -> $"%s{name}<%s{args}>"
+
             | x -> x.Name
 
     module Error =

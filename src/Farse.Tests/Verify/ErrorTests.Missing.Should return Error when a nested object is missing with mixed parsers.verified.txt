@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop.missing
-   | Tried parsing 'FSharpOption<Int32>.
+   | Tried parsing 'Int32 option.
    | Required property was not found.
