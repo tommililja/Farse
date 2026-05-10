@@ -76,10 +76,10 @@ And the three custom operators.
 // Parses a required property.
 let (&=) = Prop.req
 
-// Parses an optional property by flattening.
+// Parses an optional property by flattening options.
 let (?=) = Prop.opt
 
-// Parses an optional property by distinguishing between missing and null.
+// Parses an optional property by distinguishing between a missing property and null value.
 let (??=) = Prop.tryOpt
 ```
 

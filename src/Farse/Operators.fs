@@ -17,7 +17,7 @@ module Operators =
         Prop.opt path parser
 
     /// <summary>Parses an optional property.</summary>
-    /// <remarks>Distinguishing between a missing property and a null value.</remarks>
+    /// <remarks>Distinguishes between a missing property and a null value.</remarks>
     /// <example>let! int = "prop.prop2" ??= Parse.int</example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
