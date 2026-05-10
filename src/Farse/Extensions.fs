@@ -38,7 +38,9 @@ module internal Extensions =
 
     module String =
 
-        let isNotEmpty = String.IsNullOrWhiteSpace >> not
+        let isNotEmpty =
+            String.IsNullOrWhiteSpace
+            >> not
 
     module Type =
 
@@ -102,7 +104,8 @@ module internal Extensions =
 
     module Seq =
 
-        let inline ofSeq x = x :> seq<_>
+        let inline ofSeq x =
+            x :> seq<_>
 
     [<AutoOpen>]
     module ActivePatterns =

@@ -7,7 +7,8 @@ type JsonPath = JsonPath of string list
 
 module JsonPath =
 
-    let internal empty = JsonPath []
+    let internal empty =
+        JsonPath []
 
     let inline internal prop name =
         JsonPath [ $".%s{name}" ]

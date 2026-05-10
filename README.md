@@ -395,7 +395,8 @@ module User =
             "tags", JStr.arr Tag.asString user.Tags
         ]
         
-    let asJsonString = asJson >> Json.asString Indented
+    let asJsonString =
+        asJson >> Json.asString Indented
 ```
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
