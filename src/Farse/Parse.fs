@@ -135,7 +135,7 @@ module Parse =
     let inline private tryParse fn : Result<'r, string> =
         match fn () with
         | true, x -> Ok x
-        | _ -> Error $"Invalid %s{typeof<'r>.Name}."
+        | _ -> Error $"Invalid %s{Type.getName typeof<'r>}."
 
     /// <summary>Parses a number as System.Int32.</summary>
     /// <example>let! int = "prop" &amp;= Parse.int</example>
