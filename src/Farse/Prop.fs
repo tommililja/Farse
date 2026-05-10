@@ -4,7 +4,7 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private isObject<'t, 'r> fn : Parser<'r> =
+    let inline private requireObject<'t, 'r> fn : Parser<'r> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object -> fn element
@@ -15,7 +15,7 @@ module Prop =
         )
 
     let inline private parse name (Parser parse) : Parser<'r> =
-        isObject<'r, 'r> (fun element ->
+        requireObject<'r, 'r> (fun element ->
             match JsonElement.tryGetProperty name element with
             | Element prop | Null prop ->
                 parse prop
@@ -30,7 +30,7 @@ module Prop =
         )
 
     let inline private tryParse name (Parser parse) =
-        isObject<'r, 'r option> (fun element ->
+        requireObject<'r, 'r option> (fun element ->
             match JsonElement.tryGetProperty name element with
             | Element prop ->
                 match parse prop with
@@ -43,7 +43,7 @@ module Prop =
         )
 
     let inline private tryParseNull name (Parser parse) =
-        isObject<'r, 'r option option> (fun element ->
+        requireObject<'r, 'r option option> (fun element ->
             match JsonElement.tryGetProperty name element with
             | Element prop ->
                 match parse prop with
