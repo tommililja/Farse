@@ -94,6 +94,7 @@ module Parser =
         )
 
     /// <summary>Parses a JSON string.</summary>
+    /// <example>let result = Parser.parse json parser</example>
     /// <param name="json">The JSON string to parse.</param>
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
@@ -105,6 +106,7 @@ module Parser =
             | :? ArgumentNullException as exn -> Error <| Json exn
 
     /// <summary>Parses a JSON stream asynchronously.</summary>
+    /// <example>let! result = Parser.parseAsync stream ct parser</example>
     /// <param name="stream">The JSON stream to parse.</param>
     /// <param name="token">The CancellationToken to monitor.</param>
     let parseAsync stream token (Parser parse) =
