@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop.missing
-   | Tried parsing 'Int32 option.
+   | Tried parsing 'int option.
    | Required property was not found.

@@ -50,8 +50,11 @@ module internal Extensions =
 
     module Type =
 
-        let rec getName = function
-            | (x:Type) when x.IsGenericType ->
+        let rec getName type' =
+            match type' with
+            | x when x = typeof<unit> -> "unit"
+            | x when x.IsArray -> $"%s{getName (x.GetElementType())} array"
+            | x when x.IsGenericType ->
                 let name = x.Name.Substring(0, x.Name.IndexOf('`'))
                 let args =
                     x.GetGenericArguments()
@@ -60,9 +63,32 @@ module internal Extensions =
 
                 match name with
                 | "FSharpOption" -> $"%s{args} option"
+                | "FSharpList" -> $"%s{args} list"
+                | "FSharpSet" -> $"%s{args} Set"
+                | "FSharpMap" -> $"Map<%s{args}>"
+                | "FSharpResult" -> $"Result<%s{args}>"
+                | "IEnumerable" -> $"%s{args} seq"
+                | "Tuple" -> $"(%s{args})"
                 | name -> $"%s{name}<%s{args}>"
-
-            | x -> x.Name
+            | x ->
+                match x.Name with
+                | "Int16" -> "int16"
+                | "Int32" -> "int"
+                | "Int64" -> "int64"
+                | "Byte" -> "byte"
+                | "SByte" -> "int8"
+                | "UInt16" -> "uint16"
+                | "UInt32" -> "uint"
+                | "UInt64" -> "uint64"
+                | "Double" -> "float"
+                | "Single" -> "float32"
+                | "Boolean" -> "bool"
+                | "String" -> "string"
+                | "Char" -> "char"
+                | "Decimal" -> "decimal"
+                | "BigInteger" -> "bigint"
+                | "Object" -> "obj"
+                | name -> name
 
     module Error =
 

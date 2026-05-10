@@ -2,6 +2,6 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'String.
+   | Tried parsing 'string.
    | Expected string to match '^[0-9]+$'.
    = "abc"

@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'Unit.
+   | Tried parsing 'unit.
    | Expected Object, but got Array.

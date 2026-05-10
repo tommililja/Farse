@@ -2,6 +2,6 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'Int32.
+   | Tried parsing 'int.
    | Invalid Int32.
    = 1.5

@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop.missing
-   | Tried parsing 'String.
+   | Tried parsing 'string.
    | Required property was not found.

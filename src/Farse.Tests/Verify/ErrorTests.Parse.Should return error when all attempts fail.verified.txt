@@ -2,5 +2,5 @@
 
 Error[0]:
   at $.prop
-   | Tried parsing 'Object.
+   | Tried parsing 'obj.
    | Tried 3 parsers without success.
