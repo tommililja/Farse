@@ -21,6 +21,7 @@ module JsonPath =
         |> JsonPath
 
     /// <summary>Converts a JsonPath to a string.</summary>
+    /// <example>let string = JsonPath.asString path</example>
     let asString (JsonPath list) =
         list
         |> List.append [ "$" ]
@@ -166,6 +167,7 @@ module ParseError =
         append path x
 
     /// <summary>Converts a ParseError to a formatted string.</summary>
+    /// <example>let string = ParseError.asString error</example>
     /// <param name="error">The ParseError to convert.</param>
     let asString error =
         string {
