@@ -14,21 +14,19 @@ module internal Extensions =
                 CommentHandling = JsonCommentHandling.Skip
             )
 
-    module JsonElement =
+    [<Struct; NoComparison>]
+    type JsonElementType =
+        | Element of JsonElement
+        | Undefined of JsonElement
+        | Null of JsonElement
 
-        // Returns Null and Undefined elements.
-        let inline getProperty (name:string) (e:JsonElement) =
-            e.TryGetProperty(name) |> snd
+    module JsonElement =
 
         let inline tryGetProperty (name:string) (e:JsonElement) =
             match e.TryGetProperty(name) with
-            | true, prop when prop.ValueKind <> Kind.Null -> Some prop
-            | _ -> None
-
-        let inline tryGetNullProperty (name:string) (e:JsonElement) =
-            match e.TryGetProperty(name) with
-            | true, prop -> Some prop
-            | _ -> None
+            | true, prop when prop.ValueKind <> Kind.Null -> Element prop
+            | true, prop -> Null prop
+            | _, prop -> Undefined prop
 
         let inline tryGetValue (e:JsonElement) =
             match e.ValueKind with

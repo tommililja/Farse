@@ -16,14 +16,14 @@ module Prop =
 
     let inline private parse name (Parser parse) : Parser<'r> =
         isObject<'r, 'r> (fun element ->
-            match JsonElement.getProperty name element with
-            | prop when prop.ValueKind <> Kind.Undefined ->
+            match JsonElement.tryGetProperty name element with
+            | Element prop | Null prop ->
                 parse prop
                 |> Result.mapError (fun errors ->
                     errors
                     |> List.map (ParseError.withProp name)
                 )
-            | prop ->
+            | Undefined prop ->
                 prop
                 |> ParseError.required (JsonPath.prop name) typeof<'r>
                 |> Error.list
@@ -32,28 +32,28 @@ module Prop =
     let inline private tryParse name (Parser parse) =
         isObject<'r, 'r option> (fun element ->
             match JsonElement.tryGetProperty name element with
-            | Some prop ->
+            | Element prop ->
                 match parse prop with
                 | Ok x -> Ok <| Some x
                 | Error errors ->
                     errors
                     |> List.map (ParseError.withProp name)
                     |> Error
-            | None -> Ok None
+            | Null _ | Undefined _ -> Ok None
         )
 
     let inline private tryParseNull name (Parser parse) =
         isObject<'r, 'r option option> (fun element ->
-            match JsonElement.tryGetNullProperty name element with
-            | Some prop when prop.ValueKind <> Kind.Null ->
+            match JsonElement.tryGetProperty name element with
+            | Element prop ->
                 match parse prop with
                 | Ok x -> Ok <| (Some (Some x))
                 | Error errors ->
                     errors
                     |> List.map (ParseError.withProp name)
                     |> Error
-            | Some _ -> Ok (Some None)
-            | None -> Ok None
+            | Null _ -> Ok (Some None)
+            | Undefined _ -> Ok None
         )
 
     let inline private traverse path (Parser parse) : Parser<'r> =
@@ -66,9 +66,9 @@ module Prop =
                         match element.ValueKind with
                         | Kind.Object ->
                             let path = JsonPath.append path (JsonPath.prop name)
-                            match JsonElement.getProperty name element with
-                            | prop when prop.ValueKind <> Kind.Undefined -> Ok prop, path
-                            | prop -> Error (prop, true), path
+                            match JsonElement.tryGetProperty name element with
+                            | Element prop | Null prop -> Ok prop, path
+                            | Undefined prop -> Error (prop, true), path
                         | _ -> Error (element, false), path
                     | Error e -> Error e, path
                 ) (Ok element, JsonPath.empty)
@@ -99,9 +99,10 @@ module Prop =
                     | Ok (Some (element:JsonElement)) ->
                         match element.ValueKind with
                         | Kind.Object ->
-                            element
-                            |> JsonElement.tryGetProperty name
-                            |> Ok, JsonPath.append path (JsonPath.prop name)
+                            let path = JsonPath.append path (JsonPath.prop name)
+                            match JsonElement.tryGetProperty name element with
+                            | Element prop -> Ok <| Some prop, path
+                            | Null _ | Undefined _ -> Ok None, path
                         | _ -> Error element, path
                     | _ -> prop, path
                 ) (Ok (Some element), JsonPath.empty)
@@ -130,9 +131,10 @@ module Prop =
                     | Ok (Some (element:JsonElement)) ->
                         match element.ValueKind with
                         | Kind.Object ->
-                            element
-                            |> JsonElement.tryGetNullProperty name
-                            |> Ok, JsonPath.append path (JsonPath.prop name)
+                            let path = JsonPath.append path (JsonPath.prop name)
+                            match JsonElement.tryGetProperty name element with
+                            | Element prop | Null prop -> Ok <| Some prop, path
+                            | Undefined _ -> Ok None, path
                         | Kind.Null -> Ok None, path
                         | _ -> Error element, path
                     | _ -> prop, path
