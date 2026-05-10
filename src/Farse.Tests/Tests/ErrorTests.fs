@@ -457,7 +457,7 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when value is not verified`` () =
-            Prop.req "prop" (Parse.verified Parse.int (fun x -> x > 0) "Not valid.")
+            Prop.req "prop" (Parse.verify Parse.int (fun x -> x > 0) "Not valid.")
             |> Parser.parse """{ "prop": 0 }"""
             |> Expect.errorString
 
@@ -626,12 +626,12 @@ module ErrorTests =
 
         [<Fact>]
         let ``Should return Error when regex does not match`` () =
-            Prop.req "prop" (Parse.stringRegex "^[0-9]+$")
+            Prop.req "prop" (Parse.regex "^[0-9]+$")
             |> Parser.parse """{ "prop": "abc" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when string is not a number`` () =
-            Prop.req "prop" Parse.stringNumber<int>
+            Prop.req "prop" Parse.number<int>
             |> Parser.parse """{ "prop": "invalid" }"""
             |> Expect.errorString

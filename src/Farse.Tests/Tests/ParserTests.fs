@@ -69,7 +69,7 @@ module ParserTests =
     let ``Should set default value for optional value`` () =
         let expected = 1
         let actual =
-            Parse.optional Parse.int
+            Parse.option Parse.int
             |> Parser.defaultValue 1
             |> Parser.parse "null"
             |> Expect.ok

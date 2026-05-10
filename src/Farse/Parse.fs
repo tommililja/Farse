@@ -25,8 +25,8 @@ module Parse =
         )
 
     /// <summary>Parses an optional value.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.optional Parse.int</example>
-    let optional (Parser parse) =
+    /// <example>let! int = "prop" &amp;= Parse.option Parse.int</example>
+    let option (Parser parse) =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Null -> Ok None
@@ -52,10 +52,10 @@ module Parse =
         )
 
     /// <summary>Verifies a parsed value.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.verified Parse.int (fun x -> x > 0) "message"</example>
+    /// <example>let! int = "prop" &amp;= Parse.verify Parse.int (fun x -> x > 0) "message"</example>
     /// <param name="fn">The predicate.</param>
     /// <param name="msg">The error message.</param>
-    let verified (Parser parse) fn msg : Parser<'r> =
+    let verify (Parser parse) fn msg : Parser<'r> =
         Parser (fun element ->
             match parse element with
             | Ok x when fn x -> Ok x
@@ -204,9 +204,9 @@ module Parse =
          ) ExpectedKind.String
 
     /// <summary>Parses a string as System.String that matches a regular expression.</summary>
-    /// <example>let! string = "prop" &amp;= Parse.stringRegex "^[0-9]+$"</example>
+    /// <example>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</example>
     /// <param name="regex">The regular expression to match.</param>
-    let stringRegex ([<StringSyntax("Regex")>] regex:string) =
+    let regex ([<StringSyntax("Regex")>] regex:string) =
         custom (fun element ->
             try
                 let str = element.GetString()
@@ -216,8 +216,8 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.stringNumber&lt;int&gt;</example>
-    let stringNumber<'r when 'r :> INumberBase<'r>> : Parser<'r> =
+    /// <example>let! int = "prop" &amp;= Parse.number&lt;int&gt;</example>
+    let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
         customInternal (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, number -> Ok number

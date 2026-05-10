@@ -335,7 +335,7 @@ There are a few different ways to validate parsed values.
 ```fsharp
 let! age = "age" ?= age
 let! age = "age" ?= valid byte Age.fromByte
-let! age = "age" ?= verified byte (fun x -> x >= 12uy) "The minimum age is '12'."
+let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is '12'."
 ```
 
 Validation can also be combined with sequences.

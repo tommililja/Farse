@@ -393,7 +393,7 @@ module ParseTests =
     let ``Should parse string as int`` () =
         let expected = BigInteger.Parse("1")
         let actual =
-            Prop.req "prop" Parse.stringNumber<bigint>
+            Prop.req "prop" Parse.number<bigint>
             |> Parser.parse """{ "prop": "1" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -402,7 +402,7 @@ module ParseTests =
     let ``Should parse string with regex`` () =
         let expected = "12345"
         let actual =
-            Prop.req "prop" (Parse.stringRegex "^[0-9]+$")
+            Prop.req "prop" (Parse.regex "^[0-9]+$")
             |> Parser.parse """{ "prop": "12345" }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -836,7 +836,7 @@ module ParseTests =
     let ``Should parse optional null value as None`` () =
         let expected = None
         let actual =
-            Prop.req "prop" (Parse.optional Parse.int)
+            Prop.req "prop" (Parse.option Parse.int)
             |> Parser.parse """{ "prop": null }"""
             |> Expect.ok
         Expect.equal actual expected
@@ -845,14 +845,14 @@ module ParseTests =
     let ``Should parse optional value as Some int`` () =
         let expected = Some 1
         let actual =
-            Prop.req "prop" (Parse.optional Parse.int)
+            Prop.req "prop" (Parse.option Parse.int)
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
     let ``Should fail when parsing optional value when a required property is missing`` () =
-        Prop.req "missing" (Parse.optional Parse.int)
+        Prop.req "missing" (Parse.option Parse.int)
         |> Parser.parse """{ "prop": null }"""
         |> Expect.errorString
 
@@ -884,7 +884,7 @@ module ParseTests =
     let ``Should return Ok when value is verified`` () =
         let expected = 1
         let actual =
-            Prop.req "prop" (Parse.verified Parse.int (fun x -> x > 0) "Error")
+            Prop.req "prop" (Parse.verify Parse.int (fun x -> x > 0) "Error")
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
