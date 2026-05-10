@@ -4,13 +4,13 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private isObject<'a, 'b> fn : Parser<'b> =
+    let inline private isObject<'t, 'r> fn : Parser<'r> =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
             | Kind.Object -> fn element
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'a>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'t>
                 |> Error.list
         )
 

@@ -255,63 +255,63 @@ module Parse =
 
     // Enums
 
-    let inline private parseEnum<'a, 'b when 'a: enum<'b>> fn =
-        let enumType = typeof<'a>
+    let inline private parseEnum<'r, 'e when 'r: enum<'e>> fn =
+        let enumType = typeof<'r>
         match fn () with
-        | true, x when Enum.IsDefined(enumType, x) -> Ok <| LanguagePrimitives.EnumOfValue<'b, 'a> x
+        | true, x when Enum.IsDefined(enumType, x) -> Ok <| LanguagePrimitives.EnumOfValue<'e, 'r> x
         | true, _ -> Error $"Expected %s{enumType.Name} enum."
         | _ -> Error $"Invalid %s{enumType.Name}."
 
     /// <summary>Parses a string as an enum type.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</example>
-    let enum<'a when 'a :> ValueType and 'a : struct and 'a : (new: unit -> 'a)> =
+    let enum<'r when 'r :> ValueType and 'r : struct and 'r : (new: unit -> 'r)> =
         custom (fun element ->
             let str = element.GetString()
-            let enumType = typeof<'a>
-            match Enum.TryParse<'a>(str, true) with
+            let enumType = typeof<'r>
+            match Enum.TryParse<'r>(str, true) with
             | true, enum when Enum.IsDefined(enumType, enum) -> Ok enum
             | _ -> Error $"Invalid %s{enumType.Name}."
         ) ExpectedKind.String
 
     /// <summary>Parses a number as a System.Int32 enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.intEnum&lt;Enum&gt;</example>
-    let intEnum<'a when 'a : enum<int>> =
-        custom (_.TryGetInt32 >> parseEnum<'a, int>) ExpectedKind.Number
+    let intEnum<'r when 'r : enum<int>> =
+        custom (_.TryGetInt32 >> parseEnum<'r, int>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.Int16 enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.int16Enum&lt;Enum&gt;</example>
-    let int16Enum<'a when 'a : enum<int16>> =
-        custom (_.TryGetInt16 >> parseEnum<'a, int16>) ExpectedKind.Number
+    let int16Enum<'r when 'r : enum<int16>> =
+        custom (_.TryGetInt16 >> parseEnum<'r, int16>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.Int64 enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.int64Enum&lt;Enum&gt;</example>
-    let int64Enum<'a when 'a : enum<int64>> =
-        custom (_.TryGetInt64 >> parseEnum<'a, int64>) ExpectedKind.Number
+    let int64Enum<'r when 'r : enum<int64>> =
+        custom (_.TryGetInt64 >> parseEnum<'r, int64>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.UInt16 enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.uint16Enum&lt;Enum&gt;</example>
-    let uint16Enum<'a when 'a : enum<uint16>> =
-        custom (_.TryGetUInt16 >> parseEnum<'a, uint16>) ExpectedKind.Number
+    let uint16Enum<'r when 'r : enum<uint16>> =
+        custom (_.TryGetUInt16 >> parseEnum<'r, uint16>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.UInt32 enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.uint32Enum&lt;Enum&gt;</example>
-    let uint32Enum<'a when 'a : enum<uint32>> =
-        custom (_.TryGetUInt32 >> parseEnum<'a, uint32>) ExpectedKind.Number
+    let uint32Enum<'r when 'r : enum<uint32>> =
+        custom (_.TryGetUInt32 >> parseEnum<'r, uint32>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.UInt64 enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.uint64Enum&lt;Enum&gt;</example>
-    let uint64Enum<'a when 'a : enum<uint64>> =
-        custom (_.TryGetUInt64 >> parseEnum<'a, uint64>) ExpectedKind.Number
+    let uint64Enum<'r when 'r : enum<uint64>> =
+        custom (_.TryGetUInt64 >> parseEnum<'r, uint64>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.Byte enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.byteEnum&lt;Enum&gt;</example>
-    let byteEnum<'a when 'a : enum<byte>> =
-        custom (_.TryGetByte >> parseEnum<'a, byte>) ExpectedKind.Number
+    let byteEnum<'r when 'r : enum<byte>> =
+        custom (_.TryGetByte >> parseEnum<'r, byte>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.SByte enum.</summary>
     /// <example>let! enum = "prop" &amp;= Parse.sbyteEnum&lt;Enum&gt;</example>
-    let sbyteEnum<'a when 'a : enum<sbyte>> =
-        custom (_.TryGetSByte >> parseEnum<'a, sbyte>) ExpectedKind.Number
+    let sbyteEnum<'r when 'r : enum<sbyte>> =
+        custom (_.TryGetSByte >> parseEnum<'r, sbyte>) ExpectedKind.Number
 
     // Date and time
 

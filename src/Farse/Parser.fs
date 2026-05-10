@@ -78,10 +78,10 @@ module Parser =
 
     /// <summary>Ignores a parsed value.</summary>
     /// <example>do! "prop" &amp;= Parse.int |> Parser.ignore</example>
-    let inline ignore<'a> (Parser parse) =
+    let inline ignore<'r> (Parser parse) =
         Parser (fun element ->
             parse element
-            |> Result.map ignore<'a>
+            |> Result.map ignore<'r>
         )
 
     /// <summary>Returns the parsed value or a default value.</summary>
