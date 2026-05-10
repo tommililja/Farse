@@ -25,6 +25,11 @@ module internal Extensions =
             | true, prop when prop.ValueKind <> Kind.Null -> Some prop
             | _ -> None
 
+        let inline tryGetNullProperty (name:string) (e:JsonElement) =
+            match e.TryGetProperty(name) with
+            | true, prop -> Some prop
+            | _ -> None
+
         let inline tryGetValue (e:JsonElement) =
             match e.ValueKind with
             | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> None

@@ -70,14 +70,17 @@ Given the JSON string.
 }
 ```
 
-And the two custom operators.
+And the three custom operators.
 
 ```fsharp
 // Parses a required property.
 let (&=) = Prop.req
 
-// Parses an optional property.
+// Parses an optional property by flattening.
 let (?=) = Prop.opt
+
+// Parses an optional property by distinguishing between missing and null.
+let (??=) = Prop.tryOpt
 ```
 
 We can create this simple parser.  

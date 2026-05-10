@@ -28,6 +28,60 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
+    let ``Should try parse null as None`` () =
+        let expected = None
+        let actual =
+            Prop.tryOpt "missing" Parse.int
+            |> Parser.parse """{ "prop": null }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse null as Some None`` () =
+        let expected = Some None
+        let actual =
+            Prop.tryOpt "prop" Parse.int
+            |> Parser.parse """{ "prop": null }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse number as Some Some int`` () =
+        let expected = Some (Some 1)
+        let actual =
+            Prop.tryOpt "prop" Parse.int
+            |> Parser.parse """{ "prop": 1 }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse nested null as None`` () =
+        let expected = None
+        let actual =
+            Prop.tryOpt "prop.prop2" Parse.int
+            |> Parser.parse """{ "prop": null }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse nested null as Some None`` () =
+        let expected = Some None
+        let actual =
+            Prop.tryOpt "prop.prop2" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse nested number as Some Some 1`` () =
+        let expected = Some (Some 1)
+        let actual =
+            Prop.tryOpt "prop.prop2" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
     let ``Should parse nested number as int`` () =
         let expected = 1
         let actual =
