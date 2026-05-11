@@ -86,9 +86,6 @@ module Parse =
                 |> Error.list
         )
 
-    let inline internal customInternalWith fn expectedKind =
-        customInternal fn expectedKind
-
     /// <summary>Creates a custom parser.</summary>
     /// <example><code>
     ///     let parser =
@@ -199,7 +196,7 @@ module Parse =
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
     let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
-        customInternalWith (fun element ->
+        customInternal (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
             | false, _ ->
@@ -408,7 +405,7 @@ module Parse =
         )
 
     let inline private arr ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        customInternalWith (fun element ->
+        customInternal (fun element ->
             let mutable error = false
             let mutable enumerator = element.EnumerateArray()
             let mutable i = 0
@@ -437,6 +434,7 @@ module Parse =
                         )
                 )
                 |> Error
+            else Ok <| convert items
         ) ExpectedKind.Array
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
@@ -464,7 +462,7 @@ module Parse =
     /// <param name="n">The index to parse in the array.</param>
     /// <param name="parser">The parser used for the element.</param>
     let index n parser : Parser<'r> =
-        customInternalWith (fun (element:JsonElement) ->
+        customInternal (fun (element:JsonElement) ->
             match element.GetArrayLength() with
             | length when n >= 0 && length >= n + 1 -> parseIndex n parser element
             | _ ->
@@ -486,7 +484,7 @@ module Parse =
         |> List.ofSeq
 
     let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        customInternalWith (fun (element:JsonElement) ->
+        customInternal (fun (element:JsonElement) ->
             let mutable error = false
             let mutable enumerator = element.EnumerateObject()
             let mutable i = 0
@@ -551,7 +549,7 @@ module Parse =
     // Tuples
 
     let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'r> =
-        customInternalWith (fun (element:JsonElement) ->
+        customInternal (fun (element:JsonElement) ->
             match element.GetArrayLength() with
             | actual when actual = expected -> fn element
             | actual ->
@@ -635,7 +633,7 @@ module Parse =
     /// <param name="name">The discriminator property name.</param>
     /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
-        customInternalWith (fun element ->
+        customInternal (fun element ->
             let (Parser parse) = Prop.req name string
             parse element
             |> Result.bind (fun x ->
