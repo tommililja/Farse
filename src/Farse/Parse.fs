@@ -422,9 +422,7 @@ module Parse =
                 | Ok x -> items[i] <- x; i <- i + 1
                 | Error _ -> error <- true
 
-            match error with
-            | false -> Ok <| convert items
-            | true ->
+            if error then
                 element.EnumerateArray()
                 |> List.ofSeq
                 |> List.indexed
@@ -503,15 +501,7 @@ module Parse =
                 | Ok x -> items[i] <- current.Name, x; i <- i + 1
                 | Error _ -> error <- true
 
-            match error with
-            | false ->
-                match getDuplicateKeys items with
-                | [] -> Ok <| convert items
-                | keys ->
-                    keys
-                    |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
-                    |> Error
-            | true ->
+            if error then
                 element.EnumerateObject()
                 |> List.ofSeq
                 |> List.collect (fun prop ->
@@ -525,6 +515,13 @@ module Parse =
                         )
                 )
                 |> Error
+            else
+                match getDuplicateKeys items with
+                | [] -> Ok <| convert items
+                | keys ->
+                    keys
+                    |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
+                    |> Error
         ) ExpectedKind.Object
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
