@@ -66,6 +66,29 @@ module Parse =
             | Error e -> Error e
         )
 
+    let inline internal customInternal fn expectedKind : Parser<'r> =
+        Parser (fun element ->
+            let actual = ExpectedKind.fromKind element.ValueKind
+            let isExpectedKind =
+                match expectedKind with
+                | ExpectedKind.Any -> true
+                | expected -> expected = actual
+
+            if isExpectedKind then
+                try fn element
+                with ex ->
+                    element
+                    |> ParseError.invalidEx ex.Message typeof<'r> ex
+                    |> Error.list
+            else
+                element
+                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
+                |> Error.list
+        )
+
+    let inline internal customInternalWith fn expectedKind =
+        customInternal fn expectedKind
+
     /// <summary>Creates a custom parser.</summary>
     /// <example><code>
     ///     let parser =
@@ -79,56 +102,14 @@ module Parse =
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
     let custom fn expectedKind : Parser<'r> =
-        Parser (fun element ->
-            let isExpectedKind =
-                match expectedKind with
-                | ExpectedKind.Any -> true
-                | ExpectedKind.Bool -> JsonElement.isBool element
-                | kind ->
-                    element.ValueKind
-                    |> ExpectedKind.fromKind
-                    |> (=) kind
-
-            if isExpectedKind then
-                try
-                    fn element
-                    |> Result.mapError (fun msg ->
-                        element
-                        |> ParseError.invalid msg typeof<'r>
-                        |> List.singleton
-                    )
-                with ex ->
-                    element
-                    |> ParseError.invalidEx ex.Message typeof<'r> ex
-                    |> Error.list
-            else
+        customInternal (fun element ->
+            fn element
+            |> Result.mapError (fun msg ->
                 element
-                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
-                |> Error.list
-        )
-
-    let inline internal customInternal fn expectedKind : Parser<'r> =
-        Parser (fun element ->
-            let isExpectedKind =
-                match expectedKind with
-                | ExpectedKind.Any -> true
-                | ExpectedKind.Bool -> JsonElement.isBool element
-                | kind ->
-                    element.ValueKind
-                    |> ExpectedKind.fromKind
-                    |> (=) kind
-
-            if isExpectedKind then
-                try fn element
-                with ex ->
-                    element
-                    |> ParseError.invalidEx ex.Message typeof<'r> ex
-                    |> Error.list
-            else
-                element
-                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
-                |> Error.list
-        )
+                |> ParseError.invalid msg typeof<'r>
+                |> List.singleton
+            )
+        ) expectedKind
 
     // Basic types
 
@@ -218,7 +199,7 @@ module Parse =
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
     /// <example>let! int = "prop" &amp;= Parse.number&lt;int&gt;</example>
     let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
-        customInternal (fun element ->
+        customInternalWith (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
             | false, _ ->
@@ -427,7 +408,7 @@ module Parse =
         )
 
     let inline private arr ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        customInternal (fun element ->
+        customInternalWith (fun element ->
             let mutable error = false
             let mutable enumerator = element.EnumerateArray()
             let mutable i = 0
@@ -485,7 +466,7 @@ module Parse =
     /// <param name="n">The index to parse in the array.</param>
     /// <param name="parser">The parser used for the element.</param>
     let index n parser : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternalWith (fun (element:JsonElement) ->
             match element.GetArrayLength() with
             | length when n >= 0 && length >= n + 1 -> parseIndex n parser element
             | _ ->
@@ -507,7 +488,7 @@ module Parse =
         |> List.ofSeq
 
     let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternalWith (fun (element:JsonElement) ->
             let mutable error = false
             let mutable enumerator = element.EnumerateObject()
             let mutable i = 0
@@ -573,7 +554,7 @@ module Parse =
     // Tuples
 
     let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternalWith (fun (element:JsonElement) ->
             match element.GetArrayLength() with
             | actual when actual = expected -> fn element
             | actual ->
@@ -657,7 +638,7 @@ module Parse =
     /// <param name="name">The discriminator property name.</param>
     /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
-        customInternal (fun element ->
+        customInternalWith (fun element ->
             let (Parser parse) = Prop.req name string
             parse element
             |> Result.bind (fun x ->
