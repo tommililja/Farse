@@ -10,62 +10,6 @@ open System.Text.RegularExpressions
 
 module Parse =
 
-    /// <summary>Always succeeds and returns FSharp.Core.Unit.</summary>
-    /// <example><code>do! "prop" &amp;= Parse.none</code></example>
-    let none = Parser.from ()
-
-    /// <summary>Parses an optional value but returns a default value when null.</summary>
-    /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
-    /// <param name="x">The default value.</param>
-    let nil (Parser parse) x =
-        Parser (fun (element:JsonElement) ->
-            match element.ValueKind with
-            | Kind.Null -> Ok x
-            | _ -> parse element
-        )
-
-    /// <summary>Parses an optional value.</summary>
-    /// <example><code>let! int = "prop" &amp;= Parse.option Parse.int</code></example>
-    let option (Parser parse) =
-        Parser (fun (element:JsonElement) ->
-            match element.ValueKind with
-            | Kind.Null -> Ok None
-            | _ ->
-                parse element
-                |> Result.map Some
-        )
-
-    /// <summary>Validates a parsed value.</summary>
-    /// <example><code>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</code></example>
-    /// <param name="fn">The validation function.</param>
-    let valid (Parser parse) fn : Parser<'r> =
-        Parser (fun element ->
-            parse element
-            |> Result.bind (fun x ->
-                fn x
-                |> Result.mapError (fun msg ->
-                    element
-                    |> ParseError.validation msg typeof<'r> $"%A{x}"
-                    |> List.singleton
-                )
-            )
-        )
-
-    /// <summary>Verifies a parsed value.</summary>
-    /// <example><code>let! int = "prop" &amp;= Parse.verify Parse.int (fun x -> x > 0) "message"</code></example>
-    /// <param name="fn">The predicate.</param>
-    /// <param name="msg">The error message.</param>
-    let verify (Parser parse) fn msg : Parser<'r> =
-        Parser (fun element ->
-            match parse element with
-            | Ok x when fn x -> Ok x
-            | Ok x ->
-                element
-                |> ParseError.validation msg typeof<'r> $"%A{x}"
-                |> Error.list
-            | Error e -> Error e
-        )
-
     let inline internal customInternal fn expectedKind : Parser<'r> =
         Parser (fun element ->
             let actual = ExpectedKind.fromKind element.ValueKind
@@ -179,7 +123,7 @@ module Parse =
             match element.GetString() with
             | str when String.isNotEmpty str -> Ok str
             | _ -> Error "Expected a non-empty string."
-         ) ExpectedKind.String
+        ) ExpectedKind.String
 
     /// <summary>Parses a string as System.String that matches a regular expression.</summary>
     /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
@@ -230,6 +174,10 @@ module Parse =
     /// <summary>Parses null as FSharp.Core.Unit.</summary>
     /// <example><code>do! "prop" &amp;= Parse.unit</code></example>
     let unit = custom (ignore >> Ok) ExpectedKind.Null
+
+    /// <summary>Always succeeds and returns FSharp.Core.Unit.</summary>
+    /// <example><code>do! "prop" &amp;= Parse.none</code></example>
+    let none = Parser.from ()
 
     // Enums
 
@@ -672,6 +620,60 @@ module Parse =
                     | Ok x -> Ok x
                     | Error _ -> loop (errors + 1) rest
             loop 0 parsers
+        )
+
+    // Combinators
+
+    /// <summary>Parses an optional value but returns a default value when null.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
+    /// <param name="x">The default value.</param>
+    let nil (Parser parse) x =
+        Parser (fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Null -> Ok x
+            | _ -> parse element
+        )
+
+    /// <summary>Parses an optional value.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.option Parse.int</code></example>
+    let option (Parser parse) =
+        Parser (fun (element:JsonElement) ->
+            match element.ValueKind with
+            | Kind.Null -> Ok None
+            | _ ->
+                parse element
+                |> Result.map Some
+        )
+
+    /// <summary>Validates a parsed value.</summary>
+    /// <example><code>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</code></example>
+    /// <param name="fn">The validation function.</param>
+    let valid (Parser parse) fn : Parser<'r> =
+        Parser (fun element ->
+            parse element
+            |> Result.bind (fun x ->
+                fn x
+                |> Result.mapError (fun msg ->
+                    element
+                    |> ParseError.validation msg typeof<'r> $"%A{x}"
+                    |> List.singleton
+                )
+            )
+        )
+
+    /// <summary>Verifies a parsed value.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.verify Parse.int (fun x -> x > 0) "message"</code></example>
+    /// <param name="fn">The predicate.</param>
+    /// <param name="msg">The error message.</param>
+    let verify (Parser parse) fn msg : Parser<'r> =
+        Parser (fun element ->
+            match parse element with
+            | Ok x when fn x -> Ok x
+            | Ok x ->
+                element
+                |> ParseError.validation msg typeof<'r> $"%A{x}"
+                |> Error.list
+            | Error e -> Error e
         )
 
     // Json
