@@ -32,13 +32,13 @@ module Parse =
 
     /// <summary>Creates a custom parser.</summary>
     /// <example><code>
-    ///     let parser =
-    ///         Parse.custom (fun element ->
-    ///             let string = element.GetString()
-    ///             match InstantPattern.General.Parse(string) with
-    ///             | result when result.Success -> Ok result.Value
-    ///             | result -> Error result.Exception.Message
-    ///         ) ExpectedKind.String
+    /// let parser =
+    ///     Parse.custom (fun element ->
+    ///         let string = element.GetString()
+    ///         match InstantPattern.General.Parse(string) with
+    ///         | result when result.Success -> Ok result.Value
+    ///         | result -> Error result.Exception.Message
+    ///     ) ExpectedKind.String
     /// </code></example>
     /// <param name="fn">The parsing function.</param>
     /// <param name="expectedKind">The expected element kind.</param>
