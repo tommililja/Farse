@@ -27,7 +27,7 @@ module JsonPath =
         |> JsonPath
 
     /// <summary>Converts a JsonPath to a string.</summary>
-    /// <example>let string = JsonPath.asString path</example>
+    /// <example><code>let string = JsonPath.asString path</code></example>
     let asString (JsonPath list) =
         list
         |> List.append [ "$" ]

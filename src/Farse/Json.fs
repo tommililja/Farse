@@ -27,7 +27,7 @@ type JsonFormat =
 type JNum =
 
     /// <summary>Creates a Json from a number.</summary>
-    /// <example>"number", JNum 1</example>
+    /// <example><code>"number", JNum 1</code></example>
     /// <param name="number">The number.</param>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
         match typeof<'a> with
@@ -47,7 +47,7 @@ module internal JNil =
 module JArr =
 
     /// <summary>An empty JSON array.</summary>
-    /// <example>"array", JArr.empty</example>
+    /// <example><code>"array", JArr.empty</code></example>
     let empty = JArr List.empty
 
     let inline internal from fn map =
@@ -56,23 +56,23 @@ module JArr =
 module JStr =
 
     /// <summary>An empty JSON string.</summary>
-    /// <example>"string", JStr.empty</example>
+    /// <example><code>"string", JStr.empty</code></example>
     let empty = JStr String.Empty
 
     /// <summary>Creates a JSON string from an optional value.</summary>
-    /// <example>"string", JStr.nil _ToUpper() (Some "string")</example>
+    /// <example><code>"string", JStr.nil _ToUpper() (Some "string")</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The optional value.</param>
     let inline nil fn x = JNil.from fn JStr x
 
     /// <summary>Creates a JSON string array from a sequence.</summary>
-    /// <example>"array", JStr.arr _ToUpper() [ "string" ]</example>
+    /// <example><code>"array", JStr.arr _ToUpper() [ "string" ]</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JStr x
 
     /// <summary>Creates a JSON string array from a value.</summary>
-    /// <example>"array", JStr.singleton _ToUpper() "string"</example>
+    /// <example><code>"array", JStr.singleton _ToUpper() "string"</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The value.</param>
     let inline singleton fn x =
@@ -82,25 +82,25 @@ module JStr =
 module JNum =
 
     /// <summary>A JSON number with the value 0.</summary>
-    /// <example>"number", JNum.zero</example>
+    /// <example><code>"number", JNum.zero</code></example>
     let zero = JNum 0
 
     /// <summary>Creates a JSON number from an optional value.</summary>
-    /// <example>"number", JNum.nil ((*)2) (Some 1)</example>
+    /// <example><code>"number", JNum.nil ((*)2) (Some 1)</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The optional value.</param>
     let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JNil.from fn JNum x
 
     /// <summary>Creates a JSON number array from a sequence.</summary>
-    /// <example>"array", JNum.arr ((*)2) [ 1 ]</example>
+    /// <example><code>"array", JNum.arr ((*)2) [ 1 ]</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The sequence.</param>
     let inline arr<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JArr.from fn JNum x
 
     /// <summary>Creates a JSON number array from a value.</summary>
-    /// <example>"array", JNum.singleton ((*)2) 1</example>
+    /// <example><code>"array", JNum.singleton ((*)2) 1</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The value.</param>
     let inline singleton fn x =
@@ -110,19 +110,19 @@ module JNum =
 module JBit =
 
     /// <summary>Creates a JSON bool from an optional value.</summary>
-    /// <example>"bool", JBit.nil not (Some true)</example>
+    /// <example><code>"bool", JBit.nil not (Some true)</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The optional value.</param>
     let inline nil fn x = JNil.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a sequence.</summary>
-    /// <example>"array", JBit.arr not [ true ]</example>
+    /// <example><code>"array", JBit.arr not [ true ]</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a value.</summary>
-    /// <example>"array", JBit.singleton not true</example>
+    /// <example><code>"array", JBit.singleton not true</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The value.</param>
     let inline singleton fn x =
@@ -132,23 +132,23 @@ module JBit =
 module JObj =
 
     /// <summary>An empty JSON object.</summary>
-    /// <example>"object", JObj.empty</example>
+    /// <example><code>"object", JObj.empty</code></example>
     let empty = JObj List.empty
 
     /// <summary>Creates a JSON object from an optional value.</summary>
-    /// <example>"object", JObj.nil (fun obj -> [ "prop", JStr obj.Prop ]) (Some {| Prop = "value" |})</example>
+    /// <example><code>"object", JObj.nil (fun obj -> [ "prop", JStr obj.Prop ]) (Some {| Prop = "value" |})</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The optional value.</param>
     let inline nil fn x = JNil.from fn JObj x
 
     /// <summary>Creates a JSON object array from a sequence.</summary>
-    /// <example>"array", JObj.arr (fun obj -> [ "prop", JStr obj.Prop ]) [ {| Prop = "value" |} ]</example>
+    /// <example><code>"array", JObj.arr (fun obj -> [ "prop", JStr obj.Prop ]) [ {| Prop = "value" |} ]</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The sequence.</param>
     let inline arr fn x = JArr.from fn JObj x
 
     /// <summary>Creates a JSON object array from a value.</summary>
-    /// <example>"array", JObj.singleton (fun obj -> [ "prop", JStr obj.Prop ]) {| Prop = "value" |}</example>
+    /// <example><code>"array", JObj.singleton (fun obj -> [ "prop", JStr obj.Prop ]) {| Prop = "value" |}</code></example>
     /// <param name="fn">The mapping function.</param>
     /// <param name="x">The value.</param>
     let inline singleton fn x =
@@ -165,7 +165,7 @@ module Json =
         )
 
     /// <summary>Sorts all properties in ascending order.</summary>
-    /// <example>let sorted = Json.sort json</example>
+    /// <example><code>let sorted = Json.sort json</code></example>
     /// <param name="json">The Json to sort.</param>
     let rec sort json =
         match json with
@@ -181,7 +181,7 @@ module Json =
         | other -> other
 
     /// <summary>Converts a JsonElement to a Json.</summary>
-    /// <example>let json = Json.fromElement element</example>
+    /// <example><code>let json = Json.fromElement element</code></example>
     /// <param name="element">The JsonElement to convert.</param>
     let rec fromElement (element:JsonElement) =
         match element.ValueKind with
@@ -202,7 +202,7 @@ module Json =
         | Kind.Null | Kind.Undefined -> JNil
 
     /// <summary>Parses a JSON string to a Json.</summary>
-    /// <example>let result = Json.fromString json</example>
+    /// <example><code>let result = Json.fromString json</code></example>
     /// <param name="json">The JSON string to parse.</param>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
@@ -213,7 +213,7 @@ module Json =
             | :? ArgumentNullException as exn -> Error exn
 
     /// <summary>Parses a JSON string asynchronously to a Json.</summary>
-    /// <example>let! result = Json.fromStreamAsync token stream</example>
+    /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     /// <param name="token">The CancellationToken to monitor.</param>
     /// <param name="stream">The JSON stream to parse.</param>
     let fromStreamAsync token stream =
@@ -227,14 +227,14 @@ module Json =
         }
 
     /// <summary>Parses a byte array to a Json.</summary>
-    /// <example>let result = Json.fromBytes bytes</example>
+    /// <example><code>let result = Json.fromBytes bytes</code></example>
     /// <param name="bytes">The byte array to parse.</param>
     let fromBytes (bytes:byte array) =
         Encoding.UTF8.GetString(bytes)
         |> fromString
 
     /// <summary>Converts a Json to a JsonNode.</summary>
-    /// <example>let node = Json.asJsonNode json</example>
+    /// <example><code>let node = Json.asJsonNode json</code></example>
     /// <param name="json">The Json to convert.</param>
     let rec asJsonNode json =
         match json with
@@ -254,7 +254,7 @@ module Json =
         | JNil -> null
 
     /// <summary>Converts a Json to a formatted JSON string.</summary>
-    /// <example>let string = Json.asString Indented json</example>
+    /// <example><code>let string = Json.asString Indented json</code></example>
     /// <param name="format">The format to use.</param>
     /// <param name="json">The Json to convert.</param>
     let asString format json =
@@ -270,7 +270,7 @@ module Json =
             node.ToJsonString(options)
 
     /// <summary>Writes a Json as a JSON string to a writer.</summary>
-    /// <example>Json.asStringTo writer json</example>
+    /// <example><code>Json.asStringTo writer json</code></example>
     /// <param name="writer">The writer to write to.</param>
     /// <param name="json">The Json to write.</param>
     let asStringTo (writer:Utf8JsonWriter) json =
@@ -295,7 +295,7 @@ module Json =
         write json
 
     /// <summary>Converts a Json to a byte array.</summary>
-    /// <example>let bytes = Json.asBytes Indented json</example>
+    /// <example><code>let bytes = Json.asBytes Indented json</code></example>
     /// <param name="format">The format to use.</param>
     /// <param name="json">The Json to convert.</param>
     let asBytes format json =

@@ -143,7 +143,7 @@ module ParseError =
         }
 
     /// <summary>Converts a ParseError to a formatted string.</summary>
-    /// <example>let string = ParseError.asString error</example>
+    /// <example><code>let string = ParseError.asString error</code></example>
     /// <param name="error">The ParseError to convert.</param>
     let asString error =
         string {

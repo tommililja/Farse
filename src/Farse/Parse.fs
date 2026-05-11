@@ -11,11 +11,11 @@ open System.Text.RegularExpressions
 module Parse =
 
     /// <summary>Always succeeds and returns FSharp.Core.Unit.</summary>
-    /// <example>do! "prop" &amp;= Parse.none</example>
+    /// <example><code>do! "prop" &amp;= Parse.none</code></example>
     let none = Parser.from ()
 
     /// <summary>Parses an optional value but returns a default value when null.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.nil Parse.int 1</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
     /// <param name="x">The default value.</param>
     let nil (Parser parse) x =
         Parser (fun (element:JsonElement) ->
@@ -25,7 +25,7 @@ module Parse =
         )
 
     /// <summary>Parses an optional value.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.option Parse.int</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.option Parse.int</code></example>
     let option (Parser parse) =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
@@ -36,7 +36,7 @@ module Parse =
         )
 
     /// <summary>Validates a parsed value.</summary>
-    /// <example>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</example>
+    /// <example><code>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</code></example>
     /// <param name="fn">The validation function.</param>
     let valid (Parser parse) fn : Parser<'r> =
         Parser (fun element ->
@@ -52,7 +52,7 @@ module Parse =
         )
 
     /// <summary>Verifies a parsed value.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.verify Parse.int (fun x -> x > 0) "message"</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.verify Parse.int (fun x -> x > 0) "message"</code></example>
     /// <param name="fn">The predicate.</param>
     /// <param name="msg">The error message.</param>
     let verify (Parser parse) fn msg : Parser<'r> =
@@ -119,51 +119,51 @@ module Parse =
         | _ -> Error $"Invalid %s{Type.getName typeof<'r>}."
 
     /// <summary>Parses a number as System.Int32.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.int</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.int</code></example>
     let int = custom (_.TryGetInt32 >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.Int16.</summary>
-    /// <example>let! int16 = "prop" &amp;= Parse.int16</example>
+    /// <example><code>let! int16 = "prop" &amp;= Parse.int16</code></example>
     let int16 = custom (_.TryGetInt16 >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.Int64.</summary>
-    /// <example>let! int64 = "prop" &amp;= Parse.int64</example>
+    /// <example><code>let! int64 = "prop" &amp;= Parse.int64</code></example>
     let int64 = custom (_.TryGetInt64 >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.UInt16.</summary>
-    /// <example>let! uint64 = "prop" &amp;= Parse.uint16</example>
+    /// <example><code>let! uint64 = "prop" &amp;= Parse.uint16</code></example>
     let uint16 = custom (_.TryGetUInt16 >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.UInt32.</summary>
-    /// <example>let! uint32 = "prop" &amp;= Parse.uint32</example>
+    /// <example><code>let! uint32 = "prop" &amp;= Parse.uint32</code></example>
     let uint32 = custom (_.TryGetUInt32 >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.UInt64.</summary>
-    /// <example>let! uint64 = "prop" &amp;= Parse.uint64</example>
+    /// <example><code>let! uint64 = "prop" &amp;= Parse.uint64</code></example>
     let uint64 = custom (_.TryGetUInt64 >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.Double.</summary>
-    /// <example>let! float = "prop" &amp;= Parse.float</example>
+    /// <example><code>let! float = "prop" &amp;= Parse.float</code></example>
     let float = custom (_.TryGetDouble >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.Single.</summary>
-    /// <example>let! float32 = "prop" &amp;= Parse.float32</example>
+    /// <example><code>let! float32 = "prop" &amp;= Parse.float32</code></example>
     let float32 = custom (_.TryGetSingle >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.Decimal.</summary>
-    /// <example>let! decimal = "prop" &amp;= Parse.decimal</example>
+    /// <example><code>let! decimal = "prop" &amp;= Parse.decimal</code></example>
     let decimal = custom (_.TryGetDecimal >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.Byte.</summary>
-    /// <example>let! byte = "prop" &amp;= Parse.byte</example>
+    /// <example><code>let! byte = "prop" &amp;= Parse.byte</code></example>
     let byte = custom (_.TryGetByte >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a number as System.SByte.</summary>
-    /// <example>let! sbyte = "prop" &amp;= Parse.sbyte</example>
+    /// <example><code>let! sbyte = "prop" &amp;= Parse.sbyte</code></example>
     let sbyte = custom (_.TryGetSByte >> tryParse) ExpectedKind.Number
 
     /// <summary>Parses a string as System.Char.</summary>
-    /// <example>let! char = "prop" &amp;= Parse.char</example>
+    /// <example><code>let! char = "prop" &amp;= Parse.char</code></example>
     let char =
         custom (fun element ->
             match element.GetString() with
@@ -172,11 +172,11 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.String.</summary>
-    /// <example>let! string = "prop" &amp;= Parse.string</example>
+    /// <example><code>let! string = "prop" &amp;= Parse.string</code></example>
     let string = custom (_.GetString() >> Ok) ExpectedKind.String
 
     /// <summary>Parses a non-empty, non-whitespace string as System.String.</summary>
-    /// <example>let! string = "prop" &amp;= Parse.stringNonEmpty</example>
+    /// <example><code>let! string = "prop" &amp;= Parse.stringNonEmpty</code></example>
     let stringNonEmpty =
         custom (fun element ->
             match element.GetString() with
@@ -185,7 +185,7 @@ module Parse =
          ) ExpectedKind.String
 
     /// <summary>Parses a string as System.String that matches a regular expression.</summary>
-    /// <example>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</example>
+    /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
     /// <param name="regex">The regular expression to match.</param>
     let regex ([<StringSyntax("Regex")>] regex:string) =
         custom (fun element ->
@@ -197,7 +197,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.number&lt;int&gt;</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
     let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
         customInternalWith (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
@@ -209,11 +209,11 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as System.Byte array.</summary>
-    /// <example>let! bytes = "prop" &amp;= Parse.base64Bytes</example>
+    /// <example><code>let! bytes = "prop" &amp;= Parse.base64Bytes</code></example>
     let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String
 
     /// <summary>Parses a number as System.Numerics.BigInteger.</summary>
-    /// <example>let! bigint = "prop" &amp;= Parse.bigint</example>
+    /// <example><code>let! bigint = "prop" &amp;= Parse.bigint</code></example>
     let bigint : Parser<bigint> =
         custom (fun element ->
             let str = element.GetRawText()
@@ -223,15 +223,15 @@ module Parse =
         ) ExpectedKind.Number
 
     /// <summary>Parses a bool as System.Boolean.</summary>
-    /// <example>let! bool = "prop" &amp;= Parse.bool</example>
+    /// <example><code>let! bool = "prop" &amp;= Parse.bool</code></example>
     let bool = custom (_.GetBoolean() >> Ok) ExpectedKind.Bool
 
     /// <summary>Parses a string as System.Guid.</summary>
-    /// <example>let! guid = "prop" &amp;= Parse.guid</example>
+    /// <example><code>let! guid = "prop" &amp;= Parse.guid</code></example>
     let guid = custom (_.TryGetGuid >> tryParse) ExpectedKind.String
 
     /// <summary>Parses null as FSharp.Core.Unit.</summary>
-    /// <example>do! "prop" &amp;= Parse.unit</example>
+    /// <example><code>do! "prop" &amp;= Parse.unit</code></example>
     let unit = custom (ignore >> Ok) ExpectedKind.Null
 
     // Enums
@@ -244,7 +244,7 @@ module Parse =
         | _ -> Error $"Invalid %s{enumType.Name}."
 
     /// <summary>Parses a string as an enum type.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</code></example>
     let enum<'r when 'r :> ValueType and 'r : struct and 'r : (new: unit -> 'r)> =
         custom (fun element ->
             let str = element.GetString()
@@ -255,49 +255,49 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a number as a System.Int32 enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.intEnum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.intEnum&lt;Enum&gt;</code></example>
     let intEnum<'r when 'r : enum<int>> =
         custom (_.TryGetInt32 >> parseEnum<'r, int>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.Int16 enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.int16Enum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.int16Enum&lt;Enum&gt;</code></example>
     let int16Enum<'r when 'r : enum<int16>> =
         custom (_.TryGetInt16 >> parseEnum<'r, int16>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.Int64 enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.int64Enum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.int64Enum&lt;Enum&gt;</code></example>
     let int64Enum<'r when 'r : enum<int64>> =
         custom (_.TryGetInt64 >> parseEnum<'r, int64>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.UInt16 enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.uint16Enum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.uint16Enum&lt;Enum&gt;</code></example>
     let uint16Enum<'r when 'r : enum<uint16>> =
         custom (_.TryGetUInt16 >> parseEnum<'r, uint16>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.UInt32 enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.uint32Enum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.uint32Enum&lt;Enum&gt;</code></example>
     let uint32Enum<'r when 'r : enum<uint32>> =
         custom (_.TryGetUInt32 >> parseEnum<'r, uint32>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.UInt64 enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.uint64Enum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.uint64Enum&lt;Enum&gt;</code></example>
     let uint64Enum<'r when 'r : enum<uint64>> =
         custom (_.TryGetUInt64 >> parseEnum<'r, uint64>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.Byte enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.byteEnum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.byteEnum&lt;Enum&gt;</code></example>
     let byteEnum<'r when 'r : enum<byte>> =
         custom (_.TryGetByte >> parseEnum<'r, byte>) ExpectedKind.Number
 
     /// <summary>Parses a number as a System.SByte enum.</summary>
-    /// <example>let! enum = "prop" &amp;= Parse.sbyteEnum&lt;Enum&gt;</example>
+    /// <example><code>let! enum = "prop" &amp;= Parse.sbyteEnum&lt;Enum&gt;</code></example>
     let sbyteEnum<'r when 'r : enum<sbyte>> =
         custom (_.TryGetSByte >> parseEnum<'r, sbyte>) ExpectedKind.Number
 
     // Date and time
 
     /// <summary>Parses a string as System.TimeOnly.</summary>
-    /// <example>let! timeOnly = "prop" &amp;= Parse.timeOnly</example>
+    /// <example><code>let! timeOnly = "prop" &amp;= Parse.timeOnly</code></example>
     let timeOnly =
         custom (fun element ->
             let str = element.GetString()
@@ -307,7 +307,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
-    /// <example>let! timeOnly = "prop" &amp;= Parse.timeOnlyExact "HH:mm:ss"</example>
+    /// <example><code>let! timeOnly = "prop" &amp;= Parse.timeOnlyExact "HH:mm:ss"</code></example>
     /// <param name="format">The required format.</param>
     let timeOnlyExact ([<StringSyntax("TimeOnlyFormat")>] format:string) =
         custom (fun element ->
@@ -318,7 +318,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeSpan.</summary>
-    /// <example>let! timeSpan = "prop" &amp;= Parse.timeSpan</example>
+    /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpan</code></example>
     let timeSpan =
         custom (fun element ->
             let str = element.GetString()
@@ -328,7 +328,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
-    /// <example>let! timeSpan = "prop" &amp;= Parse.timeSpanExact "c"</example>
+    /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpanExact "c"</code></example>
     /// <param name="format">The required format.</param>
     let timeSpanExact ([<StringSyntax("TimeSpanFormat")>] format:string) =
         custom (fun element ->
@@ -339,7 +339,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateOnly (ISO 8601).</summary>
-    /// <example>let! dateOnly = "prop" &amp;= Parse.dateOnly</example>
+    /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnly</code></example>
     let dateOnly =
         custom (fun element ->
             let str = element.GetString()
@@ -349,7 +349,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
-    /// <example>let! dateOnly = "prop" &amp;= Parse.dateOnlyExact "yyyy-MM-dd"</example>
+    /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnlyExact "yyyy-MM-dd"</code></example>
     /// <param name="format">The required format.</param>
     let dateOnlyExact ([<StringSyntax("DateOnlyFormat")>] format:string) =
         custom (fun element ->
@@ -360,11 +360,11 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime (ISO 8601).</summary>
-    /// <example>let! dateTime = "prop" &amp;= Parse.dateTime</example>
+    /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTime</code></example>
     let dateTime = custom (_.TryGetDateTime >> tryParse) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime (ISO 8601) and converts it to UTC.</summary>
-    /// <example>let! dateTime = "prop" &amp;= Parse.dateTimeUtc</example>
+    /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeUtc</code></example>
     let dateTimeUtc =
         custom (fun element ->
             match element.TryGetDateTime() with
@@ -373,7 +373,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
-    /// <example>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</example>
+    /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
     /// <param name="format">The required format.</param>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
@@ -384,11 +384,11 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTimeOffset (ISO 8601).</summary>
-    /// <example>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffset</example>
+    /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffset</code></example>
     let dateTimeOffset = custom (_.TryGetDateTimeOffset >> tryParse) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
-    /// <example>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</example>
+    /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</code></example>
     /// <param name="format">The required format.</param>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
@@ -442,27 +442,27 @@ module Parse =
         ) ExpectedKind.Array
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
-    /// <example>let! list = "prop" &amp;= Parse.list Parse.int</example>
+    /// <example><code>let! list = "prop" &amp;= Parse.list Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>
     let list parser = arr List.ofSeq parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Core.array.</summary>
-    /// <example>let! array = "prop" &amp;= Parse.array Parse.int</example>
+    /// <example><code>let! array = "prop" &amp;= Parse.array Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>
     let array parser = arr Array.ofSeq parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
-    /// <example>let! set = "prop" &amp;= Parse.set Parse.int</example>
+    /// <example><code>let! set = "prop" &amp;= Parse.set Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>
     let set parser = arr Set.ofSeq parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
-    /// <example>let! seq = "prop" &amp;= Parse.seq Parse.int</example>
+    /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>
     let seq parser = arr Seq.ofSeq parser
 
     /// <summary>Parses an array at a specific index.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.index 0 Parse.int</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.index 0 Parse.int</code></example>
     /// <param name="n">The index to parse in the array.</param>
     /// <param name="parser">The parser used for the element.</param>
     let index n parser : Parser<'r> =
@@ -528,27 +528,27 @@ module Parse =
         ) ExpectedKind.Object
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
-    /// <example>let! map = "prop" &amp;= Parse.map Parse.int</example>
+    /// <example><code>let! map = "prop" &amp;= Parse.map Parse.int</code></example>
     /// <param name="parser">The parser used for every property value.</param>
     let map parser = keyValue Map.ofSeq parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.IDictionary.</summary>
-    /// <example>let! dict = "prop" &amp;= Parse.dict Parse.int</example>
+    /// <example><code>let! dict = "prop" &amp;= Parse.dict Parse.int</code></example>
     /// <param name="parser">The parser used for every property value.</param>
     let dict parser = keyValue dict parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.KeyValuePair seq.</summary>
-    /// <example>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</example>
+    /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
     /// <param name="parser">The parser used for every property value.</param>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
     /// <summary>Parses an object's properties as tuple Microsoft.FSharp.Collections.seq.</summary>
-    /// <example>let! tuples = "prop" &amp;= Parse.tuples Parse.int</example>
+    /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
     /// <param name="parser">The parser used for every property value.</param>
     let tuples parser = keyValue Seq.ofSeq parser
 
     /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq.</summary>
-    /// <example>let! keys = "prop" &amp;= Parse.keys</example>
+    /// <example><code>let! keys = "prop" &amp;= Parse.keys</code></example>
     let keys = keyValue (Seq.map fst) none
 
     // Tuples
@@ -564,7 +564,7 @@ module Parse =
         ) ExpectedKind.Array
 
     /// <summary>Parses an array with two values as a tuple.</summary>
-    /// <example>let! tuple = "prop" &amp;= Parse.tuple2 Parse.int Parse.string</example>
+    /// <example><code>let! tuple = "prop" &amp;= Parse.tuple2 Parse.int Parse.string</code></example>
     /// <param name="a">The parser used for the first value.</param>
     /// <param name="b">The parser used for the second value.</param>
     let tuple2 a b =
@@ -578,7 +578,7 @@ module Parse =
         )
 
     /// <summary>Parses an array with three values as a tuple of three.</summary>
-    /// <example>let! tuple = "prop" &amp;= Parse.tuple3 Parse.int Parse.string Parse.bool</example>
+    /// <example><code>let! tuple = "prop" &amp;= Parse.tuple3 Parse.int Parse.string Parse.bool</code></example>
     /// <param name="a">The parser used for the first value.</param>
     /// <param name="b">The parser used for the second value.</param>
     /// <param name="c">The parser used for the third value.</param>
@@ -594,7 +594,7 @@ module Parse =
         )
 
     /// <summary>Parses an array with four values as a tuple of four.</summary>
-    /// <example>let! tuple = "prop" &amp;= Parse.tuple4 Parse.int Parse.string Parse.bool Parse.float</example>
+    /// <example><code>let! tuple = "prop" &amp;= Parse.tuple4 Parse.int Parse.string Parse.bool Parse.float</code></example>
     /// <param name="a">The parser used for the first value.</param>
     /// <param name="b">The parser used for the second value.</param>
     /// <param name="c">The parser used for the third value.</param>
@@ -612,7 +612,7 @@ module Parse =
         )
 
     /// <summary>Parses an array with five values as a tuple of five.</summary>
-    /// <example>let! tuple = "prop" &amp;= Parse.tuple5 Parse.int Parse.string Parse.bool Parse.float Parse.int</example>
+    /// <example><code>let! tuple = "prop" &amp;= Parse.tuple5 Parse.int Parse.string Parse.bool Parse.float Parse.int</code></example>
     /// <param name="a">The parser used for the first value.</param>
     /// <param name="b">The parser used for the second value.</param>
     /// <param name="c">The parser used for the third value.</param>
@@ -634,7 +634,7 @@ module Parse =
     // One-of
 
     /// <summary>Parses an object based on a discriminator property.</summary>
-    /// <example>let! x = Parse.oneOf "type" [ "a", a; "b", b ]</example>
+    /// <example><code>let! x = Parse.oneOf "type" [ "a", a; "b", b ]</code></example>
     /// <param name="name">The discriminator property name.</param>
     /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
@@ -653,7 +653,7 @@ module Parse =
         ) ExpectedKind.Object
 
     /// <summary>Creates a recursive parser that allows a parser to reference itself.</summary>
-    /// <example>let! x = Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</example>
+    /// <example><code>let! x = Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</code></example>
     /// <param name="fn">A function that receives a self-referencing parser.</param>
     let self (fn:Parser<'r> -> Parser<'r>) : Parser<'r> =
         let self = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
@@ -663,7 +663,7 @@ module Parse =
 
     /// <summary>Parses an element by trying each parser in order.</summary>
     /// <remarks>Returns the first that succeeds.</remarks>
-    /// <example>let! x = Parse.attempt [ a; b ]</example>
+    /// <example><code>let! x = Parse.attempt [ a; b ]</code></example>
     /// <param name="parsers">The list of parsers to try.</param>
     let attempt parsers : Parser<'r> =
         Parser (fun element ->
@@ -682,21 +682,21 @@ module Parse =
     // Json
 
     /// <summary>Parses an element's kind as System.Text.Json.JsonValueKind.</summary>
-    /// <example>let! jsonValueKind = "prop" &amp;= Parse.kind</example>
+    /// <example><code>let! jsonValueKind = "prop" &amp;= Parse.kind</code></example>
     let kind = custom (_.ValueKind >> Ok) ExpectedKind.Any
 
     /// <summary>Parses an element as System.Text.Json.JsonElement.</summary>
-    /// <example>let! jsonElement = "prop" &amp;= Parse.element</example>
+    /// <example><code>let! jsonElement = "prop" &amp;= Parse.element</code></example>
     let element = custom (JsonElement.clone >> Ok) ExpectedKind.Any
 
     /// <summary>Parses an element's raw text as System.String.</summary>
-    /// <example>let! string = "prop" &amp;= Parse.rawText</example>
+    /// <example><code>let! string = "prop" &amp;= Parse.rawText</code></example>
     let rawText = custom (_.GetRawText() >> Ok) ExpectedKind.Any
 
     /// <summary>Parses an array's length as System.Int32.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.arrayLength</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.arrayLength</code></example>
     let arrayLength = custom (_.GetArrayLength() >> Ok) ExpectedKind.Array
 
     /// <summary>Parses an object's property count as System.Int32.</summary>
-    /// <example>let! int = "prop" &amp;= Parse.propertyCount</example>
+    /// <example><code>let! int = "prop" &amp;= Parse.propertyCount</code></example>
     let propertyCount = custom (_.GetPropertyCount() >> Ok) ExpectedKind.Object
