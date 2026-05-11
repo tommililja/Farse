@@ -1,5 +1,6 @@
 namespace Farse
 
+open System
 open System.Text.Json
 
 [<Struct; NoComparison>]
@@ -7,6 +8,30 @@ type internal JsonElementType =
     | Element of JsonElement
     | Undefined of JsonElement
     | Null of JsonElement
+
+type JsonPath = JsonPath of string list
+
+module JsonPath =
+
+    let internal empty =
+        JsonPath []
+
+    let inline internal prop name =
+        JsonPath [ $".%s{name}" ]
+
+    let inline internal index n =
+        JsonPath [ $"[%i{n}]" ]
+
+    let inline internal append (JsonPath a) (JsonPath b) =
+        List.append a b
+        |> JsonPath
+
+    /// <summary>Converts a JsonPath to a string.</summary>
+    /// <example>let string = JsonPath.asString path</example>
+    let asString (JsonPath list) =
+        list
+        |> List.append [ "$" ]
+        |> String.concat String.Empty
 
 type internal Kind = JsonValueKind
 

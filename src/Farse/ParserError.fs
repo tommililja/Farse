@@ -3,30 +3,6 @@ namespace Farse
 open System
 open System.Text.Json
 
-type JsonPath = JsonPath of string list
-
-module JsonPath =
-
-    let internal empty =
-        JsonPath []
-
-    let inline internal prop name =
-        JsonPath [ $".%s{name}" ]
-
-    let inline internal index n =
-        JsonPath [ $"[%i{n}]" ]
-
-    let inline internal append (JsonPath a) (JsonPath b) =
-        List.append a b
-        |> JsonPath
-
-    /// <summary>Converts a JsonPath to a string.</summary>
-    /// <example>let string = JsonPath.asString path</example>
-    let asString (JsonPath list) =
-        list
-        |> List.append [ "$" ]
-        |> String.concat String.Empty
-
 [<NoComparison>]
 type ParseError = {
     Path: JsonPath
@@ -39,6 +15,20 @@ type ParseError = {
 }
 
 module ParseError =
+
+    // Functions for appending the path.
+
+    let private append path x =
+        { x with Path = JsonPath.append path x.Path }
+
+    let internal withProp name x =
+        append (JsonPath.prop name) x
+
+    let internal withIndex n x =
+        append (JsonPath.index n) x
+
+    let internal withPath path x =
+        append path x
 
     // Errors
 
@@ -151,20 +141,6 @@ module ParseError =
             Value = None
             Exn = None
         }
-
-    // Functions for appending the path.
-
-    let private append path x =
-        { x with Path = JsonPath.append path x.Path }
-
-    let internal withProp name x =
-        append (JsonPath.prop name) x
-
-    let internal withIndex n x =
-        append (JsonPath.index n) x
-
-    let internal withPath path x =
-        append path x
 
     /// <summary>Converts a ParseError to a formatted string.</summary>
     /// <example>let string = ParseError.asString error</example>
