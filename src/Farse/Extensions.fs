@@ -33,9 +33,6 @@ module internal Extensions =
             | Kind.Undefined -> JsonElement() // Undefined.
             | _ -> e.Clone()
 
-        let inline isBool (e:JsonElement) =
-            e.ValueKind = Kind.True || e.ValueKind = Kind.False
-
     module String =
 
         let isNotEmpty =
