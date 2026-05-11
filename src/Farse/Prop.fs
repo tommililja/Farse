@@ -47,12 +47,12 @@ module Prop =
             match JsonElement.tryGetProperty name element with
             | Element prop ->
                 match parse prop with
-                | Ok x -> Ok <| (Some (Some x))
+                | Ok x -> Ok <| Some (Some x)
                 | Error errors ->
                     errors
                     |> List.map (ParseError.withProp name)
                     |> Error
-            | Null _ -> Ok (Some None)
+            | Null _ -> Ok <| Some None
             | Undefined _ -> Ok None
         )
 
@@ -148,7 +148,7 @@ module Prop =
                     errors
                     |> List.map (ParseError.withPath path)
                     |> Error
-            | Ok (Some _) -> Ok (Some None)
+            | Ok (Some _) -> Ok <| Some None
             | Ok None -> Ok None
             | Error element ->
                 element

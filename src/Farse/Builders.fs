@@ -5,8 +5,7 @@ module internal Builders =
 
     type StringBuilder() =
 
-        member inline _.Yield(line:string) =
-            Seq.singleton line
+        member inline _.Yield(line:string) = Seq.singleton line
 
         member inline _.Yield(line:string option) =
             line
