@@ -20,23 +20,23 @@ dotnet package add Farse
 The benchmarks can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.8, macOS Tahoe 26.4.1 (25E253) [Darwin 25.4.0]
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.5 (25F71) [Darwin 25.5.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
-.NET SDK 10.0.201
-  [Host]     : .NET 10.0.5 (10.0.5, 10.0.526.15411), Arm64 RyuJIT armv8.0-a DEBUG
-  DefaultJob : .NET 10.0.5 (10.0.5, 10.0.526.15411), Arm64 RyuJIT armv8.0-a
+.NET SDK 10.0.203
+  [Host]     : .NET 10.0.7 (10.0.7, 10.0.726.21808), Arm64 RyuJIT armv8.0-a DEBUG
+  DefaultJob : .NET 10.0.7 (10.0.7, 10.0.726.21808), Arm64 RyuJIT armv8.0-a
 ```
 
 ```shell
 | Method                 | Mean     | Ratio | Gen0     | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|---------:|--------:|----------:|------------:|
-| System.Text.Json       | 122.2 us |  0.77 |   6.1035 |       - |  37.57 KB |        0.68 |
-| Farse                  | 157.7 us |  1.00 |   9.0332 |       - |  55.58 KB |        1.00 |
-| System.Text.Json*      | 130.3 us |  0.83 |  17.3340 |  2.6855 | 106.53 KB |        1.92 |
-| Newtonsoft.Json*       | 222.2 us |  1.41 |  48.8281 |  8.5449 | 299.77 KB |        5.39 |
-| Thoth.System.Text.Json | 250.0 us |  1.59 |  68.8477 | 22.4609 | 423.88 KB |        7.63 |
-| Newtonsoft.Json        | 259.9 us |  1.65 |  86.9141 | 40.0391 | 534.38 KB |        9.61 |
-| Thoth.Json.Net         | 365.7 us |  2.32 | 111.3281 | 55.6641 | 684.98 KB |       12.32 |
+| System.Text.Json       | 128.9 us |  0.80 |   6.1035 |       - |  37.57 KB |        0.86 |
+| Farse                  | 160.6 us |  1.00 |   7.0801 |       - |  43.86 KB |        1.00 |
+| System.Text.Json*      | 133.3 us |  0.83 |  17.3340 |  2.6855 | 106.53 KB |        2.43 |
+| Newtonsoft.Json*       | 226.9 us |  1.41 |  48.8281 |  7.3242 | 299.77 KB |        6.83 |
+| Thoth.System.Text.Json | 235.9 us |  1.47 |  65.9180 | 18.7988 | 405.13 KB |        9.24 |
+| Newtonsoft.Json        | 268.5 us |  1.67 |  86.9141 | 40.0391 | 534.38 KB |       12.18 |
+| Thoth.Json.Net         | 372.6 us |  2.32 | 111.3281 | 55.6641 | 684.98 KB |       15.62 |
 
 * Serialization
 ```
