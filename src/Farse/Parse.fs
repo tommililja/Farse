@@ -393,7 +393,7 @@ module Parse =
     /// <summary>Parses an array as Microsoft.FSharp.Core.array.</summary>
     /// <example><code>let! array = "prop" &amp;= Parse.array Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>
-    let array parser = arr Array.ofSeq parser
+    let array parser = arr id parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
     /// <example><code>let! set = "prop" &amp;= Parse.set Parse.int</code></example>
