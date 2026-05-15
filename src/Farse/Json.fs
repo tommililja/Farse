@@ -51,7 +51,9 @@ module JArr =
     let empty = JArr List.empty
 
     let inline internal from fn map =
-        List.ofSeq >> List.map (fn >> map) >> JArr
+        List.ofSeq
+        >> List.map (fn >> map)
+        >> JArr
 
 module JStr =
 

@@ -37,7 +37,7 @@ module ParseError =
             Path = path
             Element = JsonElement.clone element
             Index = None
-            Details = "Required property was not found."
+            Details = "Missing required property."
             Value = None
             Type = type'
             Exn = None
@@ -54,7 +54,7 @@ module ParseError =
             Exn = None
         }
 
-    let internal invalid details type' element =
+    let invalid details type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element

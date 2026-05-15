@@ -4,155 +4,144 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private parseInternal<'t, 'r> fn : Parser<'r> =
-        Parser (fun (element:JsonElement) ->
+    let inline private jsonPath path count =
+        path
+        |> Array.take count
+        |> JsonPath.fromArray
+
+    let inline private fold path element =
+        path
+        |> Array.fold (fun (element:JsonElement, count) (name:string) ->
             match element.ValueKind with
-            | Kind.Object -> fn element
+            | Kind.Object -> element.TryGetProperty(name) |> snd, count + 1
+            | _ -> element, count
+        ) (element, 0)
+
+    let private parse (name:string) (Parser parse) : Parser<'r> =
+        Parser (fun element ->
+            match element.ValueKind with
+            | Kind.Object ->
+                match element.TryGetProperty(name) with
+                | true, prop ->
+                    match parse prop with
+                    | Ok x -> Ok x
+                    | Error errors ->
+                        errors
+                        |> List.map (ParseError.withProp name)
+                        |> Error
+                | _, prop ->
+                    prop
+                    |> ParseError.required (JsonPath.prop name) typeof<'r>
+                    |> Error.list
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'t>
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
-    let inline private parse name (Parser parse) : Parser<'r> =
-        parseInternal<'r, 'r> (fun element ->
-            match JsonElement.tryGetProperty name element with
-            | Element prop | Null prop ->
-                parse prop
-                |> Result.mapError (fun errors ->
+    let private tryParse (name:string) (Parser parse) : Parser<'r option> =
+        Parser (fun element ->
+            match element.ValueKind with
+            | Kind.Object ->
+                match element.TryGetProperty(name) with
+                | true, prop when prop.isNotNull ->
+                    match parse prop with
+                    | Ok x -> Ok <| Some x
+                    | Error errors ->
+                        errors
+                        |> List.map (ParseError.withProp name)
+                        |> Error
+                | _ -> Ok None
+            | _ ->
+                element
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
+                |> Error.list
+        )
+
+    let private tryParseNull (name:string) (Parser parse) : Parser<'r option option> =
+        Parser (fun element ->
+            match element.ValueKind with
+            | Kind.Object ->
+                match element.TryGetProperty(name) with
+                | true, prop when prop.isNull -> Ok <| Some None
+                | true, prop ->
+                    match parse prop with
+                    | Ok x -> Ok <| Some (Some x)
+                    | Error errors ->
+                        errors
+                        |> List.map (ParseError.withProp name)
+                        |> Error
+                | _ -> Ok None
+            | _ ->
+                element
+                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
+                |> Error.list
+        )
+
+    let private traverse (path:string array) (Parser parse) : Parser<'r> =
+        Parser (fun element ->
+            match fold path element with
+            | element, count when count = path.Length && element.isUndefined ->
+                element
+                |> ParseError.required (jsonPath path count) typeof<'r>
+                |> Error.list
+            | element, count when count = path.Length ->
+                match parse element with
+                | Ok x -> Ok x
+                | Error errors ->
                     errors
-                    |> List.map (ParseError.withProp name)
-                )
-            | Undefined prop ->
-                prop
-                |> ParseError.required (JsonPath.prop name) typeof<'r>
+                    |> List.map (
+                        path
+                        |> JsonPath.fromArray
+                        |> ParseError.withPath
+                    )
+                    |> Error
+            | element, count ->
+                element
+                |> ParseError.expectedKind ExpectedKind.Object (jsonPath path count) typeof<'r>
                 |> Error.list
         )
 
-    let inline private tryParse name (Parser parse) =
-        parseInternal<'r, 'r option> (fun element ->
-            match JsonElement.tryGetProperty name element with
-            | Element prop ->
-                match parse prop with
+    let private tryTraverse (path:string array) (Parser parse) : Parser<'r option> =
+        Parser (fun element ->
+            match fold path element with
+            | element, _ when element.isNullOrUndefined -> Ok None
+            | element, count when count = path.Length ->
+                match parse element with
                 | Ok x -> Ok <| Some x
                 | Error errors ->
                     errors
-                    |> List.map (ParseError.withProp name)
+                    |> List.map (
+                        path
+                        |> JsonPath.fromArray
+                        |> ParseError.withPath
+                    )
                     |> Error
-            | Null _ | Undefined _ -> Ok None
+            | element, count ->
+                element
+                |> ParseError.expectedKind ExpectedKind.Object (jsonPath path count) typeof<'r>
+                |> Error.list
         )
 
-    let inline private tryParseNull name (Parser parse) =
-        parseInternal<'r, 'r option option> (fun element ->
-            match JsonElement.tryGetProperty name element with
-            | Element prop ->
-                match parse prop with
+    let private tryTraverseNull (path:string array) (Parser parse) : Parser<'r option option> =
+        Parser (fun element ->
+            match fold path element with
+            | element, count when element.isNull && count = path.Length -> Ok <| Some None
+            | element, _ when element.isNullOrUndefined -> Ok None
+            | element, count when count = path.Length ->
+                match parse element with
                 | Ok x -> Ok <| Some (Some x)
                 | Error errors ->
                     errors
-                    |> List.map (ParseError.withProp name)
+                    |> List.map (
+                        path
+                        |> JsonPath.fromArray
+                        |> ParseError.withPath
+                    )
                     |> Error
-            | Null _ -> Ok <| Some None
-            | Undefined _ -> Ok None
-        )
-
-    let inline private traverse path (Parser parse) : Parser<'r> =
-        Parser (fun element ->
-            let prop, path =
-                path
-                |> Seq.fold (fun (prop, path) name ->
-                    match prop with
-                    | Ok (element:JsonElement) ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            let path = JsonPath.append path (JsonPath.prop name)
-                            match JsonElement.tryGetProperty name element with
-                            | Element prop | Null prop -> Ok prop, path
-                            | Undefined prop -> Error (prop, true), path
-                        | _ -> Error (element, false), path
-                    | Error e -> Error e, path
-                ) (Ok element, JsonPath.empty)
-
-            match prop with
-            | Ok prop ->
-                parse prop
-                |> Result.mapError (fun errors ->
-                    errors
-                    |> List.map (ParseError.withPath path)
-                )
-            | Error (element, true) ->
+            | element, count ->
                 element
-                |> ParseError.required path typeof<'r>
-                |> Error.list
-            | Error (element, false) ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Object path typeof<'r>
-                |> Error.list
-        )
-
-    let inline private tryTraverse path (Parser parse) : Parser<'r option> =
-        Parser (fun element ->
-            let prop, path =
-                path
-                |> Seq.fold (fun (prop, path) name ->
-                    match prop with
-                    | Ok (Some (element:JsonElement)) ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            let path = JsonPath.append path (JsonPath.prop name)
-                            match JsonElement.tryGetProperty name element with
-                            | Element prop -> Ok <| Some prop, path
-                            | Null _ | Undefined _ -> Ok None, path
-                        | _ -> Error element, path
-                    | _ -> prop, path
-                ) (Ok (Some element), JsonPath.empty)
-
-            match prop with
-            | Ok (Some prop) ->
-                match parse prop with
-                | Ok x -> Ok <| Some x
-                | Error errors ->
-                    errors
-                    |> List.map (ParseError.withPath path)
-                    |> Error
-            | Ok None -> Ok None
-            | Error element ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Object path typeof<'r>
-                |> Error.list
-        )
-
-    let inline private tryTraverseNull path (Parser parse) : Parser<'r option option> =
-        Parser (fun element ->
-            let prop, path =
-                path
-                |> Seq.fold (fun (prop, path) name ->
-                    match prop with
-                    | Ok (Some (element:JsonElement)) ->
-                        match element.ValueKind with
-                        | Kind.Object ->
-                            let path = JsonPath.append path (JsonPath.prop name)
-                            match JsonElement.tryGetProperty name element with
-                            | Element prop | Null prop -> Ok <| Some prop, path
-                            | Undefined _ -> Ok None, path
-                        | Kind.Null -> Ok None, path
-                        | _ -> Error element, path
-                    | _ -> prop, path
-                ) (Ok (Some element), JsonPath.empty)
-
-            match prop with
-            | Ok (Some prop) when prop.ValueKind <> Kind.Null ->
-                match parse prop with
-                | Ok x -> Ok <| Some (Some x)
-                | Error errors ->
-                    errors
-                    |> List.map (ParseError.withPath path)
-                    |> Error
-            | Ok (Some _) -> Ok <| Some None
-            | Ok None -> Ok None
-            | Error element ->
-                element
-                |> ParseError.expectedKind ExpectedKind.Object path typeof<'r>
+                |> ParseError.expectedKind ExpectedKind.Object (jsonPath path count) typeof<'r>
                 |> Error.list
         )
 

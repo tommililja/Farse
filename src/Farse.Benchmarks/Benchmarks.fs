@@ -34,8 +34,7 @@ type User = {
 module BenchmarkData =
 
     let json n =
-        seq { 1 .. n }
-        |> List.ofSeq
+        [ 1 .. n ]
         |> List.map (fun _ ->
             JObj [
                 "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"

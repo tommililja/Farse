@@ -14,13 +14,21 @@ module internal Extensions =
                 CommentHandling = JsonCommentHandling.Skip
             )
 
-    module JsonElement =
+    type JsonElement with
 
-        let inline tryGetProperty (name:string) (e:JsonElement) =
-            match e.TryGetProperty(name) with
-            | true, prop when prop.ValueKind <> Kind.Null -> Element prop
-            | true, prop -> Null prop
-            | _, prop -> Undefined prop
+        member inline this.isNull =
+            this.ValueKind = Kind.Null
+
+        member inline this.isUndefined =
+            this.ValueKind = Kind.Undefined
+
+        member inline this.isNullOrUndefined =
+            this.ValueKind = Kind.Null || this.ValueKind = Kind.Undefined
+
+        member inline this.isNotNull =
+            this.ValueKind <> Kind.Null
+
+    module JsonElement =
 
         let inline tryGetValue (e:JsonElement) =
             match e.ValueKind with
@@ -35,9 +43,9 @@ module internal Extensions =
 
     module String =
 
-        let isNotEmpty =
-            String.IsNullOrWhiteSpace
-            >> not
+        let inline isNotEmpty str =
+            String.IsNullOrWhiteSpace(str)
+            |> not
 
     module Type =
 
@@ -83,21 +91,9 @@ module internal Extensions =
 
     module Error =
 
-        let list x =
+        let inline list x =
             List.singleton x
             |> Error
-
-    module Result =
-
-        // Significantly decreases memory allocations.
-        let inline mapError ([<InlineIfLambda>] fn) = function
-            | Ok x -> Ok x
-            | Error e -> Error <| fn e
-
-    module ResultOption =
-
-        let inline defaultValue x =
-            Result.map (Option.defaultValue x)
 
     module Seq =
 
@@ -107,7 +103,7 @@ module internal Extensions =
     [<AutoOpen>]
     module ActivePatterns =
 
-        let inline (|Prop|Path|) (str:string) =
+        let (|Prop|Path|) (str:string) =
             if str.Contains('.')
             then Path (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Prop str

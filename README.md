@@ -7,9 +7,11 @@
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
-Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while producing detailed errors.
+Farse uses a slightly different syntax, includes a computation expression, and a few custom operators that simplify parsing. It also tries to keep a low overhead while producing detailed errors and helpful error messages.
 
 ## Installation
+
+Farse currently targets .NET 8.0 and above.
 
 ```shell
 dotnet package add Farse
@@ -30,13 +32,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0     | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|---------:|--------:|----------:|------------:|
-| System.Text.Json       | 128.9 us |  0.80 |   6.1035 |       - |  37.57 KB |        0.86 |
-| Farse                  | 160.6 us |  1.00 |   7.0801 |       - |  43.86 KB |        1.00 |
-| System.Text.Json*      | 133.3 us |  0.83 |  17.3340 |  2.6855 | 106.53 KB |        2.43 |
-| Newtonsoft.Json*       | 226.9 us |  1.41 |  48.8281 |  7.3242 | 299.77 KB |        6.83 |
-| Thoth.System.Text.Json | 235.9 us |  1.47 |  65.9180 | 18.7988 | 405.13 KB |        9.24 |
-| Newtonsoft.Json        | 268.5 us |  1.67 |  86.9141 | 40.0391 | 534.38 KB |       12.18 |
-| Thoth.Json.Net         | 372.6 us |  2.32 | 111.3281 | 55.6641 | 684.98 KB |       15.62 |
+| System.Text.Json       | 128.5 us |  0.81 |   6.1035 |       - |  37.57 KB |        0.86 |
+| Farse                  | 158.6 us |  1.00 |   7.0801 |       - |  43.86 KB |        1.00 |
+| System.Text.Json*      | 134.9 us |  0.85 |  17.3340 |  2.6855 | 106.53 KB |        2.43 |
+| Newtonsoft.Json*       | 229.5 us |  1.45 |  48.8281 |  7.3242 | 299.77 KB |        6.83 |
+| Thoth.System.Text.Json | 240.5 us |  1.52 |  65.9180 | 18.7988 | 405.13 KB |        9.24 |
+| Newtonsoft.Json        | 275.3 us |  1.74 |  86.9141 | 40.0391 | 534.38 KB |       12.18 |
+| Thoth.Json.Net         | 382.0 us |  2.41 | 111.3281 | 55.6641 | 684.98 KB |       15.62 |
 
 * Serialization
 ```
@@ -76,10 +78,10 @@ And the three custom operators.
 // Parses a required property.
 let (&=) = Prop.req
 
-// Parses an optional property by flattening options.
+// Parses an optional property, returning 'a option.
 let (?=) = Prop.opt
 
-// Parses an optional property by distinguishing between a missing property and null value.
+// Parses an optional property, distinguishing between a missing property and null value.
 let (??=) = Prop.tryOpt
 ```
 
@@ -99,7 +101,6 @@ module User =
             and! age = "age" ?= valid byte Age.fromByte
             and! email = "email" &= valid string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
-            and! tags = "tags" &= list (valid string Tag.fromString)
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
@@ -113,6 +114,8 @@ module User =
                     RenewsAt = renewsAt
                 }
             }
+            
+            and! tags = "tags" &= list (valid string Tag.fromString)
 
             // "Path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).

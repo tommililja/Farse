@@ -44,12 +44,12 @@ module Parse =
     /// <param name="expectedKind">The expected element kind.</param>
     let custom fn expectedKind : Parser<'r> =
         customInternal (fun element ->
-            fn element
-            |> Result.mapError (fun msg ->
+            match fn element with
+            | Ok x -> Ok x
+            | Error msg ->
                 element
                 |> ParseError.invalid msg typeof<'r>
-                |> List.singleton
-            )
+                |> Error.list
         ) expectedKind
 
     // Basic types
@@ -143,7 +143,7 @@ module Parse =
         customInternal (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
-            | false, _ ->
+            | _ ->
                 element
                 |> ParseError.invalid "Expected a number string." typeof<'r>
                 |> Error.list
@@ -160,7 +160,7 @@ module Parse =
             let str = element.GetRawText()
             match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, bigint -> Ok bigint
-            | false, _ -> Error "Invalid BigInteger."
+            | _ -> Error "Invalid BigInteger."
         ) ExpectedKind.Number
 
     /// <summary>Parses a bool as System.Boolean.</summary>
@@ -346,13 +346,14 @@ module Parse =
     // Sequences
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =
-        parse (element.Item n)
-        |> Result.mapError (fun errors ->
+        match parse (element.Item n) with
+        | Ok x -> Ok x
+        | Error errors ->
             errors
             |> List.map (ParseError.withIndex n)
-        )
+            |> Error
 
-    let inline private arr ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
+    let inline private arr convert (Parser parse) : Parser<'r> =
         customInternal (fun element ->
             let mutable error = false
             let mutable enumerator = element.EnumerateArray()
@@ -583,8 +584,8 @@ module Parse =
     let oneOf name parsers : Parser<'r> =
         customInternal (fun element ->
             let (Parser parse) = Prop.req name string
-            parse element
-            |> Result.bind (fun x ->
+            match parse element with
+            | Ok x ->
                 let parser = List.tryFind (fun (key, _) -> key = x) parsers
                 match parser with
                 | Some (_, Parser parse) -> parse element
@@ -592,7 +593,7 @@ module Parse =
                     element
                     |> ParseError.invalidOneOf x typeof<'r>
                     |> Error.list
-            )
+            | Error e -> Error e
         ) ExpectedKind.Object
 
     /// <summary>Creates a recursive parser that allows a parser to reference itself.</summary>
@@ -641,8 +642,9 @@ module Parse =
             match element.ValueKind with
             | Kind.Null -> Ok None
             | _ ->
-                parse element
-                |> Result.map Some
+                match parse element with
+                | Ok x -> Ok <| Some x
+                | Error e -> Error e
         )
 
     /// <summary>Validates a parsed value.</summary>
@@ -650,15 +652,15 @@ module Parse =
     /// <param name="fn">The validation function.</param>
     let valid (Parser parse) fn : Parser<'r> =
         Parser (fun element ->
-            parse element
-            |> Result.bind (fun x ->
-                fn x
-                |> Result.mapError (fun msg ->
+            match parse element with
+            | Ok x ->
+                match fn x with
+                | Ok x -> Ok x
+                | Error msg ->
                     element
                     |> ParseError.validation msg typeof<'r> $"%A{x}"
-                    |> List.singleton
-                )
-            )
+                    |> Error.list
+            | Error e -> Error e
         )
 
     /// <summary>Verifies a parsed value.</summary>

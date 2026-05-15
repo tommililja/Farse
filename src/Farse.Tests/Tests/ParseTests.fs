@@ -55,11 +55,29 @@ module ParseTests =
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should try parse nested null as None`` () =
+    let ``Should try parse last value as None`` () =
         let expected = None
         let actual =
             Prop.tryOpt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": null }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse nested null object as None`` () =
+        let expected = None
+        let actual =
+            Prop.tryOpt "prop.prop2.prop3" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should try parse nested missing object as None`` () =
+        let expected = None
+        let actual =
+            Prop.tryOpt "prop.missing.prop3" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.ok
         Expect.equal actual expected
 
@@ -136,6 +154,15 @@ module ParseTests =
         let actual =
             Prop.opt "prop.prop2.prop3" Parse.int
             |> Parser.parse """ { "prop": { "prop2": null } } """
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should parse nested missing object as None`` () =
+        let expected = None
+        let actual =
+            Prop.opt "prop.missing.prop3" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.ok
         Expect.equal actual expected
 

@@ -3,35 +3,33 @@ namespace Farse
 open System
 open System.Text.Json
 
-[<Struct; NoComparison>]
-type internal JsonElementType =
-    | Element of JsonElement
-    | Undefined of JsonElement
-    | Null of JsonElement
-
-type JsonPath = JsonPath of string list
+[<Struct>]
+type JsonPath = JsonPath of string
 
 module JsonPath =
 
-    let internal empty =
-        JsonPath []
+    let empty =
+        JsonPath String.Empty
 
-    let inline internal prop name =
-        JsonPath [ $".%s{name}" ]
+    let internal prop name =
+        JsonPath $".%s{name}"
 
-    let inline internal index n =
-        JsonPath [ $"[%i{n}]" ]
+    let internal index n =
+        JsonPath $"[%i{n}]"
 
-    let inline internal append (JsonPath a) (JsonPath b) =
-        List.append a b
+    let internal append (JsonPath a) (JsonPath b) =
+        JsonPath (a + b)
+
+    let internal fromArray array =
+        array
+        |> Array.map (sprintf ".%s")
+        |> String.concat String.Empty
         |> JsonPath
 
     /// <summary>Converts a JsonPath to a string.</summary>
     /// <example><code>let string = JsonPath.asString path</code></example>
-    let asString (JsonPath list) =
-        list
-        |> List.append [ "$" ]
-        |> String.concat String.Empty
+    let asString (JsonPath str) =
+        "$" + str
 
 type internal Kind = JsonValueKind
 

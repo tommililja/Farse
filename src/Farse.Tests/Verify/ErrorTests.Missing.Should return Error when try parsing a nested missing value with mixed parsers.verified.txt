@@ -3,4 +3,4 @@
 Error[0]:
   at $.prop.prop2.missing
    | Tried parsing 'int.
-   | Required property was not found.
+   | Missing required property.

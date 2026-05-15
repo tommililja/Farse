@@ -19,14 +19,14 @@ module Parser =
     /// <summary>Creates a parser from a result.</summary>
     /// <example><code>let! int = Ok 1 |> Parser.fromResult</code></example>
     /// <param name="x">The result to return.</param>
-    let fromResult x : Parser<'r> =
+    let inline fromResult x : Parser<'r> =
         Parser (fun element ->
-            x
-            |> Result.mapError (fun msg ->
+            match x with
+            | Ok x -> Ok x
+            | Error msg ->
                 element
                 |> ParseError.invalid msg typeof<'r>
-                |> List.singleton
-            )
+                |> Error.list
         )
 
     /// <summary>Creates a parser that will fail.</summary>
@@ -41,9 +41,9 @@ module Parser =
     /// <param name="x">The default value to return.</param>
     let inline recover x (Parser parse) =
         Parser (fun element ->
-            parse element
-            |> Result.defaultValue x
-            |> Ok
+            match parse element with
+            | Ok x -> Ok x
+            | Error _ -> Ok x
         )
 
     /// <summary>Binds a parsed value.</summary>
@@ -51,11 +51,11 @@ module Parser =
     /// <param name="fn">The binding function.</param>
     let inline bind ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
-            parse element
-            |> Result.bind (fun x ->
+            match parse element with
+            | Ok x ->
                 let (Parser next) = fn x
                 next element
-            )
+            | Error e -> Error e
         )
 
     /// <summary>Maps a parsed value.</summary>
@@ -63,8 +63,9 @@ module Parser =
     /// <param name="fn">The mapping function.</param>
     let inline map ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
-            parse element
-            |> Result.map fn
+            match parse element with
+            | Ok x -> Ok <| fn x
+            | Error e -> Error e
         )
 
     /// <summary>Filters a parsed sequence.</summary>
@@ -72,16 +73,18 @@ module Parser =
     /// <param name="fn">The predicate to filter by.</param>
     let inline filter ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
-            parse element
-            |> Result.map (Seq.filter fn)
+            match parse element with
+            | Ok x -> Ok <| Seq.filter fn x
+            | Error e -> Error e
         )
 
     /// <summary>Ignores a parsed value.</summary>
     /// <example><code>do! "prop" &amp;= Parse.int |> Parser.ignore</code></example>
     let inline ignore<'r> (Parser parse) =
         Parser (fun element ->
-            parse element
-            |> Result.map ignore<'r>
+            match parse element with
+            | Ok (_:'r) -> Ok ()
+            | Error e -> Error e
         )
 
     /// <summary>Returns the parsed value or a default value.</summary>
@@ -89,8 +92,9 @@ module Parser =
     /// <param name="x">The default value to return.</param>
     let inline defaultValue x (Parser parse) =
         Parser (fun element ->
-            parse element
-            |> ResultOption.defaultValue x
+            match parse element with
+            | Ok (Some x) -> Ok x
+            | _ -> Ok x
         )
 
     /// <summary>Parses a JSON string.</summary>
@@ -99,8 +103,9 @@ module Parser =
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
             use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
-            parse document.RootElement
-            |> Result.mapError Errors
+            match parse document.RootElement with
+            | Ok x -> Ok x
+            | Error list -> Error <| Errors list
         with
             | :? JsonException
             | :? ArgumentNullException as exn -> Error <| Json exn
@@ -114,8 +119,9 @@ module Parser =
             try
                 use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
                 return
-                    parse document.RootElement
-                    |> Result.mapError Errors
+                    match parse document.RootElement with
+                    | Ok x -> Ok x
+                    | Error list -> Error <| Errors list
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn -> return Error <| Json exn

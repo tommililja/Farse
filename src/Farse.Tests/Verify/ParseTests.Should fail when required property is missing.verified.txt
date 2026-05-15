@@ -3,4 +3,4 @@
 Error[0]:
   at $.missing
    | Tried parsing 'unit.
-   | Required property was not found.
+   | Missing required property.

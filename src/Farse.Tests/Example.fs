@@ -120,7 +120,6 @@ module User =
             and! age = "age" ?= valid byte Age.fromByte
             and! email = "email" &= valid string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
-            and! tags = "tags" &= list (valid string Tag.fromString)
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
@@ -134,6 +133,8 @@ module User =
                     RenewsAt = renewsAt
                 }
             }
+
+            and! tags = "tags" &= list (valid string Tag.fromString)
 
             // "Path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).

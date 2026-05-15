@@ -1,6 +1,6 @@
 ﻿Parser failed with 1 error[s].
 
 Error[0]:
-  at $.missing
+  at $.prop.missing
    | Tried parsing 'int.
    | Expected Object, but got Undefined.

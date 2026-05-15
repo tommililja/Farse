@@ -302,9 +302,15 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when an object is null`` () =
+        let ``Should return Error when first object is null`` () =
             Prop.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": null }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when a nested object is null`` () =
+            Prop.req "prop.prop2.prop3" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
@@ -349,9 +355,15 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when parsing a nested missing value`` () =
+        let ``Should return Error when last nested value is missing`` () =
             Prop.req "prop.missing" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should return Error when nested object is missing`` () =
+            Prop.req "prop.missing.prop3" Parse.int
+            |> Parser.parse """{ "prop": { "prop2": null } }"""
             |> Expect.errorString
 
         [<Fact>]
