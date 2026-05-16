@@ -158,12 +158,42 @@ module User =
             "age", JNum.nil Age.asByte user.Age
             "email", JStr (Email.asString user.Email)
             "profiles", JStr.arr ProfileId.asString user.Profiles
-            "subscription", JObj [
-                "plan", JStr (Plan.asString user.Subscription.Plan)
-                "isCanceled", JBit user.Subscription.IsCanceled
-                "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
-            ]
+            "subscription",
+                JObj [
+                    "plan", JStr (Plan.asString user.Subscription.Plan)
+                    "isCanceled", JBit user.Subscription.IsCanceled
+                    "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
+                ]
             "tags", JStr.arr Tag.asString user.Tags
+        ]
+
+    let asJson2 user =
+        JObj [
+            "id", JStr (UserId.asString user.Id)
+            "name", JStr user.Name
+            "age",
+                user.Age
+                |> Option.map (Age.asByte >> JNum)
+                |> Option.defaultValue JNil
+            "email", JStr (Email.asString user.Email)
+            "profiles",
+                user.Profiles
+                |> Set.toList
+                |> List.map (ProfileId.asString >> JStr)
+                |> JArr
+            "subscription",
+                JObj [
+                    "plan", JStr (Plan.asString user.Subscription.Plan)
+                    "isCanceled", JBit user.Subscription.IsCanceled
+                    "renewsAt",
+                        user.Subscription.RenewsAt
+                        |> Option.map (_.ToString() >> JStr)
+                        |> Option.defaultValue JNil
+                ]
+            "tags",
+                user.Tags
+                |> List.map (Tag.asString >> JStr)
+                |> JArr
         ]
 
     let asJsonString =
