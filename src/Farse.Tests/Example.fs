@@ -178,7 +178,7 @@ module User =
             "email", JStr (Email.asString user.Email)
             "profiles",
                 user.Profiles
-                |> Set.toList
+                |> List.ofSeq
                 |> List.map (ProfileId.asString >> JStr)
                 |> JArr
             "subscription",

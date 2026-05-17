@@ -78,7 +78,7 @@ And the three custom operators.
 // Parses a required property.
 let (&=) = Prop.req
 
-// Parses an optional property, returning 'a option.
+// Parses an optional property, returning an option.
 let (?=) = Prop.opt
 
 // Parses an optional property, distinguishing between a missing property and null value.
@@ -89,9 +89,9 @@ We can create this simple parser.
 
 ```fsharp
 open Farse
+open Farse.Operators
 
 module User =
-    open Operators
     open Parse
 
     let parser =
@@ -403,7 +403,7 @@ module User =
         asJson >> Json.asString Indented
 ```
 
-Which is the same as.
+Which is the same as the following.
 
 ```fsharp
 let asJson user =
@@ -417,7 +417,7 @@ let asJson user =
         "email", JStr (Email.asString user.Email)
         "profiles",
             user.Profiles
-            |> Set.toList
+            |> List.ofSeq
             |> List.map (ProfileId.asString >> JStr)
             |> JArr
         "subscription",
@@ -466,7 +466,9 @@ type JsonFormat =
     | Indented
     | Custom of JsonSerializerOptions
     | Raw
+```
 
+```fsharp
 let string = Json.asString Indented json
 ```
 
