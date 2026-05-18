@@ -437,7 +437,7 @@ let asJson user =
 ```
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
-### From a string
+### From string
 
 Parsing a string to a Json.
 
@@ -457,7 +457,7 @@ task {
 }
 ```
 
-### To a string
+### To string
 
 Converting a Json to a string.
 
