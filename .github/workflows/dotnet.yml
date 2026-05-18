@@ -35,6 +35,7 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: build-output
+                    path: src
             -   name: Test
                 working-directory: src/Farse.Tests
                 run: dotnet test -c Release --no-build --verbosity normal
@@ -51,6 +52,7 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: build-output
+                    path: src
             -   name: Pack
                 working-directory: src
                 run: dotnet pack -c Release --no-build -o ./nupkg
