@@ -53,13 +53,10 @@ jobs:
             -   uses: actions/checkout@v4
             -   name: Setup .NET
                 uses: actions/setup-dotnet@v4
-            -   name: Download build artifacts
-                uses: actions/download-artifact@v4
-                with:
-                    name: build-output
-                    path: src
+            -   name: Restore dependencies
+                working-directory: src
+                run: dotnet restore
             -   name: Pack
                 run: dotnet pack src/Farse/Farse.fsproj -c Release --no-build -o ./nupkg
             -   name: Publish to NuGet
-                working-directory: src
                 run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
