@@ -23,6 +23,11 @@ jobs:
             -   name: Build
                 working-directory: src
                 run: dotnet build -c Release --no-restore
+            -   name: Upload build artifacts
+                uses: actions/upload-artifact@v4
+                with:
+                    name: build-output
+                    path: src/**/bin/Release/
 
     test:
         needs: build
