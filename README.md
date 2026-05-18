@@ -72,7 +72,7 @@ Given the JSON string.
 }
 ```
 
-And the three custom operators.
+And the three (optional) operators.
 
 ```fsharp
 // Parses a required property.
