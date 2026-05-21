@@ -3,5 +3,5 @@
 Error[0]:
   at $.prop
    | Tried parsing 'int.
-   | Invalid int.
+   | Invalid value.
    = 1.5
