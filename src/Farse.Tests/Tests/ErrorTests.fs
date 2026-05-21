@@ -462,13 +462,13 @@ module ErrorTests =
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when value is not valid`` () =
-            Prop.req "prop" (Parse.valid Parse.int (fun _ -> Error "Not valid."))
+        let ``Should return Error when refined value is not valid`` () =
+            Prop.req "prop" (Parse.refine Parse.int (fun _ -> Error "Not valid."))
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when value is not verified`` () =
+        let ``Should return Error when verified value is not valid`` () =
             Prop.req "prop" (Parse.verify Parse.int (fun x -> x > 0) "Not valid.")
             |> Parser.parse """{ "prop": 0 }"""
             |> Expect.errorString

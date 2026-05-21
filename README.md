@@ -98,13 +98,13 @@ module User =
         parser {
             let! id = "id" &= guid |> Parser.map UserId
             and! name = "name" &= string
-            and! age = "age" ?= valid byte Age.fromByte
-            and! email = "email" &= valid string Email.fromString
+            and! age = "age" ?= refine byte Age.fromByte
+            and! email = "email" &= refine string Email.fromString
             and! profiles = "profiles" &= set profileId // Custom parser example.
 
             // Inlined parser example.
             and! subscription = "subscription" &= parser {
-                let! plan = "plan" &= valid string Plan.fromString
+                let! plan = "plan" &= refine string Plan.fromString
                 and! isCanceled = "isCanceled" &= bool
                 and! renewsAt = "renewsAt" ?= instant // Custom parser example.
 
@@ -115,7 +115,7 @@ module User =
                 }
             }
             
-            and! tags = "tags" &= list (valid string Tag.fromString)
+            and! tags = "tags" &= list (refine string Tag.fromString)
 
             // "Path" example, which can be very useful
             // when we just want to parse a (few) nested value(s).
@@ -337,7 +337,7 @@ There are a few different ways to validate parsed values.
 
 ```fsharp
 let! age = "age" ?= age
-let! age = "age" ?= valid byte Age.fromByte
+let! age = "age" ?= refine byte Age.fromByte
 let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is '12'."
 ```
 
@@ -345,7 +345,7 @@ Validation can also be combined with sequences.
 
 ```fsharp
 let! tags = "tags" &= list tag
-let! tags = "tags" &= list (valid string Tag.fromString)
+let! tags = "tags" &= list (refine string Tag.fromString)
 ```
 
 ### Errors

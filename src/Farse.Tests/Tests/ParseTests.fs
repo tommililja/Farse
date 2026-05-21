@@ -899,16 +899,16 @@ module ParseTests =
         Expect.equal expected actual
 
     [<Fact>]
-    let ``Should return Ok when value is valid`` () =
+    let ``Should return Ok when refined value is valid`` () =
         let expected = 1
         let actual =
-            Prop.req "prop" (Parse.valid Parse.int Ok)
+            Prop.req "prop" (Parse.refine Parse.int Ok)
             |> Parser.parse """{ "prop": 1 }"""
             |> Expect.ok
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return Ok when value is verified`` () =
+    let ``Should return Ok when verified value is valid`` () =
         let expected = 1
         let actual =
             Prop.req "prop" (Parse.verify Parse.int (fun x -> x > 0) "Error")

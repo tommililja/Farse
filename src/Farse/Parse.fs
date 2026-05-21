@@ -650,10 +650,10 @@ module Parse =
                 | Error e -> Error e
         )
 
-    /// <summary>Validates a parsed value.</summary>
-    /// <example><code>let! type' = "prop" &amp;= Parse.valid Parse.string Type.fromString</code></example>
+    /// <summary>Refines a parsed value.</summary>
+    /// <example><code>let! type' = "prop" &amp;= Parse.refine Parse.string Type.fromString</code></example>
     /// <param name="fn">The validation function.</param>
-    let valid (Parser parse) fn : Parser<'r> =
+    let refine (Parser parse) fn : Parser<'r> =
         Parser (fun element ->
             match parse element with
             | Ok x ->
