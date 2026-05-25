@@ -94,7 +94,8 @@ module Parser =
         Parser (fun element ->
             match parse element with
             | Ok (Some x) -> Ok x
-            | _ -> Ok x
+            | Ok None -> Ok x
+            | Error e -> Error e
         )
 
     /// <summary>Parses a JSON string.</summary>
