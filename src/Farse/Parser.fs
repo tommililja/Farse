@@ -98,6 +98,17 @@ module Parser =
             | Error e -> Error e
         )
 
+    /// <summary>Returns the parsed value or a default value from a function.</summary>
+    /// <example><code>let! int = "prop" ?= Parse.int |> Parser.defaultWith (fun () -> 0)</code></example>
+    /// <param name="fn">The function to run.</param>
+    let inline defaultWith fn (Parser parse) =
+        Parser (fun element ->
+            match parse element with
+            | Ok (Some x) -> Ok x
+            | Ok None -> Ok <| fn ()
+            | Error e -> Error e
+        )
+
     /// <summary>Parses a JSON string.</summary>
     /// <example><code>let result = Parser.parse json parser</code></example>
     /// <param name="json">The JSON string to parse.</param>

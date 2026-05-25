@@ -83,6 +83,23 @@ module ParserTests =
         |> Expect.errorString
 
     [<Fact>]
+    let ``Should set default with for optional value`` () =
+        let expected = 1
+        let actual =
+            Parse.option Parse.int
+            |> Parser.defaultWith (fun () -> 1)
+            |> Parser.parse "null"
+            |> Expect.ok
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should return Error when defaultWith fails`` () =
+        Parse.option Parse.int
+        |> Parser.defaultWith (fun () -> 1)
+        |> Parser.parse "true"
+        |> Expect.errorString
+
+    [<Fact>]
     let ``Should recover from an error with a default value`` () =
         let expected = 1
         let actual =
