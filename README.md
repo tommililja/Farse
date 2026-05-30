@@ -439,7 +439,7 @@ let asJson user =
 
 ### From string
 
-Parsing a string to a Json.
+Parsing a string to Json.
 
 ```fsharp
 let json =
@@ -459,7 +459,7 @@ task {
 
 ### To string
 
-Converting a Json to a string.
+Converting Json to a string.
 
 ```fsharp
 type JsonFormat =
