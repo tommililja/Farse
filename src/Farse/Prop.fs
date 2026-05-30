@@ -1,13 +1,20 @@
 namespace Farse
 
+open System
 open System.Text.Json
 
 module Prop =
 
+    let inline private createPath array =
+        array
+        |> Array.map (sprintf ".%s")
+        |> String.concat String.Empty
+        |> JsonPath
+
     let inline private jsonPath path count =
         path
         |> Array.take count
-        |> JsonPath.fromArray
+        |> createPath
 
     let inline private fold path element =
         path
@@ -91,8 +98,7 @@ module Prop =
                 | Error errors ->
                     errors
                     |> List.map (
-                        path
-                        |> JsonPath.fromArray
+                        createPath path
                         |> ParseError.withPath
                     )
                     |> Error
@@ -112,8 +118,7 @@ module Prop =
                 | Error errors ->
                     errors
                     |> List.map (
-                        path
-                        |> JsonPath.fromArray
+                        createPath path
                         |> ParseError.withPath
                     )
                     |> Error
@@ -134,8 +139,7 @@ module Prop =
                 | Error errors ->
                     errors
                     |> List.map (
-                        path
-                        |> JsonPath.fromArray
+                        createPath path
                         |> ParseError.withPath
                     )
                     |> Error

@@ -20,12 +20,6 @@ module JsonPath =
     let internal append (JsonPath a) (JsonPath b) =
         JsonPath (a + b)
 
-    let internal fromArray array =
-        array
-        |> Array.map (sprintf ".%s")
-        |> String.concat String.Empty
-        |> JsonPath
-
     /// <summary>Converts a JsonPath to a string.</summary>
     /// <example><code>let string = JsonPath.asString path</code></example>
     let asString (JsonPath str) =
