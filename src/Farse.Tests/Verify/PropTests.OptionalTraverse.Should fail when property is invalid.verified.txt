@@ -1,0 +1,7 @@
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  at $.prop.prop2
+   | Tried parsing 'int.
+   | Invalid value.
+   = 1.1

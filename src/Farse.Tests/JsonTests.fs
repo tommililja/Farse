@@ -18,34 +18,64 @@ module JsonTests =
             "name", JStr "Alice"
             "age", JNil
             "email", JStr "alice@domain.com"
-            "profiles", JStr.arr id [
-                "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
-                "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
-                "bf00d1e2-ee53-4969-9507-86bed7e96432"
-            ]
-            "subscription", JObj [
-                "plan", JStr "pro"
-                "isCanceled", JBit false
-                "renewsAt", JStr "2026-12-25T10:30:00Z"
-            ]
-            "tags", JArr [
-                JStr "beta"
-                JStr "verified"
-            ]
+            "profiles",
+                JArr [
+                    JStr "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
+                    JStr "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
+                    JStr "bf00d1e2-ee53-4969-9507-86bed7e96432"
+                ]
+            "subscription",
+                JObj [
+                    "plan", JStr "pro"
+                    "isCanceled", JBit false
+                    "renewsAt", JStr "2026-12-25T10:30:00Z"
+                ]
+            "tags",
+                JArr [
+                    JStr "beta"
+                    JStr "verified"
+                ]
         ]
 
     [<Fact>]
-    let ``Should return Ok when creating Json`` () =
+    let ``Should return equal when comparing two equal Json values`` () =
+        let a = JObj [ "value", JNum 1 ]
+        let b = JObj [ "value", JNum 1 ]
+        Expect.equal a b
+
+    [<Fact>]
+    let ``Should not return equal when comparing two different Json values`` () =
+        let a = JObj [ "value", JNum 1 ]
+        let b = JObj [ "value", JNum 2 ]
+        Expect.notEqual a b
+
+    [<Fact>]
+    let ``Should sort properties in ascending order`` () =
+        example
+        |> Json.sort
+        |> Json.asString Indented
+        |> Expect.string
+
+    [<Fact>]
+    let ``Should create Json from JsonElement`` () =
         let expected = Json.asString Indented example
-        let actual =
-            expected
-            |> Json.fromString
-            |> Expect.ok
-            |> Json.asString Indented
+        let actual = JsonElement.Parse expected |> Json.fromElement |> Json.asString Indented
         Expect.equal actual expected
 
     [<Fact>]
-    let ``Should return Ok when creating Json async`` () =
+    let ``Should create Json from string`` () =
+        let expected = Json.asString Indented example
+        let actual = Json.fromString expected |> Expect.ok |> Json.asString Indented
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should fail to create Json from string when JSON is invalid``() =
+        "invalid"
+        |> Json.fromString
+        |> Expect.isError
+
+    [<Fact>]
+    let ``Should create Json from stream async`` () =
         task {
             let expected = Json.asString Indented example
             let! actual =
@@ -56,31 +86,37 @@ module JsonTests =
         }
 
     [<Fact>]
-    let ``Should return Ok when creating Json from bytes`` () =
-        let bytes = Json.asString Indented example |> Encoding.UTF8.GetBytes
-        let actual = Json.fromBytes bytes |> Expect.ok
-        Expect.equal actual example
-
-    [<Fact>]
-    let ``Should return Error when creating Json from invalid JSON`` () =
-        """{ "prop" 1 }"""
-        |> Json.fromString
-        |> Expect.error
-
-    [<Fact>]
-    let ``Should return Error when creating Json async from invalid JSON`` () =
-        MemoryStream.create """{ "prop" 1 }"""
+    let ``Should fail to create Json from stream async when JSON is invalid`` () =
+        MemoryStream.create "invalid"
         |> Json.fromStreamAsync CancellationToken.None
-        |> Task.map Expect.error
+        |> Task.map Expect.isError
 
     [<Fact>]
-    let ``Should create indented JSON string`` () =
+    let ``Should create Json from bytes``() =
+        let expected = Json.asString Indented example
+        let actual = Encoding.UTF8.GetBytes expected |> Json.fromBytes |> Expect.ok |> Json.asString Indented
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should fail to create Json from bytes when JSON is invalid``() =
+        Encoding.UTF8.GetBytes("invalid")
+        |> Json.fromBytes
+        |> Expect.isError
+
+    [<Fact>]
+    let ``Should convert Json to JsonNode`` () =
+        let expected = Json.asString Indented example
+        let actual = Json.fromString expected |> Expect.ok |> Json.asJsonNode |> _.ToJsonString(JsonSerializerOptions(WriteIndented = true, IndentSize = 4))
+        Expect.equal actual expected
+
+    [<Fact>]
+    let ``Should convert Json to indented JSON string`` () =
         example
         |> Json.asString Indented
         |> Expect.string
 
     [<Fact>]
-    let ``Should create custom JSON string`` () =
+    let ``Should convert Json to custom JSON string`` () =
         let options =
             JsonSerializerOptions(
                 WriteIndented = true,
@@ -94,13 +130,13 @@ module JsonTests =
         |> Expect.string
 
     [<Fact>]
-    let ``Should create raw JSON string`` () =
+    let ``Should convert Json to raw JSON string`` () =
         example
         |> Json.asString Raw
         |> Expect.string
 
     [<Fact>]
-    let ``Should write JSON string to writer`` () =
+    let ``Should write Json as string to writer`` () =
         task {
             let stream = new MemoryStream()
             use writer = new Utf8JsonWriter(stream)
@@ -112,32 +148,18 @@ module JsonTests =
         }
 
     [<Fact>]
-    let ``Should return bytes from JSON string`` () =
-        let expected = Json.asString Indented example |> Encoding.UTF8.GetBytes
-        let actual = Json.asBytes Indented example
+    let ``Should convert Json to bytes`` () =
+        let expected = Json.asString Indented example
+        let actual = Json.asBytes Indented example |> Encoding.UTF8.GetString
         Expect.equal actual expected
 
-    [<Fact>]
-    let ``Comparing two equal Json values should return true`` () =
-        let json = Json.asString Indented example
-        let a = Json.fromString json
-        let b = Json.fromString json
-        Expect.equal a b
-
-    [<Fact>]
-    let ``Comparing two non-equal Json values should return false`` () =
-        let a = JObj [ "value", JNum 1 ]
-        let b = JObj [ "value", JNum 2 ]
-        Expect.notEqual a b
-
-    [<Fact>]
-    let ``Should sort properties in ascending order`` () =
-        example
-        |> Json.sort
-        |> Json.asString Indented
-        |> Expect.string
-
     module JStr =
+
+        [<Fact>]
+        let ``Should create string`` () =
+            JStr "string"
+            |> Json.asString Indented
+            |> Expect.string
 
         [<Fact>]
         let ``Should create empty string`` () =
@@ -238,6 +260,11 @@ module JsonTests =
 
     module JBit =
 
+        let ``Should create bool`` () =
+            JBit true
+            |> Json.asString Indented
+            |> Expect.string
+
         [<Fact>]
         let ``Should create bool when Some`` () =
             JBit.nil id (Some true)
@@ -264,6 +291,11 @@ module JsonTests =
 
     module JObj =
 
+        let ``Should create object`` () =
+            JObj [ "1", JNum 1; "2", JNum 2; "3", JNum 3 ]
+            |> Json.asString Indented
+            |> Expect.string
+
         [<Fact>]
         let ``Should create empty object`` () =
             JObj.empty
@@ -272,7 +304,7 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object when Some`` () =
-            JObj.nil (fun x -> [ "value", JStr x ]) (Some "1")
+            JObj.nil (fun x -> [ "value", JNum x ]) (Some 1)
             |> Json.asString Indented
             |> Expect.string
 
@@ -284,17 +316,22 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object array`` () =
-            JObj.arr (fun x -> [ "value", JStr x ]) [ "1"; "2"; "3" ]
+            JObj.arr (fun x -> [ "value", JNum x ]) [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create object singleton`` () =
-            JObj.singleton id [ "value", JStr "1" ]
+            JObj.singleton (fun (n, v) -> [ n, JNum v ]) ("value", 1)
             |> Json.asString Indented
             |> Expect.string
 
     module JArr =
+
+        let ``Should create array`` () =
+            JArr [ JNum 1; JNum 2; JNum 3 ]
+            |> Json.asString Indented
+            |> Expect.string
 
         [<Fact>]
         let ``Should create empty array`` () =
@@ -304,7 +341,7 @@ module JsonTests =
 
     module JNil =
 
-        let ``Should create null value`` () =
+        let ``Should create null`` () =
             JNil
             |> Json.asString Indented
             |> Expect.string

@@ -34,6 +34,9 @@ module Expect =
     let isTrue actual =
         Expect.isTrue actual String.Empty
 
+    let isError actual =
+        Expect.isError actual String.Empty
+
     let equal actual expected =
         Expect.equal actual expected String.Empty
 
