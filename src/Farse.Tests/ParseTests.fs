@@ -1,6 +1,7 @@
 namespace Farse.Tests
 
 open System.Numerics
+open System.Text
 open Xunit
 open Farse
 open System
@@ -12,14 +13,14 @@ module ParseTests =
     module Custom =
 
         [<Fact>]
-        let ``Should succeed when value is custom`` () =
+        let ``Should parse with custom parser`` () =
             Parse.custom (_.GetInt32() >> Ok) ExpectedKind.Number
             |> Parser.parse "1"
             |> Expect.ok
             |> Expect.equal 1
 
         [<Fact>]
-        let ``Should succeed when value is custom with any kind`` () =
+        let ``Should parse with custom parser and any kind`` () =
             Parse.custom (fun element ->
                 match element.TryGetInt32() with
                 | true, x -> Ok x
@@ -327,13 +328,13 @@ module ParseTests =
 
         [<Fact>]
         let ``Should return Error when parsing empty string`` () =
-            Prop.req "prop" Parse.stringNonEmpty
+             Parse.stringNonEmpty
             |> Parser.parse """{ "prop": "" }"""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should return Error when parsing whitespace string`` () =
-            Prop.req "prop" Parse.stringNonEmpty
+             Parse.stringNonEmpty
             |> Parser.parse """{ "prop": "  " }"""
             |> Expect.errorString
 
@@ -356,25 +357,27 @@ module ParseTests =
         let ``Should parse string with regex`` () =
             let expected = "12345"
             let actual =
-                Prop.req "prop" (Parse.regex "^[0-9]+$")
+                 (Parse.regex "^[0-9]+$")
                 |> Parser.parse """{ "prop": "12345" }"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
         let ``Should return Error when regex does not match`` () =
-            Prop.req "prop" (Parse.regex "^[0-9]+$")
+             (Parse.regex "^[0-9]+$")
             |> Parser.parse """{ "prop": "abc" }"""
             |> Expect.errorString
 
     module Number =
 
         [<Fact>]
-        let ``Should succeed when value is number`` () =
-            Parse.number<int>
-            |> Parser.parse "\"1\""
-            |> Expect.ok
-            |> Expect.equal 1
+        let ``Should parse string as bigint`` () =
+            let expected = BigInteger.Parse("1")
+            let actual =
+                 Parse.number<bigint>
+                |> Parser.parse "1"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -383,64 +386,70 @@ module ParseTests =
             |> Expect.isError
 
         [<Fact>]
-        let ``Should parse string as int`` () =
-            let expected = BigInteger.Parse("1")
-            let actual =
-                Prop.req "prop" Parse.number<bigint>
-                |> Parser.parse """{ "prop": "1" }"""
-                |> Expect.ok
-            Expect.equal actual expected
-
-        [<Fact>]
-        let ``Should return Error when string is not a number`` () =
-            Prop.req "prop" Parse.number<int>
-            |> Parser.parse """{ "prop": "invalid" }"""
+        let ``Should fail when element is not a string`` () =
+             Parse.number<int>
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module Base64Bytes =
 
         [<Fact>]
-        let ``Should succeed when value is base64Bytes`` () =
-            Parse.base64Bytes
-            |> Parser.parse "\"SGVsbG8=\""
-            |> Expect.ok
-            |> Expect.equal ("Hello" |> System.Text.Encoding.UTF8.GetBytes)
-
-        [<Fact>]
-        let ``Should parse base64 string byte array`` () =
-            let expected = Convert.FromBase64String("aGVsbG8gc3RyYW5nZXIh")
-            let actual =
-                Prop.req "prop" Parse.base64Bytes
-                |> Parser.parse """{ "prop": "aGVsbG8gc3RyYW5nZXIh" }"""
+        let ``Should parse string as base64 byte array`` () =
+            let actual = Convert.FromBase64String("aGVsbG8gc3RyYW5nZXIh")
+            let expected =
+                Parse.base64Bytes
+                |> Parser.parse "\"aGVsbG8gc3RyYW5nZXIh\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.base64Bytes
+            |> Parser.parse "1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.base64Bytes
+            |> Parser.parse "\"abc\""
+            |> Expect.errorString
 
     module Bigint =
 
         [<Fact>]
-        let ``Should succeed when value is bigint`` () =
-            Parse.bigint
-            |> Parser.parse "123456789012345678901234567890"
-            |> Expect.ok
-            |> Expect.equal (System.Numerics.BigInteger.Parse "123456789012345678901234567890")
+        let ``Should parse number as bigint`` () =
+            let expected = BigInteger.Parse("123456789012345678901234567890")
+            let actual =
+                Parse.bigint
+                |> Parser.parse "123456789012345678901234567890"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.bigint
-            |> Parser.parse "\"a\""
-            |> Expect.isError
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.bigint
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module Bool =
 
         [<Fact>]
-        let ``Should succeed when value is bool`` () =
-            Parse.bool
-            |> Parser.parse "true"
-            |> Expect.ok
-            |> Expect.equal true
+        let ``Should parse true as bool`` () =
+            let expected = true
+            let actual =
+                Parse.bool
+                |> Parser.parse "true"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
-        let ``Should fail when value is invalid`` () =
+        let ``Should fail when element is not a bool`` () =
             Parse.bool
             |> Parser.parse "1"
             |> Expect.isError
@@ -448,43 +457,45 @@ module ParseTests =
     module Guid =
 
         [<Fact>]
-        let ``Should succeed when value is guid`` () =
-            let guid = Guid.NewGuid()
-            Parse.guid
-            |> Parser.parse (sprintf "\"%s\"" (guid.ToString()))
-            |> Expect.ok
-            |> Expect.equal guid
+        let ``Should parse string as Guid`` () =
+            let expected = Guid.Parse("fb245a37-2de1-4cc5-b41b-1c6e68866b68")
+            let actual =
+                Parse.guid
+                |> Parser.parse "\"fb245a37-2de1-4cc5-b41b-1c6e68866b68\""
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.guid
-            |> Parser.parse "\"invalid-guid\""
-            |> Expect.isError
+            |> Parser.parse "\"invalid\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.guid
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module Unit =
 
         [<Fact>]
-        let ``Should succeed when value is unit`` () =
-            Parse.unit
-            |> Parser.parse "null"
-            |> Expect.ok
-            |> Expect.equal ()
+        let ``Should parse null as unit`` () =
+            let expected = ()
+            let actual =
+                Parse.unit
+                |> Parser.parse "null"
+                |> Expect.ok
+            Expect.equal actual expected
 
     module None =
-
-        [<Fact>]
-        let ``Should succeed when value is none`` () =
-            Parse.none
-            |> Parser.parse "null"
-            |> Expect.ok
-            |> Expect.equal ()
 
         [<Fact>]
         let ``Should not parse element and return unit`` () =
             let expected = ()
             let actual =
-                Prop.req "prop" Parse.none
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.none
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
 
@@ -494,13 +505,25 @@ module ParseTests =
             | A = 0
 
         [<Fact>]
-        let ``Should parse string as enum`` () =
+        let ``Should parse number as string enum`` () =
             let expected = StringEnum.A
             let actual =
-                Prop.req "prop" Parse.enum<StringEnum>
-                |> Parser.parse """{ "prop": "something" }"""
+                Parse.enum
+                |> Parser.parse "\"A\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.enum<StringEnum>
+            |> Parser.parse "\"B\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.enum<StringEnum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module IntEnum =
 
@@ -508,20 +531,31 @@ module ParseTests =
             | A = 1
 
         [<Fact>]
-        let ``Should succeed when value is intEnum`` () =
-            Parse.intEnum<IntEnum>
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal IntEnum.A
-
-        [<Fact>]
         let ``Should parse number as int enum`` () =
             let expected = IntEnum.A
             let actual =
-                Prop.req "prop" Parse.intEnum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.intEnum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.intEnum<IntEnum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.intEnum<IntEnum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.intEnum<IntEnum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module Int16Enum =
 
@@ -532,10 +566,28 @@ module ParseTests =
         let ``Should parse number as int16 enum`` () =
             let expected = Int16Enum.A
             let actual =
-                Prop.req "prop" Parse.int16Enum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.int16Enum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.int16Enum<Int16Enum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.int16Enum<Int16Enum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.int16Enum<Int16Enum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module Int64Enum =
 
@@ -546,10 +598,28 @@ module ParseTests =
         let ``Should parse number as int64 enum`` () =
             let expected = Int64Enum.A
             let actual =
-                Prop.req "prop" Parse.int64Enum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.int64Enum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.int64Enum<Int64Enum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.int64Enum<Int64Enum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.int64Enum<Int64Enum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module UInt16Enum =
 
@@ -560,10 +630,28 @@ module ParseTests =
         let ``Should parse number as uint16 enum`` () =
             let expected = UInt16Enum.A
             let actual =
-                Prop.req "prop" Parse.uint16Enum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.uint16Enum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.uint16Enum<UInt16Enum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.uint16Enum<UInt16Enum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.uint16Enum<UInt16Enum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module UInt32Enum =
 
@@ -574,11 +662,28 @@ module ParseTests =
         let ``Should parse number as uint32 enum`` () =
             let expected = UInt32Enum.A
             let actual =
-                Prop.req "prop" Parse.uint32Enum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.uint32Enum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
 
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.uint32Enum<UInt32Enum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.uint32Enum<UInt32Enum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.uint32Enum<UInt32Enum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module UInt64Enum =
 
@@ -589,10 +694,28 @@ module ParseTests =
         let ``Should parse number as uint64 enum`` () =
             let expected = UInt64Enum.A
             let actual =
-                Prop.req "prop" Parse.uint64Enum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.uint64Enum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.uint64Enum<UInt64Enum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.uint64Enum<UInt64Enum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.uint64Enum<UInt64Enum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module ByteEnum =
 
@@ -603,10 +726,28 @@ module ParseTests =
         let ``Should parse number as byte enum`` () =
             let expected = ByteEnum.A
             let actual =
-                Prop.req "prop" Parse.byteEnum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.byteEnum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.byteEnum<ByteEnum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.byteEnum<ByteEnum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.byteEnum<ByteEnum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module SByteEnum =
 
@@ -617,10 +758,28 @@ module ParseTests =
         let ``Should parse number as sbyte enum`` () =
             let expected = SByteEnum.A
             let actual =
-                Prop.req "prop" Parse.sbyteEnum
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.sbyteEnum
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.sbyteEnum<SByteEnum>
+            |> Parser.parse "2"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.sbyteEnum<SByteEnum>
+            |> Parser.parse "1.1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.sbyteEnum<SByteEnum>
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module TimeOnly =
 
@@ -635,7 +794,7 @@ module ParseTests =
         let ``Should parse string as TimeOnly`` () =
             let expected = TimeOnly.Parse("17:28:45")
             let actual =
-                Prop.req "prop" Parse.timeOnly
+                Parse.timeOnly
                 |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
                 |> Expect.ok
             Expect.equal actual expected
@@ -643,41 +802,33 @@ module ParseTests =
     module TimeOnlyExact =
 
         [<Fact>]
-        let ``Should succeed when value is timeOnlyExact`` () =
-            Parse.timeOnlyExact "HH:mm"
-            |> Parser.parse "\"12:00\""
-            |> Expect.ok
-            |> Expect.equal (TimeOnly(12, 0))
-
-        [<Fact>]
-        let ``Should parse string as TimeOnly exact`` () =
+        let ``Should parse TimeOnly exact`` () =
             let expected = TimeOnly.Parse("17:28:45")
             let actual =
-                Prop.req "prop" (Parse.timeOnlyExact "HHmmss")
-                |> Parser.parse """{ "prop": "172845" }"""
+                Parse.timeOnlyExact "HHmmss"
+                |> Parser.parse "172845"
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing a TimeOnly exact with an incorrect format`` () =
-            Prop.req "prop" (Parse.timeOnlyExact "HHmmss")
-            |> Parser.parse """{ "prop": "17:28:45" }"""
+        let ``Should fail when format is incorrect`` () =
+            Parse.timeOnlyExact "HHmmss"
+            |> Parser.parse "17:28:45"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.timeOnlyExact "HHmmss"
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module TimeSpan =
 
         [<Fact>]
-        let ``Should succeed when value is timeSpan`` () =
-            Parse.timeSpan
-            |> Parser.parse "\"01:00:00\""
-            |> Expect.ok
-            |> Expect.equal (TimeSpan(1, 0, 0))
-
-        [<Fact>]
-        let ``Should parse string as TimeSpan`` () =
+        let ``Should parse TimeSpan`` () =
             let expected = TimeSpan.Parse("1:23:45")
             let actual =
-                Prop.req "prop" Parse.timeSpan
+                Parse.timeSpan
                 |> Parser.parse """{ "prop": "1:23:45" }"""
                 |> Expect.ok
             Expect.equal actual expected
@@ -685,523 +836,562 @@ module ParseTests =
     module TimeSpanExact =
 
         [<Fact>]
-        let ``Should succeed when value is timeSpanExact`` () =
-            Parse.timeSpanExact "c"
-            |> Parser.parse "\"1.00:00:00\""
-            |> Expect.ok
-            |> Expect.equal (TimeSpan(1, 0, 0, 0))
-
-        [<Fact>]
-        let ``Should parse string as TimeSpan exact`` () =
+        let ``Should parse TimeSpan exact`` () =
             let expected = TimeSpan.Parse("01:23:45")
             let actual =
-                Prop.req "prop" (Parse.timeSpanExact "hhmmss")
-                |> Parser.parse """{ "prop": "012345" }"""
+                Parse.timeSpanExact "hhmmss"
+                |> Parser.parse "\"012345\""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing a TimeSpan exact with an incorrect format`` () =
-            Prop.req "prop" (Parse.timeSpanExact @"hh\mm\ss")
-            |> Parser.parse """{ "prop": "01:28:45" }"""
+        let ``Should fail when format is incorrect`` () =
+            Parse.timeSpanExact @"hh\mm\ss"
+            |> Parser.parse "\"01:28:45\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.timeSpanExact @"hh\mm\ss"
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module DateOnly =
 
         [<Fact>]
-        let ``Should succeed when value is dateOnly`` () =
-            Parse.dateOnly
-            |> Parser.parse "\"2021-01-01\""
-            |> Expect.ok
-            |> Expect.equal (DateOnly(2021, 1, 1))
-
-        [<Fact>]
-        let ``Should parse string as DateOnly`` () =
+        let ``Should parse DateOnly`` () =
             let expected = DateOnly.Parse("2025-05-13")
             let actual =
-                Prop.req "prop" Parse.dateOnly
-                |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+                Parse.dateOnly
+                |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.dateOnly
+            |> Parser.parse "\"2025-0513\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateOnly
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module DateOnlyExact =
 
         [<Fact>]
-        let ``Should succeed when value is dateOnlyExact`` () =
-            Parse.dateOnlyExact "yyyy-MM-dd"
-            |> Parser.parse "\"2021-01-01\""
-            |> Expect.ok
-            |> Expect.equal (DateOnly(2021, 1, 1))
-
-        [<Fact>]
-        let ``Should parse string as DateOnly exact`` () =
+        let ``Should parse DateOnly exact`` () =
             let expected = DateOnly.Parse("2025-05-13")
             let actual =
-                Prop.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
-                |> Parser.parse """{ "prop": "20250513" }"""
+                Parse.dateOnlyExact "yyyyMMdd"
+                |> Parser.parse "20250513"
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing a DateOnly exact with an incorrect format`` () =
-            Prop.req "prop" (Parse.dateOnlyExact "yyyyMMdd")
-            |> Parser.parse """{ "prop": "2025-05-13" }"""
+        let ``Should fail when format is incorrect`` () =
+            Parse.dateOnlyExact "yyyyMMdd"
+            |> Parser.parse "\"2025-05-13\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateOnlyExact "yyyyMMdd"
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module DateTime =
 
         [<Fact>]
-        let ``Should succeed when value is dateTime`` () =
-            let dt = DateTime(2021, 1, 1, 12, 0, 0)
-            Parse.dateTime
-            |> Parser.parse (sprintf "\"%04d-%02d-%02dT%02d:%02d:%02d\"" dt.Year dt.Month dt.Day dt.Hour dt.Minute dt.Second)
-            |> Expect.ok
-            |> Expect.equal dt
-
-        [<Fact>]
-        let ``Should parse string as DateTime`` () =
+        let ``Should parse DateTime`` () =
             let expected = DateTime.Parse("2025-05-13T17:28:45")
             let actual =
-                Prop.req "prop" Parse.dateTime
-                |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+                Parse.dateTime
+                |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.dateTime
+                |> Parser.parse "\"2025-05-13T172845\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateTime
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module DateTimeUtc =
 
         [<Fact>]
-        let ``Should succeed when value is dateTimeUtc`` () =
-            let dt = DateTime(2021, 1, 1, 12, 0, 0, DateTimeKind.Utc)
-            Parse.dateTimeUtc
-            |> Parser.parse (sprintf "\"%04d-%02d-%02dT%02d:%02d:%02dZ\"" dt.Year dt.Month dt.Day dt.Hour dt.Minute dt.Second)
-            |> Expect.ok
-            |> Expect.equal dt
-
-        [<Fact>]
-        let ``Should parse string as DateTime UTC`` () =
+        let ``Should parse DateTime UTC`` () =
             let now = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00))
             let expected = now.ToUniversalTime()
             let actual =
-                Prop.req "prop" Parse.dateTimeUtc
-                |> Parser.parse $$"""{ "prop": "%%s{{now.ToString("yyyy-MM-ddTHH:mm")}}" }"""
+                Parse.dateTimeUtc
+                |> Parser.parse (now.ToString("yyyy-MM-ddTHH:mm"))
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.dateTimeUtc
+            |> Parser.parse "\"2025-05-25100000\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateTimeUtc
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module DateTimeExact =
 
         [<Fact>]
-        let ``Should succeed when value is dateTimeExact`` () =
-            let dt = DateTime(2021, 1, 1, 12, 0, 0)
-            Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
-            |> Parser.parse "\"2021-01-01 12:00:00\""
-            |> Expect.ok
-            |> Expect.equal dt
-
-        [<Fact>]
-        let ``Should parse string as DateTime exact`` () =
+        let ``Should parse DateTimeExact`` () =
             let expected = DateTime.Parse("2025-05-13T17:28:45")
             let actual =
-                Prop.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
-                |> Parser.parse """{ "prop": "2025-05-13 17:28:45" }"""
+                Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
+                |> Parser.parse "\"2025-05-13 17:28:45\""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing a DateTime exact with an incorrect format`` () =
-            Prop.req "prop" (Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss")
-            |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+        let ``Should fail when format is incorrect`` () =
+            Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
+            |> Parser.parse "\"2025-05-13T17:28:45\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module DateTimeOffset =
 
         [<Fact>]
-        let ``Should succeed when value is dateTimeOffset`` () =
-            let dto = DateTimeOffset(2021, 1, 1, 12, 0, 0, TimeSpan.FromHours(1.0))
-            Parse.dateTimeOffset
-            |> Parser.parse (sprintf "\"%04d-%02d-%02dT%02d:%02d:%02d+01:00\"" dto.Year dto.Month dto.Day dto.Hour dto.Minute dto.Second)
-            |> Expect.ok
-            |> Expect.equal dto
-
-        [<Fact>]
-        let ``Should parse string as DateTimeOffset`` () =
+        let ``Should parse DateTimeOffset`` () =
             let expected = DateTime.Parse("2025-05-13T17:28:45+02:00")
             let actual =
-                Prop.req "prop" Parse.dateTime
-                |> Parser.parse """{ "prop": "2025-05-13T17:28:45+02:00" }"""
+                Parse.dateTime
+                |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail whe parsing fails`` () =
+            Parse.dateTime
+            |> Parser.parse "\"2025-05-13T17:28:4502:00\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateTime
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module DateTimeOffsetExact =
 
         [<Fact>]
-        let ``Should succeed when value is dateTimeOffsetExact`` () =
-            let dto = DateTimeOffset(2021, 1, 1, 12, 0, 0, TimeSpan.FromHours(1.0))
-            Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"
-            |> Parser.parse "\"2021-01-01 12:00:00 +01:00\""
-            |> Expect.ok
-            |> Expect.equal dto
-
-        [<Fact>]
-        let ``Should parse string as DateTimeOffset exact`` () =
+        let ``Should parse DateTimeOffset exact`` () =
             let expected = DateTimeOffset.Parse("2025-05-13T17:28:00+02:00")
             let actual =
-                Prop.req "prop" (Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz")
-                |> Parser.parse """{ "prop": "2025-05-13 17:28 +02:00" }"""
+                Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz"
+                |> Parser.parse "\"2025-05-13 17:28 +02:00\""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing a DateTimeOffset exact with an incorrect format`` () =
-            Prop.req "prop" (Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz")
-            |> Parser.parse """{ "prop": "2025-05-13 17:28 +02:00" }"""
+        let ``Should fail when format is incorrect`` () =
+            Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz"
+            |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateTimeOffsetExact "\"yyyyMMdd HH:mm:ss zzz\""
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module List =
 
         [<Fact>]
-        let ``Should succeed when value is list`` () =
-            Parse.list Parse.int
-            |> Parser.parse "[1, 2, 3]"
-            |> Expect.ok
-            |> Expect.equal [1; 2; 3]
-
-        [<Fact>]
-        let ``Should parse array as list`` () =
+        let ``Should parse value Set`` () =
             let expected = [ 1; 2; 3; ]
             let actual: _ list =
-                Prop.req "prop" (Parse.list Parse.int)
-                |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+                Parse.list Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.ok
-            Expect.equal actual expected
+            Expect.equalSeq actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.list Parse.int
+            |> Parser.parse """[ "1", "2", "3" ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.list Parse.int
+            |> Parser.parse "{}"
+            |> Expect.errorString
 
     module Array =
 
         [<Fact>]
-        let ``Should succeed when value is array`` () =
-            Parse.array Parse.int
-            |> Parser.parse "[1, 2, 3]"
-            |> Expect.ok
-            |> Expect.equal [|1; 2; 3|]
-
-        [<Fact>]
-        let ``Should parse array as array`` () =
+        let ``Should parse value Set`` () =
             let expected = [| 1; 2; 3; |]
             let actual: _ array =
-                Prop.req "prop" (Parse.array Parse.int)
-                |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+                Parse.array Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.ok
-            Expect.equal actual expected
+            Expect.equalSeq actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.array Parse.int
+            |> Parser.parse """[ "1", "2", "3" ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.array Parse.int
+            |> Parser.parse "{}"
+            |> Expect.errorString
 
     module Set =
 
         [<Fact>]
-        let ``Should succeed when value is set`` () =
-            Parse.set Parse.int
-            |> Parser.parse "[1, 2, 3]"
-            |> Expect.ok
-            |> Expect.equal (Set.ofList [1; 2; 3])
+        let ``Should parse value Set`` () =
+            let expected = Set [ 1; 2; 3; ]
+            let actual: _ Set =
+                Parse.set Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
+                |> Expect.ok
+            Expect.equalSeq actual expected
 
         [<Fact>]
-        let ``Should parse array as Set`` () =
-            let expected = set [ 1; 2; 3; ]
-            let actual: _ Set =
-                Prop.req "prop" (Parse.set Parse.int)
-                |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
-                |> Expect.ok
-            Expect.equal actual expected
+        let ``Should fail when parsing fails`` () =
+            Parse.set Parse.int
+            |> Parser.parse """[ "1", "2", "3" ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.set Parse.int
+            |> Parser.parse "{}"
+            |> Expect.errorString
 
     module Seq =
 
         [<Fact>]
-        let ``Should succeed when value is seq`` () =
-            Parse.seq Parse.int
-            |> Parser.parse "[1, 2, 3]"
-            |> Expect.ok
-            |> Expect.equalSeq [1; 2; 3]
-
-        [<Fact>]
-        let ``Should parse array as seq`` () =
+        let ``Should parse value seq`` () =
             let expected = seq [ 1; 2; 3; ]
             let actual: _ seq =
-                Prop.req "prop" (Parse.seq Parse.int)
-                |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+                Parse.seq Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.ok
             Expect.equalSeq actual expected
 
-    module Index =
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.seq Parse.int
+            |> Parser.parse """[ "1", "2", "3" ]"""
+            |> Expect.errorString
 
         [<Fact>]
-        let ``Should succeed when value is index`` () =
-            Parse.index 1 Parse.int
-            |> Parser.parse "[1, 2, 3]"
-            |> Expect.ok
-            |> Expect.equal 2
+        let ``Should fail when element is not an array`` () =
+            Parse.seq Parse.int
+            |> Parser.parse "{}"
+            |> Expect.errorString
+
+    module Index =
 
         [<Fact>]
         let ``Should parse array at index`` () =
             let expected = 1
             let actual =
-                Prop.req "prop" (Parse.index 0 Parse.int)
-                |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+                Parse.index 0 Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when index is out of range`` () =
-            Prop.req "prop" (Parse.index 3 Parse.int)
-            |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+        let ``Should fail when index is out of range`` () =
+            Parse.index 3 Parse.int
+            |> Parser.parse "[ 1, 2, 3 ]"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when index parsing fails`` () =
-            Prop.req "prop" (Parse.index 1 Parse.int)
-            |> Parser.parse """{ "prop": [ 1, "2", 3 ] }"""
+        let ``Should fail when parsing fails`` () =
+            Parse.index 1 Parse.int
+            |> Parser.parse """[ 1, "2", 3 ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.index 1 Parse.int
+            |> Parser.parse "{}"
             |> Expect.errorString
 
     module Map =
 
         [<Fact>]
-        let ``Should succeed when value is map`` () =
-            Parse.map Parse.int
-            |> Parser.parse "{\"a\": 1, \"b\": 2}"
-            |> Expect.ok
-            |> Expect.equal (Map.ofList [("a", 1); ("b", 2)])
-
-        [<Fact>]
-        let ``Should parse object as Map`` () =
-            let expected = Map.ofSeq [ "key1", 1; "key2", 2; "key3", 3; ]
+        let ``Should parse object properties as IDictionary`` () =
+            let expected = Map [ "key1", 1; "key2", 2; "key3", 3 ]
             let actual: Map<_,_> =
-                Prop.req "prop" (Parse.map Parse.int)
-                |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+                Parse.map Parse.int
+                |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.ok
-            Expect.equal actual expected
+            Expect.equalSeq actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing Map fails`` () =
-            Prop.req "prop" (Parse.map Parse.int)
-            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+        let ``Should fail when element is not an object`` () =
+            Parse.map Parse.int
+            |> Parser.parse "[]"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when parsing Map with duplicate keys`` () =
-            Prop.req "prop" (Parse.map Parse.int)
-            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
+        let ``Should fail when parsing duplicate keys`` () =
+            Parse.map Parse.int
+            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.map Parse.int
+            |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
             |> Expect.errorString
 
     module Dict =
 
         [<Fact>]
-        let ``Should succeed when value is dict`` () =
-            Parse.dict Parse.int
-            |> Parser.parse "{\"a\": 1, \"b\": 2}"
-            |> Expect.ok
-            |> (fun r -> Expect.equal (r.["a"]) 1; Expect.equal (r.["b"]) 2)
-
-        [<Fact>]
-        let ``Should parse object as Dictionary`` () =
-            let expected = dict [ "key1", 1; "key2", 2; "key3", 3; ]
+        let ``Should parse object properties as IDictionary`` () =
+            let expected = seq [ "key1", 1; "key2", 2; "key3", 3 ] |> dict
             let actual: IDictionary<_,_> =
-                Prop.req "prop" (Parse.dict Parse.int)
-                |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+                Parse.dict Parse.int
+                |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.ok
             Expect.equalSeq actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing Dictionary with duplicate keys`` () =
-            Prop.req "prop" (Parse.dict Parse.int)
-            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
+        let ``Should fail when element is not an object`` () =
+            Parse.dict Parse.int
+            |> Parser.parse "[]"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when parsing Dictionary fails`` () =
-            Prop.req "prop" (Parse.dict Parse.int)
-            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+        let ``Should fail when parsing duplicate keys`` () =
+            Parse.dict Parse.int
+            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.dict Parse.int
+            |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
             |> Expect.errorString
 
     module KeyValuePairs =
 
         [<Fact>]
-        let ``Should succeed when value is keyValuePairs`` () =
-            Parse.keyValuePairs Parse.int
-            |> Parser.parse "{\"a\": 1, \"b\": 2}"
-            |> Expect.ok
-            |> Expect.equalSeq [KeyValuePair.Create("a", 1); KeyValuePair.Create("b", 2)]
-
-        [<Fact>]
-        let ``Should parse object as KeyValuePair seq`` () =
-            let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ] |> Seq.map KeyValuePair
+        let ``Should parse object properties as KeyValuePair seq`` () =
+            let expected = seq [ "key1", 1; "key2", 2; "key3", 3 ] |> Seq.map KeyValuePair
             let actual: _ seq =
-                Prop.req "prop" (Parse.keyValuePairs Parse.int)
-                |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+                Parse.keyValuePairs Parse.int
+                |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.ok
             Expect.equalSeq actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing KeyValuePair seq with duplicate keys`` () =
-            Prop.req "prop" (Parse.keyValuePairs Parse.int)
-            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
+        let ``Should fail when element is not an object`` () =
+            Parse.keyValuePairs Parse.int
+            |> Parser.parse "[]"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when parsing KeyValuePairs fails`` () =
-            Prop.req "prop" (Parse.keyValuePairs Parse.int)
-            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+        let ``Should fail when parsing duplicate keys`` () =
+            Parse.keyValuePairs Parse.int
+            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.keyValuePairs Parse.int
+            |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
             |> Expect.errorString
 
     module Tuples =
 
         [<Fact>]
-        let ``Should succeed when value is tuples`` () =
-            Parse.tuples Parse.int
-            |> Parser.parse "{\"a\": 1, \"b\": 2}"
-            |> Expect.ok
-            |> Expect.equalSeq [("a", 1); ("b", 2)]
-
-        [<Fact>]
-        let ``Should parse object as tuple seq`` () =
-            let expected = seq [ "key1", 1; "key2", 2; "key3", 3; ]
+        let ``Should parse object properties as tuple seq`` () =
+            let expected = seq [ "key1", 1; "key2", 2; "key3", 3 ]
             let actual: _ seq =
-                Prop.req "prop" (Parse.tuples Parse.int)
-                |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+                Parse.tuples Parse.int
+                |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.ok
             Expect.equalSeq actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing tuple seq with duplicate keys`` () =
-            Prop.req "prop" (Parse.tuples Parse.int)
-            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
+        let ``Should fail when element is not an object`` () =
+            Parse.tuples Parse.int
+            |> Parser.parse "[]"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when parsing tuples fails`` () =
-            Prop.req "prop" (Parse.tuples Parse.int)
-            |> Parser.parse """{ "prop": { "key1": "1", "key2": "2", "key3": 3 } }"""
+        let ``Should fail when parsing duplicate keys`` () =
+            Parse.tuples Parse.int
+            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.tuples Parse.int
+            |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
             |> Expect.errorString
 
     module Keys =
 
         [<Fact>]
-        let ``Should succeed when value is keys`` () =
-            Parse.keys
-            |> Parser.parse "{\"a\": 1, \"b\": 2}"
-            |> Expect.ok
-            |> Expect.equalSeq ["a"; "b"]
-
-        [<Fact>]
-        let ``Should parse objects keys as string seq`` () =
+        let ``Should parse object keys as string seq`` () =
             let expected = seq [ "key1"; "key2"; "key3" ]
             let actual: _ seq =
-                Prop.req "prop" Parse.keys
-                |> Parser.parse """{ "prop": { "key1": 1, "key2": 2, "key3": 3 } }"""
+                Parse.keys
+                |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.ok
             Expect.equalSeq actual expected
 
         [<Fact>]
-        let ``Should return Error when trying to parse string seq with duplicate keys`` () =
-            Prop.req "prop" Parse.keys
-            |> Parser.parse """{ "prop": { "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 } }"""
+        let ``Should fail when element is not an object`` () =
+            Parse.keys
+            |> Parser.parse "[]"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when parsing duplicate keys`` () =
+            Parse.keys
+            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
             |> Expect.errorString
 
     module Tuple2 =
 
         [<Fact>]
-        let ``Should succeed when value is tuple2`` () =
-            Parse.tuple2 Parse.int Parse.string
-            |> Parser.parse "[1, \"a\"]"
-            |> Expect.ok
-            |> Expect.equal (1, "a")
-
-        [<Fact>]
-        let ``Should parse array as tuple`` () =
+        let ``Should parse tuple of 2`` () =
             let expected = "1", 1
             let actual =
-                Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
-                |> Parser.parse """{ "prop": [ "1", 1 ] }"""
+                Parse.tuple2 Parse.string Parse.int
+                |> Parser.parse """[ "1", 1 ]"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when parsing tuple with incorrect length`` () =
-            Prop.req "prop" (Parse.tuple2 Parse.string Parse.int)
-            |> Parser.parse """{ "prop": [ 1, 1, 1 ] }"""
+        let ``Should fail when parsing fails`` () =
+            Parse.tuple2 Parse.int Parse.int
+            |> Parser.parse """[ "1", 1, 1 ]"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when tuple2 parsing fails`` () =
-            Prop.req "prop" (Parse.tuple2 Parse.int Parse.int)
-            |> Parser.parse """{ "prop": [ "1", "1" ] }"""
+        let ``Should fail when length is invalid`` () =
+            Parse.tuple2 Parse.int Parse.int
+            |> Parser.parse "[ 1 ]"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.tuple2 Parse.int Parse.int
+            |> Parser.parse "{}"
             |> Expect.errorString
 
     module Tuple3 =
 
         [<Fact>]
-        let ``Should succeed when value is tuple3`` () =
-            Parse.tuple3 Parse.int Parse.string Parse.bool
-            |> Parser.parse "[1, \"a\", true]"
-            |> Expect.ok
-            |> Expect.equal (1, "a", true)
-
-        [<Fact>]
-        let ``Should parse array as tuple of three`` () =
+        let ``Should parse tuple of 3`` () =
             let expected = "1", 1, 1
             let actual =
-                Prop.req "prop" (Parse.tuple3 Parse.string Parse.int Parse.int)
-                |> Parser.parse """{ "prop": [ "1", 1, 1 ] }"""
+                Parse.tuple3 Parse.string Parse.int Parse.int
+                |> Parser.parse """[ "1", 1, 1 ]"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when tuple3 parsing fails`` () =
-            Prop.req "prop" (Parse.tuple3 Parse.int Parse.int Parse.int)
-            |> Parser.parse """{ "prop": [ "1", "1", 1 ] }"""
+        let ``Should fail when parsing fails`` () =
+            Parse.tuple3 Parse.int Parse.int Parse.int
+            |> Parser.parse """[ "1", 1, 1, 1 ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when length is invalid`` () =
+            Parse.tuple3 Parse.int Parse.int Parse.int
+            |> Parser.parse "[ 1, 1 ]"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.tuple3 Parse.int Parse.int Parse.int
+            |> Parser.parse "{}"
             |> Expect.errorString
 
     module Tuple4 =
 
         [<Fact>]
-        let ``Should succeed when value is tuple4`` () =
-            Parse.tuple4 Parse.int Parse.string Parse.bool Parse.float
-            |> Parser.parse "[1, \"a\", true, 1.1]"
-            |> Expect.ok
-            |> Expect.equal (1, "a", true, 1.1)
-
-        [<Fact>]
-        let ``Should parse array as tuple of four`` () =
+        let ``Should parse tuple of 4`` () =
             let expected = "1", 1, 1, 1
             let actual =
-                Prop.req "prop" (Parse.tuple4 Parse.string Parse.int Parse.int Parse.int)
-                |> Parser.parse """{ "prop": [ "1", 1, 1, 1 ] }"""
+                Parse.tuple4 Parse.string Parse.int Parse.int Parse.int
+                |> Parser.parse """[ "1", 1, 1, 1 ]"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when tuple4 parsing fails`` () =
-            Prop.req "prop" (Parse.tuple4 Parse.int Parse.int Parse.int Parse.int)
-            |> Parser.parse """{ "prop": [ "1", "1", 1, 1 ] }"""
+        let ``Should fail when parsing fails`` () =
+            Parse.tuple4 Parse.int Parse.int Parse.int Parse.int
+            |> Parser.parse """[ "1", 1, 1, 1 ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when length is invalid`` () =
+            Parse.tuple4 Parse.int Parse.int Parse.int Parse.int
+            |> Parser.parse "[ 1, 1, 1 ]"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.tuple4 Parse.int Parse.int Parse.int Parse.int
+            |> Parser.parse "{}"
             |> Expect.errorString
 
     module Tuple5 =
 
         [<Fact>]
-        let ``Should succeed when value is tuple5`` () =
-            Parse.tuple5 Parse.int Parse.string Parse.bool Parse.float Parse.int
-            |> Parser.parse "[1, \"a\", true, 1.1, 2]"
-            |> Expect.ok
-            |> Expect.equal (1, "a", true, 1.1, 2)
-
-        [<Fact>]
-        let ``Should parse array as tuple of five`` () =
+        let ``Should parse tuple of five`` () =
             let expected = "1", 1, 1, 1, 1
             let actual =
-                Prop.req "prop" (Parse.tuple5 Parse.string Parse.int Parse.int Parse.int Parse.int)
-                |> Parser.parse """{ "prop": [ "1", 1, 1, 1, 1 ] }"""
+                Parse.tuple5 Parse.string Parse.int Parse.int Parse.int Parse.int
+                |> Parser.parse """[ "1", 1, 1, 1, 1 ]"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when tuple5 parsing fails`` () =
-            Prop.req "prop" (Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int)
-            |> Parser.parse """{ "prop": [ "1", "1", 1, 1, 1 ] }"""
+        let ``Should fail when parsing fails`` () =
+            Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int
+            |> Parser.parse """[ "1", "1", 1, 1, 1 ]"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when length is invalid`` () =
+            Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int
+            |> Parser.parse "[ 1, 1, 1, 1 ]"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int
+            |> Parser.parse "{}"
             |> Expect.errorString
 
     module OneOf =
@@ -1215,20 +1405,20 @@ module ParseTests =
         let ``Should parse one-of as discriminated union`` () =
             let expected = A (1, 2)
             let actual =
-                Prop.req "prop" (Parse.oneOf "disc" [
+                Parse.oneOf "disc" [
                     "a", parser {
                         let! a = Prop.req "prop2" Parse.int
                         let! b = Prop.req "prop3" Parse.int
 
                         return A (a, b)
                     }
-                ])
-                |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
+                ]
+                |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when one-of parser fails`` () =
+        let ``Should fail when parsing fails`` () =
             let a =
                 parser {
                     let! a = Prop.req "prop2" Parse.int
@@ -1236,26 +1426,26 @@ module ParseTests =
 
                     return a, b
                 }
-            Prop.req "prop" (Parse.oneOf "disc" [ "a", a ])
-            |> Parser.parse """{ "prop": { "disc": "a", "prop2": "1", "prop3": 2 } }"""
+            Parse.oneOf "disc" [ "a", a ]
+            |> Parser.parse """{ "disc": "a", "prop2": "1", "prop3": 2 }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when one-of is not an object`` () =
-            Prop.req "prop" (Parse.oneOf "disc" [ "missing", Parse.int ])
-            |> Parser.parse """{ "prop": [] }"""
+        let ``Should fail when element is not an object`` () =
+            Parse.oneOf "disc" [ "missing", Parse.int ]
+            |> Parser.parse "[]"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when one-of discriminator is not matched`` () =
-            Prop.req "prop" (Parse.oneOf "disc" [ "missing", Parse.int ])
-            |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
+        let ``Should fail when discriminator is not matched`` () =
+            Parse.oneOf "disc" [ "missing", Parse.int ]
+            |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when one-of discriminator is not found`` () =
-            Prop.req "prop" (Parse.oneOf "missing" [ "a", Parse.int ])
-            |> Parser.parse """{ "prop": { "disc": "a", "prop2": 1, "prop3": 2 } }"""
+        let ``Should fail when discriminator is not found`` () =
+            Parse.oneOf "missing" [ "a", Parse.int ]
+            |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
             |> Expect.errorString
 
     module Self =
@@ -1306,13 +1496,6 @@ module ParseTests =
             | C
 
         [<Fact>]
-        let ``Should succeed when value is attempt`` () =
-            Parse.attempt [Parse.int |> Parser.map box; Parse.bool |> Parser.map box]
-            |> Parser.parse "true"
-            |> Expect.ok
-            |> Expect.equal (box true)
-
-        [<Fact>]
         let ``Should attempt to parse discriminated union`` () =
             let a =
                 parser {
@@ -1322,213 +1505,188 @@ module ParseTests =
                     return A (a, b)
                 }
 
-            let b = parser {
-                let! a = Prop.req "missing" Parse.string
+            let b =
+                parser {
+                    let! b = Prop.req "prop" Parse.string
 
-                return B {| Prop = a |}
-            }
+                    return B {| Prop = b |}
+                }
 
             let expected = A (1, 2)
             let actual =
-                Prop.req "prop" (Parse.attempt [ b; a ])
-                |> Parser.parse """{ "prop": { "prop2": 1, "prop3": 2 } }"""
+                Parse.attempt [ b; a ]
+                |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return error when all attempts fail`` () =
-            Prop.req "prop" (Parse.attempt [ Parser.fail "first"; Parser.fail "second"; Parser.fail "third" ])
-            |> Parser.parse """{ "prop": { "prop2": 1, "prop3": 2 } }"""
+        let ``Should fail when all parsers fail`` () =
+            let parser = Parser.fail "msg"
+            Parse.attempt [ parser; parser; parser ]
+            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when list is empty`` () =
+            Parse.attempt []
+            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
             |> Expect.errorString
 
     module Nil =
 
         [<Fact>]
-        let ``Should succeed and return default when value is null`` () =
-            Parse.nil Parse.int 0
-            |> Parser.parse "null"
-            |> Expect.ok
-            |> Expect.equal 0
-
-        [<Fact>]
-        let ``Should return default value when value is null`` () =
+        let ``Should set default value when null`` () =
             let expected = 1
             let actual =
-                Prop.req "prop" (Parse.nil Parse.int 1)
-                |> Parser.parse """{ "prop": null }"""
+                Parse.nil Parse.int 1
+                |> Parser.parse "null"
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should not return default value when value is not null`` () =
-            let expected = 2
+        let ``Should not set default value when not null`` () =
+            let expected = 1
             let actual =
-                Prop.req "prop" (Parse.nil Parse.int 1)
-                |> Parser.parse """{ "prop": 2 }"""
+                Parse.nil Parse.int 2
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
 
     module Option =
 
         [<Fact>]
-        let ``Should succeed when value is option`` () =
-            Parse.option Parse.int
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal (Some 1)
-
-        [<Fact>]
-        let ``Should parse optional null value as None`` () =
+        let ``Should parse null value as None`` () =
             let expected = None
             let actual =
-                Prop.req "prop" (Parse.option Parse.int)
-                |> Parser.parse """{ "prop": null }"""
+                Parse.option Parse.int
+                |> Parser.parse "null"
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should parse optional value as Some int`` () =
+        let ``Should parse value as Some value`` () =
             let expected = Some 1
             let actual =
-                Prop.req "prop" (Parse.option Parse.int)
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.option Parse.int
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.option Parse.int
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module Refine =
 
         [<Fact>]
-        let ``Should succeed when value is refine`` () =
-            Parse.refine Parse.int (fun x -> if x > 0 then Ok x else Error "Must be positive")
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1
+        let ``Should refine parsed value`` () =
+            let expected = 1
+            let actual =
+                Parse.refine Parse.int Ok
+                |> Parser.parse "1"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when refined value is not valid`` () =
-            Prop.req "prop" (Parse.refine Parse.int (fun _ -> Error "Not valid."))
-            |> Parser.parse """{ "prop": 1 }"""
+        let ``Should fail when validation fails`` () =
+            Parse.refine Parse.int (fun _ -> Error "msg")
+            |> Parser.parse "1"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Ok when refined value is valid`` () =
-            let expected = 1
-            let actual =
-                Prop.req "prop" (Parse.refine Parse.int Ok)
-                |> Parser.parse """{ "prop": 1 }"""
-                |> Expect.ok
-            Expect.equal actual expected
+        let ``Should fail when parsing fails`` () =
+            Parse.refine Parse.int Ok
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module Verify =
 
         [<Fact>]
-        let ``Should succeed when value is verify`` () =
-            Parse.verify Parse.int (fun x -> x > 0) "Must be positive"
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1
+        let ``Should verify parsed value`` () =
+            let expected = 1
+            let actual =
+                Parse.verify Parse.int (fun x -> x > 0) "msg"
+                |> Parser.parse "1"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when verified value is not valid`` () =
-            Prop.req "prop" (Parse.verify Parse.int (fun x -> x > 0) "Not valid.")
-            |> Parser.parse """{ "prop": 0 }"""
+        let ``Should fail when predicate returns false`` () =
+            Parse.verify Parse.int (fun x -> x = 0) "msg"
+            |> Parser.parse "1"
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Ok when verified value is valid`` () =
-            let expected = 1
-            let actual =
-                Prop.req "prop" (Parse.verify Parse.int (fun x -> x > 0) "Error")
-                |> Parser.parse """{ "prop": 1 }"""
-                |> Expect.ok
-            Expect.equal actual expected
+        let ``Should fail when parsing fails`` () =
+            Parse.verify Parse.int (fun x -> x > 0) "msg"
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module Kind =
 
         [<Fact>]
-        let ``Should succeed when value is kind`` () =
-            Parse.kind
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal JsonValueKind.Number
-
-        [<Fact>]
-        let ``Should parse element kind as JsonValueKind`` () =
+        let ``Should parse element as JsonValueKind`` () =
             let expected = JsonValueKind.Number
             let actual =
-                Prop.req "prop" Parse.kind
-                |> Parser.parse """{ "prop": 1 }"""
+                Parse.kind
+                |> Parser.parse "1"
                 |> Expect.ok
             Expect.equal actual expected
 
     module Element =
 
         [<Fact>]
-        let ``Should succeed when value is element`` () =
-            Parse.element
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> (fun e -> Expect.equal e.ValueKind JsonValueKind.Number)
-
-        [<Fact>]
         let ``Should parse element as JsonElement`` () =
-            let expected = JsonDocument.Parse("""{ "prop2": 1 }""").RootElement
+            let expected = JsonDocument.Parse("""{ "prop": 1 }""").RootElement
             let actual =
-                Prop.req "prop" Parse.element
-                |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+                Parse.element
+                |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.ok
             Expect.isTrue <| JsonElement.DeepEquals(expected, actual)
 
     module RawText =
 
         [<Fact>]
-        let ``Should succeed when value is rawText`` () =
-            Parse.rawText
-            |> Parser.parse "{\"a\": 1}"
-            |> Expect.ok
-            |> Expect.equal "{\"a\": 1}"
-
-        [<Fact>]
         let ``Should parse element as string`` () =
-            let expected = """{ "prop2": 1 }"""
+            let expected = """{ "prop": 1 }"""
             let actual =
-                Prop.req "prop" Parse.rawText
-                |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+                Parse.rawText
+                |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.ok
             Expect.equal actual expected
 
     module ArrayLength =
 
         [<Fact>]
-        let ``Should succeed when value is arrayLength`` () =
-            Parse.arrayLength
-            |> Parser.parse "[1, 2, 3]"
-            |> Expect.ok
-            |> Expect.equal 3
-
-        [<Fact>]
         let ``Should parse array length as int`` () =
             let expected = 3
             let actual =
-                Prop.req "prop" Parse.arrayLength
-                |> Parser.parse """{ "prop": [ 1, 2, 3 ] }"""
+                Parse.arrayLength
+                |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.ok
             Expect.equal actual expected
 
-    module PropertyCount =
-
         [<Fact>]
-        let ``Should succeed when value is propertyCount`` () =
-            Parse.propertyCount
-            |> Parser.parse "{\"a\": 1, \"b\": 2}"
-            |> Expect.ok
-            |> Expect.equal 2
+        let ``Should fail when element is not an array`` () =
+            Parse.arrayLength
+            |> Parser.parse "{}"
+            |> Expect.errorString
+
+    module PropertyCount =
 
         [<Fact>]
         let ``Should parse object property count as int`` () =
             let expected = 3
             let actual =
-                Prop.req "prop" Parse.propertyCount
-                |> Parser.parse """{ "prop": { "one": 1, "two": 2, "three": 3 } }"""
+                Parse.propertyCount
+                |> Parser.parse """{ "one": 1, "two": 2, "three": 3 }"""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when element is not an object`` () =
+            Parse.propertyCount
+            |> Parser.parse "[]"
+            |> Expect.errorString
