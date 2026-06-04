@@ -1,7 +1,6 @@
 namespace Farse.Tests
 
 open System.Numerics
-open System.Text
 open Xunit
 open Farse
 open System
@@ -13,32 +12,36 @@ module ParseTests =
     module Custom =
 
         [<Fact>]
-        let ``Should parse with custom parser`` () =
-            Parse.custom (_.GetInt32() >> Ok) ExpectedKind.Number
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1
+        let ``Should parse element with custom parser`` () =
+            let expected = 1
+            let actual =
+                Parse.custom (_.GetInt32() >> Ok) ExpectedKind.Number
+                |> Parser.parse "1"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
-        let ``Should parse with custom parser and any kind`` () =
-            Parse.custom (fun element ->
-                match element.TryGetInt32() with
-                | true, x -> Ok x
-                | _ -> Error "Invalid value."
-            ) ExpectedKind.Any
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1
+        let ``Should parse with value with custom parser when ExpectedKind is Any`` () =
+            let expected = 1
+            let actual =
+                Parse.custom (fun element ->
+                    match element.TryGetInt32() with
+                    | true, x -> Ok x
+                    | _ -> Error "Invalid value."
+                ) ExpectedKind.Any
+                |> Parser.parse "1"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
-        let ``Should fail when value is not a number`` () =
+        let ``Should fail when element is not the right kind`` () =
             Parse.custom (fun element ->
                 match element.TryGetInt32() with
                 | true, x -> Ok x
                 | _ -> Error "Invalid value."
             ) ExpectedKind.Number
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -48,324 +51,363 @@ module ParseTests =
                 | _ -> Error "Invalid value."
             ) ExpectedKind.Number
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
-        let ``Should fail when value is throwing exception`` () =
+        let ``Should fail when a exception is thrown`` () =
             Parse.custom (_.GetString() >> Ok) ExpectedKind.Number
             |> Parser.parse "1"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Int =
 
         [<Fact>]
-        let ``Should succeed when value is int`` () =
-            Parse.int
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1
+        let ``Should parse number as int`` () =
+            let expected = Int32.MaxValue
+            let actual =
+                Parse.int
+                |> Parser.parse "2147483647"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.int
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Int16 =
 
         [<Fact>]
-        let ``Should succeed when value is int16`` () =
-            Parse.int16
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1s
+        let ``Should parse number as int16`` () =
+            let expected = Int16.MaxValue
+            let actual =
+                Parse.int16
+                |> Parser.parse "32767"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.int16
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int16
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Int64 =
 
         [<Fact>]
-        let ``Should succeed when value is int64`` () =
-            Parse.int64
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1L
+        let ``Should parse number as int64`` () =
+            let expected = Int64.MaxValue
+            let actual =
+                Parse.int64
+                |> Parser.parse "9223372036854775807"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.int64
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int64
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module UInt16 =
 
         [<Fact>]
-        let ``Should succeed when value is uint16`` () =
-            Parse.uint16
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1us
+        let ``Should parse number as uint16`` () =
+            let expected = UInt16.MaxValue
+            let actual =
+                Parse.uint16
+                |> Parser.parse "65535"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.uint16
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.uint16
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module UInt32 =
 
         [<Fact>]
-        let ``Should succeed when value is uint32`` () =
-            Parse.uint32
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1u
+        let ``Should parse number as uint32`` () =
+            let expected = UInt32.MaxValue
+            let actual =
+                Parse.uint32
+                |> Parser.parse "4294967295"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.uint32
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.uint32
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module UInt64 =
 
         [<Fact>]
-        let ``Should succeed when value is uint64`` () =
-            Parse.uint64
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1UL
+        let ``Should parse number as uint64`` () =
+            let expected = UInt64.MaxValue
+            let actual =
+                Parse.uint64
+                |> Parser.parse "18446744073709551615"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.uint64
             |> Parser.parse "1.1"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.uint64
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Float =
 
         [<Fact>]
-        let ``Should succeed when value is float`` () =
-            Parse.float
-            |> Parser.parse "1.1"
-            |> Expect.ok
-            |> Expect.equal 1.1
+        let ``Should parse number as float`` () =
+            let expected = Double.MaxValue
+            let actual =
+                Parse.float
+                |> Parser.parse "1.79769313486e+308"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.float
-            |> Parser.parse "\"a\""
-            |> Expect.isError
+            |> Parser.parse "1.8e308"
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.float
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Float32 =
 
         [<Fact>]
-        let ``Should succeed when value is float32`` () =
-            Parse.float32
-            |> Parser.parse "1.1"
-            |> Expect.ok
-            |> Expect.equal 1.1f
+        let ``Should parse number as float32`` () =
+            let expected = Single.MaxValue
+            let actual =
+                Parse.float32
+                |> Parser.parse "3.40282346639e+38"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.float32
-            |> Parser.parse "\"a\""
-            |> Expect.isError
+            |> Parser.parse "1e99999"
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.float32
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Decimal =
 
         [<Fact>]
-        let ``Should succeed when value is decimal`` () =
-            Parse.decimal
-            |> Parser.parse "1.1"
-            |> Expect.ok
-            |> Expect.equal 1.1m
+        let ``Should parse number as decimal`` () =
+            let expected = Decimal.MaxValue
+            let actual =
+                Parse.decimal
+                |> Parser.parse (string Decimal.MaxValue)
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.decimal
-            |> Parser.parse "\"a\""
-            |> Expect.isError
+            |> Parser.parse "1e999"
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.decimal
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Byte =
 
         [<Fact>]
-        let ``Should succeed when value is byte`` () =
-            Parse.byte
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1uy
+        let ``Should parse number as byte`` () =
+            let expected = Byte.MaxValue
+            let actual =
+                Parse.byte
+                |> Parser.parse "255"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.byte
             |> Parser.parse "256"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.byte
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module SByte =
 
         [<Fact>]
-        let ``Should succeed when value is sbyte`` () =
-            Parse.sbyte
-            |> Parser.parse "1"
-            |> Expect.ok
-            |> Expect.equal 1y
+        let ``Should parse number as sbyte`` () =
+            let expected = SByte.MaxValue
+            let actual =
+                Parse.sbyte
+                |> Parser.parse "127"
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.sbyte
             |> Parser.parse "128"
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.sbyte
             |> Parser.parse "true"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Char =
 
         [<Fact>]
-        let ``Should succeed when value is char`` () =
-            Parse.char
-            |> Parser.parse "\"a\""
-            |> Expect.ok
-            |> Expect.equal 'a'
+        let ``Should parse string as char`` () =
+            let expected = 'a'
+            let actual =
+                Parse.char
+                |> Parser.parse "\"a\""
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.char
             |> Parser.parse "\"ab\""
-            |> Expect.isError
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.char
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module String =
 
         [<Fact>]
-        let ``Should succeed when value is string`` () =
+        let ``Should parse string as string`` () =
+            let expected = "value"
+            let actual =
+                Parse.string
+                |> Parser.parse "\"value\""
+                |> Expect.ok
+            Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
             Parse.string
-            |> Parser.parse "\"value\""
-            |> Expect.ok
-            |> Expect.equal "value"
+            |> Parser.parse "1"
+            |> Expect.errorString
 
     module StringNonEmpty =
 
         [<Fact>]
-        let ``Should succeed when value is stringNonEmpty`` () =
-            Parse.stringNonEmpty
-            |> Parser.parse "\"a\""
-            |> Expect.ok
-            |> Expect.equal "a"
+        let ``Should parse string as non-empty string`` () =
+            let expected = "value"
+            let actual =
+                Parse.stringNonEmpty
+                |> Parser.parse "\"value\""
+                |> Expect.ok
+            Expect.equal actual expected
 
         [<Fact>]
-        let ``Should fail when value is invalid`` () =
-            Parse.stringNonEmpty
-            |> Parser.parse "\"\""
-            |> Expect.isError
-
-        [<Fact>]
-        let ``Should return Error when parsing empty string`` () =
+        let ``Should fail when string is empty`` () =
              Parse.stringNonEmpty
-            |> Parser.parse """{ "prop": "" }"""
+            |> Parser.parse "\"\""
             |> Expect.errorString
 
         [<Fact>]
-        let ``Should return Error when parsing whitespace string`` () =
+        let ``Should fail when string is whitespace`` () =
              Parse.stringNonEmpty
-            |> Parser.parse """{ "prop": "  " }"""
+            |> Parser.parse "\"  \""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+             Parse.stringNonEmpty
+            |> Parser.parse "1"
             |> Expect.errorString
 
     module Regex =
 
         [<Fact>]
-        let ``Should succeed when value is regex`` () =
-            Parse.regex "^[0-9]+$"
-            |> Parser.parse "\"123\""
-            |> Expect.ok
-            |> Expect.equal "123"
-
-        [<Fact>]
-        let ``Should fail when value is invalid`` () =
-            Parse.regex "^[0-9]+$"
-            |> Parser.parse "\"abc\""
-            |> Expect.isError
-
-        [<Fact>]
         let ``Should parse string with regex`` () =
             let expected = "12345"
             let actual =
-                 (Parse.regex "^[0-9]+$")
-                |> Parser.parse """{ "prop": "12345" }"""
+                 Parse.regex "^[0-9]+$"
+                |> Parser.parse "\"12345\""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should return Error when regex does not match`` () =
-             (Parse.regex "^[0-9]+$")
-            |> Parser.parse """{ "prop": "abc" }"""
+        let ``Should fail when regex is invalid`` () =
+            Parse.regex "^[0-9+$"
+            |> Parser.parse "\"abc\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.regex "^[0-9]+$"
+            |> Parser.parse "1"
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when regex does not match`` () =
+            Parse.regex "^[0-9]+$"
+            |> Parser.parse "\"abc\""
             |> Expect.errorString
 
     module Number =
@@ -806,14 +848,14 @@ module ParseTests =
             let expected = TimeOnly.Parse("17:28:45")
             let actual =
                 Parse.timeOnlyExact "HHmmss"
-                |> Parser.parse "172845"
+                |> Parser.parse "\"172845\""
                 |> Expect.ok
             Expect.equal actual expected
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
             Parse.timeOnlyExact "HHmmss"
-            |> Parser.parse "17:28:45"
+            |> Parser.parse "\"17:28:45\""
             |> Expect.errorString
 
         [<Fact>]
@@ -886,7 +928,7 @@ module ParseTests =
             let expected = DateOnly.Parse("2025-05-13")
             let actual =
                 Parse.dateOnlyExact "yyyyMMdd"
-                |> Parser.parse "20250513"
+                |> Parser.parse "\"20250513\""
                 |> Expect.ok
             Expect.equal actual expected
 
