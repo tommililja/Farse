@@ -1,6 +1,0 @@
-﻿Parser failed with 1 error[s].
-
-Error[0]:
-  at $.prop
-   | Tried parsing '(string, int).
-   | Expected a tuple of 2, but got 3.

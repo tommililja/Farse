@@ -1,6 +1,0 @@
-﻿Parser failed with 1 error[s].
-
-Error[0]:
-  at $.prop[3]
-   | Tried parsing 'int.
-   | Index was out of range.
