@@ -1,0 +1,7 @@
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  at $
+   | Tried parsing 'string.
+   | The requested operation requires an element of type 'String', but the target element has type 'Number'.
+   = 1

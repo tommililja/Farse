@@ -614,16 +614,22 @@ module Parse =
     /// <param name="parsers">The list of parsers to try.</param>
     let attempt parsers : Parser<'r> =
         Parser (fun element ->
-            let rec loop errors = function
-                | [] ->
-                    element
-                    |> ParseError.attempt errors typeof<'r>
-                    |> Error.list
-                | Parser parse :: rest ->
-                    match parse element with
-                    | Ok x -> Ok x
-                    | Error _ -> loop (errors + 1) rest
-            loop 0 parsers
+            match parsers with
+            | [] ->
+                element
+                |> ParseError.emptyParsers typeof<'r>
+                |> Error.list
+            | _ ->
+                let rec loop errors = function
+                    | [] ->
+                        element
+                        |> ParseError.attempt errors typeof<'r>
+                        |> Error.list
+                    | Parser parse :: rest ->
+                        match parse element with
+                        | Ok x -> Ok x
+                        | Error _ -> loop (errors + 1) rest
+                loop 0 parsers
         )
 
     // Combinators

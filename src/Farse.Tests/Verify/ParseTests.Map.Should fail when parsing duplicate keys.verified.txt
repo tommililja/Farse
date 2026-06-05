@@ -1,0 +1,11 @@
+﻿Parser failed with 2 error[s].
+
+Error[0]:
+  at $.key1
+   | Tried parsing 'Map<string, int>.
+   | Duplicate key.
+
+Error[1]:
+  at $.key2
+   | Tried parsing 'Map<string, int>.
+   | Duplicate key.

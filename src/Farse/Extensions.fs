@@ -67,7 +67,7 @@ module internal Extensions =
                 | "FSharpMap" -> $"Map<%s{args}>"
                 | "FSharpResult" -> $"Result<%s{args}>"
                 | "IEnumerable" -> $"%s{args} seq"
-                | "Tuple" -> $"(%s{args})"
+                | "Tuple" -> $"""(%s{args.Replace(", ", " * ")})"""
                 | name -> $"%s{name}<%s{args}>"
             | x ->
                 match x.Name with
@@ -75,7 +75,7 @@ module internal Extensions =
                 | "Int32" -> "int"
                 | "Int64" -> "int64"
                 | "Byte" -> "byte"
-                | "SByte" -> "int8"
+                | "SByte" -> "sbyte"
                 | "UInt16" -> "uint16"
                 | "UInt32" -> "uint"
                 | "UInt64" -> "uint64"

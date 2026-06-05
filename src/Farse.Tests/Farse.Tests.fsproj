@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <IsPackable>false</IsPackable>
@@ -6,10 +6,10 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Extensions.fs" />
-        <Compile Include="Tests\JsonTests.fs" />
-        <Compile Include="Tests\ParseTests.fs" />
-        <Compile Include="Tests\ParserTests.fs" />
-        <Compile Include="Tests\ErrorTests.fs" />
+        <Compile Include="JsonTests.fs" />
+        <Compile Include="ParseTests.fs" />
+        <Compile Include="ParserTests.fs" />
+        <Compile Include="PropTests.fs" />
         <Compile Include="Example.fs" />
     </ItemGroup>
     <ItemGroup>
