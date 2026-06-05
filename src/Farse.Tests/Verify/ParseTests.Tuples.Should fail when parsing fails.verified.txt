@@ -1,0 +1,13 @@
+﻿Parser failed with 2 error[s].
+
+Error[0]:
+  at $.key1
+   | Tried parsing 'int.
+   | Expected Number, but got String.
+   = "1"
+
+Error[1]:
+  at $.key2
+   | Tried parsing 'int.
+   | Expected Number, but got String.
+   = "2"

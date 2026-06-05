@@ -1,0 +1,11 @@
+﻿Parser failed with 2 error[s].
+
+Error[0]:
+  at $.key1
+   | Tried parsing '(string * int) seq.
+   | Duplicate key.
+
+Error[1]:
+  at $.key2
+   | Tried parsing '(string * int) seq.
+   | Duplicate key.

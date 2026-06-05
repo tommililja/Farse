@@ -131,12 +131,23 @@ module ParseError =
             Exn = None
         }
 
-    let internal duplicateKey key type' element =
+    let internal emptyParsers type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
             Index = None
-            Details = $"Duplicate key '%s{key}'."
+            Value = None
+            Type = type'
+            Details = "No parsers given."
+            Exn = None
+        }
+
+    let internal duplicateKey key type' element =
+        {
+            Path = JsonPath.prop key
+            Element = JsonElement.clone element
+            Index = None
+            Details = "Duplicate key."
             Type = type'
             Value = None
             Exn = None

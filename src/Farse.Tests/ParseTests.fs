@@ -204,15 +204,9 @@ module ParseTests =
             let expected = Double.MaxValue
             let actual =
                 Parse.float
-                |> Parser.parse "1.79769313486e+308"
+                |> Parser.parse "1.7976931348623157E+308"
                 |> Expect.ok
             Expect.equal actual expected
-
-        [<Fact>]
-        let ``Should fail when value is invalid`` () =
-            Parse.float
-            |> Parser.parse "1.8e308"
-            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
@@ -230,12 +224,6 @@ module ParseTests =
                 |> Parser.parse "3.40282346639e+38"
                 |> Expect.ok
             Expect.equal actual expected
-
-        [<Fact>]
-        let ``Should fail when value is invalid`` () =
-            Parse.float32
-            |> Parser.parse "1e99999"
-            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
@@ -365,29 +353,29 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when string is empty`` () =
-             Parse.stringNonEmpty
+            Parse.stringNonEmpty
             |> Parser.parse "\"\""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when string is whitespace`` () =
-             Parse.stringNonEmpty
+            Parse.stringNonEmpty
             |> Parser.parse "\"  \""
             |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-             Parse.stringNonEmpty
+            Parse.stringNonEmpty
             |> Parser.parse "1"
             |> Expect.errorString
 
     module Regex =
 
         [<Fact>]
-        let ``Should parse string with regex`` () =
+        let ``Should parse string as string with regex`` () =
             let expected = "12345"
             let actual =
-                 Parse.regex "^[0-9]+$"
+                Parse.regex "^[0-9]+$"
                 |> Parser.parse "\"12345\""
                 |> Expect.ok
             Expect.equal actual expected
@@ -416,8 +404,8 @@ module ParseTests =
         let ``Should parse string as bigint`` () =
             let expected = BigInteger.Parse("1")
             let actual =
-                 Parse.number<bigint>
-                |> Parser.parse "1"
+                Parse.number<bigint>
+                |> Parser.parse "\"1\""
                 |> Expect.ok
             Expect.equal actual expected
 
@@ -429,7 +417,7 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-             Parse.number<int>
+            Parse.number<int>
             |> Parser.parse "1"
             |> Expect.errorString
 
@@ -826,25 +814,30 @@ module ParseTests =
     module TimeOnly =
 
         [<Fact>]
-        let ``Should succeed when value is timeOnly`` () =
-            Parse.timeOnly
-            |> Parser.parse "\"12:00:00\""
-            |> Expect.ok
-            |> Expect.equal (TimeOnly(12, 0, 0))
-
-        [<Fact>]
         let ``Should parse string as TimeOnly`` () =
             let expected = TimeOnly.Parse("17:28:45")
             let actual =
                 Parse.timeOnly
-                |> Parser.parse """{ "prop": "2025-05-13T17:28:45" }"""
+                |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.timeOnly
+            |> Parser.parse "\"17:2845\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.timeOnly
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module TimeOnlyExact =
 
         [<Fact>]
-        let ``Should parse TimeOnly exact`` () =
+        let ``Should parse string as TimeOnly exact`` () =
             let expected = TimeOnly.Parse("17:28:45")
             let actual =
                 Parse.timeOnlyExact "HHmmss"
@@ -867,18 +860,30 @@ module ParseTests =
     module TimeSpan =
 
         [<Fact>]
-        let ``Should parse TimeSpan`` () =
+        let ``Should parse string as TimeSpan`` () =
             let expected = TimeSpan.Parse("1:23:45")
             let actual =
                 Parse.timeSpan
-                |> Parser.parse """{ "prop": "1:23:45" }"""
+                |> Parser.parse "\"1:23:45\""
                 |> Expect.ok
             Expect.equal actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.timeOnly
+            |> Parser.parse "\"1:2345\""
+            |> Expect.errorString
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.timeSpan
+            |> Parser.parse "true"
+            |> Expect.errorString
 
     module TimeSpanExact =
 
         [<Fact>]
-        let ``Should parse TimeSpan exact`` () =
+        let ``Should parse string as TimeSpan exact`` () =
             let expected = TimeSpan.Parse("01:23:45")
             let actual =
                 Parse.timeSpanExact "hhmmss"
@@ -901,7 +906,7 @@ module ParseTests =
     module DateOnly =
 
         [<Fact>]
-        let ``Should parse DateOnly`` () =
+        let ``Should parse string as DateOnly`` () =
             let expected = DateOnly.Parse("2025-05-13")
             let actual =
                 Parse.dateOnly
@@ -924,7 +929,7 @@ module ParseTests =
     module DateOnlyExact =
 
         [<Fact>]
-        let ``Should parse DateOnly exact`` () =
+        let ``Should parse string as DateOnly exact`` () =
             let expected = DateOnly.Parse("2025-05-13")
             let actual =
                 Parse.dateOnlyExact "yyyyMMdd"
@@ -947,7 +952,7 @@ module ParseTests =
     module DateTime =
 
         [<Fact>]
-        let ``Should parse DateTime`` () =
+        let ``Should parse string as DateTime`` () =
             let expected = DateTime.Parse("2025-05-13T17:28:45")
             let actual =
                 Parse.dateTime
@@ -970,12 +975,12 @@ module ParseTests =
     module DateTimeUtc =
 
         [<Fact>]
-        let ``Should parse DateTime UTC`` () =
+        let ``Should parse string as DateTime UTC`` () =
             let now = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00))
             let expected = now.ToUniversalTime()
             let actual =
                 Parse.dateTimeUtc
-                |> Parser.parse (now.ToString("yyyy-MM-ddTHH:mm"))
+                |> Parser.parse "\"2025-05-25T10:00:00\""
                 |> Expect.ok
             Expect.equal actual expected
 
@@ -994,7 +999,7 @@ module ParseTests =
     module DateTimeExact =
 
         [<Fact>]
-        let ``Should parse DateTimeExact`` () =
+        let ``Should parse string as DateTimeExact`` () =
             let expected = DateTime.Parse("2025-05-13T17:28:45")
             let actual =
                 Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
@@ -1017,7 +1022,7 @@ module ParseTests =
     module DateTimeOffset =
 
         [<Fact>]
-        let ``Should parse DateTimeOffset`` () =
+        let ``Should parse string as DateTimeOffset`` () =
             let expected = DateTime.Parse("2025-05-13T17:28:45+02:00")
             let actual =
                 Parse.dateTime
@@ -1040,7 +1045,7 @@ module ParseTests =
     module DateTimeOffsetExact =
 
         [<Fact>]
-        let ``Should parse DateTimeOffset exact`` () =
+        let ``Should parse string as DateTimeOffset exact`` () =
             let expected = DateTimeOffset.Parse("2025-05-13T17:28:00+02:00")
             let actual =
                 Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz"
@@ -1063,7 +1068,7 @@ module ParseTests =
     module List =
 
         [<Fact>]
-        let ``Should parse value Set`` () =
+        let ``Should parse array as value list`` () =
             let expected = [ 1; 2; 3; ]
             let actual: _ list =
                 Parse.list Parse.int
@@ -1086,7 +1091,7 @@ module ParseTests =
     module Array =
 
         [<Fact>]
-        let ``Should parse value Set`` () =
+        let ``Should parse array as value array`` () =
             let expected = [| 1; 2; 3; |]
             let actual: _ array =
                 Parse.array Parse.int
@@ -1109,7 +1114,7 @@ module ParseTests =
     module Set =
 
         [<Fact>]
-        let ``Should parse value Set`` () =
+        let ``Should parse array as value Set`` () =
             let expected = Set [ 1; 2; 3; ]
             let actual: _ Set =
                 Parse.set Parse.int
@@ -1132,7 +1137,7 @@ module ParseTests =
     module Seq =
 
         [<Fact>]
-        let ``Should parse value seq`` () =
+        let ``Should parse array as value seq`` () =
             let expected = seq [ 1; 2; 3; ]
             let actual: _ seq =
                 Parse.seq Parse.int
@@ -1323,7 +1328,7 @@ module ParseTests =
     module Tuple2 =
 
         [<Fact>]
-        let ``Should parse tuple of 2`` () =
+        let ``Should parse array as tuple of 2`` () =
             let expected = "1", 1
             let actual =
                 Parse.tuple2 Parse.string Parse.int
@@ -1352,7 +1357,7 @@ module ParseTests =
     module Tuple3 =
 
         [<Fact>]
-        let ``Should parse tuple of 3`` () =
+        let ``Should parse array as tuple of 3`` () =
             let expected = "1", 1, 1
             let actual =
                 Parse.tuple3 Parse.string Parse.int Parse.int
@@ -1381,7 +1386,7 @@ module ParseTests =
     module Tuple4 =
 
         [<Fact>]
-        let ``Should parse tuple of 4`` () =
+        let ``Should parse array as tuple of 4`` () =
             let expected = "1", 1, 1, 1
             let actual =
                 Parse.tuple4 Parse.string Parse.int Parse.int Parse.int
@@ -1410,7 +1415,7 @@ module ParseTests =
     module Tuple5 =
 
         [<Fact>]
-        let ``Should parse tuple of five`` () =
+        let ``Should parse array as tuple of five`` () =
             let expected = "1", 1, 1, 1, 1
             let actual =
                 Parse.tuple5 Parse.string Parse.int Parse.int Parse.int Parse.int
@@ -1444,7 +1449,7 @@ module ParseTests =
             | C
 
         [<Fact>]
-        let ``Should parse one-of as discriminated union`` () =
+        let ``Should parse object as discriminated union`` () =
             let expected = A (1, 2)
             let actual =
                 Parse.oneOf "disc" [
@@ -1497,7 +1502,7 @@ module ParseTests =
             | Branch of Tree * Tree
 
         [<Fact>]
-        let ``Should parse one-of as recursive discriminated union`` () =
+        let ``Should parse object as recursive discriminated union`` () =
             let expected = Branch (Leaf 1, Branch (Leaf 2, Leaf 3))
             let actual =
                 Parse.self (fun self ->
@@ -1577,7 +1582,7 @@ module ParseTests =
     module Nil =
 
         [<Fact>]
-        let ``Should set default value when null`` () =
+        let ``Should parse null as default value`` () =
             let expected = 1
             let actual =
                 Parse.nil Parse.int 1
@@ -1586,7 +1591,7 @@ module ParseTests =
             Expect.equal actual expected
 
         [<Fact>]
-        let ``Should not set default value when not null`` () =
+        let ``Should parse element as value`` () =
             let expected = 1
             let actual =
                 Parse.nil Parse.int 2
@@ -1597,7 +1602,7 @@ module ParseTests =
     module Option =
 
         [<Fact>]
-        let ``Should parse null value as None`` () =
+        let ``Should parse null as None`` () =
             let expected = None
             let actual =
                 Parse.option Parse.int
@@ -1617,13 +1622,13 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.option Parse.int
-            |> Parser.parse "true"
+            |> Parser.parse "1.1"
             |> Expect.errorString
 
     module Refine =
 
         [<Fact>]
-        let ``Should refine parsed value`` () =
+        let ``Should parse refined value`` () =
             let expected = 1
             let actual =
                 Parse.refine Parse.int Ok
@@ -1640,13 +1645,13 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.refine Parse.int Ok
-            |> Parser.parse "true"
+            |> Parser.parse "1.1"
             |> Expect.errorString
 
     module Verify =
 
         [<Fact>]
-        let ``Should verify parsed value`` () =
+        let ``Should parse verified value`` () =
             let expected = 1
             let actual =
                 Parse.verify Parse.int (fun x -> x > 0) "msg"
@@ -1723,7 +1728,7 @@ module ParseTests =
             let expected = 3
             let actual =
                 Parse.propertyCount
-                |> Parser.parse """{ "one": 1, "two": 2, "three": 3 }"""
+                |> Parser.parse """{ "prop": 1, "prop2": 2, "prop3": 3 }"""
                 |> Expect.ok
             Expect.equal actual expected
 

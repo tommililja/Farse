@@ -1,0 +1,7 @@
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  at $
+   | Tried parsing 'Int64Enum.
+   | Expected Int64Enum enum.
+   = 2
