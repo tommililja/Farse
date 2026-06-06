@@ -143,18 +143,20 @@ module Parse =
     /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
     let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
-        customInternal (fun element ->
+        custom (fun element ->
             match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
-            | _ ->
-                element
-                |> ParseError.invalid "Expected a number string." typeof<'r>
-                |> Error.list
+            | _ -> Error "Expected a number string."
         ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as System.Byte array.</summary>
     /// <example><code>let! bytes = "prop" &amp;= Parse.base64Bytes</code></example>
-    let base64Bytes = custom (_.TryGetBytesFromBase64 >> tryParse) ExpectedKind.String
+    let base64Bytes =
+        custom (fun element ->
+            match element.TryGetBytesFromBase64() with
+            | true, bytes -> Ok bytes
+            | _ -> Error "Expected a base64 string."
+        ) ExpectedKind.String
 
     /// <summary>Parses a number as System.Numerics.BigInteger.</summary>
     /// <example><code>let! bigint = "prop" &amp;= Parse.bigint</code></example>

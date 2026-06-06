@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'byte array.
-   | Invalid value.
+   | Expected a base64 string.
    = "abc"
