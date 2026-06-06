@@ -4,9 +4,9 @@ open System
 open System.IO
 open System.Text
 open System.Threading.Tasks
-open Expecto
 open VerifyTests
 open VerifyXunit
+open Expecto
 open Farse
 
 module Expect =

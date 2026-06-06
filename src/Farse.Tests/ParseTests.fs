@@ -1,11 +1,11 @@
 namespace Farse.Tests
 
-open System.Numerics
-open Xunit
-open Farse
 open System
 open System.Collections.Generic
+open System.Numerics
 open System.Text.Json
+open Xunit
+open Farse
 
 module ParseTests =
 

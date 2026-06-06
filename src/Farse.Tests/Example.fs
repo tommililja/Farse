@@ -1,10 +1,10 @@
 namespace Farse.Tests
 
-open Farse
+open System
 open NodaTime
 open NodaTime.Text
-open System
 open Xunit
+open Farse
 
 type UserId = UserId of Guid
 
