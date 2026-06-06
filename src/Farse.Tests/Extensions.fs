@@ -48,8 +48,8 @@ module Expect =
 
 module MemoryStream =
 
-    let create (str:string) =
-        let bytes = Encoding.UTF8.GetBytes(str)
+    let create (string:string) =
+        let bytes = Encoding.UTF8.GetBytes(string)
         new MemoryStream(bytes)
 
 module Task =

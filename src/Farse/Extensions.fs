@@ -43,8 +43,8 @@ module internal Extensions =
 
     module String =
 
-        let inline isNotEmpty str =
-            String.IsNullOrWhiteSpace(str)
+        let inline isNotEmpty string =
+            String.IsNullOrWhiteSpace(string)
             |> not
 
     module Type =
@@ -103,7 +103,7 @@ module internal Extensions =
     [<AutoOpen>]
     module ActivePatterns =
 
-        let (|Prop|Path|) (str:string) =
-            if str.Contains('.')
-            then Path (str.Split('.', StringSplitOptions.RemoveEmptyEntries))
-            else Prop str
+        let (|Prop|Path|) (string:string) =
+            if string.Contains('.')
+            then Path (string.Split('.', StringSplitOptions.RemoveEmptyEntries))
+            else Prop string

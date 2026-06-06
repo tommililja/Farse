@@ -54,7 +54,7 @@ module Plan =
         | "pro" -> Ok Pro
         | "standard" -> Ok Standard
         | "free" -> Ok Free
-        | str -> Error $"Plan '%s{str}' not found."
+        | string -> Error $"Plan '%s{string}' not found."
 
     let asString = function
         | Pro -> "pro"
@@ -76,7 +76,7 @@ module Tag =
     let fromString = function
         | "beta" -> Ok Beta
         | "verified" -> Ok Verified
-        | str -> Error $"Tag '%s{str}' not found."
+        | string -> Error $"Tag '%s{string}' not found."
 
     let asString = function
         | Beta -> "beta"

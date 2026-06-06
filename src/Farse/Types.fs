@@ -22,8 +22,8 @@ module JsonPath =
 
     /// <summary>Converts a JsonPath to a string.</summary>
     /// <example><code>let string = JsonPath.asString path</code></example>
-    let asString (JsonPath str) =
-        "$" + str
+    let asString (JsonPath string) =
+        "$" + string
 
 type internal Kind = JsonValueKind
 

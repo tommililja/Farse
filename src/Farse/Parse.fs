@@ -111,7 +111,7 @@ module Parse =
     let char =
         custom (fun element ->
             match element.GetString() with
-            | str when str.Length = 1 -> Ok str[0]
+            | string when string.Length = 1 -> Ok string[0]
             | _ -> Error "Expected a string length of 1."
         ) ExpectedKind.String
 
@@ -124,7 +124,7 @@ module Parse =
     let stringNonEmpty =
         custom (fun element ->
             match element.GetString() with
-            | str when String.isNotEmpty str -> Ok str
+            | string when String.isNotEmpty string -> Ok string
             | _ -> Error "Expected a non-empty string."
         ) ExpectedKind.String
 
@@ -134,8 +134,8 @@ module Parse =
     let regex ([<StringSyntax("Regex")>] regex:string) =
         custom (fun element ->
             try
-                let str = element.GetString()
-                if Regex.IsMatch(str, regex) then Ok str
+                let string = element.GetString()
+                if Regex.IsMatch(string, regex) then Ok string
                 else Error $"Expected string to match '%s{regex}'."
             with :? ArgumentException -> Error $"Invalid regular expression '%s{regex}'."
         ) ExpectedKind.String
@@ -144,7 +144,8 @@ module Parse =
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
     let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
         custom (fun element ->
-            match 'r.TryParse(element.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture) with
+            let string = element.GetString()
+            match 'r.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
             | _ -> Error "Expected a number string."
         ) ExpectedKind.String
@@ -162,8 +163,8 @@ module Parse =
     /// <example><code>let! bigint = "prop" &amp;= Parse.bigint</code></example>
     let bigint : Parser<bigint> =
         custom (fun element ->
-            let str = element.GetRawText()
-            match BigInteger.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            let string = element.GetRawText()
+            match BigInteger.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | true, bigint -> Ok bigint
             | _ -> Error GenericMessage
         ) ExpectedKind.Number
@@ -197,9 +198,9 @@ module Parse =
     /// <example><code>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</code></example>
     let enum<'r when 'r :> ValueType and 'r : struct and 'r : (new: unit -> 'r)> =
         custom (fun element ->
-            let str = element.GetString()
+            let string = element.GetString()
             let enumType = typeof<'r>
-            match Enum.TryParse<'r>(str, true) with
+            match Enum.TryParse<'r>(string, true) with
             | true, enum when Enum.IsDefined(enumType, enum) -> Ok enum
             | _ -> Error GenericMessage
         ) ExpectedKind.String
@@ -250,8 +251,8 @@ module Parse =
     /// <example><code>let! timeOnly = "prop" &amp;= Parse.timeOnly</code></example>
     let timeOnly =
         custom (fun element ->
-            let str = element.GetString()
-            match TimeOnly.TryParse(str, CultureInfo.InvariantCulture) with
+            let string = element.GetString()
+            match TimeOnly.TryParse(string, CultureInfo.InvariantCulture) with
             | true, timeOnly -> Ok timeOnly
             | _ -> Error GenericMessage
         ) ExpectedKind.String
@@ -261,8 +262,8 @@ module Parse =
     /// <param name="format">The required format.</param>
     let timeOnlyExact ([<StringSyntax("TimeOnlyFormat")>] format:string) =
         custom (fun element ->
-            let str = element.GetString()
-            match TimeOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            let string = element.GetString()
+            match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, timeOnly -> Ok timeOnly
             | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
@@ -271,8 +272,8 @@ module Parse =
     /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpan</code></example>
     let timeSpan =
         custom (fun element ->
-            let str = element.GetString()
-            match TimeSpan.TryParse(str, CultureInfo.InvariantCulture) with
+            let string = element.GetString()
+            match TimeSpan.TryParse(string, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
             | _ -> Error GenericMessage
         ) ExpectedKind.String
@@ -282,8 +283,8 @@ module Parse =
     /// <param name="format">The required format.</param>
     let timeSpanExact ([<StringSyntax("TimeSpanFormat")>] format:string) =
         custom (fun element ->
-            let str = element.GetString()
-            match TimeSpan.TryParseExact(str, format, CultureInfo.InvariantCulture) with
+            let string = element.GetString()
+            match TimeSpan.TryParseExact(string, format, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
             | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
@@ -292,8 +293,8 @@ module Parse =
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnly</code></example>
     let dateOnly =
         custom (fun element ->
-            let str = element.GetString()
-            match DateOnly.TryParse(str, CultureInfo.InvariantCulture) with
+            let string = element.GetString()
+            match DateOnly.TryParse(string, CultureInfo.InvariantCulture) with
             | true, dateOnly -> Ok dateOnly
             | _ -> Error GenericMessage
         ) ExpectedKind.String
@@ -303,8 +304,8 @@ module Parse =
     /// <param name="format">The required format.</param>
     let dateOnlyExact ([<StringSyntax("DateOnlyFormat")>] format:string) =
         custom (fun element ->
-            let str = element.GetString()
-            match DateOnly.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            let string = element.GetString()
+            match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
             | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
@@ -315,20 +316,15 @@ module Parse =
 
     /// <summary>Parses a string as System.DateTime (ISO 8601) and converts it to UTC.</summary>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeUtc</code></example>
-    let dateTimeUtc =
-        custom (fun element ->
-            match element.TryGetDateTime() with
-            | true, dateTime -> Ok <| dateTime.ToUniversalTime()
-            | _ -> Error GenericMessage
-        ) ExpectedKind.String
+    let dateTimeUtc = custom (_.TryGetDateTime >> tryParse >> Result.map _.ToUniversalTime()) ExpectedKind.String
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
     /// <param name="format">The required format.</param>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
-            let str = element.GetString()
-            match DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            let string = element.GetString()
+            match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTime -> Ok dateTime
             | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
@@ -342,8 +338,8 @@ module Parse =
     /// <param name="format">The required format.</param>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
-            let str = element.GetString()
-            match DateTimeOffset.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+            let string = element.GetString()
+            match DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTimeOffset -> Ok dateTimeOffset
             | _ -> Error $"Expected '%s{format}'."
         ) ExpectedKind.String
