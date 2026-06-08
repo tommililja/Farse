@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'ByteEnum.
-   | Expected ByteEnum enum.
+   | Expected ByteEnum member.
    = 2

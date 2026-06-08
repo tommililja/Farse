@@ -1,7 +1,7 @@
 ﻿Parser failed with 1 error[s].
 
 Error[0]:
-  at $.prop
+  at $
    | Tried parsing 'int.
-   | Expected int.
-   = 1.1
+   | Expected int string.
+   = "a"

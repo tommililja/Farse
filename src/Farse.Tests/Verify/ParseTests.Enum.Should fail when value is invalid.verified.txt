@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'StringEnum.
-   | Invalid value.
+   | Expected StringEnum member.
    = "B"

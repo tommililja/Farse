@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'uint64.
-   | Invalid value.
+   | Expected uint64.
    = 1.1

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'DateOnly.
-   | Expected 'yyyyMMdd'.
+   | Expected DateOnly string (yyyyMMdd).
    = "2025-05-13"

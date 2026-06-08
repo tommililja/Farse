@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'UInt16Enum.
-   | Expected UInt16Enum enum.
+   | Expected UInt16Enum member.
    = 2

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'int16.
-   | Invalid value.
+   | Expected int16.
    = 1.1

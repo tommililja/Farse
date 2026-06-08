@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'TimeOnly.
-   | Expected 'HHmmss'.
-   = "17:28:45"
+   | Expected TimeOnly string (HH:mm:ss).
+   = "172845"

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'int.
-   | Invalid value.
+   | Expected int.
    = 1.1

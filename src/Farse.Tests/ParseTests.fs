@@ -413,7 +413,7 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.number<int>
             |> Parser.parse "\"a\""
-            |> Expect.isError
+            |> Expect.errorString
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -444,7 +444,7 @@ module ParseTests =
             |> Parser.parse "\"abc\""
             |> Expect.errorString
 
-    module Bigint =
+    module BigInt =
 
         [<Fact>]
         let ``Should parse number as bigint`` () =
@@ -482,7 +482,7 @@ module ParseTests =
         let ``Should fail when element is not a bool`` () =
             Parse.bool
             |> Parser.parse "1"
-            |> Expect.isError
+            |> Expect.errorString
 
     module Guid =
 
@@ -847,8 +847,8 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
-            Parse.timeOnlyExact "HHmmss"
-            |> Parser.parse "\"17:28:45\""
+            Parse.timeOnlyExact "HH:mm:ss"
+            |> Parser.parse "\"172845\""
             |> Expect.errorString
 
         [<Fact>]
@@ -893,8 +893,8 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
-            Parse.timeSpanExact @"hh\mm\ss"
-            |> Parser.parse "\"01:28:45\""
+            Parse.timeSpanExact @"hh:mm:ss"
+            |> Parser.parse "\"012845\""
             |> Expect.errorString
 
         [<Fact>]

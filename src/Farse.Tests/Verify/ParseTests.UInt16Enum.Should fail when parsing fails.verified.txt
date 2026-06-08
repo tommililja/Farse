@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'UInt16Enum.
-   | Invalid value.
+   | Expected uint16.
    = 1.1

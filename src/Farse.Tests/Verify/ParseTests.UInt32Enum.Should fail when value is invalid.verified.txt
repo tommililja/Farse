@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'UInt32Enum.
-   | Expected UInt32Enum enum.
+   | Expected UInt32Enum member.
    = 2

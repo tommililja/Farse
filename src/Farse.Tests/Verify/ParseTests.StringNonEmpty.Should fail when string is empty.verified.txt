@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'string.
-   | Expected a non-empty string.
+   | Expected non-empty string.
    = ""

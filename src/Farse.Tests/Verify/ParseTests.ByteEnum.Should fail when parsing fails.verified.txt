@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'ByteEnum.
-   | Invalid value.
+   | Expected byte.
    = 1.1
