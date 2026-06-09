@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'DateTimeOffset.
-   | Expected DateTimeOffset string (yyyyMMdd HH:mm:ss zzz).
+   | Expected a DateTimeOffset string (yyyyMMdd HH:mm:ss zzz).
    = "2025-05-13 17:28 +02:00"

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'IntEnum.
-   | Expected IntEnum member.
+   | Expected a value of IntEnum.
    = 2

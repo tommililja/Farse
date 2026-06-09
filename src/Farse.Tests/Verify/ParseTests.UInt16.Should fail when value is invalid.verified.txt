@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'uint16.
-   | Expected uint16.
+   | Expected a uint16.
    = 1.1

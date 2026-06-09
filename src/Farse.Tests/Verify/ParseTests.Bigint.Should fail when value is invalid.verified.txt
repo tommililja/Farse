@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'bigint.
-   | Expected bigint.
+   | Expected a bigint.
    = 1.1

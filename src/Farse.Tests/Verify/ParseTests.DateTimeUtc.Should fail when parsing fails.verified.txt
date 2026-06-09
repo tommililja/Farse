@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'DateTime.
-   | Expected DateTime string.
+   | Expected a DateTime string.
    = "2025-05-25100000"

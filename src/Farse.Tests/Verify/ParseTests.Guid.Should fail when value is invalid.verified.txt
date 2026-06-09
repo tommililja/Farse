@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'Guid.
-   | Expected Guid string.
+   | Expected a Guid string.
    = "invalid"

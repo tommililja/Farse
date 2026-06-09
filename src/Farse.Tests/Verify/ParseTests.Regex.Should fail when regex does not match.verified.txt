@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'string.
-   | Expected string to match '^[0-9]+$'.
+   | Expected the string to match '^[0-9]+$'.
    = "abc"

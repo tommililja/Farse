@@ -268,7 +268,7 @@ module Parse =
         Parse.custom (fun element ->
             match element.TryGetGuid() with
             | true, guid -> Ok <| ProfileId guid
-            | _ -> Error "Expected Guid string." // Added as details.
+            | _ -> Error "Expected a Guid string." // Added as details.
         ) ExpectedKind.String
 
     let instant =
@@ -291,7 +291,7 @@ Parser failed with 1 error[s].
 Error[0]:
   at $.profiles[1]
    | Tried parsing 'ProfileId.
-   | Expected Guid string.
+   | Expected a Guid string.
    = "invalid"
 ```
 

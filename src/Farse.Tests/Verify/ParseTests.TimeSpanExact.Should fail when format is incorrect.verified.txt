@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'TimeSpan.
-   | Expected TimeSpan string (hh:mm:ss).
+   | Expected a TimeSpan string (hh:mm:ss).
    = "012845"

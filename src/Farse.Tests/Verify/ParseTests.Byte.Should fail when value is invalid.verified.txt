@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'byte.
-   | Expected byte.
+   | Expected a byte.
    = 256

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'int.
-   | Expected int string.
+   | Expected a number string.
    = "a"

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'Int64Enum.
-   | Expected Int64Enum member.
+   | Expected a value of Int64Enum.
    = 2

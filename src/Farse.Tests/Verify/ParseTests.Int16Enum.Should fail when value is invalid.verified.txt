@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'Int16Enum.
-   | Expected Int16Enum member.
+   | Expected a value of Int16Enum.
    = 2

@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'DateTime.
-   | Expected DateTime string (yyyy-MM-dd HH:mm:ss).
+   | Expected a DateTime string (yyyy-MM-dd HH:mm:ss).
    = "2025-05-13T17:28:45"

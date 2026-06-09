@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'SByteEnum.
-   | Expected SByteEnum member.
+   | Expected a value of SByteEnum.
    = 2

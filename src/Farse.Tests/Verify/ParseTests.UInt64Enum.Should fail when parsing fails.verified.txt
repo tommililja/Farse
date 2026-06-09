@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'UInt64Enum.
-   | Expected uint64.
+   | Expected a uint64.
    = 1.1

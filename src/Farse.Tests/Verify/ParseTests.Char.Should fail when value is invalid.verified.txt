@@ -3,5 +3,5 @@
 Error[0]:
   at $
    | Tried parsing 'char.
-   | Expected string length of 1.
+   | Expected a string length of 1.
    = "ab"
