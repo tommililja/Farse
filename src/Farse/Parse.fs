@@ -407,6 +407,21 @@ module Parse =
             else Ok <| convert items
         ) ExpectedKind.Array
 
+    /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
+    /// <remarks>Ignores null and invalid values.</remarks>
+    /// <example><code>let! seq = "prop" &amp;= Parse.choose Parse.int</code></example>
+    let choose (Parser parse) : Parser<'r seq> =
+        customInternal (fun element ->
+            element.EnumerateArray()
+            |> Seq.choose (fun element ->
+                match parse element with
+                | Ok x -> Some x
+                | Error _ -> None
+            )
+            |> Seq.toArray :> seq<_>
+            |> Ok
+        ) ExpectedKind.Array
+
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <example><code>let! list = "prop" &amp;= Parse.list Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>

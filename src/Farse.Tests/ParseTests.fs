@@ -1065,6 +1065,23 @@ module ParseTests =
             |> Parser.parse "1"
             |> Expect.errorString
 
+    module Choose =
+
+        [<Fact>]
+        let ``Should parse array as value seq`` () =
+            let expected = seq [ 1; 2; 3; ]
+            let actual: _ seq =
+                Parse.choose Parse.int
+                |> Parser.parse """[ 1, null, 2, 3, "4" ]"""
+                |> Expect.ok
+            Expect.equalSeq actual expected
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.choose Parse.int
+            |> Parser.parse "{}"
+            |> Expect.errorString
+
     module List =
 
         [<Fact>]
