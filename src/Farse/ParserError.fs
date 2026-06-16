@@ -60,7 +60,7 @@ module ParseError =
             Element = JsonElement.clone element
             Index = None
             Details = details
-            Value = JsonElement.tryGetValue element
+            Value = None
             Type = type'
             Exn = None
         }
@@ -71,7 +71,7 @@ module ParseError =
             Element = JsonElement.clone element
             Index = None
             Details = details
-            Value = JsonElement.tryGetValue element
+            Value = None
             Type = type'
             Exn = Some exn
         }
@@ -83,7 +83,7 @@ module ParseError =
             Index = None
             Details = $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
             Type = type'
-            Value = JsonElement.tryGetValue element
+            Value = None
             Exn = None
         }
 
@@ -94,7 +94,7 @@ module ParseError =
             Index = Some n
             Details = "Index was out of range."
             Type = type'
-            Value = JsonElement.tryGetValue element
+            Value = None
             Exn = None
         }
 
@@ -105,7 +105,7 @@ module ParseError =
             Index = None
             Details = $"Expected a tuple of %i{expected}, but got %i{actual}."
             Type = type'
-            Value = JsonElement.tryGetValue element
+            Value = None
             Exn = None
         }
 
