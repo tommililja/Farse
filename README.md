@@ -512,7 +512,7 @@ type ParseError = {
     Path: JsonPath
     Element: JsonElement
     Index: int option
-    Value: string option
+    Value: string option // Parsing succeeded, but validation failed.
     Type: Type
     Details: string
     Exn: exn option
