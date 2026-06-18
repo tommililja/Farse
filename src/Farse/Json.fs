@@ -182,6 +182,16 @@ module Json =
             |> JArr
         | other -> other
 
+    /// <summary>Compares two Json values.</summary>
+    /// <remarks>Properties are sorted in ascending order.</remarks>
+    /// <example><code>let equal = Json.equal x y</code></example>
+    /// <param name="x">The first Json value to compare.</param>
+    /// <param name="y">The second Json value to compare.</param>
+    let equal x y =
+        let x = sort x
+        let y = sort y
+        x = y
+
     /// <summary>Converts a JsonElement to a Json.</summary>
     /// <example><code>let json = Json.fromElement element</code></example>
     /// <param name="element">The JsonElement to convert.</param>

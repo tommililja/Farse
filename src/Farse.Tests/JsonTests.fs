@@ -38,23 +38,25 @@ module JsonTests =
         ]
 
     [<Fact>]
-    let ``Should return equal when comparing two equal Json values`` () =
-        let a = JObj [ "value", JNum 1 ]
-        let b = JObj [ "value", JNum 1 ]
-        Expect.equal a b
-
-    [<Fact>]
-    let ``Should not return equal when comparing two different Json values`` () =
-        let a = JObj [ "value", JNum 1 ]
-        let b = JObj [ "value", JNum 2 ]
-        Expect.notEqual a b
-
-    [<Fact>]
     let ``Should sort properties in ascending order`` () =
         example
         |> Json.sort
         |> Json.asString Indented
         |> Expect.string
+
+    [<Fact>]
+    let ``Should be equal after properties are sorted`` () =
+        let a = JObj [ "a", JNum 1; "b", JNum 2 ]
+        let b = JObj [ "b", JNum 2; "a", JNum 1 ]
+        let equal = Json.equal a b
+        Expect.isTrue equal
+
+    [<Fact>]
+    let ``Should not be equal after properties are sorted`` () =
+        let a = JObj [ "a", JNum 1; "b", JNum 2 ]
+        let b = JObj [ "b", JNum 1; "a", JNum 2 ]
+        let equal = Json.equal a b
+        Expect.isFalse equal
 
     [<Fact>]
     let ``Should create Json from JsonElement`` () =
