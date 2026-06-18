@@ -1655,7 +1655,7 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when validation fails`` () =
-            Parse.refine Parse.int (fun _ -> Error "msg")
+            Parse.refine Parse.byte (fun _ -> Error "msg")
             |> Parser.parse "1"
             |> Expect.errorString
 
@@ -1678,7 +1678,7 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when predicate returns false`` () =
-            Parse.verify Parse.int (fun x -> x = 0) "msg"
+            Parse.verify Parse.byte (fun x -> x = 0uy) "msg"
             |> Parser.parse "1"
             |> Expect.errorString
 
