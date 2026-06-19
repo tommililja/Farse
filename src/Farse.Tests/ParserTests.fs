@@ -2,6 +2,7 @@ namespace Farse.Tests
 
 open System
 open System.Threading
+open Expecto.Flip
 open Xunit
 open Farse
 
@@ -14,8 +15,8 @@ module ParserTests =
             expected
             |> Parser.from
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should create Parser from Result`` () =
@@ -24,21 +25,21 @@ module ParserTests =
             expected
             |> Parser.fromResult
             |> Parser.parse "1"
-        Expect.equal actual expected
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should create Parser from Result that fails`` () =
         Error "msg"
         |> Parser.fromResult
         |> Parser.parse "1"
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should create Parser that fails`` () =
         "msg"
         |> Parser.fail
         |> Parser.parse "1"
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should recover with a default value when a Parser fails`` () =
@@ -47,8 +48,8 @@ module ParserTests =
             Parser.fail "msg"
             |> Parser.recover 1
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should not recover with a default value when a Parser succeeds`` () =
@@ -57,8 +58,8 @@ module ParserTests =
             Parse.int
             |> Parser.recover 2
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should bind parsers`` () =
@@ -67,8 +68,8 @@ module ParserTests =
             Parse.int
             |> Parser.bind (fun x -> Parser.from (x + 1))
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should map Parser value`` () =
@@ -77,8 +78,8 @@ module ParserTests =
             Parse.int
             |> Parser.map string
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should filter Parser value`` () =
@@ -87,8 +88,8 @@ module ParserTests =
             Parse.list Parse.int
             |> Parser.filter (fun x -> x > 0)
             |> Parser.parse "[ -2, 1, 0, 2, 3 ]"
-            |> Expect.ok
-        Expect.equalSeq actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.sequenceEqual Msg.none actual expected
 
     [<Fact>]
     let ``Should ignore Parser value`` () =
@@ -97,15 +98,15 @@ module ParserTests =
             Parse.int
             |> Parser.ignore<int>
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should not ignore Parser value when a Parser fails`` () =
         Parser.fail "msg"
         |> Parser.ignore<int>
         |> Parser.parse "1"
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should set default value when None`` () =
@@ -114,8 +115,8 @@ module ParserTests =
             Parse.option Parse.int
             |> Parser.defaultValue 1
             |> Parser.parse "null"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should not set default value when Some`` () =
@@ -124,15 +125,15 @@ module ParserTests =
             Parse.option Parse.int
             |> Parser.defaultValue 2
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should not set default value when a Parser fails`` () =
         Parser.fail "msg"
         |> Parser.defaultValue 1
         |> Parser.parse "1"
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should get default value when None`` () =
@@ -141,8 +142,8 @@ module ParserTests =
             Parse.option Parse.int
             |> Parser.defaultWith (fun () -> 1)
             |> Parser.parse "null"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should not get default value when Some`` () =
@@ -151,15 +152,15 @@ module ParserTests =
             Parse.option Parse.int
             |> Parser.defaultWith (fun () -> 2)
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should not get default value when a Parser fails`` () =
         Parser.fail "msg"
         |> Parser.defaultWith (fun () -> 1)
         |> Parser.parse "1"
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should parse JSON`` () =
@@ -167,26 +168,26 @@ module ParserTests =
         let actual =
             Parse.int
             |> Parser.parse "1"
-            |> Expect.ok
-        Expect.equal actual expected
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should fail when parsing invalid JSON`` () =
         Parse.int
         |> Parser.parse "invalid"
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should fail when parsing a null string`` () =
         Parse.int
         |> Parser.parse null
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should fail when parsing an empty string`` () =
         Parse.int
         |> Parser.parse String.Empty
-        |> Expect.errorString
+        |> Expect.wantErrorString
 
     [<Fact>]
     let ``Should parse JSON async`` () =
@@ -194,24 +195,24 @@ module ParserTests =
         |> Parser.parseAsync (MemoryStream.create "1") CancellationToken.None
         |> Task.map (fun x ->
             let expected = 1
-            let actual = Expect.ok x
-            Expect.equal actual expected
+            let actual = Expect.wantOk $"Expected %s{nameof Parser.parseAsync} to succeed." x
+            Expect.equal Msg.none actual expected
         )
 
     [<Fact>]
     let ``Should fail when parsing invalid JSON async`` () =
         Parse.int
         |> Parser.parseAsync (MemoryStream.create "invalid") CancellationToken.None
-        |> Task.bind Expect.errorString
+        |> Task.bind Expect.wantErrorString
 
     [<Fact>]
     let ``Should fail when parsing a null stream async`` () =
         Parse.int
         |> Parser.parseAsync null CancellationToken.None
-        |> Task.bind Expect.errorString
+        |> Task.bind Expect.wantErrorString
 
     [<Fact>]
     let ``Should fail when parsing an empty string async`` () =
         Parse.int
         |> Parser.parseAsync (MemoryStream.create String.Empty) CancellationToken.None
-        |> Task.bind Expect.errorString
+        |> Task.bind Expect.wantErrorString

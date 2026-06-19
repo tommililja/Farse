@@ -49,6 +49,35 @@ module internal Extensions =
 
     module Type =
 
+        let private fromType = function
+            | "Int16" -> "int16"
+            | "Int32" -> "int"
+            | "Int64" -> "int64"
+            | "Byte" -> "byte"
+            | "SByte" -> "sbyte"
+            | "UInt16" -> "uint16"
+            | "UInt32" -> "uint"
+            | "UInt64" -> "uint64"
+            | "Double" -> "float"
+            | "Single" -> "float32"
+            | "Boolean" -> "bool"
+            | "String" -> "string"
+            | "Char" -> "char"
+            | "Decimal" -> "decimal"
+            | "BigInteger" -> "bigint"
+            | "Object" -> "obj"
+            | name -> name
+
+        let private fromGenericType args = function
+            | "FSharpOption" -> $"%s{args} option"
+            | "FSharpList" -> $"%s{args} list"
+            | "FSharpSet" -> $"%s{args} Set"
+            | "FSharpMap" -> $"Map<%s{args}>"
+            | "FSharpResult" -> $"Result<%s{args}>"
+            | "IEnumerable" -> $"%s{args} seq"
+            | "Tuple" -> $"""(%s{args.Replace(", ", " * ")})"""
+            | name -> $"%s{name}<%s{args}>"
+
         let rec getName type' =
             match type' with
             | x when x = typeof<unit> -> "unit"
@@ -60,34 +89,8 @@ module internal Extensions =
                     |> Array.map getName
                     |> String.concat ", "
 
-                match name with
-                | "FSharpOption" -> $"%s{args} option"
-                | "FSharpList" -> $"%s{args} list"
-                | "FSharpSet" -> $"%s{args} Set"
-                | "FSharpMap" -> $"Map<%s{args}>"
-                | "FSharpResult" -> $"Result<%s{args}>"
-                | "IEnumerable" -> $"%s{args} seq"
-                | "Tuple" -> $"""(%s{args.Replace(", ", " * ")})"""
-                | name -> $"%s{name}<%s{args}>"
-            | x ->
-                match x.Name with
-                | "Int16" -> "int16"
-                | "Int32" -> "int"
-                | "Int64" -> "int64"
-                | "Byte" -> "byte"
-                | "SByte" -> "sbyte"
-                | "UInt16" -> "uint16"
-                | "UInt32" -> "uint"
-                | "UInt64" -> "uint64"
-                | "Double" -> "float"
-                | "Single" -> "float32"
-                | "Boolean" -> "bool"
-                | "String" -> "string"
-                | "Char" -> "char"
-                | "Decimal" -> "decimal"
-                | "BigInteger" -> "bigint"
-                | "Object" -> "obj"
-                | name -> name
+                fromGenericType args name
+            | x -> fromType x.Name
 
     module Error =
 

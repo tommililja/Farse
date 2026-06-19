@@ -11,7 +11,7 @@ module Prop =
         |> String.concat String.Empty
         |> JsonPath
 
-    let inline private jsonPath path count =
+    let inline private select path count =
         path
         |> Array.take count
         |> createPath
@@ -85,12 +85,12 @@ module Prop =
                 |> Error.list
         )
 
-    let private traverse (path:string array) (Parser parse) : Parser<'r> =
+    let private traverse path (Parser parse) : Parser<'r> =
         Parser (fun element ->
             match fold path element with
             | element, count when count = path.Length && element.isUndefined ->
                 element
-                |> ParseError.required (jsonPath path count) typeof<'r>
+                |> ParseError.required (select path count) typeof<'r>
                 |> Error.list
             | element, count when count = path.Length ->
                 match parse element with
@@ -104,11 +104,11 @@ module Prop =
                     |> Error
             | element, count ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object (jsonPath path count) typeof<'r>
+                |> ParseError.expectedKind ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
         )
 
-    let private tryTraverse (path:string array) (Parser parse) : Parser<'r option> =
+    let private tryTraverse path (Parser parse) : Parser<'r option> =
         Parser (fun element ->
             match fold path element with
             | element, _ when element.isNullOrUndefined -> Ok None
@@ -124,11 +124,11 @@ module Prop =
                     |> Error
             | element, count ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object (jsonPath path count) typeof<'r>
+                |> ParseError.expectedKind ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
         )
 
-    let private tryTraverseNull (path:string array) (Parser parse) : Parser<'r option option> =
+    let private tryTraverseNull path (Parser parse) : Parser<'r option option> =
         Parser (fun element ->
             match fold path element with
             | element, count when element.isNull && count = path.Length -> Ok <| Some None
@@ -145,7 +145,7 @@ module Prop =
                     |> Error
             | element, count ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object (jsonPath path count) typeof<'r>
+                |> ParseError.expectedKind ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
         )
 

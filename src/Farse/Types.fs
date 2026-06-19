@@ -8,8 +8,7 @@ type JsonPath = JsonPath of string
 
 module JsonPath =
 
-    let empty =
-        JsonPath String.Empty
+    let empty = JsonPath String.Empty
 
     let internal prop name =
         JsonPath $".%s{name}"

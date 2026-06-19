@@ -2,6 +2,6 @@
 
 Error[0]:
   at $
-   | Tried parsing 'int.
+   | Tried parsing 'byte.
    | msg
-   = 1
+   = 1uy

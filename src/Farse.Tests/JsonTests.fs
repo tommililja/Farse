@@ -7,6 +7,7 @@ open System.Numerics
 open System.Text
 open System.Text.Json
 open System.Threading
+open Expecto.Flip
 open Xunit
 open Farse
 
@@ -49,32 +50,38 @@ module JsonTests =
         let a = JObj [ "a", JNum 1; "b", JNum 2 ]
         let b = JObj [ "b", JNum 2; "a", JNum 1 ]
         let equal = Json.equal a b
-        Expect.isTrue equal
+        Expect.isTrue "Expected values to be equal." equal
 
     [<Fact>]
     let ``Should not be equal after properties are sorted`` () =
         let a = JObj [ "a", JNum 1; "b", JNum 2 ]
         let b = JObj [ "b", JNum 1; "a", JNum 2 ]
         let equal = Json.equal a b
-        Expect.isFalse equal
+        Expect.isFalse "Expected values to not be equal." equal
 
     [<Fact>]
     let ``Should create Json from JsonElement`` () =
         let expected = Json.asString Indented example
-        let actual = JsonElement.Parse expected |> Json.fromElement |> Json.asString Indented
-        Expect.equal actual expected
+        let actual =
+            JsonElement.Parse expected
+            |> Json.fromElement
+            |> Json.asString Indented
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should create Json from string`` () =
         let expected = Json.asString Indented example
-        let actual = Json.fromString expected |> Expect.ok |> Json.asString Indented
-        Expect.equal actual expected
+        let actual =
+            Json.fromString expected
+            |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
+            |> Json.asString Indented
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should fail to create Json from string when JSON is invalid``() =
         "invalid"
         |> Json.fromString
-        |> Expect.isError
+        |> Expect.isError $"Expected %s{nameof Json.fromString} to fail."
 
     [<Fact>]
     let ``Should create Json from stream async`` () =
@@ -83,33 +90,47 @@ module JsonTests =
             let! actual =
                 MemoryStream.create expected
                 |> Json.fromStreamAsync CancellationToken.None
-                |> Task.map (Expect.ok >> Json.asString Indented)
-            Expect.equal actual expected
+                |> Task.map (
+                    Expect.wantOk $"Expected %s{nameof Json.fromStreamAsync} to succeed."
+                    >> Json.asString Indented
+                )
+            Expect.equal Msg.none actual expected
         }
 
     [<Fact>]
     let ``Should fail to create Json from stream async when JSON is invalid`` () =
         MemoryStream.create "invalid"
         |> Json.fromStreamAsync CancellationToken.None
-        |> Task.map Expect.isError
+        |> Task.map (Expect.isError $"Expected %s{nameof Json.fromStreamAsync} to fail.")
 
     [<Fact>]
     let ``Should create Json from bytes``() =
         let expected = Json.asString Indented example
-        let actual = Encoding.UTF8.GetBytes expected |> Json.fromBytes |> Expect.ok |> Json.asString Indented
-        Expect.equal actual expected
+        let actual =
+            Encoding.UTF8.GetBytes expected
+            |> Json.fromBytes
+            |> Expect.wantOk $"Expected %s{nameof Json.fromBytes} to succeed."
+            |> Json.asString Indented
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should fail to create Json from bytes when JSON is invalid``() =
         Encoding.UTF8.GetBytes("invalid")
         |> Json.fromBytes
-        |> Expect.isError
+        |> Expect.isError $"Expected %s{nameof Json.fromBytes} to fail."
 
     [<Fact>]
     let ``Should convert Json to JsonNode`` () =
         let expected = Json.asString Indented example
-        let actual = Json.fromString expected |> Expect.ok |> Json.asJsonNode |> _.ToJsonString(JsonSerializerOptions(WriteIndented = true, IndentSize = 4))
-        Expect.equal actual expected
+        let actual =
+            Json.fromString expected
+            |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
+            |> Json.asJsonNode
+            |> _.ToJsonString(JsonSerializerOptions(
+                WriteIndented = true,
+                IndentSize = 4)
+            )
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should convert Json to indented JSON string`` () =
@@ -146,14 +167,14 @@ module JsonTests =
             do! writer.FlushAsync()
             let expected = Json.asString Raw example
             let actual = Encoding.UTF8.GetString(stream.ToArray())
-            Expect.equal actual expected
+            Expect.equal Msg.none actual expected
         }
 
     [<Fact>]
     let ``Should convert Json to bytes`` () =
         let expected = Json.asString Indented example
         let actual = Json.asBytes Indented example |> Encoding.UTF8.GetString
-        Expect.equal actual expected
+        Expect.equal Msg.none actual expected
 
     module JStr =
 
@@ -257,7 +278,7 @@ module JsonTests =
         ]
         |> List.iter (fun (json, expected) ->
             let actual = Json.asString Raw json
-            Expect.equal actual expected
+            Expect.equal Msg.none actual expected
         )
 
     module JBit =

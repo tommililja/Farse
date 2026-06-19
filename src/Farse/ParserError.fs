@@ -164,7 +164,9 @@ module ParseError =
             if String.isNotEmpty error.Details then
                 $" | %s{error.Details}"
 
-            Option.map (sprintf " = %s") error.Value
+            error.Value
+            |> Option.orElse (JsonElement.tryGetValue error.Element)
+            |> Option.map (sprintf " = %s")
         }
 
 [<NoComparison>]

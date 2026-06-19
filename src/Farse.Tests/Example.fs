@@ -1,10 +1,12 @@
 namespace Farse.Tests
 
 open System
+open Expecto.Flip
 open NodaTime
 open NodaTime.Text
 open Xunit
 open Farse
+open Farse.Operators
 
 type UserId = UserId of Guid
 
@@ -30,9 +32,7 @@ type Email = Email of string
 
 module Email =
 
-    let fromString =
-        // Some validation.
-        Email >> Ok
+    let fromString = Email >> Ok // Some validation.
 
     let asString (Email x) = x
 
@@ -110,7 +110,6 @@ module Parse =
         ) ExpectedKind.String
 
 module User =
-    open Operators
     open Parse
 
     let parser =
@@ -211,7 +210,7 @@ module Example =
             User.parser
             |> Parser.parse expected
             |> Result.mapError ParserError.asString
-            |> Expect.ok
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
 
         let actual = User.asJsonString user
 

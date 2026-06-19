@@ -163,9 +163,7 @@ type Email = Email of string
 
 module Email =
 
-    let fromString =
-        // Some validation.
-        Email >> Ok
+    let fromString = Email >> Ok // Some validation.
         
     let asString (Email x) = x
 

@@ -4,4 +4,4 @@ Error[0]:
   at $
    | Tried parsing 'obj.
    | msg
-   = 1
+   = 1uy
