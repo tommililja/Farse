@@ -140,9 +140,9 @@ module Parse =
             with :? ArgumentException -> Error $"Invalid regular expression '%s{regex}'."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string as System.Numerics.INumberBase.</summary>
+    /// <summary>Parses a string as System.Numerics.INumber.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
-    let number<'r when 'r :> INumberBase<'r>> : Parser<'r> =
+    let number<'r when 'r :> INumber<'r>> (_:Parser<'r>) =
         custom (fun element ->
             let string = element.GetString()
             match 'r.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with

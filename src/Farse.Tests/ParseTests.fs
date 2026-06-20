@@ -405,20 +405,20 @@ module ParseTests =
         let ``Should parse string as bigint`` () =
             let expected = BigInteger.Parse("1")
             let actual =
-                Parse.number<bigint>
+                Parse.number Parse.bigint
                 |> Parser.parse "\"1\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
-            Parse.number<int>
+            Parse.number Parse.int
             |> Parser.parse "\"a\""
             |> Expect.wantErrorString
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-            Parse.number<int>
+            Parse.number Parse.int
             |> Parser.parse "1"
             |> Expect.wantErrorString
 
