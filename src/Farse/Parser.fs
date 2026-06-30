@@ -10,7 +10,7 @@ type Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 module Parser =
 
     /// <summary>Runs the parser against an element.</summary>
-    /// <example><code>let result = Parser.run element</code></example>
+    /// <example><code>let result = Parser.run element parser</code></example>
     /// <param name="element">The element to parse.</param>
     let inline run element (Parser parse) =
         parse element
