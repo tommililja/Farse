@@ -1,12 +1,22 @@
 namespace Farse.Tests
 
 open System
+open System.Text.Json
 open System.Threading
 open Expecto.Flip
 open Xunit
 open Farse
 
 module ParserTests =
+
+    [<Fact>]
+    let ``Should run parser against an element`` () =
+        let expected = ()
+        let actual =
+            Parse.unit
+            |> Parser.run (JsonElement.Parse("null"))
+            |> Expect.wantOk $"Expected %s{nameof Parser.run} to succeed."
+        Expect.equal Msg.none actual expected
 
     [<Fact>]
     let ``Should create Parser from value`` () =

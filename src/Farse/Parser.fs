@@ -9,6 +9,12 @@ type Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 
 module Parser =
 
+    /// <summary>Runs the parser against an element.</summary>
+    /// <example><code>let result = Parser.run element</code></example>
+    /// <param name="element">The element to parse.</param>
+    let inline run element (Parser parse) =
+        parse element
+
     /// <summary>Creates a parser from a value.</summary>
     /// <remarks>This parser will always succeed.</remarks>
     /// <example><code>let! int = Parser.from 1</code></example>
@@ -52,9 +58,7 @@ module Parser =
     let inline bind ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
             match parse element with
-            | Ok x ->
-                let (Parser next) = fn x
-                next element
+            | Ok x -> fn x |> run element
             | Error e -> Error e
         )
 
