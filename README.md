@@ -23,7 +23,7 @@ dotnet package add Farse
 The benchmarks can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.8, macOS Tahoe 26.5 (25F71) [Darwin 25.5.0]
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.5.2 (25F84) [Darwin 25.5.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 .NET SDK 10.0.203
   [Host]     : .NET 10.0.7 (10.0.7, 10.0.726.21808), Arm64 RyuJIT armv8.0-a DEBUG
@@ -33,13 +33,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0     | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|---------:|--------:|----------:|------------:|
-| System.Text.Json       | 128.5 us |  0.81 |   6.1035 |       - |  37.57 KB |        0.86 |
-| Farse                  | 158.6 us |  1.00 |   7.0801 |       - |  43.86 KB |        1.00 |
-| System.Text.Json*      | 134.9 us |  0.85 |  17.3340 |  2.6855 | 106.53 KB |        2.43 |
-| Newtonsoft.Json*       | 229.5 us |  1.45 |  48.8281 |  7.3242 | 299.77 KB |        6.83 |
-| Thoth.System.Text.Json | 240.5 us |  1.52 |  65.9180 | 18.7988 | 405.13 KB |        9.24 |
-| Newtonsoft.Json        | 275.3 us |  1.74 |  86.9141 | 40.0391 | 534.38 KB |       12.18 |
-| Thoth.Json.Net         | 382.0 us |  2.41 | 111.3281 | 55.6641 | 684.98 KB |       15.62 |
+| System.Text.Json       | 128.0 us |  0.82 |   6.1035 |       - |  37.57 KB |        0.86 |
+| Farse                  | 156.7 us |  1.00 |   7.0801 |       - |  43.86 KB |        1.00 |
+| System.Text.Json*      | 133.3 us |  0.85 |  17.3340 |  2.6855 | 106.53 KB |        2.43 |
+| Newtonsoft.Json*       | 226.2 us |  1.44 |  48.8281 |  7.3242 | 299.77 KB |        6.83 |
+| Thoth.System.Text.Json | 237.2 us |  1.51 |  65.9180 | 18.7988 | 405.13 KB |        9.24 |
+| Newtonsoft.Json        | 270.3 us |  1.73 |  86.9141 | 40.0391 | 534.38 KB |       12.18 |
+| Thoth.Json.Net         | 379.9 us |  2.42 | 111.3281 | 55.6641 | 684.98 KB |       15.62 |
 
 * Serialization
 ```
@@ -335,7 +335,7 @@ let! x = "prop" &= attempt [ a; b ]
 There are a few different ways to validate parsed values.
 
 ```fsharp
-let! age = "age" ?= age
+let! age = "age" ?= age // Custom parser that uses Age.fromByte.
 let! age = "age" ?= refine byte Age.fromByte
 let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is '12'."
 ```
@@ -507,13 +507,13 @@ From the following information.
 
 ```fsharp
 type ParseError = {
-    Path: JsonPath
-    Element: JsonElement
-    Index: int option
+    Path: JsonPath // The full JSON path where the error occurred.
+    Element: JsonElement // The element that was parsed.
+    Index: int option // If the error occurred directly in an array.
     Value: string option // Parsing succeeded, but validation failed.
-    Type: Type
-    Details: string
-    Exn: exn option
+    Type: Type // The Type that was parsed.
+    Details: string // Parsing error or validation error details.
+    Exn: exn option // Full exn if one occurred.
 }
 ```
 > Note: Farse does not throw exceptions unless something unexpected occurs.
