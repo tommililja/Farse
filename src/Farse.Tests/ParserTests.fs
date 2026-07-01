@@ -92,16 +92,6 @@ module ParserTests =
         Expect.equal Msg.none actual expected
 
     [<Fact>]
-    let ``Should filter Parser value`` () =
-        let expected = seq [ 1; 2; 3 ]
-        let actual: _ seq =
-            Parse.list Parse.int
-            |> Parser.filter (fun x -> x > 0)
-            |> Parser.parse "[ -2, 1, 0, 2, 3 ]"
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.sequenceEqual Msg.none actual expected
-
-    [<Fact>]
     let ``Should ignore Parser value`` () =
         let expected = ()
         let actual =

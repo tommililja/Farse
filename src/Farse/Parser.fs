@@ -72,16 +72,6 @@ module Parser =
             | Error e -> Error e
         )
 
-    /// <summary>Filters a parsed sequence.</summary>
-    /// <example><code>let! positive = "prop" &amp;= Parse.list Parse.int |> Parser.filter (fun x -> x > 0)</code></example>
-    /// <param name="fn">The predicate to filter by.</param>
-    let inline filter ([<InlineIfLambda>] fn) (Parser parse) =
-        Parser (fun element ->
-            match parse element with
-            | Ok x -> Ok <| Seq.filter fn x
-            | Error e -> Error e
-        )
-
     /// <summary>Ignores a parsed value.</summary>
     /// <example><code>do! "prop" &amp;= Parse.int |> Parser.ignore</code></example>
     let inline ignore<'r> (Parser parse) =
