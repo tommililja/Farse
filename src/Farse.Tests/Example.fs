@@ -174,7 +174,7 @@ module Example =
     [<Fact>]
     let ``Should parse and create example JSON string`` () =
         let expected =
-            JsonTests.example
+            Data.example
             |> Json.asString Indented
 
         let user =

@@ -13,34 +13,9 @@ open Farse
 
 module JsonTests =
 
-    let example =
-        JObj [
-            "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
-            "name", JStr "Alice"
-            "age", JNil
-            "email", JStr "alice@domain.com"
-            "profiles",
-                JArr [
-                    JStr "01458283-b6e3-4ae7-ae54-a68eb587cdc0"
-                    JStr "927eb20f-cd62-470c-aafc-c3ce6b9248b0"
-                    JStr "bf00d1e2-ee53-4969-9507-86bed7e96432"
-                ]
-            "subscription",
-                JObj [
-                    "plan", JStr "pro"
-                    "isCanceled", JBit false
-                    "renewsAt", JStr "2026-12-25T10:30:00Z"
-                ]
-            "tags",
-                JArr [
-                    JStr "beta"
-                    JStr "verified"
-                ]
-        ]
-
     [<Fact>]
     let ``Should sort properties in ascending order`` () =
-        example
+        Data.example
         |> Json.sort
         |> Json.asString Indented
         |> Expect.string
@@ -61,7 +36,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from JsonElement`` () =
-        let expected = Json.asString Indented example
+        let expected = Json.asString Indented Data.example
         let actual =
             JsonElement.Parse expected
             |> Json.fromElement
@@ -70,7 +45,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from string`` () =
-        let expected = Json.asString Indented example
+        let expected = Json.asString Indented Data.example
         let actual =
             Json.fromString expected
             |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
@@ -86,7 +61,7 @@ module JsonTests =
     [<Fact>]
     let ``Should create Json from stream async`` () =
         task {
-            let expected = Json.asString Indented example
+            let expected = Json.asString Indented Data.example
             let! actual =
                 MemoryStream.create expected
                 |> Json.fromStreamAsync CancellationToken.None
@@ -105,7 +80,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from bytes``() =
-        let expected = Json.asString Indented example
+        let expected = Json.asString Indented Data.example
         let actual =
             Encoding.UTF8.GetBytes expected
             |> Json.fromBytes
@@ -121,7 +96,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should convert Json to JsonNode`` () =
-        let expected = Json.asString Indented example
+        let expected = Json.asString Indented Data.example
         let actual =
             Json.fromString expected
             |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
@@ -134,7 +109,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should convert Json to indented JSON string`` () =
-        example
+        Data.example
         |> Json.asString Indented
         |> Expect.string
 
@@ -148,13 +123,13 @@ module JsonTests =
             )
             |> Custom
 
-        example
+        Data.example
         |> Json.asString options
         |> Expect.string
 
     [<Fact>]
     let ``Should convert Json to raw JSON string`` () =
-        example
+        Data.example
         |> Json.asString Raw
         |> Expect.string
 
@@ -163,17 +138,17 @@ module JsonTests =
         task {
             let stream = new MemoryStream()
             use writer = new Utf8JsonWriter(stream)
-            Json.asStringTo writer example
+            Json.asStringTo writer Data.example
             do! writer.FlushAsync()
-            let expected = Json.asString Raw example
+            let expected = Json.asString Raw Data.example
             let actual = Encoding.UTF8.GetString(stream.ToArray())
             Expect.equal Msg.none actual expected
         }
 
     [<Fact>]
     let ``Should convert Json to bytes`` () =
-        let expected = Json.asString Indented example
-        let actual = Json.asBytes Indented example |> Encoding.UTF8.GetString
+        let expected = Json.asString Indented Data.example
+        let actual = Json.asBytes Indented Data.example |> Encoding.UTF8.GetString
         Expect.equal Msg.none actual expected
 
     module JStr =
