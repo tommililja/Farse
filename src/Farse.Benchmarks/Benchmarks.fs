@@ -51,7 +51,7 @@ module BenchmarkData =
                     JObj [
                         "plan", JStr "pro"
                         "isCanceled", JBit false
-                        "renewsAt", JStr.nil id (Some "2026-12-25T10:30:00Z")
+                        "renewsAt", JStr "2026-12-25T10:30:00Z"
                     ]
                 "tags",
                     JArr [
@@ -63,19 +63,11 @@ module BenchmarkData =
         |> JArr
 
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
-type JsonBenchmarks() =
-
-    [<Benchmark(Description = "Farse")>]
-    member _.Farse() =
-        BenchmarkData.json 1
-        |> Json.asString Indented
-
-[<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type ParserBenchmarks() =
 
     let mutable json = String.Empty
 
-    let options = JsonSerializerOptions(
+    let options = JsonSerializerOptions (
         PropertyNameCaseInsensitive = true
     )
 
