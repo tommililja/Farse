@@ -1,5 +1,4 @@
-![Build](https://img.shields.io/github/actions/workflow/status/tommililja/Farse/dotnet.yml?branch=main&label=Build)
-[![NuGet](https://img.shields.io/nuget/v/Farse.svg?label=Version)](https://www.nuget.org/packages/Farse)
+[![NuGet](https://img.shields.io/nuget/v/Farse.svg?label=NuGet)](https://www.nuget.org/packages/Farse)
 
 ![Farse](https://raw.githubusercontent.com/tommililja/Farse/main/logo/farse-128.png)
 
