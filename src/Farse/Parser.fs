@@ -109,9 +109,8 @@ module Parser =
     let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
         try
             use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
-            match parse document.RootElement with
-            | Ok x -> Ok x
-            | Error list -> Error <| Errors list
+            parse document.RootElement
+            |> Result.mapError Errors
         with
             | :? JsonException
             | :? ArgumentNullException as exn -> Error <| Json exn
@@ -125,9 +124,8 @@ module Parser =
             try
                 use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
                 return
-                    match parse document.RootElement with
-                    | Ok x -> Ok x
-                    | Error list -> Error <| Errors list
+                    parse document.RootElement
+                    |> Result.mapError Errors
             with
                 | :? JsonException
                 | :? ArgumentNullException as exn -> return Error <| Json exn
