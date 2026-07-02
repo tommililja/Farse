@@ -35,8 +35,8 @@ module BenchmarkData =
 
     let json n =
         [ 1 .. n ]
-        |> List.map (fun _ ->
-            JObj [
+        |> JObj.arr (fun _ ->
+            [
                 "id", JStr "c8eae96a-025d-4bc9-88f8-f204e95f2883"
                 "name", JStr "Alice"
                 "age", JNil
@@ -60,7 +60,6 @@ module BenchmarkData =
                     ]
             ]
         )
-        |> JArr
 
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type ParserBenchmarks() =
