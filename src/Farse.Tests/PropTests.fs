@@ -39,25 +39,25 @@ module PropTests =
         let ``Should fail when property is a different kind``() =
             Prop.opt "prop" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is invalid``() =
             Prop.opt "prop" Parse.int
             |> Parser.parse """{ "prop": 1.1 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
             Prop.opt "prop" Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is null`` () =
             Prop.opt "prop" Parse.int
             |> Parser.parse "null"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module OptionalTraverse =
 
@@ -128,13 +128,13 @@ module PropTests =
         let ``Should fail when property is a different kind``() =
             Prop.opt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is invalid``() =
             Prop.opt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1.1 } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is null`` () =
@@ -146,19 +146,19 @@ module PropTests =
         let ``Should fail when element is not an object`` () =
             Prop.opt "prop.prop2.prop3" Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when first property is not an object`` () =
             Prop.opt "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": [] }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when intermediate property is not an object`` () =
             Prop.opt "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Required =
 
@@ -193,37 +193,37 @@ module PropTests =
         let ``Should fail when property is null`` () =
             Prop.req "prop" Parse.int
             |> Parser.parse """{ "prop": null }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is undefined`` () =
             Prop.req "missing" Parse.int
             |> Parser.parse """{ "prop": 1 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is a different kind``() =
             Prop.req "prop" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is invalid``() =
             Prop.req "prop" Parse.int
             |> Parser.parse """{ "prop": 1.1 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
             Prop.req "prop" Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is null`` () =
             Prop.req "prop" Parse.int
             |> Parser.parse "null"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module RequiredTraverse =
 
@@ -258,73 +258,73 @@ module PropTests =
         let ``Should fail when first property is null`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": null }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when intermediate property is null`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": null } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when last property is null`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when first property is undefined`` () =
             Prop.req "missing.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when intermediate property is undefined`` () =
             Prop.req "prop.missing.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when last property is undefined`` () =
             Prop.req "prop.prop2.missing" Parse.int
             |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is a different kind``() =
             Prop.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is invalid``() =
             Prop.req "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1.1 } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is null`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse "null"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when first property is not an object`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": [] }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when intermediate property is not an object`` () =
             Prop.req "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module TryOptional =
 
@@ -359,25 +359,25 @@ module PropTests =
         let ``Should fail when property is a different kind``() =
             Prop.tryOpt "prop" Parse.int
             |> Parser.parse """{ "prop": "1" }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is invalid``() =
             Prop.tryOpt "prop" Parse.int
             |> Parser.parse """{ "prop": 1.1 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
             Prop.tryOpt "prop" Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is null`` () =
             Prop.tryOpt "prop" Parse.int
             |> Parser.parse "null"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module TryOptionalTraverse =
 
@@ -457,13 +457,13 @@ module PropTests =
         let ``Should fail when property is a different kind``() =
             Prop.tryOpt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": "1" } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when property is invalid``() =
             Prop.tryOpt "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1.1 } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is null`` () =
@@ -475,16 +475,16 @@ module PropTests =
         let ``Should fail when element is not an object`` () =
             Prop.tryOpt "prop.prop2.prop3" Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when first property is not an object`` () =
             Prop.tryOpt "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": [] }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when intermediate property is not an object`` () =
             Prop.tryOpt "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError

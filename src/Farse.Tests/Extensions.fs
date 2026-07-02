@@ -22,7 +22,7 @@ module Expect =
             .Verify(actual, settings)
             .ToTask()
 
-    let wantErrorString result =
+    let parserError result =
         result
         |> Result.mapError ParserError.asString
         |> Expect.wantError "Expected a parser error."

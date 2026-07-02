@@ -42,14 +42,14 @@ module ParserTests =
         Error "msg"
         |> Parser.fromResult
         |> Parser.parse "1"
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should create Parser that fails`` () =
         "msg"
         |> Parser.fail
         |> Parser.parse "1"
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should recover with a default value when a Parser fails`` () =
@@ -106,7 +106,7 @@ module ParserTests =
         Parser.fail "msg"
         |> Parser.ignore<int>
         |> Parser.parse "1"
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should set default value when None`` () =
@@ -133,7 +133,7 @@ module ParserTests =
         Parser.fail "msg"
         |> Parser.defaultValue 1
         |> Parser.parse "1"
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should get default value when None`` () =
@@ -160,7 +160,7 @@ module ParserTests =
         Parser.fail "msg"
         |> Parser.defaultWith (fun () -> 1)
         |> Parser.parse "1"
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should parse JSON`` () =
@@ -175,19 +175,19 @@ module ParserTests =
     let ``Should fail when parsing invalid JSON`` () =
         Parse.int
         |> Parser.parse "invalid"
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should fail when parsing a null string`` () =
         Parse.int
         |> Parser.parse null
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should fail when parsing an empty string`` () =
         Parse.int
         |> Parser.parse String.Empty
-        |> Expect.wantErrorString
+        |> Expect.parserError
 
     [<Fact>]
     let ``Should parse JSON async`` () =
@@ -203,16 +203,16 @@ module ParserTests =
     let ``Should fail when parsing invalid JSON async`` () =
         Parse.int
         |> Parser.parseAsync (MemoryStream.create "invalid") CancellationToken.None
-        |> Task.bind Expect.wantErrorString
+        |> Task.bind Expect.parserError
 
     [<Fact>]
     let ``Should fail when parsing a null stream async`` () =
         Parse.int
         |> Parser.parseAsync null CancellationToken.None
-        |> Task.bind Expect.wantErrorString
+        |> Task.bind Expect.parserError
 
     [<Fact>]
     let ``Should fail when parsing an empty string async`` () =
         Parse.int
         |> Parser.parseAsync (MemoryStream.create String.Empty) CancellationToken.None
-        |> Task.bind Expect.wantErrorString
+        |> Task.bind Expect.parserError

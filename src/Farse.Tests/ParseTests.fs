@@ -42,7 +42,7 @@ module ParseTests =
                 | _ -> Error "Invalid value."
             ) ExpectedKind.Number
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -52,13 +52,13 @@ module ParseTests =
                 | _ -> Error "Invalid value."
             ) ExpectedKind.Number
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when a exception is thrown`` () =
             Parse.custom (_.GetString() >> Ok) ExpectedKind.Number
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Int =
 
@@ -75,13 +75,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.int
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Int16 =
 
@@ -98,13 +98,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.int16
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int16
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Int64 =
 
@@ -121,13 +121,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.int64
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int64
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module UInt16 =
 
@@ -144,13 +144,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint16
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.uint16
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module UInt32 =
 
@@ -167,13 +167,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint32
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.uint32
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module UInt64 =
 
@@ -190,13 +190,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint64
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.uint64
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Float =
 
@@ -213,7 +213,7 @@ module ParseTests =
         let ``Should fail when value is not a number`` () =
             Parse.float
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Float32 =
 
@@ -230,7 +230,7 @@ module ParseTests =
         let ``Should fail when value is not a number`` () =
             Parse.float32
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Decimal =
 
@@ -247,13 +247,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.decimal
             |> Parser.parse "1e999"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.decimal
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Byte =
 
@@ -270,13 +270,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.byte
             |> Parser.parse "256"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.byte
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module SByte =
 
@@ -293,13 +293,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.sbyte
             |> Parser.parse "128"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.sbyte
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Char =
 
@@ -316,13 +316,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.char
             |> Parser.parse "\"ab\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.char
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module String =
 
@@ -339,7 +339,7 @@ module ParseTests =
         let ``Should fail when element is not a string`` () =
             Parse.string
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module StringNonEmpty =
 
@@ -356,19 +356,19 @@ module ParseTests =
         let ``Should fail when string is empty`` () =
             Parse.stringNonEmpty
             |> Parser.parse "\"\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when string is whitespace`` () =
             Parse.stringNonEmpty
             |> Parser.parse "\"  \""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.stringNonEmpty
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Regex =
 
@@ -385,19 +385,19 @@ module ParseTests =
         let ``Should fail when regex is invalid`` () =
             Parse.regex "^[0-9+$"
             |> Parser.parse "\"abc\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.regex "^[0-9]+$"
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when regex does not match`` () =
             Parse.regex "^[0-9]+$"
             |> Parser.parse "\"abc\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Number =
 
@@ -414,13 +414,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.number Parse.int
             |> Parser.parse "\"a\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.number Parse.int
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Base64Bytes =
 
@@ -437,13 +437,13 @@ module ParseTests =
         let ``Should fail when element is not a string`` () =
             Parse.base64Bytes
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.base64Bytes
             |> Parser.parse "\"abc\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module BigInt =
 
@@ -460,13 +460,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.bigint
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.bigint
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Bool =
 
@@ -483,7 +483,7 @@ module ParseTests =
         let ``Should fail when element is not a bool`` () =
             Parse.bool
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Guid =
 
@@ -500,13 +500,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.guid
             |> Parser.parse "\"invalid\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.guid
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Unit =
 
@@ -548,13 +548,13 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.enum<StringEnum>
             |> Parser.parse "\"B\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.enum<StringEnum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module IntEnum =
 
@@ -574,19 +574,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.intEnum<IntEnum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.intEnum<IntEnum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.intEnum<IntEnum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Int16Enum =
 
@@ -606,19 +606,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.int16Enum<Int16Enum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.int16Enum<Int16Enum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.int16Enum<Int16Enum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Int64Enum =
 
@@ -638,19 +638,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.int64Enum<Int64Enum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.int64Enum<Int64Enum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.int64Enum<Int64Enum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module UInt16Enum =
 
@@ -670,19 +670,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint16Enum<UInt16Enum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.uint16Enum<UInt16Enum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.uint16Enum<UInt16Enum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module UInt32Enum =
 
@@ -702,19 +702,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint32Enum<UInt32Enum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.uint32Enum<UInt32Enum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.uint32Enum<UInt32Enum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module UInt64Enum =
 
@@ -734,19 +734,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint64Enum<UInt64Enum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.uint64Enum<UInt64Enum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.uint64Enum<UInt64Enum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module ByteEnum =
 
@@ -766,19 +766,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.byteEnum<ByteEnum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.byteEnum<ByteEnum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.byteEnum<ByteEnum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module SByteEnum =
 
@@ -798,19 +798,19 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.sbyteEnum<SByteEnum>
             |> Parser.parse "2"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.sbyteEnum<SByteEnum>
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.sbyteEnum<SByteEnum>
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module TimeOnly =
 
@@ -827,13 +827,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.timeOnly
             |> Parser.parse "\"17:2845\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.timeOnly
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module TimeOnlyExact =
 
@@ -850,13 +850,13 @@ module ParseTests =
         let ``Should fail when format is incorrect`` () =
             Parse.timeOnlyExact "HH:mm:ss"
             |> Parser.parse "\"172845\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.timeOnlyExact "HHmmss"
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module TimeSpan =
 
@@ -873,13 +873,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.timeOnly
             |> Parser.parse "\"1:2345\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.timeSpan
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module TimeSpanExact =
 
@@ -896,13 +896,13 @@ module ParseTests =
         let ``Should fail when format is incorrect`` () =
             Parse.timeSpanExact @"hh:mm:ss"
             |> Parser.parse "\"012845\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.timeSpanExact @"hh\mm\ss"
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateOnly =
 
@@ -919,13 +919,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.dateOnly
             |> Parser.parse "\"2025-0513\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateOnly
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateOnlyExact =
 
@@ -942,13 +942,13 @@ module ParseTests =
         let ``Should fail when format is incorrect`` () =
             Parse.dateOnlyExact "yyyyMMdd"
             |> Parser.parse "\"2025-05-13\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateOnlyExact "yyyyMMdd"
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateTime =
 
@@ -965,13 +965,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.dateTime
                 |> Parser.parse "\"2025-05-13T172845\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateTime
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateTimeUtc =
 
@@ -989,13 +989,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.dateTimeUtc
             |> Parser.parse "\"2025-05-25100000\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateTimeUtc
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateTimeExact =
 
@@ -1012,13 +1012,13 @@ module ParseTests =
         let ``Should fail when format is incorrect`` () =
             Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
             |> Parser.parse "\"2025-05-13T17:28:45\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateTimeOffset =
 
@@ -1035,13 +1035,13 @@ module ParseTests =
         let ``Should fail whe parsing fails`` () =
             Parse.dateTime
             |> Parser.parse "\"2025-05-13T17:28:4502:00\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateTime
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module DateTimeOffsetExact =
 
@@ -1058,13 +1058,13 @@ module ParseTests =
         let ``Should fail when format is incorrect`` () =
             Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz"
             |> Parser.parse "\"2025-05-13 17:28 +02:00\""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateTimeOffsetExact "\"yyyyMMdd HH:mm:ss zzz\""
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Choose =
 
@@ -1081,7 +1081,7 @@ module ParseTests =
         let ``Should fail when element is not an array`` () =
             Parse.choose Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module List =
 
@@ -1098,13 +1098,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.list Parse.int
             |> Parser.parse """[ "1", "2", "3" ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.list Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Array =
 
@@ -1121,13 +1121,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.array Parse.int
             |> Parser.parse """[ "1", "2", "3" ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.array Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Set =
 
@@ -1144,13 +1144,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.set Parse.int
             |> Parser.parse """[ "1", "2", "3" ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.set Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Seq =
 
@@ -1167,13 +1167,13 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.seq Parse.int
             |> Parser.parse """[ "1", "2", "3" ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.seq Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Index =
 
@@ -1190,19 +1190,19 @@ module ParseTests =
         let ``Should fail when index is out of range`` () =
             Parse.index 3 Parse.int
             |> Parser.parse "[ 1, 2, 3 ]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.index 1 Parse.int
             |> Parser.parse """[ 1, "2", 3 ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.index 1 Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Map =
 
@@ -1219,19 +1219,19 @@ module ParseTests =
         let ``Should fail when element is not an object`` () =
             Parse.map Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing duplicate keys`` () =
             Parse.map Parse.int
             |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.map Parse.int
             |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Dict =
 
@@ -1248,19 +1248,19 @@ module ParseTests =
         let ``Should fail when element is not an object`` () =
             Parse.dict Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing duplicate keys`` () =
             Parse.dict Parse.int
             |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.dict Parse.int
             |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module KeyValuePairs =
 
@@ -1277,19 +1277,19 @@ module ParseTests =
         let ``Should fail when element is not an object`` () =
             Parse.keyValuePairs Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing duplicate keys`` () =
             Parse.keyValuePairs Parse.int
             |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.keyValuePairs Parse.int
             |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Tuples =
 
@@ -1306,19 +1306,19 @@ module ParseTests =
         let ``Should fail when element is not an object`` () =
             Parse.tuples Parse.int
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing duplicate keys`` () =
             Parse.tuples Parse.int
             |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.tuples Parse.int
             |> Parser.parse """{ "key1": "1", "key2": "2", "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Keys =
 
@@ -1335,13 +1335,13 @@ module ParseTests =
         let ``Should fail when element is not an object`` () =
             Parse.keys
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing duplicate keys`` () =
             Parse.keys
             |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Tuple2 =
 
@@ -1358,19 +1358,19 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.tuple2 Parse.int Parse.int
             |> Parser.parse """[ "1", 1, 1 ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when length is invalid`` () =
             Parse.tuple2 Parse.int Parse.int
             |> Parser.parse "[ 1 ]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.tuple2 Parse.int Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Tuple3 =
 
@@ -1387,19 +1387,19 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.tuple3 Parse.int Parse.int Parse.int
             |> Parser.parse """[ "1", 1, 1, 1 ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when length is invalid`` () =
             Parse.tuple3 Parse.int Parse.int Parse.int
             |> Parser.parse "[ 1, 1 ]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.tuple3 Parse.int Parse.int Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Tuple4 =
 
@@ -1416,19 +1416,19 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.tuple4 Parse.int Parse.int Parse.int Parse.int
             |> Parser.parse """[ "1", 1, 1, 1 ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when length is invalid`` () =
             Parse.tuple4 Parse.int Parse.int Parse.int Parse.int
             |> Parser.parse "[ 1, 1, 1 ]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.tuple4 Parse.int Parse.int Parse.int Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Tuple5 =
 
@@ -1445,19 +1445,19 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int
             |> Parser.parse """[ "1", "1", 1, 1, 1 ]"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when length is invalid`` () =
             Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int
             |> Parser.parse "[ 1, 1, 1, 1 ]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.tuple5 Parse.int Parse.int Parse.int Parse.int Parse.int
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module OneOf =
 
@@ -1493,25 +1493,25 @@ module ParseTests =
                 }
             Parse.oneOf "disc" [ "a", a ]
             |> Parser.parse """{ "disc": "a", "prop2": "1", "prop3": 2 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
             Parse.oneOf "disc" [ "missing", Parse.int ]
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when discriminator is not matched`` () =
             Parse.oneOf "disc" [ "missing", Parse.int ]
             |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when discriminator is not found`` () =
             Parse.oneOf "missing" [ "a", Parse.int ]
             |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Self =
 
@@ -1589,13 +1589,13 @@ module ParseTests =
             let parser = Parser.fail "msg"
             Parse.attempt [ parser; parser; parser ]
             |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when list is empty`` () =
             Parse.attempt []
             |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Nil =
 
@@ -1641,7 +1641,7 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.option Parse.int
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Refine =
 
@@ -1658,13 +1658,13 @@ module ParseTests =
         let ``Should fail when validation fails`` () =
             Parse.refine Parse.byte (fun _ -> Error "msg")
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.refine Parse.int Ok
             |> Parser.parse "1.1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Verify =
 
@@ -1681,13 +1681,13 @@ module ParseTests =
         let ``Should fail when predicate returns false`` () =
             Parse.verify Parse.byte (fun x -> x = 0uy) "msg"
             |> Parser.parse "1"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.verify Parse.int (fun x -> x > 0) "msg"
             |> Parser.parse "true"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module Kind =
 
@@ -1737,7 +1737,7 @@ module ParseTests =
         let ``Should fail when element is not an array`` () =
             Parse.arrayLength
             |> Parser.parse "{}"
-            |> Expect.wantErrorString
+            |> Expect.parserError
 
     module PropertyCount =
 
@@ -1754,4 +1754,4 @@ module ParseTests =
         let ``Should fail when element is not an object`` () =
             Parse.propertyCount
             |> Parser.parse "[]"
-            |> Expect.wantErrorString
+            |> Expect.parserError
