@@ -464,6 +464,11 @@ module Parse =
     /// <param name="parser">The parser used for every element.</param>
     let set parser = arr Set.ofSeq parser
 
+    /// <summary>Parses an array as System.Collections.Generic.HashSet.</summary>
+    /// <example><code>let! hashSet = "prop" &amp;= Parse.hashSet Parse.int</code></example>
+    /// <param name="parser">The parser used for every element.</param>
+    let hashSet parser = arr HashSet parser
+
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
     /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
     /// <param name="parser">The parser used for every element.</param>

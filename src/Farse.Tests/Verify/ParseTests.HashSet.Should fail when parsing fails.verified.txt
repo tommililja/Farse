@@ -1,0 +1,19 @@
+﻿Parser failed with 3 error[s].
+
+Error[0]:
+  at $[0]
+   | Tried parsing 'int.
+   | Expected Number, but got String.
+   = "1"
+
+Error[1]:
+  at $[1]
+   | Tried parsing 'int.
+   | Expected Number, but got String.
+   = "2"
+
+Error[2]:
+  at $[2]
+   | Tried parsing 'int.
+   | Expected Number, but got String.
+   = "3"

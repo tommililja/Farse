@@ -1222,6 +1222,29 @@ module ParseTests =
             |> Parser.parse "{}"
             |> Expect.parserError
 
+    module HashSet =
+
+        [<Fact>]
+        let ``Should parse array as value HashSet`` () =
+            let expected = HashSet [ 1; 2; 3; ]
+            let actual: _ HashSet =
+                Parse.hashSet Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.sequenceEqual Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.hashSet Parse.int
+            |> Parser.parse """[ "1", "2", "3" ]"""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.hashSet Parse.int
+            |> Parser.parse "{}"
+            |> Expect.parserError
+
     module Seq =
 
         [<Fact>]
