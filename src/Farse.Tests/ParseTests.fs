@@ -1759,6 +1759,29 @@ module ParseTests =
             |> Parser.parse "true"
             |> Expect.parserError
 
+    module Exact =
+
+        [<Fact>]
+        let ``Should parse exact value`` () =
+            let expected = ()
+            let actual =
+                Parse.exact Parse.int 1
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when values are not equal`` () =
+            Parse.exact Parse.byte 0uy
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.exact Parse.int 1
+            |> Parser.parse "true"
+            |> Expect.parserError
+
     module Kind =
 
         [<Fact>]

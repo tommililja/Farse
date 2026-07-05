@@ -747,6 +747,20 @@ module Parse =
             | Error e -> Error e
         )
 
+    /// <summary>Parses an exact value and returns FSharp.Core.Unit.</summary>
+    /// <example><code>do! "prop" &amp;= Parse.exact Parse.int 1</code></example>
+    /// <param name="expected">The expected value.</param>
+    let exact (Parser parse) (expected:'a) =
+        Parser (fun element ->
+            match parse element with
+            | Ok x when x = expected -> Ok ()
+            | Ok x ->
+                element
+                |> ParseError.invalid $"Expected %A{expected}, but got %A{x}." typeof<'a>
+                |> Error.list
+            | Error e -> Error e
+        )
+
     // Json
 
     /// <summary>Parses an element's kind as System.Text.Json.JsonValueKind.</summary>
