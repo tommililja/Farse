@@ -1,0 +1,7 @@
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  at $
+   | Tried parsing 'DateTimeOffset.
+   | Expected an int64 Unix timestamp (seconds).
+   = 100.5

@@ -373,6 +373,24 @@ module Parse =
             | _ -> Error $"Expected a DateTimeOffset string (%s{format})."
         ) ExpectedKind.String
 
+    /// <summary>Parses a number as System.DateTimeOffset from a Unix timestamp in seconds.</summary>
+    /// <example><code>let! unixSeconds = "prop" &amp;= Parse.unixSeconds</code></example>
+    let unixSeconds =
+        custom (fun element ->
+            match element.TryGetInt64() with
+            | true, seconds -> Ok <| DateTimeOffset.FromUnixTimeSeconds(seconds)
+            | _ -> Error "Expected an int64 Unix timestamp (seconds)."
+        ) ExpectedKind.Number
+
+    /// <summary>Parses a number as System.DateTimeOffset from a Unix timestamp in milliseconds.</summary>
+    /// <example><code>let! unixMilliseconds = "prop" &amp;= Parse.unixMilliseconds</code></example>
+    let unixMilliseconds =
+        custom (fun element ->
+            match element.TryGetInt64() with
+            | true, milliseconds -> Ok <| DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
+            | _ -> Error "Expected an int64 Unix timestamp (milliseconds)."
+        ) ExpectedKind.Number
+
     // Sequences
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =

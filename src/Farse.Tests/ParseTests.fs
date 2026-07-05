@@ -1090,6 +1090,52 @@ module ParseTests =
             |> Parser.parse "1"
             |> Expect.parserError
 
+    module UnixSeconds =
+
+        [<Fact>]
+        let ``Should parse string as DateTimeOffset from Unix seconds`` () =
+            let expected = DateTimeOffset.Parse("2026-07-05T20:06:58+00:00")
+            let actual =
+                Parse.unixSeconds
+                |> Parser.parse "1783282018"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.unixSeconds
+            |> Parser.parse "100.5"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.unixSeconds
+            |> Parser.parse "true"
+            |> Expect.parserError
+
+    module UnixMilliseconds =
+
+        [<Fact>]
+        let ``Should parse string as DateTimeOffset from Unix milliseconds`` () =
+            let expected = DateTimeOffset.Parse("2026-07-05T20:18:12.255+00:00")
+            let actual =
+                Parse.unixMilliseconds
+                |> Parser.parse "1783282692255"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.unixMilliseconds
+            |> Parser.parse "100.5"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.unixMilliseconds
+            |> Parser.parse "true"
+            |> Expect.parserError
+
     module Choose =
 
         [<Fact>]
