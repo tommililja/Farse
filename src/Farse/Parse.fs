@@ -349,7 +349,16 @@ module Parse =
     let dateTimeOffset =
         custom (fun element ->
             match element.TryGetDateTime() with
-            | true, dateTime -> Ok dateTime
+            | true, dateTimeOffset -> Ok dateTimeOffset
+            | _ -> Error "Expected a DateTimeOffset string."
+        ) ExpectedKind.String
+
+    /// <summary>Parses a string as System.DateTimeOffset (ISO 8601) and converts it to UTC.</summary>
+    /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetUtc</code></example>
+    let dateTimeOffsetUtc =
+        custom (fun element ->
+            match element.TryGetDateTimeOffset() with
+            | true, dateTimeOffset -> Ok <| dateTimeOffset.ToUniversalTime()
             | _ -> Error "Expected a DateTimeOffset string."
         ) ExpectedKind.String
 

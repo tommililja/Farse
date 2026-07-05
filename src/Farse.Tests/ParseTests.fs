@@ -1043,6 +1043,30 @@ module ParseTests =
             |> Parser.parse "1"
             |> Expect.parserError
 
+    module DateTimeOffsetUtc =
+
+        [<Fact>]
+        let ``Should parse string as DateTimeOffset UTC`` () =
+            let now = DateTimeOffset(DateOnly(2025, 05, 25), TimeOnly(10, 00), TimeSpan.FromHours(1))
+            let expected = now.ToUniversalTime()
+            let actual =
+                Parse.dateTimeOffsetUtc
+                |> Parser.parse "\"2025-05-25T10:00:00+01:00\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.dateTimeOffsetUtc
+            |> Parser.parse "\"2025-05-25100000\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.dateTimeOffsetUtc
+            |> Parser.parse "1"
+            |> Expect.parserError
+
     module DateTimeOffsetExact =
 
         [<Fact>]
