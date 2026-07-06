@@ -1136,6 +1136,29 @@ module ParseTests =
             |> Parser.parse "true"
             |> Expect.parserError
 
+    module Uri =
+
+        [<Fact>]
+        let ``Should parse string as Uri`` () =
+            let expected = Uri("https://www.example.com/path?query=value")
+            let actual =
+                Parse.uri UriKind.Absolute
+                |> Parser.parse "\"https://www.example.com/path?query=value\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.uri UriKind.Absolute
+            |> Parser.parse "\"123\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.uri UriKind.Absolute
+            |> Parser.parse "true"
+            |> Expect.parserError
+
     module Choose =
 
         [<Fact>]

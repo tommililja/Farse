@@ -391,6 +391,19 @@ module Parse =
             | _ -> Error "Expected an int64 Unix timestamp (milliseconds)."
         ) ExpectedKind.Number
 
+    // Other
+
+    /// <summary>Parses a string as System.Uri with a specific kind.</summary>
+    /// <example><code>let! uri = "prop" &amp;= Parse.uri UriKind.Absolute</code></example>
+    /// <param name="kind">The expected kind.</param>
+    let uri (kind:UriKind) =
+        custom (fun element ->
+            let string = element.GetString()
+            match Uri.TryCreate(string, kind) with
+            | true, uri -> Ok uri
+            | _ -> Error $"Expected a Uri string (%s{kind.ToString()})."
+        ) ExpectedKind.String
+
     // Sequences
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =
