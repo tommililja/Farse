@@ -2,6 +2,7 @@ namespace Farse.Tests
 
 open System
 open System.Collections.Generic
+open System.Net
 open System.Numerics
 open System.Text.Json
 open Expecto.Flip
@@ -1179,6 +1180,29 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.version
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+    module IpAddress =
+
+        [<Fact>]
+        let ``Should parse string as IPAddress`` () =
+            let expected = IPAddress.Parse("192.168.1.1")
+            let actual =
+                Parse.ipAddress
+                |> Parser.parse "\"192.168.1.1\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.ipAddress
+            |> Parser.parse "\"true\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.ipAddress
             |> Parser.parse "1"
             |> Expect.parserError
 

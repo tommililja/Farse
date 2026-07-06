@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
+open System.Net
 open System.Numerics
 open System.Text.Json
 open System.Text.RegularExpressions
@@ -412,6 +413,16 @@ module Parse =
             match Version.TryParse(string) with
             | true, version -> Ok version
             | _ -> Error "Expected a Version string."
+        ) ExpectedKind.String
+
+    /// <summary>Parses a string as System.Net.IPAddress.</summary>
+    /// <example><code>let! ip = "prop" &amp;= Parse.ipAddress</code></example>
+    let ipAddress =
+        custom (fun element ->
+            let string = element.GetString()
+            match IPAddress.TryParse(string) with
+            | true, ip -> Ok ip
+            | _ -> Error "Expected an IPAddress string."
         ) ExpectedKind.String
 
     // Sequences
