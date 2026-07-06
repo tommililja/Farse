@@ -25,7 +25,7 @@ module Parse =
                 try fn element
                 with ex ->
                     element
-                    |> ParseError.invalidEx ex.Message typeof<'r> ex
+                    |> ParseError.invalidEx ex typeof<'r>
                     |> Error.list
             else
                 element
@@ -653,13 +653,13 @@ module Parse =
         customInternal (fun element ->
             let (Parser parse) = Prop.req name string
             match parse element with
-            | Ok x ->
-                let parser = List.tryFind (fun (key, _) -> key = x) parsers
+            | Ok disc ->
+                let parser = List.tryFind (fun (key, _) -> key = disc) parsers
                 match parser with
                 | Some (_, Parser parse) -> parse element
                 | None ->
                     element
-                    |> ParseError.invalidOneOf x typeof<'r>
+                    |> ParseError.missingParser disc typeof<'r>
                     |> Error.list
             | Error e -> Error e
         ) ExpectedKind.Object
@@ -732,7 +732,7 @@ module Parse =
                 | Ok x -> Ok x
                 | Error msg ->
                     element
-                    |> ParseError.validation msg typeof<'r> $"%A{x}"
+                    |> ParseError.validation $"%A{x}" msg typeof<'r>
                     |> Error.list
             | Error e -> Error e
         )
@@ -747,7 +747,7 @@ module Parse =
             | Ok x when fn x -> Ok x
             | Ok x ->
                 element
-                |> ParseError.validation msg typeof<'r> $"%A{x}"
+                |> ParseError.validation $"%A{x}" msg typeof<'r>
                 |> Error.list
             | Error e -> Error e
         )
@@ -761,7 +761,7 @@ module Parse =
             | Ok x when x = expected -> Ok ()
             | Ok x ->
                 element
-                |> ParseError.invalid $"Expected %A{expected}, but got %A{x}." typeof<'a>
+                |> ParseError.expectedValue x expected typeof<'a>
                 |> Error.list
             | Error e -> Error e
         )

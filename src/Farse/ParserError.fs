@@ -8,9 +8,9 @@ type ParseError = {
     Path: JsonPath
     Element: JsonElement
     Index: int option
+    Details: string
     Value: string option
     Type: Type
-    Details: string
     Exn: exn option
 }
 
@@ -43,7 +43,7 @@ module ParseError =
             Exn = None
         }
 
-    let internal validation details type' value element =
+    let internal validation value details type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -65,25 +65,36 @@ module ParseError =
             Exn = None
         }
 
-    let internal invalidEx details type' exn element =
+    let internal invalidEx (exn:exn) type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
             Index = None
-            Details = details
+            Details = exn.Message
             Value = None
             Type = type'
             Exn = Some exn
         }
 
-    let internal expectedKind expectedKind path type' element =
+    let internal expectedKind expected path type' element =
         {
             Path = path
             Element = JsonElement.clone element
             Index = None
-            Details = $"Expected %s{ExpectedKind.asString expectedKind}, but got %s{Kind.asString element.ValueKind}."
-            Type = type'
+            Details = $"Expected %s{ExpectedKind.asString expected}, but got %s{Kind.asString element.ValueKind}."
             Value = None
+            Type = type'
+            Exn = None
+        }
+
+    let internal expectedValue actual expected type' element =
+        {
+            Path = JsonPath.empty
+            Element = JsonElement.clone element
+            Index = None
+            Details = $"Expected %A{expected}, but got %A{actual}."
+            Value = None
+            Type = type'
             Exn = None
         }
 
@@ -93,8 +104,8 @@ module ParseError =
             Element = JsonElement.clone element
             Index = Some n
             Details = "Index was out of range."
-            Type = type'
             Value = None
+            Type = type'
             Exn = None
         }
 
@@ -104,19 +115,19 @@ module ParseError =
             Element = JsonElement.clone element
             Index = None
             Details = $"Expected a tuple of %i{expected}, but got %i{actual}."
-            Type = type'
             Value = None
+            Type = type'
             Exn = None
         }
 
-    let internal invalidOneOf value type' element =
+    let internal missingParser disc type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
             Index = None
-            Details = $"Missing parser for discriminator '%s{value}'."
-            Type = type'
+            Details = $"Missing parser for discriminator '%s{disc}'."
             Value = None
+            Type = type'
             Exn = None
         }
 
@@ -125,9 +136,9 @@ module ParseError =
             Path = JsonPath.empty
             Element = JsonElement.clone element
             Index = None
+            Details = $"Tried %i{parsers} parsers without success."
             Value = None
             Type = type'
-            Details = $"Tried %i{parsers} parsers without success."
             Exn = None
         }
 
@@ -136,9 +147,9 @@ module ParseError =
             Path = JsonPath.empty
             Element = JsonElement.clone element
             Index = None
+            Details = "No parsers given."
             Value = None
             Type = type'
-            Details = "No parsers given."
             Exn = None
         }
 
@@ -148,8 +159,8 @@ module ParseError =
             Element = JsonElement.clone element
             Index = None
             Details = "Duplicate key."
-            Type = type'
             Value = None
+            Type = type'
             Exn = None
         }
 
