@@ -509,6 +509,29 @@ module ParseTests =
             |> Parser.parse "1"
             |> Expect.parserError
 
+    module GuidExact =
+
+        [<Fact>]
+        let ``Should parse string as Guid`` () =
+            let expected = Guid.Parse("fb245a372de14cc5b41b1c6e68866b68")
+            let actual =
+                Parse.guidExact "N"
+                |> Parser.parse "\"fb245a372de14cc5b41b1c6e68866b68\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when format is incorrect`` () =
+            Parse.guidExact "N"
+            |> Parser.parse "\"1732f607-fc13-4ed3-a54e-7851343278a5\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.guidExact "N"
+            |> Parser.parse "1"
+            |> Expect.parserError
+
     module Unit =
 
         [<Fact>]

@@ -183,6 +183,17 @@ module Parse =
             | _ -> Error "Expected a Guid string."
         ) ExpectedKind.String
 
+    /// <summary>Parses a string as System.Guid with a specific format.</summary>
+    /// <example><code>let! guid = "prop" &amp;= Parse.guidExact "N"</code></example>
+    /// <param name="format">The required format.</param>
+    let guidExact ([<StringSyntax("GuidFormat")>] format:string) =
+        custom (fun element ->
+            let string = element.GetString()
+            match Guid.TryParseExact(string, format) with
+            | true, guid -> Ok guid
+            | _ -> Error $"Expected a Guid string (%s{format})."
+        ) ExpectedKind.String
+
     /// <summary>Parses null as FSharp.Core.Unit.</summary>
     /// <example><code>do! "prop" &amp;= Parse.unit</code></example>
     let unit = custom (ignore >> Ok) ExpectedKind.Null
