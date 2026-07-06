@@ -1159,6 +1159,29 @@ module ParseTests =
             |> Parser.parse "true"
             |> Expect.parserError
 
+    module Version =
+
+        [<Fact>]
+        let ``Should parse string as Uri`` () =
+            let expected = Version(1, 2)
+            let actual =
+                Parse.version
+                |> Parser.parse "\"1.2\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.version
+            |> Parser.parse "\"1\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.version
+            |> Parser.parse "1"
+            |> Expect.parserError
+
     module Choose =
 
         [<Fact>]

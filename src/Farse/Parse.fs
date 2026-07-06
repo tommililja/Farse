@@ -404,6 +404,16 @@ module Parse =
             | _ -> Error $"Expected a Uri string (%s{kind.ToString()})."
         ) ExpectedKind.String
 
+    /// <summary>Parses a string as System.Version.</summary>
+    /// <example><code>let! version = "prop" &amp;= Parse.version</code></example>
+    let version =
+        custom (fun element ->
+            let string = element.GetString()
+            match Version.TryParse(string) with
+            | true, version -> Ok version
+            | _ -> Error "Expected a Version string."
+        ) ExpectedKind.String
+
     // Sequences
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =
