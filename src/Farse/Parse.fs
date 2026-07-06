@@ -402,7 +402,7 @@ module Parse =
             let string = element.GetString()
             match Uri.TryCreate(string, kind) with
             | true, uri -> Ok uri
-            | _ -> Error $"Expected a Uri string (%s{kind.ToString()})."
+            | _ -> Error $"Expected a Uri string (%O{kind})."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as System.Version.</summary>
