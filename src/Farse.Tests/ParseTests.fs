@@ -1025,22 +1025,22 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string as DateTimeOffset`` () =
-            let expected = DateTime.Parse("2025-05-13T17:28:45+02:00")
+            let expected = DateTimeOffset.Parse("2025-05-13T17:28:45+02:00")
             let actual =
-                Parse.dateTime
+                Parse.dateTimeOffset
                 |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
         [<Fact>]
         let ``Should fail whe parsing fails`` () =
-            Parse.dateTime
+            Parse.dateTimeOffset
             |> Parser.parse "\"2025-05-13T17:28:4502:00\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-            Parse.dateTime
+            Parse.dateTimeOffset
             |> Parser.parse "1"
             |> Expect.parserError
 

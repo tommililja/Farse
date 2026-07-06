@@ -349,7 +349,7 @@ module Parse =
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffset</code></example>
     let dateTimeOffset =
         custom (fun element ->
-            match element.TryGetDateTime() with
+            match element.TryGetDateTimeOffset() with
             | true, dateTimeOffset -> Ok dateTimeOffset
             | _ -> Error "Expected a DateTimeOffset string."
         ) ExpectedKind.String

@@ -2,6 +2,6 @@
 
 Error[0]:
   at $
-   | Tried parsing 'DateTime.
-   | Expected a DateTime string.
+   | Tried parsing 'DateTimeOffset.
+   | Expected a DateTimeOffset string.
    = "2025-05-13T17:28:4502:00"

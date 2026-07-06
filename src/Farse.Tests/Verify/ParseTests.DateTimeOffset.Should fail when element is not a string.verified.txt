@@ -2,6 +2,6 @@
 
 Error[0]:
   at $
-   | Tried parsing 'DateTime.
+   | Tried parsing 'DateTimeOffset.
    | Expected String, but got Number.
    = 1
