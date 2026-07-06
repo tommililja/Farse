@@ -202,7 +202,7 @@ module Parse =
 
     /// <summary>Parses a string as an enum type.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</code></example>
-    let enum<'r when 'r :> ValueType and 'r : struct and 'r : (new: unit -> 'r)> =
+    let enum<'r when 'r :> Enum and 'r : struct and 'r : (new: unit -> 'r)> =
         custom (fun element ->
             let string = element.GetString()
             let enumType = typeof<'r>
