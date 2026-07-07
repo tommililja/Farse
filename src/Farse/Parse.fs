@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Net
+open System.Net.Mail
 open System.Numerics
 open System.Text.Json
 open System.Text.RegularExpressions
@@ -434,6 +435,16 @@ module Parse =
             match IPAddress.TryParse(string) with
             | true, ip -> Ok ip
             | _ -> Error "Expected an IPAddress string."
+        ) ExpectedKind.String
+
+    /// <summary>Parses a string as System.Net.Mail.MailAddress.</summary>
+    /// <example><code>let! email = "prop" &amp;= Parse.mailAddress</code></example>
+    let mailAddress =
+        custom (fun element ->
+            let string = element.GetString()
+            match MailAddress.TryCreate(string) with
+            | true, email -> Ok email
+            | _ -> Error "Expected a MailAddress string."
         ) ExpectedKind.String
 
     // Sequences

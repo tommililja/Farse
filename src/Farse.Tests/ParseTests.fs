@@ -3,6 +3,7 @@ namespace Farse.Tests
 open System
 open System.Collections.Generic
 open System.Net
+open System.Net.Mail
 open System.Numerics
 open System.Text.Json
 open Expecto.Flip
@@ -1226,6 +1227,29 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.ipAddress
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+    module MailAddress =
+
+        [<Fact>]
+        let ``Should parse string as MailAddress`` () =
+            let expected = MailAddress.TryCreate("test@domain.com") |> snd
+            let actual =
+                Parse.mailAddress
+                |> Parser.parse "\"test@domain.com\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.mailAddress
+            |> Parser.parse "\"test\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.mailAddress
             |> Parser.parse "1"
             |> Expect.parserError
 
