@@ -447,6 +447,10 @@ module Parse =
             | _ -> Error "Expected a MailAddress string."
         ) ExpectedKind.String
 
+    /// <summary>Parses a string as System.Globalization.RegionInfo (ISO 3166).</summary>
+    /// <example><code>let! region = "prop" &amp;= Parse.regionInfo</code></example>
+    let regionInfo = custom (_.GetString() >> RegionInfo >> Ok) ExpectedKind.String
+
     // Sequences
 
     let inline private parseIndex n (Parser parse) (element:JsonElement) =

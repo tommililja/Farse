@@ -2,6 +2,7 @@ namespace Farse.Tests
 
 open System
 open System.Collections.Generic
+open System.Globalization
 open System.Net
 open System.Net.Mail
 open System.Numerics
@@ -1250,6 +1251,29 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.mailAddress
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+    module RegionInfo =
+
+        [<Fact>]
+        let ``Should parse string as RegionInfo`` () =
+            let expected = RegionInfo("SE")
+            let actual =
+                Parse.regionInfo
+                |> Parser.parse "\"SE\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.regionInfo
+            |> Parser.parse "\"abc\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.regionInfo
             |> Parser.parse "1"
             |> Expect.parserError
 

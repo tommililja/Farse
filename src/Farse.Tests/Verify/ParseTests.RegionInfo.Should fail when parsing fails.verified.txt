@@ -1,0 +1,7 @@
+﻿Parser failed with 1 error[s].
+
+Error[0]:
+  at $
+   | Tried parsing 'RegionInfo.
+   | The region name abc should not correspond to neutral culture; a specific culture name is required. (Parameter 'name')
+   = "abc"
