@@ -3,4 +3,4 @@
 Error[0]:
   at $.prop.missing
    | Tried parsing 'int.
-   | Expected Object, but got Undefined.
+   | Missing required property.

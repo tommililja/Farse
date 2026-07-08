@@ -88,7 +88,7 @@ module Prop =
     let private traverse path (Parser parse) : Parser<'r> =
         Parser (fun element ->
             match fold path element with
-            | element, count when count = path.Length && element.isUndefined ->
+            | element, count when element.isUndefined ->
                 element
                 |> ParseError.required (select path count) typeof<'r>
                 |> Error.list
