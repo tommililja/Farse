@@ -108,8 +108,12 @@ module Json =
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     /// <param name="bytes">The byte array to parse.</param>
     let fromBytes (bytes:byte array) =
-        Encoding.UTF8.GetString(bytes)
-        |> fromString
+        try
+            use document = JsonDocument.Parse(bytes, JsonDocumentOptions.preset)
+            Ok <| fromElement document.RootElement
+        with
+            | :? JsonException
+            | :? ArgumentNullException as exn -> Error exn
 
     /// <summary>Converts a Json to a JsonNode.</summary>
     /// <example><code>let node = Json.asJsonNode json</code></example>
