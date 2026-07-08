@@ -152,6 +152,15 @@ module Parse =
             | _ -> Error "Expected a number string."
         ) ExpectedKind.String
 
+    /// <summary>Parses a base64 string as System.String.</summary>
+    /// <example><code>let! string = "prop" &amp;= Parse.base64String</code></example>
+    let base64String =
+        custom (fun element ->
+            match element.TryGetBytesFromBase64() with
+            | true, _ -> Ok <| element.GetString()
+            | _ -> Error "Expected a base64 string."
+        ) ExpectedKind.String
+
     /// <summary>Parses a base64 string as System.Byte array.</summary>
     /// <example><code>let! bytes = "prop" &amp;= Parse.base64Bytes</code></example>
     let base64Bytes =

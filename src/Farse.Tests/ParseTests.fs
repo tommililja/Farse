@@ -425,6 +425,29 @@ module ParseTests =
             |> Parser.parse "1"
             |> Expect.parserError
 
+    module Base64String =
+
+        [<Fact>]
+        let ``Should parse string as base64 string`` () =
+            let actual = "aGVsbG8gc3RyYW5nZXIh"
+            let expected =
+                Parse.base64String
+                |> Parser.parse "\"aGVsbG8gc3RyYW5nZXIh\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when element is not a string`` () =
+            Parse.base64String
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.base64String
+            |> Parser.parse "\"abc\""
+            |> Expect.parserError
+
     module Base64Bytes =
 
         [<Fact>]
