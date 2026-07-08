@@ -161,7 +161,7 @@ module User =
                 JObj [
                     "plan", JStr (Plan.asString user.Subscription.Plan)
                     "isCanceled", JBit user.Subscription.IsCanceled
-                    "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
+                    "renewsAt", JStr.nil InstantPattern.General.Format user.Subscription.RenewsAt
                 ]
             "tags", JStr.arr Tag.asString user.Tags
         ]
