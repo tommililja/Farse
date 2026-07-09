@@ -153,7 +153,7 @@ module Age =
 
     let fromByte = function
         | age when age >= MinAge -> Ok <| Age age
-        | _ -> Error $"The minimum age is '%u{MinAge}'."
+        | _ -> Error $"The minimum age is %u{MinAge}."
         
     let asByte (Age x) = x
 
@@ -319,7 +319,7 @@ let! x =
     match disc with
     | "a" -> "prop" &= a
     | "b" -> "prop" &= b
-    | x -> Parser.fail $"No matching parser found for discriminator '%s{x}'."
+    | x -> Parser.fail $"Discriminator '%s{x}' is missing a parser."
 ```
 
 We can also try each parser in order.
@@ -335,7 +335,7 @@ There are a few different ways to validate parsed values.
 ```fsharp
 let! age = "age" ?= age // Custom parser that uses Age.fromByte.
 let! age = "age" ?= refine byte Age.fromByte
-let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is '12'."
+let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is 12."
 ```
 
 Validation can also be combined with sequences.
@@ -355,7 +355,7 @@ Parser failed with 1 error[s].
 Error[0]:
   at $.age
    | Tried parsing 'Age.
-   | The minimum age is '12'.
+   | The minimum age is 12.
    = 10
 ```
 
@@ -391,7 +391,7 @@ module User =
                 JObj [
                     "plan", JStr (Plan.asString user.Subscription.Plan)
                     "isCanceled", JBit user.Subscription.IsCanceled
-                    "renewsAt", JStr.nil _.ToString() user.Subscription.RenewsAt
+                    "renewsAt", JStr.nil InstantPattern.General.Format user.Subscription.RenewsAt
                 ]
             "tags", JStr.arr Tag.asString user.Tags
         ]
@@ -423,7 +423,7 @@ let asJson user =
                 "isCanceled", JBit user.Subscription.IsCanceled
                 "renewsAt",
                     user.Subscription.RenewsAt
-                    |> Option.map (_.ToString() >> JStr)
+                    |> Option.map (InstantPattern.General.Format >> JStr)
                     |> Option.defaultValue JNil
             ]
         "tags",
@@ -505,13 +505,13 @@ From the following information.
 
 ```fsharp
 type ParseError = {
-    Path: JsonPath // The full JSON path where the error occurred.
-    Element: JsonElement // The element that was parsed.
-    Index: int option // If the error occurred directly in an array.
-    Value: string option // Parsing succeeded, but validation failed.
-    Type: Type // The Type that was parsed.
-    Details: string // Parsing error or validation error details.
-    Exn: exn option // Full exn if one occurred.
+    Path: JsonPath          // The full JSON path where the error occurred.
+    Element: JsonElement    // The element that was parsed.
+    Index: int option       // If the error occurred directly in an array.
+    Value: string option    // Parsing succeeded, but validation failed.
+    Type: Type              // The Type that was parsed.
+    Details: string         // Parsing error or validation error details.
+    Exn: exn option         // Full exn if one occurred.
 }
 ```
 > Note: Farse does not throw exceptions unless something unexpected occurs.

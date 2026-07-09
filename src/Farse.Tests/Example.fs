@@ -24,7 +24,7 @@ module Age =
 
     let fromByte = function
         | age when age >= MinAge -> Ok <| Age age
-        | _ -> Error $"The minimum age is '%u{MinAge}'."
+        | _ -> Error $"The minimum age is %u{MinAge}."
 
     let asByte (Age x) = x
 
