@@ -765,8 +765,8 @@ module Parse =
         let parserA = Parser (fun element -> let (Parser parse) = refA.Value in parse element)
         let parserB = Parser (fun element -> let (Parser parse) = refB.Value in parse element)
         let a, b = fn (parserA, parserB)
-        refA.Value <- parserA
-        refB.Value <- parserB
+        refA.Value <- a
+        refB.Value <- b
         a, b
 
     /// <summary>Parses an element by trying each parser in order.</summary>
