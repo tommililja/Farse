@@ -1796,7 +1796,7 @@ module ParseTests =
                     ]
                 )
                 |> Parser.parse
-                   """
+                    """
                         {
                             "type": "branch",
                             "left": { "type": "leaf", "value": 1 },
@@ -1807,6 +1807,151 @@ module ParseTests =
                             }
                         }
                    """
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+    module Self2 =
+
+        type Value = {
+            Id: string
+            Fields: Field array
+        }
+        and Field = {
+            Name: string
+            Values: Value array
+        }
+
+        [<Fact>]
+        let ``Should parse mutually recursive parser starting from value`` () =
+            let json =
+                """
+                    {
+                        "id": "root",
+                        "fields": [
+                            {
+                                "name": "color",
+                                "values": [
+                                    {
+                                        "id": "red",
+                                        "fields": []
+                                    },
+                                    {
+                                        "id": "blue",
+                                        "fields": [
+                                            {
+                                                "name": "shade",
+                                                "values": [
+                                                    { "id": "light", "fields": [] },
+                                                    { "id": "dark", "fields": [] }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "size",
+                                "values": [
+                                    { "id": "small", "fields": [] },
+                                    { "id": "large", "fields": [] }
+                                ]
+                            }
+                        ]
+                    }
+                """
+
+            let expected =
+                { Id = "root"
+                  Fields =
+                    [| { Name = "color"
+                         Values =
+                            [| { Id = "red"; Fields = [||] }
+                               { Id = "blue"
+                                 Fields =
+                                    [| { Name = "shade"
+                                         Values =
+                                            [| { Id = "light"; Fields = [||] }
+                                               { Id = "dark"; Fields = [||] } |] } |] } |] }
+                       { Name = "size"
+                         Values =
+                            [| { Id = "small"; Fields = [||] }
+                               { Id = "large"; Fields = [||] } |] } |] }
+
+            let valueParser, _ =
+                Parse.self2 (fun (valueParser, fieldParser) ->
+                    parser {
+                        let! id = Prop.req "id" Parse.string
+                        and! fields = Prop.req "fields" (Parse.array fieldParser)
+                        return { Id = id; Fields = fields }
+                    },
+                    parser {
+                        let! name = Prop.req "name" Parse.string
+                        and! values = Prop.req "values" (Parse.array valueParser)
+                        return { Name = name; Values = values }
+                    }
+                )
+
+            let actual =
+                valueParser
+                |> Parser.parse json
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse mutually recursive parser starting from field`` () =
+            let json =
+                """
+                    {
+                        "name": "color",
+                        "values": [
+                            {
+                                "id": "red",
+                                "fields": []
+                            },
+                            {
+                                "id": "blue",
+                                "fields": [
+                                    {
+                                        "name": "shade",
+                                        "values": [
+                                            { "id": "light", "fields": [] },
+                                            { "id": "dark", "fields": [] }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                """
+
+            let expected =
+                { Name = "color"
+                  Values =
+                    [| { Id = "red"; Fields = [||] }
+                       { Id = "blue"
+                         Fields =
+                            [| { Name = "shade"
+                                 Values =
+                                    [| { Id = "light"; Fields = [||] }
+                                       { Id = "dark"; Fields = [||] } |] } |] } |] }
+
+            let _, fieldParser =
+                Parse.self2 (fun (valueParser, fieldParser) ->
+                    parser {
+                        let! id = Prop.req "id" Parse.string
+                        and! fields = Prop.req "fields" (Parse.array fieldParser)
+                        return { Id = id; Fields = fields }
+                    },
+                    parser {
+                        let! name = Prop.req "name" Parse.string
+                        and! values = Prop.req "values" (Parse.array valueParser)
+                        return { Name = name; Values = values }
+                    }
+                )
+
+            let actual =
+                fieldParser
+                |> Parser.parse json
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
