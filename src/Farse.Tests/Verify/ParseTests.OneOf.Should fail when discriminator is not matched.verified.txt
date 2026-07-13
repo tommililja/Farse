@@ -3,4 +3,4 @@
 Error[0]:
   at $
    | Tried parsing 'int.
-   | Missing parser for discriminator 'a'.
+   | Discriminator 'a' is missing a parser.
