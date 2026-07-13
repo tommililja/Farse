@@ -483,13 +483,13 @@ module ParseTests =
             Expect.equal Msg.none actual expected
 
         [<Fact>]
-        let ``Should fail when value is invalid2`` () =
+        let ``Should fail when value is invalid`` () =
             Parse.bigint
             |> Parser.parse "1.1"
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when element is not a number2`` () =
+        let ``Should fail when element is not a number`` () =
             Parse.bigint
             |> Parser.parse "true"
             |> Expect.parserError
