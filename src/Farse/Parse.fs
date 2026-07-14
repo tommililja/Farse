@@ -13,7 +13,7 @@ open System.Text.RegularExpressions
 module Parse =
 
     let private message<'r> article =
-        $"Expected %s{Article.asString article} %s{Type.getName typeof<'r>}."
+        $"Expected %s{article} %s{Type.getName typeof<'r>}."
 
     let inline internal customInternal fn expectedKind : Parser<'r> =
         Parser (fun element ->

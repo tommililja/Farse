@@ -69,17 +69,11 @@ module internal ExpectedKind =
         | ExpectedKind.String -> "String"
         | ExpectedKind.Undefined -> "Undefined"
 
-[<Struct>]
-type internal Article = A | An
-
+[<AutoOpen>]
 module internal Article =
 
     [<Literal>]
-    let a = "a"
+    let A = "a"
 
     [<Literal>]
-    let an = "an"
-
-    let asString = function
-        | A -> a
-        | An -> an
+    let An = "an"
