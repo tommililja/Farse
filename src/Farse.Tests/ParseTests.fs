@@ -1810,7 +1810,7 @@ module ParseTests =
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
-    module Self2 =
+    module Mutual =
 
         type Value = {
             Id: string
@@ -1878,7 +1878,7 @@ module ParseTests =
                                { Id = "large"; Fields = [||] } |] } |] }
 
             let valueParser, _ =
-                Parse.self2 (fun (valueParser, fieldParser) ->
+                Parse.mutual (fun (valueParser, fieldParser) ->
                     parser {
                         let! id = Prop.req "id" Parse.string
                         and! fields = Prop.req "fields" (Parse.array fieldParser)
@@ -1936,7 +1936,7 @@ module ParseTests =
                                        { Id = "dark"; Fields = [||] } |] } |] } |] }
 
             let _, fieldParser =
-                Parse.self2 (fun (valueParser, fieldParser) ->
+                Parse.mutual (fun (valueParser, fieldParser) ->
                     parser {
                         let! id = Prop.req "id" Parse.string
                         and! fields = Prop.req "fields" (Parse.array fieldParser)

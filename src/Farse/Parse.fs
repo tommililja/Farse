@@ -736,7 +736,7 @@ module Parse =
     /// <summary>Creates a parser that can reference itself.</summary>
     /// <example><code>let! x = "prop" &amp;= Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</code></example>
     /// <param name="fn">A function that receives a self-referencing parser.</param>
-    let self (fn:Parser<'r> -> Parser<'r>) =
+    let self fn =
         let self = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
         let parser = fn (Parser (fun element -> let (Parser parse) = self.Value in parse element))
         self.Value <- parser
@@ -745,7 +745,7 @@ module Parse =
     /// <summary>Creates two parsers that can reference each other.</summary>
     /// <example><code>
     /// let valueParser, fieldParser =
-    ///     Parse.self2 (fun (valueParser, fieldParser) ->
+    ///     Parse.mutual (fun (valueParser, fieldParser) ->
     ///         parser {
     ///             let! id = "id" &amp;= Parse.string
     ///             and! fields = "fields" &amp;= Parse.array fieldParser
@@ -758,8 +758,8 @@ module Parse =
     ///         }
     ///     )
     /// </code></example>
-    /// <param name="fn">A function that receives self-referencing parsers for both values.</param>
-    let self2 (fn:Parser<'a> * Parser<'b> -> Parser<'a> * Parser<'b>) =
+    /// <param name="fn">A function that receives forwarding parsers for both values.</param>
+    let mutual fn =
         let refA = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
         let refB = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
         let parserA = Parser (fun element -> let (Parser parse) = refA.Value in parse element)
