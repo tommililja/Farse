@@ -75,13 +75,13 @@ And the three (optional) operators.
 
 ```fsharp
 // Parses a required property.
-let (&=) = Prop.req
+let (&=) = Prop.get
 
 // Parses an optional property, returning an option.
-let (?=) = Prop.opt
+let (?=) = Prop.tryGet
 
 // Parses an optional property, distinguishing between a missing property and null value.
-let (??=) = Prop.tryOpt
+let (??=) = Prop.tryGet2
 ```
 
 We can create this simple parser.  

@@ -720,7 +720,7 @@ module Parse =
     /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
         customInternal (fun element ->
-            let (Parser parse) = Prop.req name string
+            let (Parser parse) = Prop.get name string
             match parse element with
             | Ok disc ->
                 let parser = List.tryFind (fun (key, _) -> key = disc) parsers

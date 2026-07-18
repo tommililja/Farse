@@ -1729,8 +1729,8 @@ module ParseTests =
             let actual =
                 Parse.oneOf "disc" [
                     "a", parser {
-                        let! a = Prop.req "prop2" Parse.int
-                        let! b = Prop.req "prop3" Parse.int
+                        let! a = Prop.get "prop2" Parse.int
+                        let! b = Prop.get "prop3" Parse.int
 
                         return A (a, b)
                     }
@@ -1743,8 +1743,8 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             let a =
                 parser {
-                    let! a = Prop.req "prop2" Parse.int
-                    let! b = Prop.req "prop3" Parse.int
+                    let! a = Prop.get "prop2" Parse.int
+                    let! b = Prop.get "prop3" Parse.int
 
                     return a, b
                 }
@@ -1784,13 +1784,13 @@ module ParseTests =
                     Parse.oneOf "type" [
                         "leaf",
                             parser {
-                                let! value = Prop.req "value" Parse.int
+                                let! value = Prop.get "value" Parse.int
                                 return Leaf value
                             }
                         "branch",
                             parser {
-                                let! left = Prop.req "left" self
-                                let! right = Prop.req "right" self
+                                let! left = Prop.get "left" self
+                                let! right = Prop.get "right" self
                                 return Branch (left, right)
                             }
                     ]
@@ -1880,13 +1880,13 @@ module ParseTests =
             let valueParser, _ =
                 Parse.mutual (fun (valueParser, fieldParser) ->
                     parser {
-                        let! id = Prop.req "id" Parse.string
-                        and! fields = Prop.req "fields" (Parse.array fieldParser)
+                        let! id = Prop.get "id" Parse.string
+                        and! fields = Prop.get "fields" (Parse.array fieldParser)
                         return { Id = id; Fields = fields }
                     },
                     parser {
-                        let! name = Prop.req "name" Parse.string
-                        and! values = Prop.req "values" (Parse.array valueParser)
+                        let! name = Prop.get "name" Parse.string
+                        and! values = Prop.get "values" (Parse.array valueParser)
                         return { Name = name; Values = values }
                     }
                 )
@@ -1938,13 +1938,13 @@ module ParseTests =
             let _, fieldParser =
                 Parse.mutual (fun (valueParser, fieldParser) ->
                     parser {
-                        let! id = Prop.req "id" Parse.string
-                        and! fields = Prop.req "fields" (Parse.array fieldParser)
+                        let! id = Prop.get "id" Parse.string
+                        and! fields = Prop.get "fields" (Parse.array fieldParser)
                         return { Id = id; Fields = fields }
                     },
                     parser {
-                        let! name = Prop.req "name" Parse.string
-                        and! values = Prop.req "values" (Parse.array valueParser)
+                        let! name = Prop.get "name" Parse.string
+                        and! values = Prop.get "values" (Parse.array valueParser)
                         return { Name = name; Values = values }
                     }
                 )
@@ -1966,15 +1966,15 @@ module ParseTests =
         let ``Should attempt to parse discriminated union`` () =
             let a =
                 parser {
-                    let! a = Prop.req "prop2" Parse.int
-                    let! b = Prop.req "prop3" Parse.int
+                    let! a = Prop.get "prop2" Parse.int
+                    let! b = Prop.get "prop3" Parse.int
 
                     return A (a, b)
                 }
 
             let b =
                 parser {
-                    let! b = Prop.req "prop" Parse.string
+                    let! b = Prop.get "prop" Parse.string
 
                     return B {| Prop = b |}
                 }

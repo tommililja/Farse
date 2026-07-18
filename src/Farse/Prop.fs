@@ -150,29 +150,29 @@ module Prop =
         )
 
     /// <summary>Parses a required property.</summary>
-    /// <example><code>let! int = Prop.req "prop.prop2" Parse.int</code></example>
+    /// <example><code>let! int = Prop.get "prop.prop2" Parse.int</code></example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let req path parser =
+    let get path parser =
         match path with
         | Prop name -> parse name parser
         | Path path -> traverse path parser
 
     /// <summary>Parses an optional property.</summary>
-    /// <example><code>let! int = Prop.opt "prop.prop2" Parse.int</code></example>
+    /// <example><code>let! int = Prop.tryGet "prop.prop2" Parse.int</code></example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let opt path parser =
+    let tryGet path parser =
         match path with
         | Prop name -> tryParse name parser
         | Path path -> tryTraverse path parser
 
     /// <summary>Parses an optional property.</summary>
     /// <remarks>Distinguishes between a missing property and a null value.</remarks>
-    /// <example><code>let! int = Prop.tryOpt "prop.prop2" Parse.int</code></example>
+    /// <example><code>let! int = Prop.tryGet2 "prop.prop2" Parse.int</code></example>
     /// <param name="path">The path to the property.</param>
     /// <param name="parser">The parser used to parse the property value.</param>
-    let tryOpt path parser =
+    let tryGet2 path parser =
         match path with
         | Prop name -> tryParseNull name parser
         | Path path -> tryTraverseNull path parser
