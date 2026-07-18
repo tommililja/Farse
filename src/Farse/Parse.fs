@@ -12,10 +12,10 @@ open System.Text.RegularExpressions
 
 module Parse =
 
-    let private message<'r> article =
+    let inline private message<'r> article =
         $"Expected %s{article} %s{Type.getName typeof<'r>}."
 
-    let inline internal customInternal fn expectedKind : Parser<'r> =
+    let inline private customInternal fn expectedKind : Parser<'r> =
         Parser (fun element ->
             match expectedKind with
             | ExpectedKind.Any
