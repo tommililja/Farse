@@ -19,13 +19,13 @@ module Parser =
     /// <remarks>This parser will always succeed.</remarks>
     /// <example><code>let! int = Parser.from 1</code></example>
     /// <param name="x">The value to return.</param>
-    let inline from x =
+    let from x =
         Parser (fun _ -> Ok x)
 
     /// <summary>Creates a parser from a result.</summary>
     /// <example><code>let! int = Ok 1 |> Parser.fromResult</code></example>
     /// <param name="x">The result to return.</param>
-    let inline fromResult x : Parser<'r> =
+    let fromResult x : Parser<'r> =
         Parser (fun element ->
             match x with
             | Ok x -> Ok x
@@ -38,14 +38,14 @@ module Parser =
     /// <summary>Creates a parser that will fail.</summary>
     /// <example><code>do! Parser.fail "message"</code></example>
     /// <param name="msg">The error message to return.</param>
-    let inline fail msg =
+    let fail msg =
         Error msg
         |> fromResult
 
     /// <summary>Recovers from an error with a default value.</summary>
     /// <example><code>let! int = "prop" &amp;= Parser.fail "msg" |> Parser.recover 0</code></example>
     /// <param name="x">The default value to return.</param>
-    let inline recover x (Parser parse) =
+    let recover x (Parser parse) =
         Parser (fun element ->
             match parse element with
             | Ok x -> Ok x
@@ -74,7 +74,7 @@ module Parser =
 
     /// <summary>Ignores a parsed value.</summary>
     /// <example><code>do! "prop" &amp;= Parse.int |> Parser.ignore</code></example>
-    let inline ignore<'r> (Parser parse) =
+    let ignore<'r> (Parser parse) =
         Parser (fun element ->
             match parse element with
             | Ok (_:'r) -> Ok ()
@@ -84,7 +84,7 @@ module Parser =
     /// <summary>Returns the parsed value or a default value.</summary>
     /// <example><code>let! int = "prop" ?= Parse.int |> Parser.defaultValue 0</code></example>
     /// <param name="x">The default value to return.</param>
-    let inline defaultValue x (Parser parse) =
+    let defaultValue x (Parser parse) =
         Parser (fun element ->
             match parse element with
             | Ok (Some x) -> Ok x
@@ -95,7 +95,7 @@ module Parser =
     /// <summary>Returns the parsed value or a default value from a function.</summary>
     /// <example><code>let! int = "prop" ?= Parse.int |> Parser.defaultWith (fun () -> 0)</code></example>
     /// <param name="fn">The function to run.</param>
-    let inline defaultWith fn (Parser parse) =
+    let inline defaultWith ([<InlineIfLambda>] fn) (Parser parse) =
         Parser (fun element ->
             match parse element with
             | Ok (Some x) -> Ok x

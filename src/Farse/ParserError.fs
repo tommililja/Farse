@@ -54,7 +54,7 @@ module ParseError =
             Exn = None
         }
 
-    let invalid details type' element =
+    let internal invalid details type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
