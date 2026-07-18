@@ -106,6 +106,11 @@ module internal Extensions =
     [<AutoOpen>]
     module ActivePatterns =
 
+        let (|Equals|_|) actual expected =
+            if expected = ExpectedKind.fromKind actual
+            then Some ()
+            else None
+
         let (|Prop|Path|) (string:string) =
             if string.Contains('.')
             then Path (string.Split('.', StringSplitOptions.RemoveEmptyEntries))

@@ -17,19 +17,15 @@ module Parse =
 
     let inline internal customInternal fn expectedKind : Parser<'r> =
         Parser (fun element ->
-            let actual = ExpectedKind.fromKind element.ValueKind
-            let isExpectedKind =
-                match expectedKind with
-                | ExpectedKind.Any -> true
-                | expected -> expected = actual
-
-            if isExpectedKind then
+            match expectedKind with
+            | ExpectedKind.Any
+            | Equals element.ValueKind ->
                 try fn element
                 with ex ->
                     element
                     |> ParseError.invalidEx ex typeof<'r>
                     |> Error.list
-            else
+            | _ ->
                 element
                 |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
                 |> Error.list
