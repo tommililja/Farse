@@ -244,5 +244,5 @@ module ParserTests =
         [<Fact>]
         let ``Should fail when parsing invalid JSON async`` () =
             Parse.int
-            |> Parser.parseWithAsync (MemoryStream.create "[ 1, 2, 3, ]") CancellationToken.None options
+            |> Parser.parseWithAsync (MemoryStream.create "[ 1, 2, 3, ]") options CancellationToken.None
             |> Task.bind Expect.parserError

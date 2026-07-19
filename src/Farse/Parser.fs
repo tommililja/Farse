@@ -117,11 +117,11 @@ module Parser =
             | :? ArgumentNullException as exn -> Error <| Json exn
 
     /// <summary>Parses a JSON stream asynchronously.</summary>
-    /// <example><code>let! result = Parser.parseWithAsync stream ct options parser</code></example>
+    /// <example><code>let! result = Parser.parseWithAsync stream options ct parser</code></example>
     /// <param name="stream">The JSON stream to parse.</param>
-    /// <param name="token">The CancellationToken to monitor.</param>
     /// <param name="options">The JsonDocumentOptions to use.</param>
-    let parseWithAsync stream token options (Parser parse) =
+    /// <param name="token">The CancellationToken to monitor.</param>
+    let parseWithAsync stream options token (Parser parse) =
         task {
             try
                 use! document = JsonDocument.ParseAsync(stream, options, token)
@@ -160,4 +160,4 @@ module Parser =
     /// <param name="token">The CancellationToken to monitor.</param>
     /// <param name="parser">The Parser to use.</param>
     let parseAsync stream token parser =
-        parseWithAsync stream token JsonDocumentOptions.preset parser
+        parseWithAsync stream JsonDocumentOptions.preset token parser
