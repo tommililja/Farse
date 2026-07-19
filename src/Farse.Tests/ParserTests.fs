@@ -171,48 +171,78 @@ module ParserTests =
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
         Expect.equal Msg.none actual expected
 
-    [<Fact>]
-    let ``Should fail when parsing invalid JSON`` () =
-        Parse.int
-        |> Parser.parse "invalid"
-        |> Expect.parserError
+    module Parse =
 
-    [<Fact>]
-    let ``Should fail when parsing a null string`` () =
-        Parse.int
-        |> Parser.parse null
-        |> Expect.parserError
+        [<Fact>]
+        let ``Should fail when parsing invalid JSON`` () =
+            Parse.int
+            |> Parser.parse "invalid"
+            |> Expect.parserError
 
-    [<Fact>]
-    let ``Should fail when parsing an empty string`` () =
-        Parse.int
-        |> Parser.parse String.Empty
-        |> Expect.parserError
+        [<Fact>]
+        let ``Should fail when parsing a null string`` () =
+            Parse.int
+            |> Parser.parse null
+            |> Expect.parserError
 
-    [<Fact>]
-    let ``Should parse JSON async`` () =
-        Parse.int
-        |> Parser.parseAsync (MemoryStream.create "1") CancellationToken.None
-        |> Task.map (fun x ->
-            let expected = 1
-            let actual = Expect.wantOk $"Expected %s{nameof Parser.parseAsync} to succeed." x
-            Expect.equal Msg.none actual expected
-        )
+        [<Fact>]
+        let ``Should fail when parsing an empty string`` () =
+            Parse.int
+            |> Parser.parse String.Empty
+            |> Expect.parserError
 
-    [<Fact>]
-    let ``Should fail when parsing invalid JSON async`` () =
-        Parse.int
-        |> Parser.parseAsync (MemoryStream.create "invalid") CancellationToken.None
-        |> Task.bind Expect.parserError
+    module ParseWith =
 
-    [<Fact>]
-    let ``Should fail when parsing a null stream async`` () =
-        Parse.int
-        |> Parser.parseAsync null CancellationToken.None
-        |> Task.bind Expect.parserError
+        let private options =
+            JsonDocumentOptions (
+                AllowTrailingCommas = false
+            )
 
-    [<Fact>]
-    let ``Should fail when parsing an empty string async`` () =
-        Parse.int
-        |> Parser.parseAsync (MemoryStream.create String.Empty) CancellationToken.None
-        |> Task.bind Expect.parserError
+        [<Fact>]
+        let ``Should fail when parsing invalid JSON`` () =
+            Parse.list Parse.int
+            |> Parser.parseWith "[ 1, 2, 3, ]" options
+            |> Expect.parserError
+
+    module ParseAsync =
+
+        [<Fact>]
+        let ``Should parse JSON async`` () =
+            Parse.int
+            |> Parser.parseAsync (MemoryStream.create "1") CancellationToken.None
+            |> Task.map (fun x ->
+                let expected = 1
+                let actual = Expect.wantOk $"Expected %s{nameof Parser.parseAsync} to succeed." x
+                Expect.equal Msg.none actual expected
+            )
+
+        [<Fact>]
+        let ``Should fail when parsing invalid JSON async`` () =
+            Parse.int
+            |> Parser.parseAsync (MemoryStream.create "invalid") CancellationToken.None
+            |> Task.bind Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing a null stream async`` () =
+            Parse.int
+            |> Parser.parseAsync null CancellationToken.None
+            |> Task.bind Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing an empty string async`` () =
+            Parse.int
+            |> Parser.parseAsync (MemoryStream.create String.Empty) CancellationToken.None
+            |> Task.bind Expect.parserError
+
+    module ParseWithAsync =
+
+        let private options =
+            JsonDocumentOptions (
+                AllowTrailingCommas = false
+            )
+
+        [<Fact>]
+        let ``Should fail when parsing invalid JSON async`` () =
+            Parse.int
+            |> Parser.parseWithAsync (MemoryStream.create "[ 1, 2, 3, ]") CancellationToken.None options
+            |> Task.bind Expect.parserError

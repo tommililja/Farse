@@ -104,11 +104,12 @@ module Parser =
         )
 
     /// <summary>Parses a JSON string.</summary>
-    /// <example><code>let result = Parser.parse json parser</code></example>
+    /// <example><code>let result = Parser.parseWith json options parser</code></example>
     /// <param name="json">The JSON string to parse.</param>
-    let parse ([<StringSyntax("Json")>] json:string) (Parser parse) =
+    /// <param name="options">The JsonDocumentOptions to use.</param>
+    let parseWith ([<StringSyntax("Json")>] json:string) options (Parser parse) =
         try
-            use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
+            use document = JsonDocument.Parse(json, options)
             parse document.RootElement
             |> Result.mapError Errors
         with
@@ -116,13 +117,14 @@ module Parser =
             | :? ArgumentNullException as exn -> Error <| Json exn
 
     /// <summary>Parses a JSON stream asynchronously.</summary>
-    /// <example><code>let! result = Parser.parseAsync stream ct parser</code></example>
+    /// <example><code>let! result = Parser.parseWithAsync stream ct options parser</code></example>
     /// <param name="stream">The JSON stream to parse.</param>
     /// <param name="token">The CancellationToken to monitor.</param>
-    let parseAsync stream token (Parser parse) =
+    /// <param name="options">The JsonDocumentOptions to use.</param>
+    let parseWithAsync stream token options (Parser parse) =
         task {
             try
-                use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
+                use! document = JsonDocument.ParseAsync(stream, options, token)
                 return
                     parse document.RootElement
                     |> Result.mapError Errors
@@ -130,3 +132,32 @@ module Parser =
                 | :? JsonException
                 | :? ArgumentNullException as exn -> return Error <| Json exn
         }
+
+    /// <summary>Parses a JSON string.</summary>
+    /// <remarks>Uses the following default JsonDocumentOptions.
+    /// <code>
+    ///     JsonDocumentOptions (
+    ///         AllowTrailingCommas = true,
+    ///         CommentHandling = JsonCommentHandling.Skip
+    ///     )
+    /// </code>
+    /// </remarks>
+    /// <example><code>let result = Parser.parse json parser</code></example>
+    /// <param name="json">The JSON string to parse.</param>
+    /// <param name="parser">The Parser to use.</param>
+    let parse ([<StringSyntax("Json")>] json:string) parser =
+        parseWith json JsonDocumentOptions.preset parser
+
+    /// <summary>Parses a JSON stream asynchronously.</summary>
+    /// <remarks>Uses the following default JsonDocumentOptions.<code>
+    ///     JsonDocumentOptions (
+    ///         AllowTrailingCommas = true,
+    ///         CommentHandling = JsonCommentHandling.Skip
+    ///     )
+    /// </code></remarks>
+    /// <example><code>let! result = Parser.parseAsync stream ct parser</code></example>
+    /// <param name="stream">The JSON stream to parse.</param>
+    /// <param name="token">The CancellationToken to monitor.</param>
+    /// <param name="parser">The Parser to use.</param>
+    let parseAsync stream token parser =
+        parseWithAsync stream token JsonDocumentOptions.preset parser
