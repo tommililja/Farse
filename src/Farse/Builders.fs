@@ -29,48 +29,6 @@ module internal Builders =
 
         member inline _.Bind(x, [<InlineIfLambda>] fn) = Result.bind fn x
 
-        member inline _.Bind2(a, b, [<InlineIfLambda>] fn) =
-            match a, b with
-            | Ok a, Ok b -> fn (a, b)
-            | a, b ->
-                Error [
-                    match a with Error e -> yield! e | _ -> ()
-                    match b with Error e -> yield! e | _ -> ()
-                ]
-
-        member inline _.Bind3(a, b, c, [<InlineIfLambda>] fn) =
-            match a, b, c with
-            | Ok a, Ok b, Ok c -> fn (a, b, c)
-            | a, b, c ->
-                Error [
-                    match a with Error e -> yield! e | _ -> ()
-                    match b with Error e -> yield! e | _ -> ()
-                    match c with Error e -> yield! e | _ -> ()
-                ]
-
-        member inline _.Bind4(a, b, c, d, [<InlineIfLambda>] fn) =
-            match a, b, c, d with
-            | Ok a, Ok b, Ok c, Ok d -> fn (a, b, c, d)
-            | a, b, c, d ->
-                Error [
-                    match a with Error e -> yield! e | _ -> ()
-                    match b with Error e -> yield! e | _ -> ()
-                    match c with Error e -> yield! e | _ -> ()
-                    match d with Error e -> yield! e | _ -> ()
-                ]
-
-        member inline _.Bind5(a, b, c, d, e, [<InlineIfLambda>] fn) =
-            match a, b, c, d, e with
-            | Ok a, Ok b, Ok c, Ok d, Ok e -> fn (a, b, c, d, e)
-            | a, b, c, d, e ->
-                Error [
-                    match a with Error e -> yield! e | _ -> ()
-                    match b with Error e -> yield! e | _ -> ()
-                    match c with Error e -> yield! e | _ -> ()
-                    match d with Error e -> yield! e | _ -> ()
-                    match e with Error e -> yield! e | _ -> ()
-                ]
-
         member inline _.BindReturn(a, [<InlineIfLambda>] fn) =
             match a with
             | Ok a -> Ok <| fn a
