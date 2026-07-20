@@ -19,7 +19,7 @@ module ParserBuilder =
         member inline _.Bind2(Parser a, Parser b, [<InlineIfLambda>] fn) =
             Parser (fun element ->
                 match a element, b element with
-                | Ok a, Ok b -> element |> fn (a, b)
+                | Ok a, Ok b -> fn (a, b) |> run element
                 | a, b ->
                     Error [
                         match a with Error e -> yield! e | _ -> ()
@@ -30,7 +30,7 @@ module ParserBuilder =
         member inline _.Bind3(Parser a, Parser b, Parser c, [<InlineIfLambda>] fn) =
             Parser (fun element ->
                 match a element, b element, c element with
-                | Ok a, Ok b, Ok c -> element |> fn (a, b, c)
+                | Ok a, Ok b, Ok c -> fn (a, b, c) |> run element
                 | a, b, c ->
                     Error [
                         match a with Error e -> yield! e | _ -> ()
@@ -42,7 +42,7 @@ module ParserBuilder =
         member inline _.Bind4(Parser a, Parser b, Parser c, Parser d, [<InlineIfLambda>] fn) =
             Parser (fun element ->
                 match a element, b element, c element, d element with
-                | Ok a, Ok b, Ok c, Ok d -> element |> fn (a, b, c, d)
+                | Ok a, Ok b, Ok c, Ok d -> fn (a, b, c, d) |> run element
                 | a, b, c, d ->
                     Error [
                         match a with Error e -> yield! e | _ -> ()
@@ -55,7 +55,7 @@ module ParserBuilder =
         member inline _.Bind5(Parser a, Parser b, Parser c, Parser d, Parser e, [<InlineIfLambda>] fn) =
             Parser (fun element ->
                 match a element, b element, c element, d element, e element with
-                | Ok a, Ok b, Ok c, Ok d, Ok e -> element |> fn (a, b, c, d, e)
+                | Ok a, Ok b, Ok c, Ok d, Ok e -> fn (a, b, c, d, e) |> run element
                 | a, b, c, d, e ->
                     Error [
                         match a with Error e -> yield! e | _ -> ()
