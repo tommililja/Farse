@@ -65,7 +65,7 @@ module Prop =
                 |> Error.list
         )
 
-    let private tryParseNull (name:string) (Parser parse) : Parser<'r option option> =
+    let private tryParse2 (name:string) (Parser parse) : Parser<'r option option> =
         Parser (fun element ->
             match element.ValueKind with
             | Kind.Object ->
@@ -128,7 +128,7 @@ module Prop =
                 |> Error.list
         )
 
-    let private tryTraverseNull path (Parser parse) : Parser<'r option option> =
+    let private tryTraverse2 path (Parser parse) : Parser<'r option option> =
         Parser (fun element ->
             match fold path element with
             | element, count when element.isNull && count = path.Length -> Ok <| Some None
@@ -151,8 +151,6 @@ module Prop =
 
     /// <summary>Parses a required property.</summary>
     /// <example><code>let! int = Prop.get "prop.prop2" Parse.int</code></example>
-    /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
     let get path parser =
         match path with
         | Prop name -> parse name parser
@@ -160,8 +158,6 @@ module Prop =
 
     /// <summary>Parses an optional property.</summary>
     /// <example><code>let! int = Prop.tryGet "prop.prop2" Parse.int</code></example>
-    /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
     let tryGet path parser =
         match path with
         | Prop name -> tryParse name parser
@@ -170,9 +166,7 @@ module Prop =
     /// <summary>Parses an optional property.</summary>
     /// <remarks>Distinguishes between a missing property and a null value.</remarks>
     /// <example><code>let! int = Prop.tryGet2 "prop.prop2" Parse.int</code></example>
-    /// <param name="path">The path to the property.</param>
-    /// <param name="parser">The parser used to parse the property value.</param>
     let tryGet2 path parser =
         match path with
-        | Prop name -> tryParseNull name parser
-        | Path path -> tryTraverseNull path parser
+        | Prop name -> tryParse2 name parser
+        | Path path -> tryTraverse2 path parser

@@ -41,8 +41,6 @@ module Parse =
     ///         | result -> Error result.Exception.Message
     ///     ) ExpectedKind.String
     /// </code></example>
-    /// <param name="fn">The parsing function.</param>
-    /// <param name="expectedKind">The expected element kind.</param>
     let custom fn expectedKind : Parser<'r> =
         customInternal (fun element ->
             match fn element with
@@ -128,7 +126,6 @@ module Parse =
 
     /// <summary>Parses a string as System.String that matches a regular expression.</summary>
     /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
-    /// <param name="regex">The regular expression to match.</param>
     let regex ([<StringSyntax("Regex")>] regex:string) =
         custom (fun element ->
             try
@@ -191,7 +188,6 @@ module Parse =
 
     /// <summary>Parses a string as System.Guid with a specific format.</summary>
     /// <example><code>let! guid = "prop" &amp;= Parse.guidExact "N"</code></example>
-    /// <param name="format">The required format.</param>
     let guidExact ([<StringSyntax("GuidFormat")>] format:string) =
         custom (fun element ->
             let string = element.GetString()
@@ -282,7 +278,6 @@ module Parse =
 
     /// <summary>Parses a string as System.TimeOnly with a specific format.</summary>
     /// <example><code>let! timeOnly = "prop" &amp;= Parse.timeOnlyExact "HH:mm:ss"</code></example>
-    /// <param name="format">The required format.</param>
     let timeOnlyExact ([<StringSyntax("TimeOnlyFormat")>] format:string) =
         custom (fun element ->
             let string = element.GetString()
@@ -303,7 +298,6 @@ module Parse =
 
     /// <summary>Parses a string as System.TimeSpan with a specific format.</summary>
     /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpanExact "c"</code></example>
-    /// <param name="format">The required format.</param>
     let timeSpanExact ([<StringSyntax("TimeSpanFormat")>] format:string) =
         custom (fun element ->
             let string = element.GetString()
@@ -324,7 +318,6 @@ module Parse =
 
     /// <summary>Parses a string as System.DateOnly with a specific format.</summary>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnlyExact "yyyy-MM-dd"</code></example>
-    /// <param name="format">The required format.</param>
     let dateOnlyExact ([<StringSyntax("DateOnlyFormat")>] format:string) =
         custom (fun element ->
             let string = element.GetString()
@@ -353,7 +346,6 @@ module Parse =
 
     /// <summary>Parses a string as System.DateTime with a specific format.</summary>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
-    /// <param name="format">The required format.</param>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
             let string = element.GetString()
@@ -382,7 +374,6 @@ module Parse =
 
     /// <summary>Parses a string as System.DateTimeOffset with a specific format.</summary>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</code></example>
-    /// <param name="format">The required format.</param>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         custom (fun element ->
             let string = element.GetString()
@@ -413,7 +404,6 @@ module Parse =
 
     /// <summary>Parses a string as System.Uri with a specific kind.</summary>
     /// <example><code>let! uri = "prop" &amp;= Parse.uri UriKind.Absolute</code></example>
-    /// <param name="kind">The expected kind.</param>
     let uri (kind:UriKind) =
         custom (fun element ->
             let string = element.GetString()
@@ -516,33 +506,26 @@ module Parse =
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.list.</summary>
     /// <example><code>let! list = "prop" &amp;= Parse.list Parse.int</code></example>
-    /// <param name="parser">The parser used for every element.</param>
     let list parser = arr List.ofSeq parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Core.array.</summary>
     /// <example><code>let! array = "prop" &amp;= Parse.array Parse.int</code></example>
-    /// <param name="parser">The parser used for every element.</param>
     let array parser = arr id parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.Set.</summary>
     /// <example><code>let! set = "prop" &amp;= Parse.set Parse.int</code></example>
-    /// <param name="parser">The parser used for every element.</param>
     let set parser = arr Set.ofSeq parser
 
     /// <summary>Parses an array as System.Collections.Generic.HashSet.</summary>
     /// <example><code>let! hashSet = "prop" &amp;= Parse.hashSet Parse.int</code></example>
-    /// <param name="parser">The parser used for every element.</param>
     let hashSet parser = arr HashSet parser
 
     /// <summary>Parses an array as Microsoft.FSharp.Collections.seq.</summary>
     /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
-    /// <param name="parser">The parser used for every element.</param>
     let seq parser = arr Seq.ofSeq parser
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.index 0 Parse.int</code></example>
-    /// <param name="n">The index to parse in the array.</param>
-    /// <param name="parser">The parser used for the element.</param>
     let index n parser : Parser<'r> =
         customInternal (fun (element:JsonElement) ->
             match element.GetArrayLength() with
@@ -606,22 +589,18 @@ module Parse =
 
     /// <summary>Parses an object's properties as Microsoft.FSharp.Collections.Map.</summary>
     /// <example><code>let! map = "prop" &amp;= Parse.map Parse.int</code></example>
-    /// <param name="parser">The parser used for every property value.</param>
     let map parser = keyValue Map.ofSeq parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.IDictionary.</summary>
     /// <example><code>let! dict = "prop" &amp;= Parse.dict Parse.int</code></example>
-    /// <param name="parser">The parser used for every property value.</param>
     let dict parser = keyValue dict parser
 
     /// <summary>Parses an object's properties as System.Collections.Generic.KeyValuePair seq.</summary>
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
-    /// <param name="parser">The parser used for every property value.</param>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
     /// <summary>Parses an object's properties as tuple Microsoft.FSharp.Collections.seq.</summary>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
-    /// <param name="parser">The parser used for every property value.</param>
     let tuples parser = keyValue Seq.ofSeq parser
 
     /// <summary>Parses an object's keys as System.String Microsoft.FSharp.Collections.seq.</summary>
@@ -642,8 +621,6 @@ module Parse =
 
     /// <summary>Parses an array with two values as a tuple.</summary>
     /// <example><code>let! tuple = "prop" &amp;= Parse.tuple2 Parse.int Parse.string</code></example>
-    /// <param name="a">The parser used for the first value.</param>
-    /// <param name="b">The parser used for the second value.</param>
     let tuple2 a b =
         tuple 2 (fun e ->
             result {
@@ -656,9 +633,6 @@ module Parse =
 
     /// <summary>Parses an array with three values as a tuple of three.</summary>
     /// <example><code>let! tuple = "prop" &amp;= Parse.tuple3 Parse.int Parse.string Parse.bool</code></example>
-    /// <param name="a">The parser used for the first value.</param>
-    /// <param name="b">The parser used for the second value.</param>
-    /// <param name="c">The parser used for the third value.</param>
     let tuple3 a b c =
         tuple 3 (fun e ->
             result {
@@ -672,10 +646,6 @@ module Parse =
 
     /// <summary>Parses an array with four values as a tuple of four.</summary>
     /// <example><code>let! tuple = "prop" &amp;= Parse.tuple4 Parse.int Parse.string Parse.bool Parse.float</code></example>
-    /// <param name="a">The parser used for the first value.</param>
-    /// <param name="b">The parser used for the second value.</param>
-    /// <param name="c">The parser used for the third value.</param>
-    /// <param name="d">The parser used for the fourth value.</param>
     let tuple4 a b c d =
         tuple 4 (fun e ->
             result {
@@ -690,11 +660,6 @@ module Parse =
 
     /// <summary>Parses an array with five values as a tuple of five.</summary>
     /// <example><code>let! tuple = "prop" &amp;= Parse.tuple5 Parse.int Parse.string Parse.bool Parse.float Parse.int</code></example>
-    /// <param name="a">The parser used for the first value.</param>
-    /// <param name="b">The parser used for the second value.</param>
-    /// <param name="c">The parser used for the third value.</param>
-    /// <param name="d">The parser used for the fourth value.</param>
-    /// <param name="e">The parser used for the fifth value.</param>
     let tuple5 a b c d e =
         tuple 5 (fun el ->
             result {
@@ -712,8 +677,6 @@ module Parse =
 
     /// <summary>Parses an object based on a discriminator property.</summary>
     /// <example><code>let! x = Parse.oneOf "type" [ "a", a; "b", b ]</code></example>
-    /// <param name="name">The discriminator property name.</param>
-    /// <param name="parsers">The parsers to match the discriminator property against.</param>
     let oneOf name parsers : Parser<'r> =
         customInternal (fun element ->
             let (Parser parse) = Prop.get name string
@@ -731,7 +694,6 @@ module Parse =
 
     /// <summary>Creates a parser that can reference itself.</summary>
     /// <example><code>let! x = "prop" &amp;= Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</code></example>
-    /// <param name="fn">A function that receives a self-referencing parser.</param>
     let self fn =
         let self = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
         let parser = fn (Parser (fun element -> let (Parser parse) = self.Value in parse element))
@@ -754,7 +716,6 @@ module Parse =
     ///         }
     ///     )
     /// </code></example>
-    /// <param name="fn">A function that receives forwarding parsers for both values.</param>
     let mutual fn =
         let refA = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
         let refB = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
@@ -768,7 +729,6 @@ module Parse =
     /// <summary>Parses an element by trying each parser in order.</summary>
     /// <remarks>Returns the first that succeeds.</remarks>
     /// <example><code>let! x = Parse.attempt [ a; b ]</code></example>
-    /// <param name="parsers">The list of parsers to try.</param>
     let attempt parsers : Parser<'r> =
         Parser (fun element ->
             match parsers with
@@ -793,7 +753,6 @@ module Parse =
 
     /// <summary>Parses an optional value but returns a default value when null.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
-    /// <param name="x">The default value.</param>
     let nil (Parser parse) x =
         Parser (fun (element:JsonElement) ->
             match element.ValueKind with
@@ -815,7 +774,6 @@ module Parse =
 
     /// <summary>Refines a parsed value.</summary>
     /// <example><code>let! type' = "prop" &amp;= Parse.refine Parse.string Type.fromString</code></example>
-    /// <param name="fn">The validation function.</param>
     let refine (Parser parse) fn : Parser<'r> =
         Parser (fun element ->
             match parse element with
@@ -831,8 +789,6 @@ module Parse =
 
     /// <summary>Verifies a parsed value.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.verify Parse.int (fun x -> x > 0) "message"</code></example>
-    /// <param name="fn">The predicate.</param>
-    /// <param name="msg">The error message.</param>
     let verify (Parser parse) fn msg : Parser<'r> =
         Parser (fun element ->
             match parse element with
@@ -846,7 +802,6 @@ module Parse =
 
     /// <summary>Parses an exact value and returns FSharp.Core.Unit.</summary>
     /// <example><code>do! "prop" &amp;= Parse.exact Parse.int 1</code></example>
-    /// <param name="expected">The expected value.</param>
     let exact (Parser parse) (expected:'a) =
         Parser (fun element ->
             match parse element with

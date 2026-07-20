@@ -166,7 +166,6 @@ module ParseError =
 
     /// <summary>Converts a ParseError to a formatted string.</summary>
     /// <example><code>let string = ParseError.asString error</code></example>
-    /// <param name="error">The ParseError to convert.</param>
     let asString error =
         string {
             $"at %s{JsonPath.asString error.Path}"
@@ -188,7 +187,6 @@ type ParserError =
 module ParserError =
 
     /// <summary>Converts a ParserError to a formatted string.</summary>
-    /// <param name="error">The ParserError to convert.</param>
     let asString error =
         match error with
         | Json exn -> $"Could not parse JSON: %s{exn.Message}"
