@@ -102,6 +102,7 @@ module Parser =
             |> Result.mapError Errors
         with
             | :? JsonException
+            | :? ArgumentException
             | :? ArgumentNullException as exn -> Error <| Json exn
 
     /// <summary>Parses a JSON stream asynchronously with options.</summary>
@@ -115,6 +116,7 @@ module Parser =
                     |> Result.mapError Errors
             with
                 | :? JsonException
+                | :? ArgumentException
                 | :? ArgumentNullException as exn -> return Error <| Json exn
         }
 
