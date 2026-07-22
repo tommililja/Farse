@@ -80,11 +80,11 @@ let (&=) = Prop.get
 // Parses an optional property, returning an option.
 let (?=) = Prop.tryGet
 
-// Parses an optional property, distinguishing between a missing property and null value.
+// Parses an optional property, distinguishing between a missing property and a null value.
 let (??=) = Prop.tryGet2
 ```
 
-We can create this simple parser.  
+We can create this simple parser.
 
 ```fsharp
 open Farse
