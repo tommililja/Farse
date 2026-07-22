@@ -23,21 +23,21 @@ The benchmarks can be found [here](https://github.com/tommililja/Farse/blob/main
 ```shell
 BenchmarkDotNet v0.15.8, macOS Tahoe 26.5.2 (25F84) [Darwin 25.5.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
-.NET SDK 10.0.203
-  [Host]     : .NET 10.0.7 (10.0.7, 10.0.726.21808), Arm64 RyuJIT armv8.0-a DEBUG
-  DefaultJob : .NET 10.0.7 (10.0.7, 10.0.726.21808), Arm64 RyuJIT armv8.0-a
+.NET SDK 10.0.302
+  [Host]     : .NET 10.0.10 (10.0.10, 10.0.1026.32716), Arm64 RyuJIT armv8.0-a DEBUG
+  DefaultJob : .NET 10.0.10 (10.0.10, 10.0.1026.32716), Arm64 RyuJIT armv8.0-a
 ```
 
 ```shell
 | Method                 | Mean     | Ratio | Gen0     | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|---------:|--------:|----------:|------------:|
-| System.Text.Json       | 128.0 us |  0.82 |   6.1035 |       - |  37.57 KB |        0.86 |
-| Farse                  | 156.7 us |  1.00 |   7.0801 |       - |  43.86 KB |        1.00 |
-| System.Text.Json*      | 133.3 us |  0.85 |  17.3340 |  2.6855 | 106.53 KB |        2.43 |
-| Newtonsoft.Json*       | 226.2 us |  1.44 |  48.8281 |  7.3242 | 299.77 KB |        6.83 |
-| Thoth.System.Text.Json | 237.2 us |  1.51 |  65.9180 | 18.7988 | 405.13 KB |        9.24 |
-| Newtonsoft.Json        | 270.3 us |  1.73 |  86.9141 | 40.0391 | 534.38 KB |       12.18 |
-| Thoth.Json.Net         | 379.9 us |  2.42 | 111.3281 | 55.6641 | 684.98 KB |       15.62 |
+| System.Text.Json       | 140.2 us |  0.88 |   7.0801 |  0.7324 |  44.63 KB |        0.81 |
+| Farse                  | 159.3 us |  1.00 |   8.7891 |  1.2207 |  54.80 KB |        1.00 |
+| System.Text.Json*      | 121.9 us |  0.77 |  10.9863 |  1.4648 |  67.47 KB |        1.23 |
+| Newtonsoft.Json*       | 221.9 us |  1.39 |  41.5039 |  5.6152 | 254.46 KB |        4.64 |
+| Thoth.System.Text.Json | 241.6 us |  1.52 |  67.6270 | 16.8457 | 416.76 KB |        7.60 |
+| Newtonsoft.Json        | 270.5 us |  1.70 |  88.3789 | 34.6680 | 542.18 KB |        9.89 |
+| Thoth.Json.Net         | 374.0 us |  2.35 | 113.2813 | 33.2031 | 696.61 KB |       12.71 |
 
 * Serialization
 ```

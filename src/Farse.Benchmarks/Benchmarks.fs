@@ -26,9 +26,9 @@ type User = {
     Name: string
     Age: byte option
     Email: string
-    Profiles: Guid Set
+    Profiles: Guid array
     Subscription: Subscription
-    Tags: string list
+    Tags: string array
 }
 
 module BenchmarkData =
@@ -61,10 +61,122 @@ module BenchmarkData =
             ]
         )
 
+module NewtonsoftJson =
+
+    let asOption fn (t:JToken) =
+        match t with
+        | x when x.Type <> JTokenType.Null -> Some <| fn x
+        | _ -> None
+
+    let asArray fn (t:JToken) =
+        let array = t :?> JArray
+        let items = Array.zeroCreate array.Count
+        for i in 0 .. array.Count - 1 do
+            items[i] <- fn array[i]
+        items
+
+module SystemTextJson =
+
+    let asOption fn (e:JsonElement) =
+        match e with
+        | x when x.ValueKind <> JsonValueKind.Null -> Some <| fn x
+        | _ -> None
+
+    let asArray fn (e:JsonElement) =
+        let items = Array.zeroCreate <| e.GetArrayLength()
+        let mutable enumerator = e.EnumerateArray()
+        let mutable i = 0
+        while enumerator.MoveNext() do
+            items[i] <- fn enumerator.Current
+            i <- i + 1
+        items
+
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type ParserBenchmarks() =
 
-    let mutable json = String.Empty
+    let json =
+        BenchmarkData.json 100
+        |> Json.asString Indented
+
+    let farse =
+        parser {
+            let! id = "id" &= Parse.guid
+            and! name = "name" &= Parse.string
+            and! age = "age" ?= Parse.byte
+            and! email = "email" &= Parse.string
+            and! profiles = "profiles" &= Parse.array Parse.guid
+
+            and! subscription = "subscription" &= parser {
+                let! plan = "plan" &= Parse.string
+                and! isCanceled = "isCanceled" &= Parse.bool
+                and! renewsAt = "renewsAt" ?= Parse.dateTime
+
+                return {
+                    Plan = plan
+                    IsCanceled = isCanceled
+                    RenewsAt = renewsAt
+                }
+            }
+
+            and! tags = "tags" &= Parse.array Parse.string
+
+            return {
+                Id = id
+                Name = name
+                Age = age
+                Email = email
+                Profiles = profiles
+                Subscription = subscription
+                Tags = tags
+            }
+        }
+        |> Parse.array
+
+    let thothJsonNet =
+        let subscription =
+            Thoth.Json.Net.Decode.object (fun get ->
+                {
+                    Plan = get.Required.Field "plan" Thoth.Json.Net.Decode.string
+                    IsCanceled = get.Required.Field "isCanceled" Thoth.Json.Net.Decode.bool
+                    RenewsAt = get.Optional.Field "renewsAt" Thoth.Json.Net.Decode.datetimeLocal
+                }
+            )
+
+        Thoth.Json.Net.Decode.object (fun get ->
+            {
+                Id = get.Required.Field "id" Thoth.Json.Net.Decode.guid
+                Name = get.Required.Field "name" Thoth.Json.Net.Decode.string
+                Age = get.Optional.Field "age" Thoth.Json.Net.Decode.byte
+                Email = get.Required.Field "email" Thoth.Json.Net.Decode.string
+                Profiles = get.Required.Field "profiles" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.guid)
+                Subscription = get.Required.Field "subscription" subscription
+                Tags = get.Required.Field "tags" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.string)
+            }
+        )
+        |> Thoth.Json.Net.Decode.array
+
+    let thothSystemTextJson =
+        let subscription =
+            Decode.object (fun get ->
+                {
+                    Plan = get.Required.Field "plan" Decode.string
+                    IsCanceled = get.Required.Field "isCanceled" Decode.bool
+                    RenewsAt = get.Optional.Field "renewsAt" Decode.datetimeLocal
+                }
+            )
+
+        Decode.object (fun get ->
+            {
+                Id = get.Required.Field "id" Decode.guid
+                Name = get.Required.Field "name" Decode.string
+                Age = get.Optional.Field "age" Decode.byte
+                Email = get.Required.Field "email" Decode.string
+                Profiles = get.Required.Field "profiles" (Decode.array Decode.guid)
+                Subscription = get.Required.Field "subscription" subscription
+                Tags = get.Required.Field "tags" (Decode.array Decode.string)
+            }
+        )
+        |> Decode.array
 
     let options = JsonSerializerOptions (
         PropertyNameCaseInsensitive = true
@@ -75,12 +187,6 @@ type ParserBenchmarks() =
         settings.Converters.Add(CompactUnionJsonConverter())
         settings
 
-    [<GlobalSetup>]
-    member _.Setup() =
-        json <-
-            BenchmarkData.json 100
-            |> Json.asString Indented
-
     [<Benchmark(Description = "Newtonsoft.Json*")>]
     member _.NewtonsoftJsonSerialization() =
         JsonConvert.DeserializeObject<User array>(json, settings)
@@ -90,137 +196,63 @@ type ParserBenchmarks() =
         System.Text.Json.JsonSerializer.Deserialize<User array>(json, options)
 
     [<Benchmark(Description = "Newtonsoft.Json")>]
-    member this.NewtonsoftJson() =
-        let users = JArray.Parse(json)
-
-        let inline asOption fn (x:JToken) =
-            match x with
-            | x when x.Type <> JTokenType.Null -> Some <| fn x
-            | _ -> None
-
-        for user in users do
+    member _.NewtonsoftJson() =
+        JArray.Parse(json)
+        |> NewtonsoftJson.asArray (fun user ->
             let user = user :?> JObject
-            let _ = user.GetValue("id").Value<string>() |> Guid.Parse
-            let _ = user.GetValue("name").Value<string>()
-            let _ = user.GetValue("age") |> asOption _.Value<byte>()
-            let _ = user.GetValue("email") |> _.Value<string>()
-            let _ = user.GetValue("profiles") |> Seq.map (_.Value<string>() >> Guid.Parse)
-
             let subscription = user.GetValue("subscription") :?> JObject
-            let _ = subscription.GetValue("plan").Value<string>()
-            let _ = subscription.GetValue("isCanceled").Value<bool>()
-            let _ = subscription.GetValue("renewsAt") |> asOption _.Value<DateTime>()
-
-            let _ = user.GetValue("tags") |> Seq.map _.Value<string>()
-
-            ()
+            {
+                Id = user.GetValue("id").Value<string>() |> Guid.Parse
+                Name = user.GetValue("name").Value<string>()
+                Age = user.GetValue("age") |> NewtonsoftJson.asOption _.Value<byte>()
+                Email = user.GetValue("email").Value<string>()
+                Profiles = user.GetValue("profiles") |> NewtonsoftJson.asArray (_.Value<string>() >> Guid.Parse)
+                Subscription =
+                    {
+                        Plan = subscription.GetValue("plan").Value<string>()
+                        IsCanceled = subscription.GetValue("isCanceled").Value<bool>()
+                        RenewsAt = subscription.GetValue("renewsAt") |> NewtonsoftJson.asOption _.Value<DateTime>()
+                    }
+                Tags = user.GetValue("tags") |> NewtonsoftJson.asArray _.Value<string>()
+            }
+        )
 
     [<Benchmark(Description = "System.Text.Json")>]
     member _.SystemTextJson() =
         use doc = JsonDocument.Parse(json)
-        let users = doc.RootElement.EnumerateArray()
-
-        let inline asOption fn (x:JsonElement) =
-            match x with
-            | x when x.ValueKind <> JsonValueKind.Null -> Some <| fn x
-            | _ -> None
-
-        for user in users do
-            let _ = user.GetProperty("id").GetGuid()
-            let _ = user.GetProperty("name").GetString()
-            let _ = user.GetProperty("age") |> asOption _.GetByte()
-            let _ = user.GetProperty("email").GetString()
-            let _ = user.GetProperty("profiles").EnumerateArray() |> Seq.map _.GetGuid()
-
+        doc.RootElement
+        |> SystemTextJson.asArray (fun user ->
             let subscription = user.GetProperty("subscription")
-            let _ = subscription.GetProperty("plan").GetString()
-            let _ = subscription.GetProperty("isCanceled").GetBoolean()
-            let _ = subscription.GetProperty("renewsAt") |> asOption _.GetDateTime()
-
-            let _ = user.GetProperty("tags").EnumerateArray() |> Seq.map _.GetString()
-
-            ()
+            {
+                Id = user.GetProperty("id").GetGuid()
+                Name = user.GetProperty("name").GetString()
+                Age = user.GetProperty("age") |> SystemTextJson.asOption _.GetByte()
+                Email = user.GetProperty("email").GetString()
+                Profiles = user.GetProperty("profiles") |> SystemTextJson.asArray _.GetGuid()
+                Subscription = {
+                    Plan = subscription.GetProperty("plan").GetString()
+                    IsCanceled = subscription.GetProperty("isCanceled").GetBoolean()
+                    RenewsAt = subscription.GetProperty("renewsAt") |> SystemTextJson.asOption _.GetDateTime()
+                }
+                Tags = user.GetProperty("tags") |> SystemTextJson.asArray _.GetString()
+            }
+        )
 
     [<Benchmark(Description = "Thoth.Json.Net")>]
     member _.ThothJsonNet() =
-        let subscription =
-            Thoth.Json.Net.Decode.object (fun get ->
-                let _ = get.Required.Field "plan" Thoth.Json.Net.Decode.string
-                let _ = get.Required.Field "isCanceled" Thoth.Json.Net.Decode.bool
-                let _ = get.Optional.Field "renewsAt" Thoth.Json.Net.Decode.datetimeLocal
-
-                ()
-            )
-
-        let decoder =
-            Thoth.Json.Net.Decode.object (fun get ->
-                let _ = get.Required.Field "id" Thoth.Json.Net.Decode.guid
-                let _ = get.Required.Field "name" Thoth.Json.Net.Decode.string
-                let _ = get.Optional.Field "age" Thoth.Json.Net.Decode.byte
-                let _ = get.Required.Field "email" Thoth.Json.Net.Decode.string
-                let _ = get.Required.Field "profiles" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.guid)
-                let _ = get.Required.Field "subscription" subscription
-                let _ = get.Required.Field "tags" (Thoth.Json.Net.Decode.array Thoth.Json.Net.Decode.string)
-
-                ()
-            )
-
         json
-        |> Thoth.Json.Net.Decode.fromString (Thoth.Json.Net.Decode.array decoder)
+        |> Thoth.Json.Net.Decode.fromString thothJsonNet
         |> Result.defaultWith failwith
 
     [<Benchmark(Description = "Thoth.System.Text.Json")>]
     member _.ThothSystemTextJson() =
-        let subscription =
-            Decode.object (fun get ->
-                let _ = get.Required.Field "plan" Decode.string
-                let _ = get.Required.Field "isCanceled" Decode.bool
-                let _ = get.Optional.Field "renewsAt" Decode.datetimeLocal
-
-                ()
-            )
-
-        let decoder =
-            Decode.object (fun get ->
-                let _ = get.Required.Field "id" Decode.guid
-                let _ = get.Required.Field "name" Decode.string
-                let _ = get.Optional.Field "age" Decode.byte
-                let _ = get.Required.Field "email" Decode.string
-                let _ = get.Required.Field "profiles" (Decode.array Decode.guid)
-                let _ = get.Required.Field "subscription" subscription
-                let _ = get.Required.Field "tags" (Decode.array Decode.string)
-
-                ()
-            )
-
         json
-        |> System.Text.Json.Decode.fromString (Decode.array decoder)
+        |> System.Text.Json.Decode.fromString thothSystemTextJson
         |> Result.defaultWith failwith
 
     [<Benchmark(Description = "Farse", Baseline = true)>]
     member _.Farse() =
-        let parser =
-            parser {
-                let! _ = "id" &= Parse.guid
-                and! _ = "name" &= Parse.string
-                and! _ = "age" ?= Parse.byte
-                and! _ = "email" &= Parse.string
-                and! _ = "profiles" &= Parse.array Parse.guid
-                and! _ = "tags" &= Parse.array Parse.string
-
-                and! _ = "subscription" &= parser {
-                    let! _ = "plan" &= Parse.string
-                    and! _ = "isCanceled" &= Parse.bool
-                    and! _ = "renewsAt" ?= Parse.dateTime
-
-                    return ()
-                }
-
-                return ()
-            }
-
-        parser
-        |> Parse.array
+        farse
         |> Parser.parse json
         |> Result.mapError ParserError.asString
         |> Result.defaultWith failwith
