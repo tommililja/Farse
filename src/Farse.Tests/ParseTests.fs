@@ -2103,6 +2103,26 @@ module ParseTests =
             |> Parser.parse "1.1"
             |> Expect.parserError
 
+    module Catch =
+
+        [<Fact>]
+        let ``Should parse value as Some value`` () =
+            let expected = Some 1
+            let actual =
+                Parse.catch Parse.int
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse error as None`` () =
+            let expected = None
+            let actual =
+                Parse.catch Parse.int
+                |> Parser.parse "true"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
     module Refine =
 
         [<Fact>]

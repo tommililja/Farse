@@ -788,6 +788,15 @@ module Parse =
                 | Error e -> Error e
         )
 
+    /// <summary>Catches all errors.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.catch Parse.int</code></example>
+    let catch (Parser parse) =
+        Parser (fun element ->
+            match parse element with
+            | Ok x -> Ok <| Some x
+            | Error _ -> Ok None
+        )
+
     /// <summary>Refines a parsed value.</summary>
     /// <example><code>let! type' = "prop" &amp;= Parse.refine Parse.string Type.fromString</code></example>
     let refine (Parser parse) fn : Parser<'r> =
