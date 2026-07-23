@@ -1461,6 +1461,64 @@ module ParseTests =
             |> Parser.parse "{}"
             |> Expect.parserError
 
+    module First =
+
+        [<Fact>]
+        let ``Should parse array at first index`` () =
+            let expected = 1
+            let actual =
+                Parse.first Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when index is out of range`` () =
+            Parse.first Parse.int
+            |> Parser.parse "[]"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.first Parse.int
+            |> Parser.parse """[ "1", 2, 3 ]"""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.first Parse.int
+            |> Parser.parse "{}"
+            |> Expect.parserError
+
+    module Last =
+
+        [<Fact>]
+        let ``Should parse array at last index`` () =
+            let expected = 3
+            let actual =
+                Parse.last Parse.int
+                |> Parser.parse "[ 1, 2, 3 ]"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when index is out of range`` () =
+            Parse.last Parse.int
+            |> Parser.parse "[]"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.last Parse.int
+            |> Parser.parse """[ 1, 2, "3" ]"""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when element is not an array`` () =
+            Parse.last Parse.int
+            |> Parser.parse "{}"
+            |> Expect.parserError
+
     module Map =
 
         [<Fact>]

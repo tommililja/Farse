@@ -536,6 +536,22 @@ module Parse =
                 |> Error.list
         ) ExpectedKind.Array
 
+    /// <summary>Parses the first element of an array.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.first Parse.int</code></example>
+    let first parser = index 0 parser
+
+    /// <summary>Parses the last element of an array.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.last Parse.int</code></example>
+    let last parser : Parser<'r> =
+        customInternal (fun (element:JsonElement) ->
+            match element.GetArrayLength() with
+            | length when length > 0 -> parseIndex (length - 1) parser element
+            | _ ->
+                element
+                |> ParseError.invalidIndex 0 typeof<'r>
+                |> Error.list
+        ) ExpectedKind.Array
+
     // Key/Value
 
     let inline private getDuplicateKeys (pairs:('k * 'v) seq) =
