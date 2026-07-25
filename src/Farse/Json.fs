@@ -178,10 +178,9 @@ type JNum =
         match typeof<'a> with
         | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
         | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
-        | x when x = typeof<decimal> -> number.ToString(null, CultureInfo.InvariantCulture)
         | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
         | x when x = typeof<Half> -> number.ToString("G5", CultureInfo.InvariantCulture)
-        | _ -> number.ToString("D", CultureInfo.InvariantCulture)
+        | _ -> number.ToString(null, CultureInfo.InvariantCulture) // Safe default for decimal, integers and custom types.
         |> Json.JNum
 
 module internal JNil =
