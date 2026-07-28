@@ -1,6 +1,6 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing '(int * int * int).
-   | Expected a tuple of 3, but got 2.
+  Error[0]:
+    at $
+     | Tried parsing '(int * int * int).
+     | Expected a tuple of 3, but got 2.

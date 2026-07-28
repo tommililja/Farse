@@ -193,15 +193,15 @@ module ParserError =
         | Errors list ->
             let errors =
                 list
-                |> List.mapi (fun i e ->
-                    let string = ParseError.asString e
-                    let error =
-                        string.Split('\n')
-                        |> Array.map (sprintf "  %s")
-                        |> String.concat "\n"
+                |> List.mapi (fun i error ->
+                    let msg =
+                        error
+                        |> ParseError.asString
+                        |> String.indent 2
 
-                    $"Error[%i{i}]:\n%s{error}"
+                    $"Error[%i{i}]:\n%s{msg}"
                 )
                 |> String.concat "\n\n"
+                |> String.indent 2
 
-            $"Parser failed with %i{List.length list} error[s].\n\n%s{errors}"
+            $"Parser yielded %i{list.Length} error[s].\n\n%s{errors}"

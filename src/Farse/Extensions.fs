@@ -47,6 +47,11 @@ module internal Extensions =
             String.IsNullOrWhiteSpace(string)
             |> not
 
+        let inline indent n (string:string) =
+            string.Split('\n')
+            |> Array.map (fun line -> String.replicate n " " + line)
+            |> String.concat "\n"
+
     module Type =
 
         let private fromType = function

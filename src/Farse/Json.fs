@@ -47,14 +47,6 @@ module Json =
             |> JArr
         | other -> other
 
-    /// <summary>Compares two Json values.</summary>
-    /// <remarks>Properties are sorted in ascending order.</remarks>
-    /// <example><code>let equal = Json.equal x y</code></example>
-    let equal x y =
-        let x = sort x
-        let y = sort y
-        x = y
-
     /// <summary>Converts a JsonElement to a Json.</summary>
     /// <example><code>let json = Json.fromElement element</code></example>
     let rec fromElement (element:JsonElement) =
@@ -168,6 +160,99 @@ module Json =
     let asBytes format json =
         asString format json
         |> Encoding.UTF8.GetBytes
+
+    /// <summary>Determines whether two Json values are equal.</summary>
+    /// <remarks>Object properties are compared regardless of order.</remarks>
+    /// <example><code>let equal = Json.equal x y</code></example>
+    let equal x y =
+        let x = sort x
+        let y = sort y
+        x = y
+
+    /// <summary>Compares two Json values and returns a message when they differ.</summary>
+    /// <remarks>Properties are compared regardless of order.</remarks>
+    /// <example>
+    /// <code>
+    ///     match Json.diff x y with
+    ///     | Some msg -> failwith msg
+    ///     | None -> ()
+    /// </code>
+    /// </example>
+    let diff x y =
+        let render = function
+            | JStr str -> $"\"%s{str}\""
+            | JNum str -> str
+            | JBit bit -> bit.ToString().ToLower()
+            | JNil -> "null"
+            | other ->
+                asString Indented other
+                |> String.indent 4
+                |> (+) "\n"
+
+        let missing fn x y =
+            Set.difference x y
+            |> Set.toList
+            |> List.map fn
+
+        let pathKey path key =
+            $"%s{path}.%s{key}"
+
+        let renderDiff x y (path:string) =
+            string {
+                path
+                $"  x: %s{x}"
+                $"  y: %s{y}"
+            }
+
+        let rec diff path x y =
+            match x, y with
+            | JStr x, JStr y when x = y -> []
+            | JNum x, JNum y when x = y -> []
+            | JBit x, JBit y when x = y -> []
+            | JArr x, JArr y when x = y -> []
+            | JObj x, JObj y ->
+                let xKeys, xMap = x |> List.map fst |> Set.ofList, Map.ofList x
+                let yKeys, yMap = y |> List.map fst |> Set.ofList, Map.ofList y
+
+                let yMissing =
+                    missing (fun key ->
+                        pathKey path key
+                        |> renderDiff (render xMap[key]) "<missing>"
+                    ) xKeys yKeys
+
+                let xMissing =
+                    missing (fun key ->
+                        pathKey path key
+                        |> renderDiff "<missing>" (render yMap[key])
+                    ) yKeys xKeys
+
+                let differing =
+                    yKeys
+                    |> Set.intersect xKeys
+                    |> Set.toList
+                    |> List.sort
+                    |> List.collect (fun key -> diff (pathKey path key) xMap[key] yMap[key])
+
+                yMissing @ xMissing @ differing
+            | JArr x, JArr y when x.Length = y.Length ->
+                List.zip x y
+                |> List.mapi (fun i (x, y) -> diff $"%s{path}[%d{i}]" x y)
+                |> List.concat
+            | JNil, JNil -> []
+            | x, y ->
+                path
+                |> renderDiff (render x) (render y)
+                |> List.singleton
+
+        match diff "$" x y with
+        | [] -> None
+        | diffs ->
+            let list =
+                diffs
+                |> String.concat "\n\n"
+                |> String.indent 2
+
+            Some $"Diff yielded %i{diffs.Length} difference[s].\n\n%s{list}"
 
 [<AutoOpen>]
 type JNum =

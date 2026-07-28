@@ -1,7 +1,7 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing 'TimeOnly.
-   | Expected a TimeOnly string.
-   = "17:2845"
+  Error[0]:
+    at $
+     | Tried parsing 'TimeOnly.
+     | Expected a TimeOnly string.
+     = "17:2845"

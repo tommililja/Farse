@@ -1,0 +1,50 @@
+﻿Diff yielded 10 difference[s].
+
+  $.onlyInX
+    x: "present"
+    y: <missing>
+  
+  $.onlyInB
+    x: <missing>
+    y: "present"
+  
+  $.changed
+    x: 1
+    y: 2
+  
+  $.diffLengthArray
+    x: 
+      [
+          1,
+          2,
+          3
+      ]
+    y: 
+      [
+          1,
+          2
+      ]
+  
+  $.nested.onlyInX
+    x: "present"
+    y: <missing>
+  
+  $.nested.onlyInY
+    x: <missing>
+    y: "present"
+  
+  $.nested.changed
+    x: true
+    y: false
+  
+  $.nullVsValue
+    x: null
+    y: "now a string"
+  
+  $.same
+    x: 2
+    y: 1
+  
+  $.sameLengthArray[0].role
+    x: "Engineer"
+    y: "Manager"

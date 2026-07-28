@@ -35,6 +35,79 @@ module JsonTests =
         Expect.isFalse "Expected values to not be equal." equal
 
     [<Fact>]
+    let ``Should not be equal and return a message`` () =
+        let x =
+            JObj [
+                "same", JNum 2
+                "changed", JNum 1
+                "onlyInX", JStr "present"
+                "nested",
+                    JObj [
+                        "same", JBit true
+                        "changed", JBit true
+                        "onlyInX", JStr "present"
+                    ]
+                "sameArray", JArr [ JNum 1; JNum 2 ]
+                "sameLengthArray", JArr [ JObj [ "id", JNum 1; "role", JStr "Engineer" ]; JNum 2 ]
+                "diffLengthArray", JArr [ JNum 1; JNum 2; JNum 3 ]
+                "nullBoth", JNil
+                "nullVsValue", JNil
+            ]
+
+        let y =
+            JObj [
+                "same", JNum 1
+                "changed", JNum 2
+                "onlyInB", JStr "present"
+                "nested",
+                    JObj [
+                        "same", JBit true
+                        "changed", JBit false
+                        "onlyInY", JStr "present"
+                    ]
+                "sameArray", JArr [ JNum 1; JNum 2 ]
+                "sameLengthArray", JArr [ JObj [ "id", JNum 1; "role", JStr "Manager" ]; JNum 2 ]
+                "diffLengthArray", JArr [ JNum 1; JNum 2 ]
+                "nullBoth", JNil
+                "nullVsValue", JStr "now a string"
+            ]
+
+        Json.diff x y
+        |> Expect.wantSome $"Expected %s{nameof Json.diff} to return a message."
+        |> Expect.string
+
+    [<Fact>]
+    let ``Should be equal when object keys are in a different order`` () =
+        let x =
+            JObj [
+                "id", JNum 1
+                "name", JStr "Alice"
+                "active", JBit true
+                "nested",
+                    JObj [
+                        "x", JNum 1
+                        "y", JNum 2
+                    ]
+                "tags", JArr [ JStr "a"; JStr "b" ]
+            ]
+
+        let y =
+            JObj [
+                "tags", JArr [ JStr "a"; JStr "b" ]
+                "nested",
+                    JObj [
+                        "y", JNum 2
+                        "x", JNum 1
+                    ]
+                "active", JBit true
+                "id", JNum 1
+                "name", JStr "Alice"
+            ]
+
+        Json.diff x y
+        |> Expect.isNone Msg.none
+
+    [<Fact>]
     let ``Should create Json from JsonElement`` () =
         let expected = Json.asString Indented Data.example
         let actual =

@@ -1,6 +1,6 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing 'obj.
-   | Tried 3 parsers without success.
+  Error[0]:
+    at $
+     | Tried parsing 'obj.
+     | Tried 3 parsers without success.

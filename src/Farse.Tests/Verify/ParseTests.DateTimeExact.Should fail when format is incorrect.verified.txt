@@ -1,7 +1,7 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing 'DateTime.
-   | Expected a DateTime string (yyyy-MM-dd HH:mm:ss).
-   = "2025-05-13T17:28:45"
+  Error[0]:
+    at $
+     | Tried parsing 'DateTime.
+     | Expected a DateTime string (yyyy-MM-dd HH:mm:ss).
+     = "2025-05-13T17:28:45"

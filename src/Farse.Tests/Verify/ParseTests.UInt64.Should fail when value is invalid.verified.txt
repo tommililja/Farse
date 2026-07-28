@@ -1,7 +1,7 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing 'uint64.
-   | Expected a uint64.
-   = 1.1
+  Error[0]:
+    at $
+     | Tried parsing 'uint64.
+     | Expected a uint64.
+     = 1.1

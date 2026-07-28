@@ -1,6 +1,6 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing 'int.
-   | Discriminator 'a' is missing a parser.
+  Error[0]:
+    at $
+     | Tried parsing 'int.
+     | Discriminator 'a' is missing a parser.

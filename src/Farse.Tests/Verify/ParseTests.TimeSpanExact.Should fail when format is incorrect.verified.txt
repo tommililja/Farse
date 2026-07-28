@@ -1,7 +1,7 @@
-﻿Parser failed with 1 error[s].
+﻿Parser yielded 1 error[s].
 
-Error[0]:
-  at $
-   | Tried parsing 'TimeSpan.
-   | Expected a TimeSpan string (hh:mm:ss).
-   = "012845"
+  Error[0]:
+    at $
+     | Tried parsing 'TimeSpan.
+     | Expected a TimeSpan string (hh:mm:ss).
+     = "012845"
