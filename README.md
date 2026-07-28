@@ -434,6 +434,23 @@ let asJson user =
 ```
 > Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
 
+### Comparing
+
+There are a few different options for comparing two Json values.
+
+```fsharp
+// Strict
+let equal = x = y
+
+// Property order does not matter.
+let equal = Json.equal x y
+
+// Returns a diff message.
+match Json.diff x y with
+| Some msg -> failwith msg
+| None -> ()
+```
+
 ### From string
 
 Parsing a string to Json.
