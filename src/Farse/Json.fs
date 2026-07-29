@@ -108,13 +108,12 @@ module Json =
         | JBit bit -> JsonValue.Create(bit).Root
         | JObj obj ->
             let object = JsonObject()
-            for name, json in obj do
-                object.Add(name, asJsonNode json)
+            // Take last instead of throwing an exception.
+            for name, json in obj do object[name] <- asJsonNode json
             object.Root
         | JArr arr ->
             let array = JsonArray()
-            for json in arr do
-                array.Add(asJsonNode json)
+            for json in arr do array.Add(asJsonNode json)
             array.Root
         | JNil -> null
 
