@@ -442,10 +442,10 @@ There are a few different options for comparing two Json values.
 // Strict
 let equal = x = y
 
-// Property order does not matter.
+// Ignores property order.
 let equal = Json.equal x y
 
-// Returns a diff message.
+// Ignores property order, returns a diff message.
 match Json.diff x y with
 | Some msg -> failwith msg
 | None -> ()
