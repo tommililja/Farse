@@ -282,25 +282,25 @@ module Parse =
 ProfileId
 
 ```code
-Parser failed with 1 error[s].
+Parser yielded 1 error[s].
 
-Error[0]:
-  at $.profiles[1]
-   | Tried parsing 'ProfileId.
-   | Expected a Guid string.
-   = "invalid"
+  Error[0]:
+    at $.profiles[1]
+     | Tried parsing 'ProfileId.
+     | Expected a Guid string.
+     = "invalid"
 ```
 
 Instant
 
 ```code
-Parser failed with 1 error[s].
+Parser yielded 1 error[s].
 
-Error[0]:
-  at $.subscription.renewsAt
-   | Tried parsing 'Instant.
-   | The value string does not [...]
-   = "202612-25T10:30:00Z"
+  Error[0]:
+    at $.subscription.renewsAt
+     | Tried parsing 'Instant.
+     | The value string does not [...]
+     = "202612-25T10:30:00Z"
 ```
 
 ## One-of
@@ -350,25 +350,25 @@ let! tags = "tags" &= list (refine string Tag.fromString)
 Age
 
 ```code
-Parser failed with 1 error[s].
+Parser yielded 1 error[s].
 
-Error[0]:
-  at $.age
-   | Tried parsing 'Age.
-   | The minimum age is 12.
-   = 10
+  Error[0]:
+    at $.age
+     | Tried parsing 'Age.
+     | The minimum age is 12.
+     = 10
 ```
 
 Tag
 
 ```code
-Parser failed with 1 error[s].
+Parser yielded 1 error[s].
 
-Error[0]:
-  at $.tags[0]
-   | Tried parsing 'Tag.
-   | Tag 'user' not found.
-   = "user"
+  Error[0]:
+    at $.tags[0]
+     | Tried parsing 'Tag.
+     | Tag 'user' not found.
+     = "user"
 ```
 
 ## Creating JSON
