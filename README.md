@@ -460,12 +460,19 @@ let json =
     |> Result.defaultWith (_.Message >> failwith)
 ```
 
-Parsing asynchronously from a stream.
+Parsing asynchronously from a Stream.
 
 ```fsharp
 task {
-    let! result = Json.fromStreamAsync ct stream
-    return Result.defaultWith (_.Message >> failwith) result
+    let! result =
+        stream
+        |> Json.fromStreamAsync ct
+
+    let json =
+        result
+        |> Result.defaultWith (_.Message >> failwith)
+
+    return json
 }
 ```
 
@@ -484,7 +491,7 @@ type JsonFormat =
 let string = Json.asString Indented json
 ```
 
-Writing directly to a stream or buffer writer.
+Writing directly to a Stream or IBufferWriter.
 
 ```fsharp
 task {
