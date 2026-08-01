@@ -230,8 +230,6 @@ let user =
     |> Parser.parse json
     |> Result.mapError ParserError.asString
     |> Result.defaultWith failwith
-
-printf "%s" user.Name
 ```
 
 It can also be run asynchronously from a stream.
@@ -247,7 +245,7 @@ task {
         |> Result.mapError ParserError.asString
         |> Result.defaultWith failwith
 
-    return printf "%s" user.Name
+    return user
 }
 ```
 
