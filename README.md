@@ -464,15 +464,9 @@ Parsing asynchronously from a Stream.
 
 ```fsharp
 task {
-    let! result =
-        stream
-        |> Json.fromStreamAsync ct
+    let! result = Json.fromStreamAsync ct stream
 
-    let json =
-        result
-        |> Result.defaultWith (_.Message >> failwith)
-
-    return json
+    return Result.defaultWith (_.Message >> failwith) result
 }
 ```
 
