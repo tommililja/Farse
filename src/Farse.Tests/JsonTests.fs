@@ -214,7 +214,7 @@ module JsonTests =
         task {
             let stream = new MemoryStream()
             use writer = new Utf8JsonWriter(stream)
-            Json.asStringTo writer Data.example
+            Json.writeTo writer Data.example
             do! writer.FlushAsync()
             let expected = Json.asString Raw Data.example
             let actual = stream.ToArray() |> String.ofBytes

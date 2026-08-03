@@ -133,8 +133,8 @@ module Json =
             node.ToJsonString(options)
 
     /// <summary>Writes a Json to a Utf8JsonWriter.</summary>
-    /// <example><code>Json.asStringTo writer json</code></example>
-    let asStringTo (writer:Utf8JsonWriter) json =
+    /// <example><code>Json.writeTo writer json</code></example>
+    let writeTo (writer:Utf8JsonWriter) json =
         let rec write = function
             | JStr str -> writer.WriteStringValue(str)
             | JNum str -> writer.WriteRawValue(str)

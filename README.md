@@ -490,7 +490,7 @@ Writing directly to a Stream or IBufferWriter.
 ```fsharp
 task {
     use writer = new Utf8JsonWriter(ctx.Response.BodyWriter)
-    Json.asStringTo writer json
+    Json.writeTo writer json
     do! writer.FlushAsync()
 }
 ```
