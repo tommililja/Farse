@@ -63,6 +63,7 @@ module internal Extensions =
             | "UInt16" -> "uint16"
             | "UInt32" -> "uint"
             | "UInt64" -> "uint64"
+            | "UInt128" -> "uint128"
             | "Double" -> "float"
             | "Single" -> "float32"
             | "Boolean" -> "bool"

@@ -1,0 +1,7 @@
+﻿Parser yielded 1 error[s].
+
+  Error[0]:
+    at $
+     | Tried parsing 'uint128.
+     | Expected Number, but got Bool.
+     = true

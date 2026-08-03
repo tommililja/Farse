@@ -82,6 +82,16 @@ module Parse =
     /// <example><code>let! uint64 = "prop" &amp;= Parse.uint64</code></example>
     let uint64 = custom (_.TryGetUInt64 >> tryParse A) ExpectedKind.Number
 
+    /// <summary>Parses a number as System.UInt128.</summary>
+    /// <example><code>let! uint128 = "prop" &amp;= Parse.uint128</code></example>
+    let uint128 =
+        custom (fun element ->
+            let string = element.GetRawText()
+            match UInt128.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            | true, uint128 -> Ok uint128
+            | _ -> Error "Expected a uint128."
+        ) ExpectedKind.Number
+
     /// <summary>Parses a number as System.Double.</summary>
     /// <example><code>let! float = "prop" &amp;= Parse.float</code></example>
     let float = custom (_.TryGetDouble >> tryParse A) ExpectedKind.Number
