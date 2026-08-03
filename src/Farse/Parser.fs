@@ -119,7 +119,7 @@ module Parser =
                 | :? ArgumentNullException as exn -> return Error <| Json exn
         }
 
-    /// <summary>Parses a JSON string.</summary>
+    /// <summary>Parses a string.</summary>
     /// <remarks>Uses the following JsonDocumentOptions.
     /// <code>
     ///     JsonDocumentOptions (
@@ -132,13 +132,13 @@ module Parser =
     let parse ([<StringSyntax("Json")>] json:string) parser =
         parseDocument (fun () -> JsonDocument.Parse(json, JsonDocumentOptions.preset)) parser
 
-    /// <summary>Parses a JSON string with options.</summary>
+    /// <summary>Parses a string with options.</summary>
     /// <example><code>let result = Parser.parseWith json options parser</code></example>
     let parseWith ([<StringSyntax("Json")>] json:string) options parser =
         parseDocument (fun () -> JsonDocument.Parse(json, options)) parser
 
-    /// <summary>Parses a JSON stream asynchronously.</summary>
-    /// <remarks>Uses the following JsonDocumentOptions.
+    /// <summary>Parses a UTF-8 encoded stream asynchronously.</summary>
+    /// <remarks>The stream is read to completion.<br/><br/>Uses the following JsonDocumentOptions.
     /// <code>
     ///     JsonDocumentOptions (
     ///         AllowTrailingCommas = true,
@@ -149,12 +149,13 @@ module Parser =
     let parseAsync stream token parser =
         parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)) parser
 
-    /// <summary>Parses a JSON stream asynchronously with options.</summary>
+    /// <summary>Parses a UTF-8 encoded stream asynchronously with options.</summary>
+    /// <remarks>The stream is read to completion.</remarks>
     /// <example><code>let! result = Parser.parseWithAsync stream options token parser</code></example>
     let parseWithAsync stream options token parser =
         parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, options, token)) parser
 
-    /// <summary>Parses a byte array.</summary>
+    /// <summary>Parses a UTF-8 encoded byte array.</summary>
     /// <remarks>Uses the following JsonDocumentOptions.
     /// <code>
     ///     JsonDocumentOptions (
@@ -166,12 +167,12 @@ module Parser =
     let parseBytes (bytes:byte array) parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.preset)) parser
 
-    /// <summary>Parses a byte array with options.</summary>
+    /// <summary>Parses a UTF-8 encoded byte array with options.</summary>
     /// <example><code>let result = Parser.parseBytesWith bytes options parser</code></example>
     let parseBytesWith (bytes:byte array) options parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, options)) parser
 
-    /// <summary>Parses a ReadOnlyMemory of bytes.</summary>
+    /// <summary>Parses a UTF-8 encoded ReadOnlyMemory of bytes.</summary>
     /// <remarks>Uses the following JsonDocumentOptions.
     /// <code>
     ///     JsonDocumentOptions (
@@ -183,12 +184,12 @@ module Parser =
     let parseMemory (bytes:ReadOnlyMemory<byte>) parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.preset)) parser
 
-    /// <summary>Parses a ReadOnlyMemory of bytes with options.</summary>
+    /// <summary>Parses a UTF-8 encoded ReadOnlyMemory of bytes with options.</summary>
     /// <example><code>let result = Parser.parseMemoryWith bytes options parser</code></example>
     let parseMemoryWith (bytes:ReadOnlyMemory<byte>) options parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, options)) parser
 
-    /// <summary>Parses a ReadOnlySequence of bytes.</summary>
+    /// <summary>Parses a UTF-8 encoded ReadOnlySequence of bytes.</summary>
     /// <remarks>Uses the following JsonDocumentOptions.
     /// <code>
     ///     JsonDocumentOptions (
@@ -200,7 +201,7 @@ module Parser =
     let parseSequence (sequence:ReadOnlySequence<byte>) parser =
         parseDocument (fun () -> JsonDocument.Parse(sequence, JsonDocumentOptions.preset)) parser
 
-    /// <summary>Parses a ReadOnlySequence of bytes with options.</summary>
+    /// <summary>Parses a UTF-8 encoded ReadOnlySequence of bytes with options.</summary>
     /// <example><code>let result = Parser.parseSequenceWith sequence options parser</code></example>
     let parseSequenceWith (sequence:ReadOnlySequence<byte>) options parser =
         parseDocument (fun () -> JsonDocument.Parse(sequence, options)) parser

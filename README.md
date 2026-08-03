@@ -451,7 +451,7 @@ match Json.diff x y with
 
 ### From string
 
-Parsing a string to Json.
+Parsing a string into a Json.
 
 ```fsharp
 let json =
@@ -472,7 +472,7 @@ task {
 
 ### To string
 
-Converting Json to a string.
+Converting a Json into a string.
 
 ```fsharp
 type JsonFormat =
@@ -499,7 +499,7 @@ task {
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
-ParserError can be converted to a formatted string.
+ParserError can be converted into a formatted string.
 
 ```fsharp
 let msg = ParserError.asString error

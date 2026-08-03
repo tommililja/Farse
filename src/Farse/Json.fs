@@ -47,7 +47,7 @@ module Json =
             |> JArr
         | other -> other
 
-    /// <summary>Converts a JsonElement to a Json.</summary>
+    /// <summary>Converts a JsonElement into a Json.</summary>
     /// <example><code>let json = Json.fromElement element</code></example>
     let rec fromElement (element:JsonElement) =
         match element.ValueKind with
@@ -67,7 +67,7 @@ module Json =
             |> JArr
         | Kind.Null | Kind.Undefined -> JNil
 
-    /// <summary>Parses a JSON string to a Json.</summary>
+    /// <summary>Parses a string into a Json.</summary>
     /// <example><code>let result = Json.fromString json</code></example>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
@@ -77,7 +77,8 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Parses a JSON string asynchronously to a Json.</summary>
+    /// <summary>Parses a UTF-8 encoded stream asynchronously into a Json.</summary>
+    /// <remarks>The stream is read to completion.</remarks>
     /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     let fromStreamAsync token stream =
         task {
@@ -89,7 +90,7 @@ module Json =
                 | :? ArgumentNullException as exn -> return Error exn
         }
 
-    /// <summary>Parses a byte array to a Json.</summary>
+    /// <summary>Parses a UTF-8 encoded byte array into a Json.</summary>
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     let fromBytes (bytes:byte array) =
         try
@@ -99,7 +100,7 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Converts a Json to a JsonNode.</summary>
+    /// <summary>Converts a Json into a JsonNode.</summary>
     /// <example><code>let node = Json.asJsonNode json</code></example>
     let rec asJsonNode json =
         match json with
@@ -117,7 +118,7 @@ module Json =
             array.Root
         | JNil -> null
 
-    /// <summary>Converts a Json to a formatted JSON string.</summary>
+    /// <summary>Converts a Json into a formatted JSON string.</summary>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
         match asJsonNode json with
@@ -131,7 +132,7 @@ module Json =
 
             node.ToJsonString(options)
 
-    /// <summary>Writes a Json as a JSON string to a writer.</summary>
+    /// <summary>Writes a Json to a Utf8JsonWriter.</summary>
     /// <example><code>Json.asStringTo writer json</code></example>
     let asStringTo (writer:Utf8JsonWriter) json =
         let rec write = function
@@ -154,14 +155,14 @@ module Json =
 
         write json
 
-    /// <summary>Converts a Json to a byte array.</summary>
+    /// <summary>Converts a Json into a UTF-8 encoded byte array.</summary>
     /// <example><code>let bytes = Json.asBytes Indented json</code></example>
     let asBytes format json =
         asString format json
         |> Encoding.UTF8.GetBytes
 
     /// <summary>Determines whether two Json values are equal.</summary>
-    /// <remarks>Object properties are compared regardless of order.</remarks>
+    /// <remarks>Properties are compared regardless of order.</remarks>
     /// <example><code>let equal = Json.equal x y</code></example>
     let equal x y =
         let x = sort x
