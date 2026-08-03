@@ -132,6 +132,29 @@ module ParseTests =
             |> Parser.parse "true"
             |> Expect.parserError
 
+    module Int128 =
+
+        [<Fact>]
+        let ``Should parse number as int128`` () =
+            let expected = Int128.MaxValue
+            let actual =
+                Parse.int128
+                |> Parser.parse (string expected)
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when value is invalid`` () =
+            Parse.int128
+            |> Parser.parse "1.1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when value is not a number`` () =
+            Parse.int128
+            |> Parser.parse "true"
+            |> Expect.parserError
+
     module UInt16 =
 
         [<Fact>]

@@ -58,6 +58,7 @@ module internal Extensions =
             | "Int16" -> "int16"
             | "Int32" -> "int"
             | "Int64" -> "int64"
+            | "Int128" -> "int128"
             | "Byte" -> "byte"
             | "SByte" -> "sbyte"
             | "UInt16" -> "uint16"
