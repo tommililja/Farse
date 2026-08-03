@@ -4,7 +4,6 @@ open System
 open System.Globalization
 open System.IO
 open System.Numerics
-open System.Text
 open System.Text.Json
 open System.Threading
 open Expecto.Flip
@@ -136,7 +135,8 @@ module JsonTests =
         task {
             let expected = Json.asString Indented Data.example
             let! actual =
-                MemoryStream.create expected
+                expected
+                |> MemoryStream.ofString
                 |> Json.fromStreamAsync CancellationToken.None
                 |> Task.map (
                     Expect.wantOk $"Expected %s{nameof Json.fromStreamAsync} to succeed."
@@ -147,7 +147,8 @@ module JsonTests =
 
     [<Fact>]
     let ``Should fail to create Json from stream async when JSON is invalid`` () =
-        MemoryStream.create "invalid"
+        "invalid"
+        |> MemoryStream.ofString
         |> Json.fromStreamAsync CancellationToken.None
         |> Task.map (Expect.isError $"Expected %s{nameof Json.fromStreamAsync} to fail.")
 
@@ -155,7 +156,8 @@ module JsonTests =
     let ``Should create Json from bytes``() =
         let expected = Json.asString Indented Data.example
         let actual =
-            Encoding.UTF8.GetBytes expected
+            expected
+            |> String.asBytes
             |> Json.fromBytes
             |> Expect.wantOk $"Expected %s{nameof Json.fromBytes} to succeed."
             |> Json.asString Indented
@@ -163,7 +165,8 @@ module JsonTests =
 
     [<Fact>]
     let ``Should fail to create Json from bytes when JSON is invalid``() =
-        Encoding.UTF8.GetBytes("invalid")
+        "invalid"
+        |> String.asBytes
         |> Json.fromBytes
         |> Expect.isError $"Expected %s{nameof Json.fromBytes} to fail."
 
@@ -214,14 +217,14 @@ module JsonTests =
             Json.asStringTo writer Data.example
             do! writer.FlushAsync()
             let expected = Json.asString Raw Data.example
-            let actual = Encoding.UTF8.GetString(stream.ToArray())
+            let actual = stream.ToArray() |> String.ofBytes
             Expect.equal Msg.none actual expected
         }
 
     [<Fact>]
     let ``Should convert Json to bytes`` () =
         let expected = Json.asString Indented Data.example
-        let actual = Json.asBytes Indented Data.example |> Encoding.UTF8.GetString
+        let actual = Json.asBytes Indented Data.example |> String.ofBytes
         Expect.equal Msg.none actual expected
 
     module JStr =

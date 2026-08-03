@@ -1,8 +1,6 @@
 namespace Farse.Tests
 
 open System
-open System.Buffers
-open System.Text
 open System.Text.Json
 open System.Threading
 open Expecto.Flip
@@ -209,7 +207,7 @@ module ParserTests =
         [<Fact>]
         let ``Should parse JSON`` () =
             Parse.int
-            |> Parser.parseAsync (MemoryStream.create "1") CancellationToken.None
+            |> Parser.parseAsync (MemoryStream.ofString "1") CancellationToken.None
             |> Task.map (fun x ->
                 let expected = 1
                 let actual = Expect.wantOk $"Expected %s{nameof Parser.parseAsync} to succeed." x
@@ -219,7 +217,7 @@ module ParserTests =
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
             Parse.int
-            |> Parser.parseAsync (MemoryStream.create "invalid") CancellationToken.None
+            |> Parser.parseAsync (MemoryStream.ofString "invalid") CancellationToken.None
             |> Task.bind Expect.parserError
 
         [<Fact>]
@@ -231,33 +229,30 @@ module ParserTests =
         [<Fact>]
         let ``Should fail when parsing an empty string`` () =
             Parse.int
-            |> Parser.parseAsync (MemoryStream.create String.Empty) CancellationToken.None
+            |> Parser.parseAsync (MemoryStream.ofString String.Empty) CancellationToken.None
             |> Task.bind Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing JSON that is not allowed`` () =
             Parse.int
-            |> Parser.parseWithAsync (MemoryStream.create "[ 1, 2, 3, ]") options CancellationToken.None
+            |> Parser.parseWithAsync (MemoryStream.ofString "[ 1, 2, 3, ]") options CancellationToken.None
             |> Task.bind Expect.parserError
 
     module ParseBytes =
-
-        let private bytes (json:string) =
-            Encoding.UTF8.GetBytes(json)
 
         [<Fact>]
         let ``Should parse JSON`` () =
             let expected = 1
             let actual =
                 Parse.int
-                |> Parser.parseBytes (bytes "1")
+                |> Parser.parseBytes (String.asBytes "1")
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
             Parse.int
-            |> Parser.parseBytes (bytes "invalid")
+            |> Parser.parseBytes (String.asBytes "invalid")
             |> Expect.parserError
 
         [<Fact>]
@@ -269,75 +264,69 @@ module ParserTests =
         [<Fact>]
         let ``Should fail when parsing an empty string`` () =
             Parse.int
-            |> Parser.parseBytes (bytes String.Empty)
+            |> Parser.parseBytes (String.asBytes String.Empty)
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing JSON that is not allowed`` () =
             Parse.int
-            |> Parser.parseBytesWith (bytes "[ 1, 2, 3, ]") options
+            |> Parser.parseBytesWith (String.asBytes "[ 1, 2, 3, ]") options
             |> Expect.parserError
 
     module ParseMemory =
 
-        let private memory (json:string) =
-            ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(json))
-
         [<Fact>]
         let ``Should parse JSON`` () =
             let expected = 1
             let actual =
                 Parse.int
-                |> Parser.parseMemory (memory "1")
+                |> Parser.parseMemory (ReadOnlyMemory.ofString "1")
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
             Parse.int
-            |> Parser.parseMemory (memory "invalid")
+            |> Parser.parseMemory (ReadOnlyMemory.ofString "invalid")
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing an empty string`` () =
             Parse.int
-            |> Parser.parseMemory (memory String.Empty)
+            |> Parser.parseMemory (ReadOnlyMemory.ofString String.Empty)
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing JSON that is not allowed`` () =
             Parse.int
-            |> Parser.parseMemoryWith (memory "[ 1, 2, 3, ]") options
+            |> Parser.parseMemoryWith (ReadOnlyMemory.ofString "[ 1, 2, 3, ]") options
             |> Expect.parserError
 
     module ParseSequence =
 
-        let private sequence (json:string) =
-            ReadOnlySequence<byte>(Encoding.UTF8.GetBytes(json))
-
         [<Fact>]
         let ``Should parse JSON`` () =
             let expected = 1
             let actual =
                 Parse.int
-                |> Parser.parseSequence (sequence "1")
+                |> Parser.parseSequence (ReadOnlySequence.ofString "1")
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
             Parse.int
-            |> Parser.parseSequence (sequence "invalid")
+            |> Parser.parseSequence (ReadOnlySequence.ofString "invalid")
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing an empty string`` () =
             Parse.int
-            |> Parser.parseSequence (sequence String.Empty)
+            |> Parser.parseSequence (ReadOnlySequence.ofString String.Empty)
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing JSON that is not allowed`` () =
             Parse.int
-            |> Parser.parseSequenceWith (sequence "[ 1, 2, 3, ]") options
+            |> Parser.parseSequenceWith (ReadOnlySequence.ofString "[ 1, 2, 3, ]") options
             |> Expect.parserError

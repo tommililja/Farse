@@ -1,6 +1,7 @@
 namespace Farse.Tests
 
 open System
+open System.Buffers
 open System.IO
 open System.Text
 open System.Threading.Tasks
@@ -34,9 +35,31 @@ module Msg =
 
 module MemoryStream =
 
-    let create (string:string) =
+    let ofString (string:string) =
         let bytes = Encoding.UTF8.GetBytes(string)
         new MemoryStream(bytes)
+
+module String =
+
+    let ofBytes (bytes:byte array) =
+        Encoding.UTF8.GetString(bytes)
+
+    let asBytes (string:string) =
+        Encoding.UTF8.GetBytes(string)
+
+module ReadOnlyMemory =
+
+    let ofString (json:string) =
+        json
+        |> String.asBytes
+        |> ReadOnlyMemory<byte>
+
+module ReadOnlySequence =
+
+    let ofString (json:string) =
+        json
+        |> String.asBytes
+        |> ReadOnlySequence<byte>
 
 module Task =
 
