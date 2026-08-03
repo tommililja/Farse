@@ -173,6 +173,17 @@ module Parse =
             | _ -> Error "Expected a bigint."
         ) ExpectedKind.Number
 
+    /// <summary>Parses a number as System.Half.</summary>
+    /// <remarks>Values outside the valid range are parsed as positive or negative infinity.</remarks>
+    /// <example><code>let! half = "prop" &amp;= Parse.half</code></example>
+    let half =
+        custom (fun element ->
+            let string = element.GetRawText()
+            match Half.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            | true, half -> Ok half
+            | _ -> Error "Expected a Half."
+        ) ExpectedKind.Number
+
     /// <summary>Parses a bool as System.Boolean.</summary>
     /// <example><code>let! bool = "prop" &amp;= Parse.bool</code></example>
     let bool = custom (_.GetBoolean() >> Ok) ExpectedKind.Bool

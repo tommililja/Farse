@@ -494,6 +494,32 @@ module ParseTests =
             |> Parser.parse "true"
             |> Expect.parserError
 
+    module Half =
+
+        [<Fact>]
+        let ``Should parse number as Half`` () =
+            let expected = Half.Parse("1,2345")
+            let actual =
+                Parse.half
+                |> Parser.parse "1.2345"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse number that is out of range as Half`` () =
+            let expected = Half.PositiveInfinity
+            let actual =
+                Parse.half
+                |> Parser.parse "999999"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when element is not a number`` () =
+            Parse.half
+            |> Parser.parse "true"
+            |> Expect.parserError
+
     module Bool =
 
         [<Fact>]
