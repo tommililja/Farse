@@ -1,0 +1,7 @@
+﻿Parser yielded 1 error[s].
+
+  Error[0]:
+    at $
+     | Tried parsing 'int128.
+     | Expected an int128.
+     = 1.234

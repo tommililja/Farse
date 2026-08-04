@@ -75,7 +75,7 @@ module Parse =
     let int128 =
         custom (fun element ->
             let string = element.GetRawText()
-            match Int128.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            match Int128.TryParse(string, NumberStyles.Integer, CultureInfo.InvariantCulture) with
             | true, int128 -> Ok int128
             | _ -> Error "Expected an int128."
         ) ExpectedKind.Number
@@ -97,7 +97,7 @@ module Parse =
     let uint128 =
         custom (fun element ->
             let string = element.GetRawText()
-            match UInt128.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            match UInt128.TryParse(string, NumberStyles.Integer, CultureInfo.InvariantCulture) with
             | true, uint128 -> Ok uint128
             | _ -> Error "Expected a uint128."
         ) ExpectedKind.Number
@@ -160,7 +160,7 @@ module Parse =
     let number<'r when 'r :> INumber<'r>> (_:Parser<'r>) =
         custom (fun element ->
             let string = element.GetString()
-            match 'r.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            match 'r.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
             | _ -> Error "Expected a number string."
         ) ExpectedKind.String
@@ -188,7 +188,7 @@ module Parse =
     let bigint : Parser<bigint> =
         custom (fun element ->
             let string = element.GetRawText()
-            match BigInteger.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            match BigInteger.TryParse(string, NumberStyles.Integer, CultureInfo.InvariantCulture) with
             | true, bigint -> Ok bigint
             | _ -> Error "Expected a bigint."
         ) ExpectedKind.Number
@@ -199,7 +199,7 @@ module Parse =
     let half =
         custom (fun element ->
             let string = element.GetRawText()
-            match Half.TryParse(string, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            match Half.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
             | true, half -> Ok half
             | _ -> Error "Expected a Half."
         ) ExpectedKind.Number

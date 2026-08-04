@@ -150,6 +150,12 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when value has a fractional part`` () =
+            Parse.int128
+            |> Parser.parse "1.234"
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.int128
             |> Parser.parse "true"
@@ -239,6 +245,12 @@ module ParseTests =
         let ``Should fail when value is invalid`` () =
             Parse.uint128
             |> Parser.parse "1.1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when value has a fractional part`` () =
+            Parse.uint128
+            |> Parser.parse "1.234"
             |> Expect.parserError
 
         [<Fact>]
@@ -460,9 +472,39 @@ module ParseTests =
             Expect.equal Msg.none actual expected
 
         [<Fact>]
+        let ``Should parse string as int`` () =
+            let expected = 42
+            let actual =
+                Parse.number Parse.int
+                |> Parser.parse "\"42\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse a string as float`` () =
+            let expected = 1.234
+            let actual =
+                Parse.number Parse.float
+                |> Parser.parse "\"1.234\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
         let ``Should fail when value is invalid`` () =
             Parse.number Parse.int
             |> Parser.parse "\"a\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when a bigint string has a fractional part`` () =
+            Parse.number Parse.bigint
+            |> Parser.parse "\"1.234\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when an int string has a fractional part`` () =
+            Parse.number Parse.int
+            |> Parser.parse "\"1.234\""
             |> Expect.parserError
 
         [<Fact>]
@@ -552,7 +594,7 @@ module ParseTests =
             Expect.equal Msg.none actual expected
 
         [<Fact>]
-        let ``Should parse number that is out of range as Half`` () =
+        let ``Should parse number that is out of range`` () =
             let expected = Half.PositiveInfinity
             let actual =
                 Parse.half
