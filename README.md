@@ -71,16 +71,20 @@ Given the JSON string.
 }
 ```
 
-And the three (optional) operators.
+Three (optional) operators.
 
 ```fsharp
 // Parses a required property.
 let (&=) = Prop.get
+```
 
+```fsharp
 // Parses an optional property, returning an option.
 let (?=) = Prop.tryGet
+```
 
-// Parses an optional property, distinguishing between a missing property and a null value.
+```fsharp
+// Parses an optional property, returning an option option.
 let (??=) = Prop.tryGet2
 ```
 
@@ -232,7 +236,7 @@ let user =
     |> Result.defaultWith failwith
 ```
 
-It can also be run asynchronously from a stream.
+It can also be run asynchronously from a Stream.
 
 ```fsharp
 task {
@@ -279,7 +283,7 @@ module Parse =
 
 ProfileId
 
-```code
+```fsharp
 Parser yielded 1 error[s].
 
   Error[0]:
@@ -291,7 +295,7 @@ Parser yielded 1 error[s].
 
 Instant
 
-```code
+```fsharp
 Parser yielded 1 error[s].
 
   Error[0]:
@@ -347,7 +351,7 @@ let! tags = "tags" &= list (refine string Tag.fromString)
 
 Age
 
-```code
+```fsharp
 Parser yielded 1 error[s].
 
   Error[0]:
@@ -359,7 +363,7 @@ Parser yielded 1 error[s].
 
 Tag
 
-```code
+```fsharp
 Parser yielded 1 error[s].
 
   Error[0]:
@@ -434,15 +438,19 @@ let asJson user =
 
 ### Comparing
 
-There are a few different options for comparing two Json values.
+There are a few different ways to compare Json values.
 
 ```fsharp
 // Strict
 let equal = x = y
+```
 
+```fsharp
 // Ignores property order.
 let equal = Json.equal x y
+```
 
+```fsharp
 // Ignores property order, returns a diff message.
 match Json.diff x y with
 | Some msg -> failwith msg
