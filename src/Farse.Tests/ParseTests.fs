@@ -586,7 +586,7 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse number as Half`` () =
-            let expected = Half.Parse("1,2345")
+            let expected = Half.Parse("1.2345", CultureInfo.InvariantCulture)
             let actual =
                 Parse.half
                 |> Parser.parse "1.2345"
