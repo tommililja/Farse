@@ -5,6 +5,7 @@ open System.Globalization
 open System.IO
 open System.Numerics
 open System.Text.Json
+open System.Text.Json.Nodes
 open System.Threading
 open Expecto.Flip
 open Xunit
@@ -172,16 +173,36 @@ module JsonTests =
 
     [<Fact>]
     let ``Should convert Json to JsonNode`` () =
-        let expected = Json.asString Indented Data.example
+        let expected =
+            Data.example
+            |> Json.asString Indented
+            |> JsonNode.Parse
         let actual =
-            Json.fromString expected
-            |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
+            Data.example
             |> Json.asJsonNode
-            |> _.ToJsonString(JsonSerializerOptions(
-                WriteIndented = true,
-                IndentSize = 4)
-            )
-        Expect.equal Msg.none actual expected
+        Expect.isTrue Msg.none (JsonNode.DeepEquals(expected, actual))
+
+    [<Fact>]
+    let ``Should convert Json to JsonElement`` () =
+        let expected =
+            Data.example
+            |> Json.asString Indented
+            |> JsonElement.Parse
+        let actual =
+            Data.example
+            |> Json.asJsonElement
+        Expect.isTrue Msg.none (JsonElement.DeepEquals(expected, actual))
+
+    [<Fact>]
+    let ``Should convert Json to JsonDocument`` () =
+        let expected =
+            Data.example
+            |> Json.asString Indented
+            |> JsonDocument.Parse
+        use actual =
+            Data.example
+            |> Json.asJsonDocument
+        Expect.isTrue Msg.none (JsonElement.DeepEquals(expected.RootElement, actual.RootElement))
 
     [<Fact>]
     let ``Should convert Json to indented JSON string`` () =

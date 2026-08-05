@@ -118,6 +118,14 @@ module Json =
             array.Root
         | JNil -> null
 
+    /// <summary>Converts a <c>Json</c> to a <c>JsonElement</c>.</summary>
+    /// <example><code>let element = Json.asJsonElement json</code></example>
+    let asJsonElement = asJsonNode >> JsonSerializer.SerializeToElement
+
+    /// <summary>Converts a <c>Json</c> to a <c>JsonDocument</c>.</summary>
+    /// <example><code>use document = Json.asJsonDocument json</code></example>
+    let asJsonDocument = asJsonNode >> JsonSerializer.SerializeToDocument
+
     /// <summary>Converts a <c>Json</c> to a formatted JSON string.</summary>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
