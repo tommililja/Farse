@@ -10,7 +10,7 @@ Farse has a slightly different syntax and structure. It includes a computation e
 
 ## Installation
 
-Farse targets .NET 8.0 and above.
+Farse targets `.NET 8.0` and above.
 
 ```shell
 dotnet package add Farse
@@ -88,7 +88,7 @@ let (?=) = Prop.tryGet
 let (??=) = Prop.tryGet2
 ```
 
-We can create this simple parser:
+We can create this simple `Parser`:
 
 ```fsharp
 open Farse
@@ -226,7 +226,7 @@ type User = {
 }
 ```
 
-Then we can just run the parser:
+Then we can just run the `Parser`:
 
 ```fsharp
 let user =
@@ -324,7 +324,7 @@ let! x =
     | x -> Parser.fail $"Discriminator '%s{x}' is missing a parser."
 ```
 
-We can also try each parser in order:
+We can also try each `Parser` in order:
 
 ```fsharp
 let! x = "prop" &= attempt [ a; b ]
@@ -377,7 +377,7 @@ Parser yielded 1 error[s].
 
 We can create JSON structures using the [`Json`](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
-An example of creating an object and converting it to an indented string:
+An example of creating an object and converting it to an indented `string`:
 
 ```fsharp
 open Farse
@@ -461,7 +461,7 @@ match Json.diff x y with
 
 ### Parsing
 
-Parsing a string into a `Json`:
+Parsing a `string` into a `Json`:
 
 ```fsharp
 let json =
@@ -482,7 +482,7 @@ task {
 
 ### Converting
 
-Converting a `Json` to a string:
+Converting a `Json` to a `string`:
 
 ```fsharp
 type JsonFormat =
@@ -509,7 +509,7 @@ task {
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
-A `ParserError` can be converted to a formatted string:
+A `ParserError` can be converted to a formatted `string`:
 
 ```fsharp
 let msg = ParserError.asString error
