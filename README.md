@@ -46,7 +46,7 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 
 The complete example can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Tests/Example.fs).
 
-Given the JSON string.
+Given the JSON string:
 
 ```json
 {
@@ -71,7 +71,7 @@ Given the JSON string.
 }
 ```
 
-Three (optional) operators.
+Using the three included operators:
 
 ```fsharp
 // Parses a required property.
@@ -88,7 +88,7 @@ let (?=) = Prop.tryGet
 let (??=) = Prop.tryGet2
 ```
 
-We can create this simple parser.
+We can create this simple parser:
 
 ```fsharp
 open Farse
@@ -138,7 +138,7 @@ module User =
 
 > Note: The custom parsers are defined under the same module name as included parsers.
 
-For the following types.
+For the following types:
 
 ```fsharp
 type UserId = UserId of Guid
@@ -226,7 +226,7 @@ type User = {
 }
 ```
 
-Then we can just run the parser.
+Then we can just run the parser:
 
 ```fsharp
 let user =
@@ -236,7 +236,7 @@ let user =
     |> Result.defaultWith failwith
 ```
 
-It can also be run asynchronously from a Stream.
+It can also be run asynchronously from a Stream:
 
 ```fsharp
 task {
@@ -255,7 +255,7 @@ task {
 
 ## Custom parsers
 
-Parse.custom can be used to build parsers for third-party types or to just avoid unnecessary operations.
+Parse.custom can be used to build parsers for third-party types or to just avoid unnecessary operations:
 
 ```fsharp
 open Farse
@@ -281,7 +281,7 @@ module Parse =
 
 ### Errors
 
-ProfileId
+ProfileId:
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -293,7 +293,7 @@ Parser yielded 1 error[s].
      = "invalid"
 ```
 
-Instant
+Instant:
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -307,13 +307,13 @@ Parser yielded 1 error[s].
 
 ## One-of
 
-For objects with a string discriminator.
+For objects with a string discriminator:
 
 ```fsharp
 let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
 ```
 
-Which is equal to matching but less flexible.
+Which is equal to matching but less flexible:
 
 ```fsharp
 let! disc = "prop.disc" &= string
@@ -324,7 +324,7 @@ let! x =
     | x -> Parser.fail $"Discriminator '%s{x}' is missing a parser."
 ```
 
-We can also try each parser in order.
+We can also try each parser in order:
 
 ```fsharp
 let! x = "prop" &= attempt [ a; b ]
@@ -332,7 +332,7 @@ let! x = "prop" &= attempt [ a; b ]
 
 ## Validation
 
-There are a few different ways to validate parsed values.
+There are a few different ways to validate parsed values:
 
 ```fsharp
 let! age = "age" ?= age // Custom parser that uses Age.fromByte.
@@ -340,7 +340,7 @@ let! age = "age" ?= refine byte Age.fromByte
 let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is 12."
 ```
 
-Validation can also be combined with sequences.
+Validation can also be combined with sequences:
 
 ```fsharp
 let! tags = "tags" &= list tag
@@ -349,7 +349,7 @@ let! tags = "tags" &= list (refine string Tag.fromString)
 
 ### Errors
 
-Age
+Age:
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -361,7 +361,7 @@ Parser yielded 1 error[s].
      = 10
 ```
 
-Tag
+Tag:
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -376,6 +376,8 @@ Parser yielded 1 error[s].
 ## Creating JSON
 
 We can create JSON strings with the [Json](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
+
+Object:
 
 ```fsharp
 open Farse
@@ -402,7 +404,7 @@ module User =
         asJson >> Json.asString Indented
 ```
 
-Which is the same as the following.
+Which is the same as the following:
 
 ```fsharp
 let asJson user =
@@ -438,7 +440,7 @@ let asJson user =
 
 ### Comparing
 
-There are a few different ways to compare Json values.
+There are a few different ways to compare Json values:
 
 ```fsharp
 // Strict
@@ -459,7 +461,7 @@ match Json.diff x y with
 
 ### From string
 
-Parsing a string into a Json.
+Parsing a string into a Json:
 
 ```fsharp
 let json =
@@ -468,7 +470,7 @@ let json =
     |> Result.defaultWith (_.Message >> failwith)
 ```
 
-Parsing asynchronously from a Stream.
+Parsing asynchronously from a Stream:
 
 ```fsharp
 task {
@@ -480,7 +482,7 @@ task {
 
 ### To string
 
-Converting a Json into a string.
+Converting a Json into a string:
 
 ```fsharp
 type JsonFormat =
@@ -493,7 +495,7 @@ type JsonFormat =
 let string = Json.asString Indented json
 ```
 
-Writing directly to a Stream or IBufferWriter.
+Writing directly to a Stream or IBufferWriter:
 
 ```fsharp
 task {
@@ -507,13 +509,13 @@ task {
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
-ParserError can be converted into a formatted string.
+ParserError can be converted into a formatted string:
 
 ```fsharp
 let msg = ParserError.asString error
 ```
 
-We can also build custom error messages.
+We can also build custom error messages:
 
 ```fsharp
 let msg =
@@ -525,7 +527,7 @@ let msg =
         |> String.concat "\n"
 ```
 
-From the following information.
+From the following information:
 
 ```fsharp
 type ParseError = {
