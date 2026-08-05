@@ -47,7 +47,7 @@ module Json =
             |> JArr
         | other -> other
 
-    /// <summary>Converts a JsonElement into a Json.</summary>
+    /// <summary>Converts a <c>JsonElement</c> into a <c>Json</c>.</summary>
     /// <example><code>let json = Json.fromElement element</code></example>
     let rec fromElement (element:JsonElement) =
         match element.ValueKind with
@@ -67,7 +67,7 @@ module Json =
             |> JArr
         | Kind.Null | Kind.Undefined -> JNil
 
-    /// <summary>Parses a string into a Json.</summary>
+    /// <summary>Parses a <c>string</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromString json</code></example>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
@@ -77,8 +77,8 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Parses a UTF-8 encoded stream asynchronously into a Json.</summary>
-    /// <remarks>The stream is read to completion.</remarks>
+    /// <summary>Parses a UTF-8 encoded <c>Stream</c> asynchronously into a <c>Json</c>.</summary>
+    /// <remarks>The <c>Stream</c> is read to completion.</remarks>
     /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     let fromStreamAsync token stream =
         task {
@@ -90,7 +90,7 @@ module Json =
                 | :? ArgumentNullException as exn -> return Error exn
         }
 
-    /// <summary>Parses a UTF-8 encoded byte array into a Json.</summary>
+    /// <summary>Parses a UTF-8 encoded <c>byte array</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     let fromBytes (bytes:byte array) =
         try
@@ -100,7 +100,7 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Converts a Json to a JsonNode.</summary>
+    /// <summary>Converts a <c>Json</c> to a <c>JsonNode</c>.</summary>
     /// <example><code>let node = Json.asJsonNode json</code></example>
     let rec asJsonNode json =
         match json with
@@ -118,7 +118,7 @@ module Json =
             array.Root
         | JNil -> null
 
-    /// <summary>Converts a Json to a formatted JSON string.</summary>
+    /// <summary>Converts a <c>Json</c> to a formatted JSON string.</summary>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
         match asJsonNode json with
@@ -132,8 +132,16 @@ module Json =
 
             node.ToJsonString(options)
 
-    /// <summary>Writes a Json to a Utf8JsonWriter.</summary>
-    /// <example><code>Json.writeTo writer json</code></example>
+    /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
+    /// <example>
+    /// <code>
+    ///    task {
+    ///        use writer = new Utf8JsonWriter(ctx.Response.BodyWriter)
+    ///        Json.writeTo writer json
+    ///        do! writer.FlushAsync()
+    ///    }
+    /// </code>
+    /// </example>
     let writeTo (writer:Utf8JsonWriter) json =
         let rec write = function
             | JStr str -> writer.WriteStringValue(str)
@@ -155,13 +163,13 @@ module Json =
 
         write json
 
-    /// <summary>Converts a Json to a UTF-8 encoded byte array.</summary>
+    /// <summary>Converts a <c>Json</c> to a UTF-8 encoded <c>byte array</c>.</summary>
     /// <example><code>let bytes = Json.asBytes Indented json</code></example>
     let asBytes format json =
         asString format json
         |> Encoding.UTF8.GetBytes
 
-    /// <summary>Determines whether two Json values are equal.</summary>
+    /// <summary>Determines whether two <c>Json</c> values are equal.</summary>
     /// <remarks>Properties are compared regardless of order.</remarks>
     /// <example><code>let equal = Json.equal x y</code></example>
     let equal x y =
@@ -169,7 +177,7 @@ module Json =
         let y = sort y
         x = y
 
-    /// <summary>Compares two Json values and returns a message when they differ.</summary>
+    /// <summary>Compares two <c>Json</c> values and returns a message when they differ.</summary>
     /// <remarks>Properties are compared regardless of order.</remarks>
     /// <example>
     /// <code>
@@ -257,7 +265,7 @@ module Json =
 [<AutoOpen>]
 type JNum =
 
-    /// <summary>Creates a Json from a number.</summary>
+    /// <summary>Creates a <c>Json</c> from a number.</summary>
     /// <example><code>"number", JNum 1</code></example>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
         match typeof<'a> with
