@@ -20,7 +20,7 @@ module JsonPath =
     let internal append (JsonPath a) (JsonPath b) =
         JsonPath (a + b)
 
-    /// <summary>Converts a JsonPath into a string.</summary>
+    /// <summary>Converts a JsonPath to a string.</summary>
     /// <example><code>let string = JsonPath.asString path</code></example>
     let asString (JsonPath string) =
         "$" + string

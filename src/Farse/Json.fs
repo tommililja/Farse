@@ -100,7 +100,7 @@ module Json =
             | :? JsonException
             | :? ArgumentNullException as exn -> Error exn
 
-    /// <summary>Converts a Json into a JsonNode.</summary>
+    /// <summary>Converts a Json to a JsonNode.</summary>
     /// <example><code>let node = Json.asJsonNode json</code></example>
     let rec asJsonNode json =
         match json with
@@ -118,7 +118,7 @@ module Json =
             array.Root
         | JNil -> null
 
-    /// <summary>Converts a Json into a formatted JSON string.</summary>
+    /// <summary>Converts a Json to a formatted JSON string.</summary>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
         match asJsonNode json with
@@ -155,7 +155,7 @@ module Json =
 
         write json
 
-    /// <summary>Converts a Json into a UTF-8 encoded byte array.</summary>
+    /// <summary>Converts a Json to a UTF-8 encoded byte array.</summary>
     /// <example><code>let bytes = Json.asBytes Indented json</code></example>
     let asBytes format json =
         asString format json
