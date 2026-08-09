@@ -522,7 +522,7 @@ module Parse =
             else Ok <| convert items
         ) ExpectedKind.Array
 
-    /// <summary>Parses an array as <c>'r</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <remarks>Ignores null and invalid values.</remarks>
     /// <example><code>let! seq = "prop" &amp;= Parse.choose Parse.int</code></example>
     let choose (Parser parse) : Parser<'r seq> =
@@ -537,11 +537,11 @@ module Parse =
             |> Ok
         ) ExpectedKind.Array
 
-    /// <summary>Parses an array as <c>'a</c> <c>Microsoft.FSharp.Collections.list</c>.</summary>
+    /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.list</c>.</summary>
     /// <example><code>let! list = "prop" &amp;= Parse.list Parse.int</code></example>
     let list parser = arr List.ofSeq parser
 
-    /// <summary>Parses an array as <c>'a</c> <c>Microsoft.FSharp.Core.array</c>.</summary>
+    /// <summary>Parses an array as <c>'a Microsoft.FSharp.Core.array</c>.</summary>
     /// <example><code>let! array = "prop" &amp;= Parse.array Parse.int</code></example>
     let array parser = arr id parser
 
@@ -553,7 +553,7 @@ module Parse =
     /// <example><code>let! hashSet = "prop" &amp;= Parse.hashSet Parse.int</code></example>
     let hashSet parser = arr HashSet parser
 
-    /// <summary>Parses an array as <c>'a</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
     let seq parser = arr Seq.ofSeq parser
 
