@@ -6,7 +6,7 @@
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
-Farse has a slightly different syntax and structure. It includes a computation expression and a few custom operators that simplify defining and building composable, strongly typed parsers. It also aims to keep overhead low while producing detailed and helpful error messages.
+Farse uses a slightly different syntax and structure. It includes a computation expression and a few custom operators that simplify defining and building composable, strongly typed parsers. It also aims to keep overhead low while producing detailed and helpful error messages.
 
 ## Installation
 
