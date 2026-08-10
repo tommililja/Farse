@@ -6,7 +6,7 @@
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
-Farse uses a computation expression and a few custom operators that simplify defining and building composable, type-safe parsers. It also produces detailed and helpful error messages, aims to keep overhead low, and performs similarly to `System.Text.Json`.
+Farse uses a computation expression and a few custom operators that simplify defining and building composable, type-safe parsers. It also produces detailed and helpful error messages, aims to keep overhead low, and performs similarly to pure `System.Text.Json` parsing.
 
 ## Installation
 
