@@ -6,7 +6,7 @@
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
-Farse uses a slightly different syntax and structure. It includes a computation expression and a few custom operators that simplify defining and building composable, strongly typed parsers. It also aims to keep overhead low while producing detailed and helpful error messages.
+Farse uses a computation expression and a few custom operators that simplify defining and building composable, type-safe parsers. It also produces detailed and helpful error messages, aims to keep overhead low, and performs similarly to `System.Text.Json`.
 
 ## Installation
 
@@ -71,7 +71,7 @@ Given the JSON document:
 }
 ```
 
-Using the three included operators:
+And the three included operators:
 
 ```fsharp
 // Parses a required property.
@@ -88,7 +88,7 @@ let (?=) = Prop.tryGet
 let (??=) = Prop.tryGet2
 ```
 
-We can create this simple `Parser`:
+We can create this `Parser` for the `User` type:
 
 ```fsharp
 open Farse
@@ -226,7 +226,7 @@ type User = {
 }
 ```
 
-Then we can just run the `Parser`:
+The `Parser<User>` can then be run:
 
 ```fsharp
 let user =
@@ -236,7 +236,7 @@ let user =
     |> Result.defaultWith failwith
 ```
 
-It can also be run asynchronously from a `Stream`:
+We can also parse a `Stream` asynchronously:
 
 ```fsharp
 task {
@@ -377,7 +377,7 @@ Parser yielded 1 error[s].
 
 We can create JSON structures using the [`Json`](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
-An example of creating an object and converting it to an indented `string`:
+An example of building an object and converting it to an indented string:
 
 ```fsharp
 open Farse
@@ -461,7 +461,7 @@ match Json.diff x y with
 
 ### Parsing
 
-Parsing a `string` into a `Json`:
+Parsing a string:
 
 ```fsharp
 let json =
@@ -470,11 +470,11 @@ let json =
     |> Result.defaultWith (_.Message >> failwith)
 ```
 
-Parsing asynchronously from a `Stream`:
+Parsing a `Stream` asynchronously:
 
 ```fsharp
 task {
-    let! result = Json.fromStreamAsync ct stream
+    let! result = Json.fromStreamAsync token stream
 
     return Result.defaultWith (_.Message >> failwith) result
 }
@@ -482,7 +482,7 @@ task {
 
 ### Converting
 
-Converting a `Json` to a `string`:
+Converting a `Json` to a string:
 
 ```fsharp
 type JsonFormat =
@@ -495,7 +495,7 @@ type JsonFormat =
 let string = Json.asString Indented json
 ```
 
-Writing directly to a `Stream` or `IBufferWriter`:
+Writing directly to a `Stream` or `IBufferWriter` asynchronously:
 
 ```fsharp
 task {
@@ -509,7 +509,7 @@ task {
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
 
-A `ParserError` can be converted to a formatted `string`:
+`ParserError` can be converted to a formatted string:
 
 ```fsharp
 let msg = ParserError.asString error
