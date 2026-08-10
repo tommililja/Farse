@@ -88,7 +88,7 @@ let (?=) = Prop.tryGet
 let (??=) = Prop.tryGet2
 ```
 
-We can create this `Parser` for the `User` type:
+We can create a `Parser` for the `User` type:
 
 ```fsharp
 open Farse
@@ -534,9 +534,9 @@ type ParseError = {
     Path: JsonPath          // The full JSON path where the error occurred.
     Element: JsonElement    // The element that was parsed.
     Index: int option       // If the error occurred directly in an array.
-    Value: string option    // Parsing succeeded, but validation failed.
-    Type: Type              // The Type that was parsed.
     Details: string         // Parsing error or validation error details.
+    Value: string option    // Parsing succeeded, but validation failed.
+    Type: Type              // The Type that was being parsed.
     Exn: exn option         // Full exn if one occurred.
 }
 ```
