@@ -6,6 +6,7 @@ open System.IO
 open System.Text
 open System.Threading.Tasks
 open Expecto.Flip
+open NodaTime.Text
 open VerifyTests
 open VerifyXunit
 open Farse
@@ -46,6 +47,10 @@ module String =
 
     let asBytes (string:string) =
         Encoding.UTF8.GetBytes(string)
+
+module Instant =
+
+    let asString = InstantPattern.General.Format
 
 module ReadOnlyMemory =
 

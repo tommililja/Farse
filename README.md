@@ -64,8 +64,8 @@ Given the JSON document:
         "isCanceled": false,
         "renewsAt": "2026-12-25T10:30:00Z"
     },
-    "tags": [ 
-        "beta", 
+    "tags": [
+        "beta",
         "verified"
     ]
 }
@@ -117,7 +117,7 @@ module User =
                     RenewsAt = renewsAt
                 }
             }
-            
+
             and! tags = "tags" &= list (refine string Tag.fromString)
 
             // "Path" example, which can be very useful
@@ -383,23 +383,23 @@ An example of building an object and converting it to an indented string:
 open Farse
 
 module User =
-    
+
     let asJson user =
         JObj [
             "id", JStr (UserId.asString user.Id)
             "name", JStr user.Name
-            "age", JNum.nil Age.asByte user.Age
+            "age", JNum.option Age.asByte user.Age
             "email", JStr (Email.asString user.Email)
-            "profiles", JStr.arr ProfileId.asString user.Profiles
+            "profiles", JStr.array ProfileId.asString user.Profiles
             "subscription",
                 JObj [
                     "plan", JStr (Plan.asString user.Subscription.Plan)
                     "isCanceled", JBit user.Subscription.IsCanceled
-                    "renewsAt", JStr.nil InstantPattern.General.Format user.Subscription.RenewsAt
+                    "renewsAt", JStr.option Instant.asString user.Subscription.RenewsAt
                 ]
-            "tags", JStr.arr Tag.asString user.Tags
+            "tags", JStr.array Tag.asString user.Tags
         ]
-        
+
     let asJsonString =
         asJson >> Json.asString Indented
 ```
@@ -427,7 +427,7 @@ let asJson user =
                 "isCanceled", JBit user.Subscription.IsCanceled
                 "renewsAt",
                     user.Subscription.RenewsAt
-                    |> Option.map (InstantPattern.General.Format >> JStr)
+                    |> Option.map (Instant.asString >> JStr)
                     |> Option.defaultValue JNil
             ]
         "tags",

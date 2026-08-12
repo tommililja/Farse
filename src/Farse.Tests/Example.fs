@@ -154,16 +154,16 @@ module User =
         JObj [
             "id", JStr (UserId.asString user.Id)
             "name", JStr user.Name
-            "age", JNum.nil Age.asByte user.Age
+            "age", JNum.option Age.asByte user.Age
             "email", JStr (Email.asString user.Email)
-            "profiles", JStr.arr ProfileId.asString user.Profiles
+            "profiles", JStr.array ProfileId.asString user.Profiles
             "subscription",
                 JObj [
                     "plan", JStr (Plan.asString user.Subscription.Plan)
                     "isCanceled", JBit user.Subscription.IsCanceled
-                    "renewsAt", JStr.nil InstantPattern.General.Format user.Subscription.RenewsAt
+                    "renewsAt", JStr.option Instant.asString user.Subscription.RenewsAt
                 ]
-            "tags", JStr.arr Tag.asString user.Tags
+            "tags", JStr.array Tag.asString user.Tags
         ]
 
     let asJsonString =

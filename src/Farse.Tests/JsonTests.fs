@@ -264,19 +264,19 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create string when Some`` () =
-            JStr.nil id (Some "1")
+            JStr.option id (Some "1")
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create null when None`` () =
-            JStr.nil id None
+            JStr.option id None
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create string array`` () =
-            JStr.arr id [ "1"; "2"; "3" ]
+            JStr.array id [ "1"; "2"; "3" ]
             |> Json.asString Indented
             |> Expect.string
 
@@ -302,19 +302,19 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create number when Some`` () =
-            JNum.nil<int, int> id (Some 1)
+            JNum.option<int, int> id (Some 1)
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create null when None`` () =
-            JNum.nil<int, int> id None
+            JNum.option<int, int> id None
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create number array`` () =
-            JNum.arr id [ 1; 2; 3 ]
+            JNum.array id [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 
@@ -366,19 +366,19 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create bool when Some`` () =
-            JBit.nil id (Some true)
+            JBit.option id (Some true)
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create null when None`` () =
-            JBit.nil id None
+            JBit.option id None
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create bool array`` () =
-            JBit.arr id [ true; false; true ]
+            JBit.array id [ true; false; true ]
             |> Json.asString Indented
             |> Expect.string
 
@@ -403,19 +403,19 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object when Some`` () =
-            JObj.nil (fun x -> [ "value", JNum x ]) (Some 1)
+            JObj.option (fun x -> [ "value", JNum x ]) (Some 1)
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create null when None`` () =
-            JObj.nil id None
+            JObj.option id None
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create object array`` () =
-            JObj.arr (fun x -> [ "value", JNum x ]) [ 1; 2; 3 ]
+            JObj.array (fun x -> [ "value", JNum x ]) [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 

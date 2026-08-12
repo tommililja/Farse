@@ -274,7 +274,7 @@ module Json =
 type JNum =
 
     /// <summary>Creates a <c>Json</c> from a number.</summary>
-    /// <example><code>"number", JNum 1</code></example>
+    /// <example><code>"prop", JNum 1</code></example>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
         match typeof<'a> with
         | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
@@ -293,7 +293,7 @@ module internal JNil =
 module JArr =
 
     /// <summary>An empty JSON array.</summary>
-    /// <example><code>"array", JArr.empty</code></example>
+    /// <example><code>"prop", JArr.empty</code></example>
     let empty = JArr List.empty
 
     let inline internal from fn json seq =
@@ -305,77 +305,83 @@ module JArr =
 module JStr =
 
     /// <summary>An empty JSON string.</summary>
-    /// <example><code>"string", JStr.empty</code></example>
+    /// <example><code>"prop", JStr.empty</code></example>
     let empty = JStr String.Empty
 
-    /// <summary>Creates a JSON string from an optional value.</summary>
-    /// <example><code>"string", JStr.nil _ToUpper() (Some "string")</code></example>
-    let inline nil fn x = JNil.from fn JStr x
+    /// <summary>Creates a JSON string or null from an optional value.</summary>
+    /// <example><code>"prop", JStr.option _ToUpper() (Some "string")</code></example>
+    let inline option fn x =
+        JNil.from fn JStr x
 
     /// <summary>Creates a JSON string array from a sequence.</summary>
-    /// <example><code>"array", JStr.arr _ToUpper() [ "string" ]</code></example>
-    let inline arr fn x = JArr.from fn JStr x
+    /// <example><code>"prop", JStr.array _ToUpper() [ "string" ]</code></example>
+    let inline array fn x =
+        JArr.from fn JStr x
 
     /// <summary>Creates a JSON string array from a value.</summary>
-    /// <example><code>"array", JStr.singleton _ToUpper() "string"</code></example>
+    /// <example><code>"prop", JStr.singleton _ToUpper() "string"</code></example>
     let inline singleton fn x =
         List.singleton x
-        |> arr fn
+        |> array fn
 
 module JNum =
 
     /// <summary>A JSON number with the value 0.</summary>
-    /// <example><code>"number", JNum.zero</code></example>
+    /// <example><code>"prop", JNum.zero</code></example>
     let zero = JNum 0
 
-    /// <summary>Creates a JSON number from an optional value.</summary>
-    /// <example><code>"number", JNum.nil ((*)2) (Some 1)</code></example>
-    let inline nil<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
+    /// <summary>Creates a JSON number or null from an optional value.</summary>
+    /// <example><code>"prop", JNum.option ((*)2) (Some 1)</code></example>
+    let inline option<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JNil.from fn JNum x
 
     /// <summary>Creates a JSON number array from a sequence.</summary>
-    /// <example><code>"array", JNum.arr ((*)2) [ 1 ]</code></example>
-    let inline arr<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
+    /// <example><code>"prop", JNum.array ((*)2) [ 1 ]</code></example>
+    let inline array<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JArr.from fn JNum x
 
     /// <summary>Creates a JSON number array from a value.</summary>
-    /// <example><code>"array", JNum.singleton ((*)2) 1</code></example>
+    /// <example><code>"prop", JNum.singleton ((*)2) 1</code></example>
     let inline singleton fn x =
         List.singleton x
-        |> arr fn
+        |> array fn
 
 module JBit =
 
-    /// <summary>Creates a JSON bool from an optional value.</summary>
-    /// <example><code>"bool", JBit.nil not (Some true)</code></example>
-    let inline nil fn x = JNil.from fn JBit x
+    /// <summary>Creates a JSON bool or null from an optional value.</summary>
+    /// <example><code>"prop", JBit.option not (Some true)</code></example>
+    let inline option fn x =
+        JNil.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a sequence.</summary>
-    /// <example><code>"array", JBit.arr not [ true ]</code></example>
-    let inline arr fn x = JArr.from fn JBit x
+    /// <example><code>"prop", JBit.array not [ true ]</code></example>
+    let inline array fn x =
+        JArr.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a value.</summary>
-    /// <example><code>"array", JBit.singleton not true</code></example>
+    /// <example><code>"prop", JBit.singleton not true</code></example>
     let inline singleton fn x =
         List.singleton x
-        |> arr fn
+        |> array fn
 
 module JObj =
 
     /// <summary>An empty JSON object.</summary>
-    /// <example><code>"object", JObj.empty</code></example>
+    /// <example><code>"prop", JObj.empty</code></example>
     let empty = JObj List.empty
 
-    /// <summary>Creates a JSON object from an optional value.</summary>
-    /// <example><code>"object", JObj.nil (fun obj -> [ "prop", JStr obj.Prop ]) (Some {| Prop = "value" |})</code></example>
-    let inline nil fn x = JNil.from fn JObj x
+    /// <summary>Creates a JSON object or null from an optional value.</summary>
+    /// <example><code>"prop", JObj.option (fun x -> [ "prop", JStr x.Prop ]) (Some {| Prop = "value" |})</code></example>
+    let inline option fn x =
+        JNil.from fn JObj x
 
     /// <summary>Creates a JSON object array from a sequence.</summary>
-    /// <example><code>"array", JObj.arr (fun obj -> [ "prop", JStr obj.Prop ]) [ {| Prop = "value" |} ]</code></example>
-    let inline arr fn x = JArr.from fn JObj x
+    /// <example><code>"prop", JObj.array (fun x -> [ "prop", JStr x.Prop ]) [ {| Prop = "value" |} ]</code></example>
+    let inline array fn x =
+        JArr.from fn JObj x
 
     /// <summary>Creates a JSON object array from a value.</summary>
-    /// <example><code>"array", JObj.singleton (fun obj -> [ "prop", JStr obj.Prop ]) {| Prop = "value" |}</code></example>
+    /// <example><code>"prop", JObj.singleton (fun x -> [ "prop", JStr x.Prop ]) {| Prop = "value" |}</code></example>
     let inline singleton fn x =
         List.singleton x
-        |> arr fn
+        |> array fn
