@@ -527,17 +527,17 @@ let msg =
         |> String.concat "\n"
 ```
 
-From the available information:
+With the available information:
 
 ```fsharp
 type ParseError = {
     Path: JsonPath          // The full JSON path where the error occurred.
     Element: JsonElement    // The element that was parsed.
     Index: int option       // If the error occurred directly in an array.
-    Details: string         // Parsing error or validation error details.
+    Details: string         // Parsing or validation error details.
     Value: string option    // Parsing succeeded, but validation failed.
     Type: Type              // The Type that was being parsed.
-    Exn: exn option         // Full exn if one occurred.
+    Exn: exn option         // The exception if one occurred.
 }
 ```
 > Note: Farse does not throw exceptions unless something unexpected occurs.
