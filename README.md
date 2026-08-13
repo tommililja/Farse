@@ -436,7 +436,7 @@ let asJson user =
             |> JArr
     ]
 ```
-> Note: Use JNum<'a> and JNum.nil<'a, 'b> to be explicit.
+> Note: Use JNum<'a> and JNum.option<'a, 'b> to be explicit.
 
 ### Comparison
 
