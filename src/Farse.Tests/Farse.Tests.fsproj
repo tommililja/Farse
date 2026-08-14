@@ -27,7 +27,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="xunit.v3" Version="3.2.2" />
-        <PackageReference Update="FSharp.Core" Version="10.1.302" />
+        <PackageReference Update="FSharp.Core" Version="10.1.400" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Farse\Farse.fsproj"/>
