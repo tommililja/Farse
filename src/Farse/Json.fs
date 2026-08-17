@@ -370,6 +370,11 @@ module JObj =
     /// <example><code>"prop", JObj.empty</code></example>
     let empty = JObj List.empty
 
+    /// <summary>Creates a JSON object from a value.</summary>
+    /// <example><code>"prop", JObj.from (fun x -> [ "prop", JStr x.Prop ]) x</code></example>
+    let inline from fn x =
+        fn x |> JObj
+
     /// <summary>Creates a JSON object or null from an optional value.</summary>
     /// <example><code>"prop", JObj.option (fun x -> [ "prop", JStr x.Prop ]) (Some {| Prop = "value" |})</code></example>
     let inline option fn x =

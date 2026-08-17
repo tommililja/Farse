@@ -402,6 +402,12 @@ module JsonTests =
             |> Expect.string
 
         [<Fact>]
+        let ``Should create object from value`` () =
+            JObj.from (fun x -> [ "value", JNum x ]) 1
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
         let ``Should create object when Some`` () =
             JObj.option (fun x -> [ "value", JNum x ]) (Some 1)
             |> Json.asString Indented
