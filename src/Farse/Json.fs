@@ -273,7 +273,7 @@ module Json =
 [<AutoOpen>]
 type JNum =
 
-    /// <summary>Creates a <c>Json</c> from a number.</summary>
+    /// <summary>Creates a <c>Json</c> from an <c>INumber</c>.</summary>
     /// <example><code>"prop", JNum 1</code></example>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
         match typeof<'a> with
@@ -309,20 +309,19 @@ module JStr =
     let empty = JStr String.Empty
 
     /// <summary>Creates a JSON string or null from an optional value.</summary>
-    /// <example><code>"prop", JStr.option _ToUpper() (Some "string")</code></example>
+    /// <example><code>"prop", JStr.option id (Some "string")</code></example>
     let inline option fn x =
         JNil.from fn JStr x
 
     /// <summary>Creates a JSON string array from a sequence.</summary>
-    /// <example><code>"prop", JStr.array _ToUpper() [ "string" ]</code></example>
+    /// <example><code>"prop", JStr.array id [ "string" ]</code></example>
     let inline array fn x =
         JArr.from fn JStr x
 
     /// <summary>Creates a JSON string array from a value.</summary>
-    /// <example><code>"prop", JStr.singleton _ToUpper() "string"</code></example>
+    /// <example><code>"prop", JStr.singleton id "string"</code></example>
     let inline singleton fn x =
-        List.singleton x
-        |> array fn
+        JArr.from fn JStr [ x ]
 
 module JNum =
 
@@ -331,38 +330,36 @@ module JNum =
     let zero = JNum 0
 
     /// <summary>Creates a JSON number or null from an optional value.</summary>
-    /// <example><code>"prop", JNum.option ((*)2) (Some 1)</code></example>
+    /// <example><code>"prop", JNum.option id (Some 1)</code></example>
     let inline option<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JNil.from fn JNum x
 
     /// <summary>Creates a JSON number array from a sequence.</summary>
-    /// <example><code>"prop", JNum.array ((*)2) [ 1 ]</code></example>
+    /// <example><code>"prop", JNum.array id [ 1 ]</code></example>
     let inline array<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JArr.from fn JNum x
 
     /// <summary>Creates a JSON number array from a value.</summary>
-    /// <example><code>"prop", JNum.singleton ((*)2) 1</code></example>
+    /// <example><code>"prop", JNum.singleton id 1</code></example>
     let inline singleton fn x =
-        List.singleton x
-        |> array fn
+        JArr.from fn JNum [ x ]
 
 module JBit =
 
     /// <summary>Creates a JSON bool or null from an optional value.</summary>
-    /// <example><code>"prop", JBit.option not (Some true)</code></example>
+    /// <example><code>"prop", JBit.option id (Some true)</code></example>
     let inline option fn x =
         JNil.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a sequence.</summary>
-    /// <example><code>"prop", JBit.array not [ true ]</code></example>
+    /// <example><code>"prop", JBit.array id [ true ]</code></example>
     let inline array fn x =
         JArr.from fn JBit x
 
     /// <summary>Creates a JSON bool array from a value.</summary>
-    /// <example><code>"prop", JBit.singleton not true</code></example>
+    /// <example><code>"prop", JBit.singleton id true</code></example>
     let inline singleton fn x =
-        List.singleton x
-        |> array fn
+        JArr.from fn JBit [ x ]
 
 module JObj =
 
@@ -373,7 +370,7 @@ module JObj =
     /// <summary>Creates a JSON object from a value.</summary>
     /// <example><code>"prop", JObj.from (fun x -> [ "prop", JStr x.Prop ]) x</code></example>
     let inline from fn x =
-        fn x |> JObj
+        JObj <| fn x
 
     /// <summary>Creates a JSON object or null from an optional value.</summary>
     /// <example><code>"prop", JObj.option (fun x -> [ "prop", JStr x.Prop ]) (Some {| Prop = "value" |})</code></example>
@@ -388,5 +385,4 @@ module JObj =
     /// <summary>Creates a JSON object array from a value.</summary>
     /// <example><code>"prop", JObj.singleton (fun x -> [ "prop", JStr x.Prop ]) {| Prop = "value" |}</code></example>
     let inline singleton fn x =
-        List.singleton x
-        |> array fn
+        JArr.from fn JObj [ x ]
