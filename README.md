@@ -71,7 +71,7 @@ Given the JSON document:
 }
 ```
 
-And the three included operators:
+And the three operators:
 
 ```fsharp
 // Parses a required property.
@@ -88,7 +88,7 @@ let (?=) = Prop.tryGet
 let (??=) = Prop.tryGet2
 ```
 
-We can create a `Parser` for the `User` type:
+We can define a `Parser` like this:
 
 ```fsharp
 open Farse
