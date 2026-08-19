@@ -496,8 +496,9 @@ module Parse =
             let mutable i = 0
 
             let items =
-                element.GetArrayLength()
-                |> Array.zeroCreate
+                match element.GetArrayLength() with
+                | 0 -> [||]
+                | len -> Array.zeroCreate len
 
             while not error && enumerator.MoveNext() do
                 match parse enumerator.Current with
