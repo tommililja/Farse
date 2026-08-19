@@ -1,124 +1,119 @@
 namespace Farse
 
-open System
-open System.Text.Json
+open System.Runtime.CompilerServices
 
-[<AutoOpen>]
-module internal Extensions =
+module Extensions =
 
-    module JsonDocumentOptions =
+    type Parser<'r> with
 
-        let preset =
-            JsonDocumentOptions (
-                AllowTrailingCommas = true,
-                CommentHandling = JsonCommentHandling.Skip
-            )
+        // Sequences
 
-    type JsonElement with
+        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <remarks>Ignores null and invalid values.</remarks>
+        /// <example><code>let! seq = "prop" &amp;= Parse.int.Choose()</code></example>
+        member this.Choose() =
+            Parse.choose this
 
-        member inline this.isNull =
-            this.ValueKind = Kind.Null
+        /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.list</c>.</summary>
+        /// <example><code>let! list = "prop" &amp;= Parse.int.List()</code></example>
+        member this.List() =
+            Parse.list this
 
-        member inline this.isUndefined =
-            this.ValueKind = Kind.Undefined
+        /// <summary>Parses an array as <c>'a Microsoft.FSharp.Core.array</c>.</summary>
+        /// <example><code>let! array = "prop" &amp;= Parse.int.Array()</code></example>
+        member this.Array() =
+            Parse.array this
 
-        member inline this.isNullOrUndefined =
-            this.ValueKind = Kind.Null || this.ValueKind = Kind.Undefined
+        /// <summary>Parses an array as <c>System.Collections.Generic.HashSet&lt;'a&gt;</c>.</summary>
+        /// <example><code>let! hashSet = "prop" &amp;= Parse.int.HashSet()</code></example>
+        member this.HashSet() =
+            Parse.hashSet this
 
-        member inline this.isNotNull =
-            this.ValueKind <> Kind.Null
+        /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <example><code>let! seq = "prop" &amp;= Parse.int.Seq()</code></example>
+        member this.Seq() =
+            Parse.seq this
 
-    module JsonElement =
+        /// <summary>Parses an array at a specific index.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Index(0)</code></example>
+        member this.Index(index:int) =
+            Parse.index index this
 
-        let inline tryGetValue (e:JsonElement) =
-            match e.ValueKind with
-            | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> None
-            | _ -> Some <| e.GetRawText()
+        /// <summary>Parses the first element of an array.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.First()</code></example>
+        member this.First() =
+            Parse.first this
 
-        // Undefined elements are not clonable.
-        let inline clone (e:JsonElement) =
-            match e.ValueKind with
-            | Kind.Undefined -> JsonElement() // Undefined.
-            | _ -> e.Clone()
+        /// <summary>Parses the last element of an array.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Last()</code></example>
+        member this.Last() =
+            Parse.last this
 
-    module String =
+        // Key/Value
 
-        let inline isNotEmpty string =
-            String.IsNullOrWhiteSpace(string)
-            |> not
+        /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'a&gt;</c>.</summary>
+        /// <remarks>Fails when duplicate keys are found.</remarks>
+        /// <example><code>let! map = "prop" &amp;= Parse.int.Map()</code></example>
+        member this.Map() =
+            Parse.map this
 
-        let inline indent n (string:string) =
-            string.Split('\n')
-            |> Array.map (fun line -> String.replicate n " " + line)
-            |> String.concat "\n"
+        /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'a&gt;</c>.</summary>
+        /// <remarks>Fails when duplicate keys are found.</remarks>
+        /// <example><code>let! dict = "prop" &amp;= Parse.int.Dict()</code></example>
+        member this.Dict() =
+            Parse.dict this
 
-    module Type =
+        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt;</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <remarks>Fails when duplicate keys are found.</remarks>
+        /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.int.KeyValuePairs()</code></example>
+        member this.KeyValuePairs() =
+            Parse.keyValuePairs this
 
-        let private fromType = function
-            | "Int16" -> "int16"
-            | "Int32" -> "int"
-            | "Int64" -> "int64"
-            | "Int128" -> "int128"
-            | "Byte" -> "byte"
-            | "SByte" -> "sbyte"
-            | "UInt16" -> "uint16"
-            | "UInt32" -> "uint"
-            | "UInt64" -> "uint64"
-            | "UInt128" -> "uint128"
-            | "Double" -> "float"
-            | "Single" -> "float32"
-            | "Boolean" -> "bool"
-            | "String" -> "string"
-            | "Char" -> "char"
-            | "Decimal" -> "decimal"
-            | "BigInteger" -> "bigint"
-            | "Object" -> "obj"
-            | name -> name
+        /// <summary>Parses an object's properties as <c>string * 'a</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <remarks>Fails when duplicate keys are found.</remarks>
+        /// <example><code>let! tuples = "prop" &amp;= Parse.int.Tuples()</code></example>
+        member this.Tuples() =
+            Parse.tuples this
 
-        let private fromGenericType args = function
-            | "FSharpOption" -> $"%s{args} option"
-            | "FSharpList" -> $"%s{args} list"
-            | "FSharpSet" -> $"%s{args} Set"
-            | "FSharpMap" -> $"Map<%s{args}>"
-            | "FSharpResult" -> $"Result<%s{args}>"
-            | "IEnumerable" -> $"%s{args} seq"
-            | "Tuple" -> $"""(%s{args.Replace(", ", " * ")})"""
-            | name -> $"%s{name}<%s{args}>"
+        // Misc
 
-        let rec getName type' =
-            match type' with
-            | x when x = typeof<unit> -> "unit"
-            | x when x.IsArray -> $"%s{getName (x.GetElementType())} array"
-            | x when x.IsGenericType ->
-                let name = x.Name.Substring(0, x.Name.IndexOf('`'))
-                let args =
-                    x.GetGenericArguments()
-                    |> Array.map getName
-                    |> String.concat ", "
+        /// <summary>Parses an optional value but returns a default value when null.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Nil(1)</code></example>
+        member this.Nil(x) =
+            Parse.nil this x
 
-                fromGenericType args name
-            | x -> fromType x.Name
+        /// <summary>Parses an optional value.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Option()</code></example>
+        member this.Option() =
+            Parse.option this
 
-    module Error =
+        /// <summary>Catches all errors.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Catch()</code></example>
+        member this.Catch() =
+            Parse.catch this
 
-        let inline list x =
-            List.singleton x
-            |> Error
+        /// <summary>Refines a parsed value.</summary>
+        /// <example><code>let! type' = "prop" &amp;= Parse.string.Refine(Type.fromString)</code></example>
+        member this.Refine(fn) =
+            Parse.refine this fn
 
-    module Seq =
+        /// <summary>Verifies a parsed value.</summary>
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Verify(fun x -> x > 0, "message")</code></example>
+        member this.Verify(fn, msg) =
+            Parse.verify this fn msg
 
-        let inline ofSeq x =
-            x :> seq<_>
+    // Workaround: These need extra constraints.
 
-    [<AutoOpen>]
-    module ActivePatterns =
+    type Parse =
 
-        let (|Equals|_|) actual expected =
-            if expected = ExpectedKind.fromKind actual
-            then Some ()
-            else None
+        /// <summary>Parses an exact value and returns <c>FSharp.Core.Unit</c>.</summary>
+        /// <example><code>do! "prop" &amp;= Parse.int.Exact(1)</code></example>
+        [<Extension>]
+        static member Exact(parser, value) =
+            Parse.exact parser value
 
-        let (|Prop|Path|) (string:string) =
-            if string.Contains('.')
-            then Path (string.Split('.', StringSplitOptions.RemoveEmptyEntries))
-            else Prop string
+        /// <summary>Parses an array as <c>Microsoft.FSharp.Collections.Set&lt;'a&gt;</c>.</summary>
+        /// <example><code>let! set = "prop" &amp;= Parse.int.Set()</code></example>
+        [<Extension>]
+        static member Set(parser) =
+            Parse.set parser
