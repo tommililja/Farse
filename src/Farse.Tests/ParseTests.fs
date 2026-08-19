@@ -1942,6 +1942,185 @@ module ParseTests =
             |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
             |> Expect.parserError
 
+    module Attempt =
+
+        type TestDu =
+            | A of int * int
+            | B of {| Prop: string |}
+            | C
+
+        [<Fact>]
+        let ``Should attempt to parse discriminated union`` () =
+            let a =
+                parser {
+                    let! a = Prop.get "prop2" Parse.int
+                    let! b = Prop.get "prop3" Parse.int
+
+                    return A (a, b)
+                }
+
+            let b =
+                parser {
+                    let! b = Prop.get "prop" Parse.string
+
+                    return B {| Prop = b |}
+                }
+
+            let expected = A (1, 2)
+            let actual =
+                Parse.attempt [ b; a ]
+                |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when all parsers fail`` () =
+            let parser = Parser.fail "msg"
+            Parse.attempt [ parser; parser; parser ]
+            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when list is empty`` () =
+            Parse.attempt []
+            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
+            |> Expect.parserError
+
+    module Nil =
+
+        [<Fact>]
+        let ``Should parse null as default value`` () =
+            let expected = 1
+            let actual =
+                Parse.nil Parse.int 1
+                |> Parser.parse "null"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse element as value`` () =
+            let expected = 1
+            let actual =
+                Parse.nil Parse.int 2
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+    module Option =
+
+        [<Fact>]
+        let ``Should parse null as None`` () =
+            let expected = None
+            let actual =
+                Parse.option Parse.int
+                |> Parser.parse "null"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse value as Some value`` () =
+            let expected = Some 1
+            let actual =
+                Parse.option Parse.int
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.option Parse.int
+            |> Parser.parse "1.1"
+            |> Expect.parserError
+
+    module Catch =
+
+        [<Fact>]
+        let ``Should parse value as Some value`` () =
+            let expected = Some 1
+            let actual =
+                Parse.catch Parse.int
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should parse error as None`` () =
+            let expected = None
+            let actual =
+                Parse.catch Parse.int
+                |> Parser.parse "true"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+    module Refine =
+
+        [<Fact>]
+        let ``Should parse refined value`` () =
+            let expected = 1
+            let actual =
+                Parse.refine Parse.int Ok
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when validation fails`` () =
+            Parse.refine Parse.byte (fun _ -> Error "msg")
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.refine Parse.int Ok
+            |> Parser.parse "1.1"
+            |> Expect.parserError
+
+    module Verify =
+
+        [<Fact>]
+        let ``Should parse verified value`` () =
+            let expected = 1
+            let actual =
+                Parse.verify Parse.int (fun x -> x > 0) "msg"
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when predicate returns false`` () =
+            Parse.verify Parse.byte (fun x -> x = 0uy) "msg"
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.verify Parse.int (fun x -> x > 0) "msg"
+            |> Parser.parse "true"
+            |> Expect.parserError
+
+    module Exact =
+
+        [<Fact>]
+        let ``Should parse exact value`` () =
+            let expected = ()
+            let actual =
+                Parse.exact Parse.int 1
+                |> Parser.parse "1"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none actual expected
+
+        [<Fact>]
+        let ``Should fail when values are not equal`` () =
+            Parse.exact Parse.byte 0uy
+            |> Parser.parse "1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when parsing fails`` () =
+            Parse.exact Parse.int 1
+            |> Parser.parse "true"
+            |> Expect.parserError
+
     module Self =
 
         type Tree =
@@ -2126,185 +2305,6 @@ module ParseTests =
                 |> Parser.parse json
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none actual expected
-
-    module Attempt =
-
-        type TestDu =
-            | A of int * int
-            | B of {| Prop: string |}
-            | C
-
-        [<Fact>]
-        let ``Should attempt to parse discriminated union`` () =
-            let a =
-                parser {
-                    let! a = Prop.get "prop2" Parse.int
-                    let! b = Prop.get "prop3" Parse.int
-
-                    return A (a, b)
-                }
-
-            let b =
-                parser {
-                    let! b = Prop.get "prop" Parse.string
-
-                    return B {| Prop = b |}
-                }
-
-            let expected = A (1, 2)
-            let actual =
-                Parse.attempt [ b; a ]
-                |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should fail when all parsers fail`` () =
-            let parser = Parser.fail "msg"
-            Parse.attempt [ parser; parser; parser ]
-            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when list is empty`` () =
-            Parse.attempt []
-            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
-            |> Expect.parserError
-
-    module Nil =
-
-        [<Fact>]
-        let ``Should parse null as default value`` () =
-            let expected = 1
-            let actual =
-                Parse.nil Parse.int 1
-                |> Parser.parse "null"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should parse element as value`` () =
-            let expected = 1
-            let actual =
-                Parse.nil Parse.int 2
-                |> Parser.parse "1"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-    module Option =
-
-        [<Fact>]
-        let ``Should parse null as None`` () =
-            let expected = None
-            let actual =
-                Parse.option Parse.int
-                |> Parser.parse "null"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should parse value as Some value`` () =
-            let expected = Some 1
-            let actual =
-                Parse.option Parse.int
-                |> Parser.parse "1"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should fail when parsing fails`` () =
-            Parse.option Parse.int
-            |> Parser.parse "1.1"
-            |> Expect.parserError
-
-    module Catch =
-
-        [<Fact>]
-        let ``Should parse value as Some value`` () =
-            let expected = Some 1
-            let actual =
-                Parse.catch Parse.int
-                |> Parser.parse "1"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should parse error as None`` () =
-            let expected = None
-            let actual =
-                Parse.catch Parse.int
-                |> Parser.parse "true"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-    module Refine =
-
-        [<Fact>]
-        let ``Should parse refined value`` () =
-            let expected = 1
-            let actual =
-                Parse.refine Parse.int Ok
-                |> Parser.parse "1"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should fail when validation fails`` () =
-            Parse.refine Parse.byte (fun _ -> Error "msg")
-            |> Parser.parse "1"
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when parsing fails`` () =
-            Parse.refine Parse.int Ok
-            |> Parser.parse "1.1"
-            |> Expect.parserError
-
-    module Verify =
-
-        [<Fact>]
-        let ``Should parse verified value`` () =
-            let expected = 1
-            let actual =
-                Parse.verify Parse.int (fun x -> x > 0) "msg"
-                |> Parser.parse "1"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should fail when predicate returns false`` () =
-            Parse.verify Parse.byte (fun x -> x = 0uy) "msg"
-            |> Parser.parse "1"
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when parsing fails`` () =
-            Parse.verify Parse.int (fun x -> x > 0) "msg"
-            |> Parser.parse "true"
-            |> Expect.parserError
-
-    module Exact =
-
-        [<Fact>]
-        let ``Should parse exact value`` () =
-            let expected = ()
-            let actual =
-                Parse.exact Parse.int 1
-                |> Parser.parse "1"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
-
-        [<Fact>]
-        let ``Should fail when values are not equal`` () =
-            Parse.exact Parse.byte 0uy
-            |> Parser.parse "1"
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when parsing fails`` () =
-            Parse.exact Parse.int 1
-            |> Parser.parse "true"
-            |> Expect.parserError
 
     module Kind =
 

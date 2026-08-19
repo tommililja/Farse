@@ -746,42 +746,6 @@ module Parse =
             | Error e -> Error e
         ) ExpectedKind.Object
 
-    /// <summary>Creates a <c>Parser</c> that can reference itself.</summary>
-    /// <example><code>let! x = "prop" &amp;= Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</code></example>
-    let self fn =
-        let self = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
-        let parser = fn (Parser (fun element -> let (Parser parse) = self.Value in parse element))
-        self.Value <- parser
-        parser
-
-    /// <summary>Creates two <c>Parser</c> values that can reference each other.</summary>
-    /// <example>
-    /// <code>
-    ///     let valueParser, fieldParser =
-    ///         Parse.mutual (fun (valueParser, fieldParser) ->
-    ///             parser {
-    ///                 let! id = "id" &amp;= Parse.string
-    ///                 and! fields = "fields" &amp;= Parse.array fieldParser
-    ///                 return { Id = id; Fields = fields }
-    ///             },
-    ///             parser {
-    ///                 let! name = "name" &amp;= Parse.string
-    ///                 and! values = "values" &amp;= Parse.array valueParser
-    ///                 return { Name = name; Values = values }
-    ///             }
-    ///         )
-    /// </code>
-    /// </example>
-    let mutual fn =
-        let refA = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
-        let refB = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
-        let parserA = Parser (fun element -> let (Parser parse) = refA.Value in parse element)
-        let parserB = Parser (fun element -> let (Parser parse) = refB.Value in parse element)
-        let a, b = fn (parserA, parserB)
-        refA.Value <- a
-        refB.Value <- b
-        a, b
-
     /// <summary>Parses an element by trying each <c>Parser</c> in order.</summary>
     /// <remarks>Returns on the first success.</remarks>
     /// <example><code>let! x = Parse.attempt [ a; b ]</code></example>
@@ -805,7 +769,7 @@ module Parse =
                 loop 0 parsers
         )
 
-    // Combinators
+    // Misc
 
     /// <summary>Parses an optional value but returns a default value when null.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
@@ -877,6 +841,42 @@ module Parse =
                 |> Error.list
             | Error e -> Error e
         )
+
+    /// <summary>Creates a <c>Parser</c> that can reference itself.</summary>
+    /// <example><code>let! x = "prop" &amp;= Parse.self (fun self -> Parse.oneOf "type" [ "leaf", a; "branch", b self ])</code></example>
+    let self fn =
+        let self = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
+        let parser = fn (Parser (fun element -> let (Parser parse) = self.Value in parse element))
+        self.Value <- parser
+        parser
+
+    /// <summary>Creates two <c>Parser</c> values that can reference each other.</summary>
+    /// <example>
+    /// <code>
+    ///     let valueParser, fieldParser =
+    ///         Parse.mutual (fun (valueParser, fieldParser) ->
+    ///             parser {
+    ///                 let! id = "id" &amp;= Parse.string
+    ///                 and! fields = "fields" &amp;= Parse.array fieldParser
+    ///                 return { Id = id; Fields = fields }
+    ///             },
+    ///             parser {
+    ///                 let! name = "name" &amp;= Parse.string
+    ///                 and! values = "values" &amp;= Parse.array valueParser
+    ///                 return { Name = name; Values = values }
+    ///             }
+    ///         )
+    /// </code>
+    /// </example>
+    let mutual fn =
+        let refA = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
+        let refB = ref (Parser (fun _ -> failwith "Uninitialized recursive parser."))
+        let parserA = Parser (fun element -> let (Parser parse) = refA.Value in parse element)
+        let parserB = Parser (fun element -> let (Parser parse) = refB.Value in parse element)
+        let a, b = fn (parserA, parserB)
+        refA.Value <- a
+        refB.Value <- b
+        a, b
 
     // Json
 
