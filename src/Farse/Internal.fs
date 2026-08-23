@@ -114,9 +114,7 @@ module internal Internal =
     module ActivePatterns =
 
         let (|Equals|_|) actual expected =
-            if expected = ExpectedKind.fromKind actual
-            then Some ()
-            else None
+            expected = ExpectedKind.fromKind actual
 
         let (|Prop|Path|) (string:string) =
             if string.Contains('.')
