@@ -154,7 +154,7 @@ module Parse =
                 let string = element.GetString()
                 if Regex.IsMatch(string, regex) then Ok string
                 else Error $"Expected the string to match '%s{regex}'."
-            with :? ArgumentException -> Error $"Invalid regular expression '%s{regex}'."
+            with :? ArgumentException -> Error $"Invalid regex '%s{regex}'."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
@@ -164,7 +164,7 @@ module Parse =
             let string = element.GetString()
             match 'r.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
-            | _ -> Error "Expected a number string."
+            | _ -> Error "Expected an INumber string."
         ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as <c>System.String</c>.</summary>
@@ -477,7 +477,12 @@ module Parse =
 
     /// <summary>Parses a string (ISO 3166) as <c>System.Globalization.RegionInfo</c>.</summary>
     /// <example><code>let! region = "prop" &amp;= Parse.regionInfo</code></example>
-    let regionInfo = custom (_.GetString() >> RegionInfo >> Ok) ExpectedKind.String
+    let regionInfo =
+        custom (fun element ->
+            let string = element.GetString()
+            try Ok <| RegionInfo(string)
+            with :? ArgumentException as exn -> Error exn.Message
+        ) ExpectedKind.String
 
     // Sequences
 
