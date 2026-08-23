@@ -21,7 +21,7 @@ module ParserTests =
             Parse.unit
             |> Parser.run (JsonElement.Parse("null"))
             |> Expect.wantOk $"Expected %s{nameof Parser.run} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should create Parser from value`` () =
@@ -31,7 +31,7 @@ module ParserTests =
             |> Parser.from
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should create Parser from Result`` () =
@@ -40,7 +40,7 @@ module ParserTests =
             expected
             |> Parser.fromResult
             |> Parser.parse "1"
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should create Parser from Result that fails`` () =
@@ -64,7 +64,7 @@ module ParserTests =
             |> Parser.recover 1
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should not recover with a default value when a Parser succeeds`` () =
@@ -74,7 +74,7 @@ module ParserTests =
             |> Parser.recover 2
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should bind parsers`` () =
@@ -84,7 +84,7 @@ module ParserTests =
             |> Parser.bind (fun x -> Parser.from (x + 1))
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should map Parser value`` () =
@@ -94,7 +94,7 @@ module ParserTests =
             |> Parser.map string
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should ignore Parser value`` () =
@@ -104,7 +104,7 @@ module ParserTests =
             |> Parser.ignore<int>
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should not ignore Parser value when a Parser fails`` () =
@@ -121,7 +121,7 @@ module ParserTests =
             |> Parser.defaultValue 1
             |> Parser.parse "null"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should not set default value when Some`` () =
@@ -131,7 +131,7 @@ module ParserTests =
             |> Parser.defaultValue 2
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should not set default value when a Parser fails`` () =
@@ -148,7 +148,7 @@ module ParserTests =
             |> Parser.defaultWith (fun () -> 1)
             |> Parser.parse "null"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should not get default value when Some`` () =
@@ -158,7 +158,7 @@ module ParserTests =
             |> Parser.defaultWith (fun () -> 2)
             |> Parser.parse "1"
             |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should not get default value when a Parser fails`` () =
@@ -176,7 +176,7 @@ module ParserTests =
                 Parse.int
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
@@ -211,7 +211,7 @@ module ParserTests =
             |> Task.map (fun x ->
                 let expected = 1
                 let actual = Expect.wantOk $"Expected %s{nameof Parser.parseAsync} to succeed." x
-                Expect.equal Msg.none actual expected
+                Expect.equal Msg.none expected actual
             )
 
         [<Fact>]
@@ -247,7 +247,7 @@ module ParserTests =
                 Parse.int
                 |> Parser.parseBytes (String.asBytes "1")
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
@@ -282,7 +282,7 @@ module ParserTests =
                 Parse.int
                 |> Parser.parseMemory (ReadOnlyMemory.ofString "1")
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =
@@ -311,7 +311,7 @@ module ParserTests =
                 Parse.int
                 |> Parser.parseSequence (ReadOnlySequence.ofString "1")
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing invalid JSON`` () =

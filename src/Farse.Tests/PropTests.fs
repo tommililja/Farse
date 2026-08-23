@@ -15,7 +15,7 @@ module PropTests =
                 Prop.tryGet "prop" Parse.int
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse null property as None`` () =
@@ -24,7 +24,7 @@ module PropTests =
                 Prop.tryGet "prop" Parse.int
                 |> Parser.parse """{ "prop": null }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse undefined property as None`` () =
@@ -33,7 +33,7 @@ module PropTests =
                 Prop.tryGet "missing" Parse.int
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when property is a different kind``() =
@@ -68,7 +68,7 @@ module PropTests =
                 Prop.tryGet "prop.prop2" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": 1 } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse first null property as None`` () =
@@ -77,7 +77,7 @@ module PropTests =
                 Prop.tryGet "prop.prop2.pro3" Parse.int
                 |> Parser.parse """{ "prop": null }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse intermediate null property as None`` () =
@@ -86,7 +86,7 @@ module PropTests =
                 Prop.tryGet "prop.prop2.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": null } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse last null property as None`` () =
@@ -95,7 +95,7 @@ module PropTests =
                 Prop.tryGet "prop.prop2.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse first undefined property as None`` () =
@@ -104,7 +104,7 @@ module PropTests =
                 Prop.tryGet "missing.prop2.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse intermediate undefined property as None`` () =
@@ -113,7 +113,7 @@ module PropTests =
                 Prop.tryGet "prop.missing.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": 1 } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse last undefined property as None`` () =
@@ -122,7 +122,7 @@ module PropTests =
                 Prop.tryGet "prop.prop2.missing" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when property is a different kind``() =
@@ -169,7 +169,7 @@ module PropTests =
                 Prop.get "prop" Parse.int
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse property as Some value`` () =
@@ -178,7 +178,7 @@ module PropTests =
                 Prop.get "prop" (Parse.option Parse.int)
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse null property as None`` () =
@@ -187,7 +187,7 @@ module PropTests =
                 Prop.get "prop" (Parse.option Parse.int)
                 |> Parser.parse """{ "prop": null }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when property is null`` () =
@@ -234,7 +234,7 @@ module PropTests =
                 Prop.get "prop.prop2" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": 1 } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse property as Some value`` () =
@@ -243,7 +243,7 @@ module PropTests =
                 Prop.get "prop.prop2" (Parse.option Parse.int)
                 |> Parser.parse """{ "prop": { "prop2": 1 } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse null property as None`` () =
@@ -252,7 +252,7 @@ module PropTests =
                 Prop.get "prop.prop2" (Parse.option Parse.int)
                 |> Parser.parse """{ "prop": { "prop2": null } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when first property is null`` () =
@@ -335,7 +335,7 @@ module PropTests =
                 Prop.tryGet2 "prop" Parse.int
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse null property as Some None`` () =
@@ -344,7 +344,7 @@ module PropTests =
                 Prop.tryGet2 "prop" Parse.int
                 |> Parser.parse """{ "prop": null }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse undefined property as None`` () =
@@ -353,7 +353,7 @@ module PropTests =
                 Prop.tryGet2 "missing" Parse.int
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when property is a different kind``() =
@@ -388,7 +388,7 @@ module PropTests =
                 Prop.tryGet2 "prop.prop2" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": 1 } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse null property as Some None`` () =
@@ -397,7 +397,7 @@ module PropTests =
                 Prop.tryGet2 "prop.prop2" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": null } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse first null property as None`` () =
@@ -406,7 +406,7 @@ module PropTests =
                 Prop.tryGet2 "prop.prop2.pro3" Parse.int
                 |> Parser.parse """{ "prop": null }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse intermediate null property as None`` () =
@@ -415,7 +415,7 @@ module PropTests =
                 Prop.tryGet2 "prop.prop2.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": null } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse last null property as None`` () =
@@ -424,7 +424,7 @@ module PropTests =
                 Prop.tryGet2 "prop.prop2.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": { "prop3": null } } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse first undefined property as None`` () =
@@ -433,7 +433,7 @@ module PropTests =
                 Prop.tryGet2 "missing.prop2.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse intermediate undefined property as None`` () =
@@ -442,7 +442,7 @@ module PropTests =
                 Prop.tryGet2 "prop.missing.prop3" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": 1 } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse last undefined property as None`` () =
@@ -451,7 +451,7 @@ module PropTests =
                 Prop.tryGet2 "prop.prop2.missing" Parse.int
                 |> Parser.parse """{ "prop": { "prop2": { "prop3": 1 } } }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when property is a different kind``() =

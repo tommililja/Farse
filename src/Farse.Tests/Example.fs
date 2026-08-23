@@ -185,4 +185,4 @@ module Example =
 
         let actual = User.asJsonString user
 
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual

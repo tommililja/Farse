@@ -114,7 +114,7 @@ module JsonTests =
             JsonElement.Parse expected
             |> Json.fromElement
             |> Json.asString Indented
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should create Json from string`` () =
@@ -123,7 +123,7 @@ module JsonTests =
             Json.fromString expected
             |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
             |> Json.asString Indented
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should fail to create Json from string when JSON is invalid``() =
@@ -143,7 +143,7 @@ module JsonTests =
                     Expect.wantOk $"Expected %s{nameof Json.fromStreamAsync} to succeed."
                     >> Json.asString Indented
                 )
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
         }
 
     [<Fact>]
@@ -162,7 +162,7 @@ module JsonTests =
             |> Json.fromBytes
             |> Expect.wantOk $"Expected %s{nameof Json.fromBytes} to succeed."
             |> Json.asString Indented
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     [<Fact>]
     let ``Should fail to create Json from bytes when JSON is invalid``() =
@@ -239,14 +239,14 @@ module JsonTests =
             do! writer.FlushAsync()
             let expected = Json.asString Raw Data.example
             let actual = stream.ToArray() |> String.ofBytes
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
         }
 
     [<Fact>]
     let ``Should convert Json to bytes`` () =
         let expected = Json.asString Indented Data.example
         let actual = Json.asBytes Indented Data.example |> String.ofBytes
-        Expect.equal Msg.none actual expected
+        Expect.equal Msg.none expected actual
 
     module JStr =
 
@@ -354,7 +354,7 @@ module JsonTests =
         ]
         |> List.iter (fun (json, expected) ->
             let actual = Json.asString Raw json
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
         )
 
     module JBit =

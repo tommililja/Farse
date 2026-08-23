@@ -22,7 +22,7 @@ module ParseTests =
                 Parse.custom (_.GetInt32() >> Ok) ExpectedKind.Number
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse with value with custom parser when ExpectedKind is Any`` () =
@@ -35,7 +35,7 @@ module ParseTests =
                 ) ExpectedKind.Any
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not the right kind`` () =
@@ -72,7 +72,7 @@ module ParseTests =
                 Parse.int
                 |> Parser.parse "2147483647"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -95,7 +95,7 @@ module ParseTests =
                 Parse.int16
                 |> Parser.parse "32767"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -118,7 +118,7 @@ module ParseTests =
                 Parse.int64
                 |> Parser.parse "9223372036854775807"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -141,7 +141,7 @@ module ParseTests =
                 Parse.int128
                 |> Parser.parse (string expected)
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -170,7 +170,7 @@ module ParseTests =
                 Parse.uint16
                 |> Parser.parse "65535"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -193,7 +193,7 @@ module ParseTests =
                 Parse.uint32
                 |> Parser.parse "4294967295"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -216,7 +216,7 @@ module ParseTests =
                 Parse.uint64
                 |> Parser.parse "18446744073709551615"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -239,7 +239,7 @@ module ParseTests =
                 Parse.uint128
                 |> Parser.parse (string expected)
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -268,7 +268,7 @@ module ParseTests =
                 Parse.float
                 |> Parser.parse "1.7976931348623157E+308"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
@@ -285,7 +285,7 @@ module ParseTests =
                 Parse.float32
                 |> Parser.parse "3.40282346639e+38"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =
@@ -302,7 +302,7 @@ module ParseTests =
                 Parse.decimal
                 |> Parser.parse (string Decimal.MaxValue)
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -325,7 +325,7 @@ module ParseTests =
                 Parse.byte
                 |> Parser.parse "255"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -348,7 +348,7 @@ module ParseTests =
                 Parse.sbyte
                 |> Parser.parse "127"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -371,7 +371,7 @@ module ParseTests =
                 Parse.char
                 |> Parser.parse "\"a\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -394,7 +394,7 @@ module ParseTests =
                 Parse.string
                 |> Parser.parse "\"value\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -411,7 +411,7 @@ module ParseTests =
                 Parse.stringNonEmpty
                 |> Parser.parse "\"value\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when string is empty`` () =
@@ -440,7 +440,7 @@ module ParseTests =
                 Parse.regex "^[0-9]+$"
                 |> Parser.parse "\"12345\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when regex is invalid`` () =
@@ -469,7 +469,7 @@ module ParseTests =
                 Parse.number Parse.bigint
                 |> Parser.parse "\"1\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse string as int`` () =
@@ -478,7 +478,7 @@ module ParseTests =
                 Parse.number Parse.int
                 |> Parser.parse "\"42\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse a string as float`` () =
@@ -487,7 +487,7 @@ module ParseTests =
                 Parse.number Parse.float
                 |> Parser.parse "\"1.234\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -517,12 +517,12 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string as base64 string`` () =
-            let actual = "aGVsbG8gc3RyYW5nZXIh"
-            let expected =
+            let expected = "aGVsbG8gc3RyYW5nZXIh"
+            let actual =
                 Parse.base64String
                 |> Parser.parse "\"aGVsbG8gc3RyYW5nZXIh\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -540,12 +540,12 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string as base64 byte array`` () =
-            let actual = Convert.FromBase64String("aGVsbG8gc3RyYW5nZXIh")
-            let expected =
+            let expected = Convert.FromBase64String("aGVsbG8gc3RyYW5nZXIh")
+            let actual =
                 Parse.base64Bytes
                 |> Parser.parse "\"aGVsbG8gc3RyYW5nZXIh\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -568,7 +568,7 @@ module ParseTests =
                 Parse.bigint
                 |> Parser.parse "123456789012345678901234567890"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -591,7 +591,7 @@ module ParseTests =
                 Parse.half
                 |> Parser.parse "1.2345"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse number that is out of range`` () =
@@ -600,7 +600,7 @@ module ParseTests =
                 Parse.half
                 |> Parser.parse "999999"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =
@@ -617,7 +617,7 @@ module ParseTests =
                 Parse.bool
                 |> Parser.parse "true"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not a bool`` () =
@@ -634,7 +634,7 @@ module ParseTests =
                 Parse.guid
                 |> Parser.parse "\"fb245a37-2de1-4cc5-b41b-1c6e68866b68\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -657,7 +657,7 @@ module ParseTests =
                 Parse.guidExact "N"
                 |> Parser.parse "\"fb245a372de14cc5b41b1c6e68866b68\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
@@ -680,7 +680,7 @@ module ParseTests =
                 Parse.unit
                 |> Parser.parse "null"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module None =
 
@@ -691,7 +691,7 @@ module ParseTests =
                 Parse.none
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module Enum =
 
@@ -705,7 +705,7 @@ module ParseTests =
                 Parse.enum
                 |> Parser.parse "\"A\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -731,7 +731,7 @@ module ParseTests =
                 Parse.intEnum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -763,7 +763,7 @@ module ParseTests =
                 Parse.int16Enum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -795,7 +795,7 @@ module ParseTests =
                 Parse.int64Enum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -827,7 +827,7 @@ module ParseTests =
                 Parse.uint16Enum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -859,7 +859,7 @@ module ParseTests =
                 Parse.uint32Enum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -891,7 +891,7 @@ module ParseTests =
                 Parse.uint64Enum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -923,7 +923,7 @@ module ParseTests =
                 Parse.byteEnum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -955,7 +955,7 @@ module ParseTests =
                 Parse.sbyteEnum
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when value is invalid`` () =
@@ -984,7 +984,7 @@ module ParseTests =
                 Parse.timeOnly
                 |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1007,7 +1007,7 @@ module ParseTests =
                 Parse.timeOnlyExact "HHmmss"
                 |> Parser.parse "\"172845\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
@@ -1030,7 +1030,7 @@ module ParseTests =
                 Parse.timeSpan
                 |> Parser.parse "\"1:23:45\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1053,7 +1053,7 @@ module ParseTests =
                 Parse.timeSpanExact "hhmmss"
                 |> Parser.parse "\"012345\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
@@ -1076,7 +1076,7 @@ module ParseTests =
                 Parse.dateOnly
                 |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1099,7 +1099,7 @@ module ParseTests =
                 Parse.dateOnlyExact "yyyyMMdd"
                 |> Parser.parse "\"20250513\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
@@ -1122,7 +1122,7 @@ module ParseTests =
                 Parse.dateTime
                 |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1146,7 +1146,7 @@ module ParseTests =
                 Parse.dateTimeUtc
                 |> Parser.parse "\"2025-05-25T10:00:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1169,7 +1169,7 @@ module ParseTests =
                 Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
                 |> Parser.parse "\"2025-05-13 17:28:45\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
@@ -1192,7 +1192,7 @@ module ParseTests =
                 Parse.dateTimeOffset
                 |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail whe parsing fails`` () =
@@ -1216,7 +1216,7 @@ module ParseTests =
                 Parse.dateTimeOffsetUtc
                 |> Parser.parse "\"2025-05-25T10:00:00+01:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1239,7 +1239,7 @@ module ParseTests =
                 Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz"
                 |> Parser.parse "\"2025-05-13 17:28 +02:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
@@ -1262,7 +1262,7 @@ module ParseTests =
                 Parse.unixSeconds
                 |> Parser.parse "1783282018"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1285,7 +1285,7 @@ module ParseTests =
                 Parse.unixMilliseconds
                 |> Parser.parse "1783282692255"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1308,7 +1308,7 @@ module ParseTests =
                 Parse.uri UriKind.Absolute
                 |> Parser.parse "\"https://www.example.com/path?query=value\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1331,7 +1331,7 @@ module ParseTests =
                 Parse.version
                 |> Parser.parse "\"1.2\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1354,7 +1354,7 @@ module ParseTests =
                 Parse.ipAddress
                 |> Parser.parse "\"192.168.1.1\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1377,7 +1377,7 @@ module ParseTests =
                 Parse.mailAddress
                 |> Parser.parse "\"test@domain.com\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1400,7 +1400,7 @@ module ParseTests =
                 Parse.regionInfo
                 |> Parser.parse "\"SE\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1423,7 +1423,7 @@ module ParseTests =
                 Parse.choose Parse.int
                 |> Parser.parse """[ 1, null, 2, 3, "4" ]"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
@@ -1440,7 +1440,7 @@ module ParseTests =
                 Parse.list Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1463,7 +1463,7 @@ module ParseTests =
                 Parse.array Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1486,7 +1486,7 @@ module ParseTests =
                 Parse.set Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1509,7 +1509,7 @@ module ParseTests =
                 Parse.hashSet Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1532,7 +1532,7 @@ module ParseTests =
                 Parse.seq Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1555,7 +1555,7 @@ module ParseTests =
                 Parse.index 0 Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when index is out of range`` () =
@@ -1584,7 +1584,7 @@ module ParseTests =
                 Parse.first Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when index is out of range`` () =
@@ -1613,7 +1613,7 @@ module ParseTests =
                 Parse.last Parse.int
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when index is out of range`` () =
@@ -1642,7 +1642,7 @@ module ParseTests =
                 Parse.map Parse.int
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
@@ -1671,7 +1671,7 @@ module ParseTests =
                 Parse.dict Parse.int
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
@@ -1700,7 +1700,7 @@ module ParseTests =
                 Parse.keyValuePairs Parse.int
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
@@ -1729,7 +1729,7 @@ module ParseTests =
                 Parse.tuples Parse.int
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
@@ -1758,7 +1758,7 @@ module ParseTests =
                 Parse.keys
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none actual expected
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
@@ -1781,7 +1781,7 @@ module ParseTests =
                 Parse.tuple2 Parse.string Parse.int
                 |> Parser.parse """[ "1", 1 ]"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1810,7 +1810,7 @@ module ParseTests =
                 Parse.tuple3 Parse.string Parse.int Parse.int
                 |> Parser.parse """[ "1", 1, 1 ]"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1839,7 +1839,7 @@ module ParseTests =
                 Parse.tuple4 Parse.string Parse.int Parse.int Parse.int
                 |> Parser.parse """[ "1", 1, 1, 1 ]"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1868,7 +1868,7 @@ module ParseTests =
                 Parse.tuple5 Parse.string Parse.int Parse.int Parse.int Parse.int
                 |> Parser.parse """[ "1", 1, 1, 1, 1 ]"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1909,7 +1909,7 @@ module ParseTests =
                 ]
                 |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1971,7 +1971,7 @@ module ParseTests =
                 Parse.attempt [ b; a ]
                 |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when all parsers fail`` () =
@@ -1995,7 +1995,7 @@ module ParseTests =
                 Parse.nil Parse.int 1
                 |> Parser.parse "null"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse element as value`` () =
@@ -2004,7 +2004,7 @@ module ParseTests =
                 Parse.nil Parse.int 2
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module Option =
 
@@ -2015,7 +2015,7 @@ module ParseTests =
                 Parse.option Parse.int
                 |> Parser.parse "null"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse value as Some value`` () =
@@ -2024,7 +2024,7 @@ module ParseTests =
                 Parse.option Parse.int
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -2041,7 +2041,7 @@ module ParseTests =
                 Parse.catch Parse.int
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse error as None`` () =
@@ -2050,7 +2050,7 @@ module ParseTests =
                 Parse.catch Parse.int
                 |> Parser.parse "true"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module Refine =
 
@@ -2061,7 +2061,7 @@ module ParseTests =
                 Parse.refine Parse.int Ok
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when validation fails`` () =
@@ -2084,7 +2084,7 @@ module ParseTests =
                 Parse.verify Parse.int (fun x -> x > 0) "msg"
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when predicate returns false`` () =
@@ -2107,7 +2107,7 @@ module ParseTests =
                 Parse.exact Parse.int 1
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when values are not equal`` () =
@@ -2159,7 +2159,7 @@ module ParseTests =
                         }
                    """
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module Mutual =
 
@@ -2246,7 +2246,7 @@ module ParseTests =
                 valueParser
                 |> Parser.parse json
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should parse mutually recursive parser starting from field`` () =
@@ -2304,7 +2304,7 @@ module ParseTests =
                 fieldParser
                 |> Parser.parse json
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module Kind =
 
@@ -2315,7 +2315,7 @@ module ParseTests =
                 Parse.kind
                 |> Parser.parse "1"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module Element =
 
@@ -2337,7 +2337,7 @@ module ParseTests =
                 Parse.rawText
                 |> Parser.parse """{ "prop": 1 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
     module ArrayLength =
 
@@ -2348,7 +2348,7 @@ module ParseTests =
                 Parse.arrayLength
                 |> Parser.parse "[ 1, 2, 3 ]"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an array`` () =
@@ -2365,7 +2365,7 @@ module ParseTests =
                 Parse.propertyCount
                 |> Parser.parse """{ "prop": 1, "prop2": 2, "prop3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none actual expected
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
