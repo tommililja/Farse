@@ -5,7 +5,9 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Extensions.fs" />
         <Compile Include="Benchmarks.fs"/>
+        <Compile Include="App.fs" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Farse\Farse.fsproj"/>

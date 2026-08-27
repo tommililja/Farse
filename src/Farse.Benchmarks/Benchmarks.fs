@@ -1,10 +1,9 @@
+namespace Farse.Benchmarks
+
 open System
 open System.Text.Json
 open BenchmarkDotNet.Attributes
-open BenchmarkDotNet.Configs
 open BenchmarkDotNet.Order
-open BenchmarkDotNet.Reports
-open BenchmarkDotNet.Running
 open Microsoft.FSharpLu.Json
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
@@ -60,36 +59,6 @@ module BenchmarkData =
                     ]
             ]
         )
-
-module NewtonsoftJson =
-
-    let asOption fn (t:JToken) =
-        match t with
-        | x when x.Type <> JTokenType.Null -> Some <| fn x
-        | _ -> None
-
-    let asArray fn (t:JToken) =
-        let array = t :?> JArray
-        let items = Array.zeroCreate array.Count
-        for i in 0 .. array.Count - 1 do
-            items[i] <- fn array[i]
-        items
-
-module SystemTextJson =
-
-    let asOption fn (e:JsonElement) =
-        match e with
-        | x when x.ValueKind <> JsonValueKind.Null -> Some <| fn x
-        | _ -> None
-
-    let asArray fn (e:JsonElement) =
-        let items = Array.zeroCreate <| e.GetArrayLength()
-        let mutable enumerator = e.EnumerateArray()
-        let mutable i = 0
-        while enumerator.MoveNext() do
-            items[i] <- fn enumerator.Current
-            i <- i + 1
-        items
 
 [<MemoryDiagnoser(true); Orderer(SummaryOrderPolicy.FastestToSlowest)>]
 type ParserBenchmarks() =
@@ -198,22 +167,22 @@ type ParserBenchmarks() =
     [<Benchmark(Description = "Newtonsoft.Json")>]
     member _.NewtonsoftJson() =
         JArray.Parse(json)
-        |> NewtonsoftJson.asArray (fun user ->
+        |> JToken.asArray (fun user ->
             let user = user :?> JObject
             let subscription = user.GetValue("subscription") :?> JObject
             {
                 Id = user.GetValue("id").Value<string>() |> Guid.Parse
                 Name = user.GetValue("name").Value<string>()
-                Age = user.GetValue("age") |> NewtonsoftJson.asOption _.Value<byte>()
+                Age = user.GetValue("age") |> JToken.asOption _.Value<byte>()
                 Email = user.GetValue("email").Value<string>()
-                Profiles = user.GetValue("profiles") |> NewtonsoftJson.asArray (_.Value<string>() >> Guid.Parse)
+                Profiles = user.GetValue("profiles") |> JToken.asArray (_.Value<string>() >> Guid.Parse)
                 Subscription =
                     {
                         Plan = subscription.GetValue("plan").Value<string>()
                         IsCanceled = subscription.GetValue("isCanceled").Value<bool>()
-                        RenewsAt = subscription.GetValue("renewsAt") |> NewtonsoftJson.asOption _.Value<DateTime>()
+                        RenewsAt = subscription.GetValue("renewsAt") |> JToken.asOption _.Value<DateTime>()
                     }
-                Tags = user.GetValue("tags") |> NewtonsoftJson.asArray _.Value<string>()
+                Tags = user.GetValue("tags") |> JToken.asArray _.Value<string>()
             }
         )
 
@@ -221,20 +190,20 @@ type ParserBenchmarks() =
     member _.SystemTextJson() =
         use doc = JsonDocument.Parse(json)
         doc.RootElement
-        |> SystemTextJson.asArray (fun user ->
-            let subscription = user.GetProperty("subscription")
+        |> JsonElement.asArray (fun e ->
+            let subscription = e.GetProperty("subscription")
             {
-                Id = user.GetProperty("id").GetGuid()
-                Name = user.GetProperty("name").GetString()
-                Age = user.GetProperty("age") |> SystemTextJson.asOption _.GetByte()
-                Email = user.GetProperty("email").GetString()
-                Profiles = user.GetProperty("profiles") |> SystemTextJson.asArray _.GetGuid()
+                Id = e.GetProperty("id").GetGuid()
+                Name = e.GetProperty("name").GetString()
+                Age = e.GetProperty("age") |> JsonElement.asOption _.GetByte()
+                Email = e.GetProperty("email").GetString()
+                Profiles = e.GetProperty("profiles") |> JsonElement.asArray _.GetGuid()
                 Subscription = {
                     Plan = subscription.GetProperty("plan").GetString()
                     IsCanceled = subscription.GetProperty("isCanceled").GetBoolean()
-                    RenewsAt = subscription.GetProperty("renewsAt") |> SystemTextJson.asOption _.GetDateTime()
+                    RenewsAt = subscription.GetProperty("renewsAt") |> JsonElement.asOption _.GetDateTime()
                 }
-                Tags = user.GetProperty("tags") |> SystemTextJson.asArray _.GetString()
+                Tags = e.GetProperty("tags") |> JsonElement.asArray _.GetString()
             }
         )
 
@@ -256,13 +225,3 @@ type ParserBenchmarks() =
         |> Parser.parse json
         |> Result.mapError ParserError.asString
         |> Result.defaultWith failwith
-
-let config =
-    ManualConfig
-        .Create(DefaultConfig.Instance)
-        .WithSummaryStyle(SummaryStyle.Default)
-        .HideColumns("Error", "StdDev", "RatioSD")
-
-let summary =
-    BenchmarkRunner
-        .Run<ParserBenchmarks>(config)
