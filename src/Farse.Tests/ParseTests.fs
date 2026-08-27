@@ -1657,7 +1657,7 @@ module ParseTests =
                 Parse.map Parse.int
                 |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none expected actual
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1748,12 +1748,12 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse duplicate keys`` () =
-            let expected = seq [| "key1", 5; "key1", 1; "key2", 2; "key3", 3 |]
+            let expected = seq [ "key1", 5; "key1", 1; "key2", 2; "key3", 3 ]
             let actual =
                 Parse.tuples Parse.int
                 |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none expected actual
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
