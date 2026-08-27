@@ -52,25 +52,23 @@ module Extensions =
         // Key/Value
 
         /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'a&gt;</c>.</summary>
-        /// <remarks>Fails when duplicate keys are found.</remarks>
+        /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
         /// <example><code>let! map = "prop" &amp;= Parse.int.Map()</code></example>
         member this.Map() =
             Parse.map this
 
         /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'a&gt;</c>.</summary>
-        /// <remarks>Fails when duplicate keys are found.</remarks>
+        /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
         /// <example><code>let! dict = "prop" &amp;= Parse.int.Dict()</code></example>
         member this.Dict() =
             Parse.dict this
 
         /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt;</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
-        /// <remarks>Fails when duplicate keys are found.</remarks>
         /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.int.KeyValuePairs()</code></example>
         member this.KeyValuePairs() =
             Parse.keyValuePairs this
 
         /// <summary>Parses an object's properties as <c>string * 'a</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
-        /// <remarks>Fails when duplicate keys are found.</remarks>
         /// <example><code>let! tuples = "prop" &amp;= Parse.int.Tuples()</code></example>
         member this.Tuples() =
             Parse.tuples this

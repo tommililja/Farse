@@ -150,6 +150,10 @@ module Prop =
         )
 
     /// <summary>Parses a required property.</summary>
+    /// <remarks>
+    /// Property names are matched with ordinal, case-sensitive comparison.
+    /// The last occurrence is chosen when duplicate properties exist.
+    /// </remarks>
     /// <example><code>let! int = Prop.get "prop.prop2" Parse.int</code></example>
     let get path parser =
         match path with
@@ -157,14 +161,21 @@ module Prop =
         | Path path -> traverse path parser
 
     /// <summary>Parses an optional property.</summary>
+    /// <remarks>
+    /// Property names are matched with ordinal, case-sensitive comparison.
+    /// The last occurrence is chosen when duplicate properties exist.
+    /// </remarks>
     /// <example><code>let! int = Prop.tryGet "prop.prop2" Parse.int</code></example>
     let tryGet path parser =
         match path with
         | Prop name -> tryParse name parser
         | Path path -> tryTraverse path parser
 
-    /// <summary>Parses an optional property.</summary>
-    /// <remarks>Distinguishes between a missing property and a null value.</remarks>
+    /// <summary>Parses an optional property, distinguishing between a missing property and a null value.</summary>
+    /// <remarks>
+    /// Property names are matched with ordinal, case-sensitive comparison.
+    /// The last occurrence is chosen when duplicate properties exist.
+    /// </remarks>
     /// <example><code>let! int = Prop.tryGet2 "prop.prop2" Parse.int</code></example>
     let tryGet2 path parser =
         match path with

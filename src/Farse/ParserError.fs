@@ -153,17 +153,6 @@ module ParseError =
             Exn = None
         }
 
-    let internal duplicateKey key type' element =
-        {
-            Path = JsonPath.prop key
-            Element = JsonElement.clone element
-            Index = None
-            Details = "Duplicate key."
-            Value = None
-            Type = type'
-            Exn = None
-        }
-
     /// <summary>Converts a <c>ParseError</c> to a formatted <c>string</c>.</summary>
     /// <example><code>let string = ParseError.asString error</code></example>
     let asString error =

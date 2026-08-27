@@ -499,18 +499,19 @@ module Parse =
             match element.GetArrayLength() with
             | 0 -> Ok <| convert Array.empty
             | length ->
-                let mutable error = false
-                let mutable enumerator = element.EnumerateArray()
-                let mutable i = 0
+                let mutable success, enumerator, i =
+                    true, element.EnumerateArray(), 0
 
                 let items = Array.zeroCreate length
 
-                while not error && enumerator.MoveNext() do
+                while success && enumerator.MoveNext() do
                     match parse enumerator.Current with
                     | Ok x -> items[i] <- x; i <- i + 1
-                    | Error _ -> error <- true
+                    | Error _ -> success <- false
 
-                if error then
+                match success with
+                | true -> Ok <| convert items
+                | false ->
                     element.EnumerateArray()
                     |> List.ofSeq
                     |> List.indexed
@@ -522,7 +523,6 @@ module Parse =
                             |> List.map (ParseError.withIndex i)
                     )
                     |> Error
-                else Ok <| convert items
         ) ExpectedKind.Array
 
     /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
@@ -563,7 +563,7 @@ module Parse =
     /// <summary>Parses an array at a specific index.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.index 0 Parse.int</code></example>
     let index n parser : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternal (fun element ->
             match element.GetArrayLength() with
             | length when n >= 0 && length >= n + 1 -> parseIndex n parser element
             | _ ->
@@ -579,7 +579,7 @@ module Parse =
     /// <summary>Parses the last element of an array.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.last Parse.int</code></example>
     let last parser : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternal (fun element ->
             match element.GetArrayLength() with
             | length when length > 0 -> parseIndex (length - 1) parser element
             | _ ->
@@ -590,34 +590,25 @@ module Parse =
 
     // Key/Value
 
-    let inline private getDuplicateKeys (pairs:('k * 'v) seq) =
-        let seen = HashSet<'k>()
-        pairs
-        |> Seq.choose (fun (k, _) ->
-            if seen.Add(k) then None
-            else Some k
-        )
-        |> Seq.distinct
-        |> List.ofSeq
-
     let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternal (fun element ->
             match element.GetPropertyCount() with
             | 0 -> Ok <| convert Array.empty
             | length ->
-                let mutable error = false
-                let mutable enumerator = element.EnumerateObject()
-                let mutable i = 0
+                let mutable success, enumerator, i =
+                    true, element.EnumerateObject(), 0
 
                 let items = Array.zeroCreate length
 
-                while not error && enumerator.MoveNext() do
+                while success && enumerator.MoveNext() do
                     let current = enumerator.Current
                     match parse current.Value with
                     | Ok x -> items[i] <- current.Name, x; i <- i + 1
-                    | Error _ -> error <- true
+                    | Error _ -> success <- false
 
-                if error then
+                match success with
+                | true -> Ok <| convert items
+                | false ->
                     element.EnumerateObject()
                     |> List.ofSeq
                     |> List.collect (fun prop ->
@@ -628,44 +619,34 @@ module Parse =
                             |> List.map (ParseError.withProp prop.Name)
                     )
                     |> Error
-                else
-                    match getDuplicateKeys items with
-                    | [] -> Ok <| convert items
-                    | keys ->
-                        keys
-                        |> List.map (fun key -> ParseError.duplicateKey key typeof<'r> element)
-                        |> Error
         ) ExpectedKind.Object
 
     /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'a&gt;</c>.</summary>
-    /// <remarks>Fails when duplicate keys are found.</remarks>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let! map = "prop" &amp;= Parse.map Parse.int</code></example>
     let map parser = keyValue Map.ofSeq parser
 
     /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'a&gt;</c>.</summary>
-    /// <remarks>Fails when duplicate keys are found.</remarks>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let! dict = "prop" &amp;= Parse.dict Parse.int</code></example>
     let dict parser = keyValue dict parser
 
     /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt;</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
-    /// <remarks>Fails when duplicate keys are found.</remarks>
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
     /// <summary>Parses an object's properties as <c>string * 'a</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
-    /// <remarks>Fails when duplicate keys are found.</remarks>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
     let tuples parser = keyValue Seq.ofSeq parser
 
     /// <summary>Parses an object's keys as <c>System.String</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
-    /// <remarks>Fails when duplicate keys are found.</remarks>
     /// <example><code>let! keys = "prop" &amp;= Parse.keys</code></example>
     let keys = keyValue (Seq.map fst) none
 
     // Tuples
 
     let inline private tuple expected ([<InlineIfLambda>] fn) : Parser<'r> =
-        customInternal (fun (element:JsonElement) ->
+        customInternal (fun element ->
             match element.GetArrayLength() with
             | actual when actual = expected -> fn element
             | actual ->
@@ -775,7 +756,7 @@ module Parse =
     /// <summary>Parses an optional value but returns a default value when null.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.nil Parse.int 1</code></example>
     let nil (Parser parse) x =
-        Parser (fun (element:JsonElement) ->
+        Parser (fun element ->
             match element.ValueKind with
             | Kind.Null -> Ok x
             | _ -> parse element
@@ -784,7 +765,7 @@ module Parse =
     /// <summary>Parses an optional value.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.option Parse.int</code></example>
     let option (Parser parse) =
-        Parser (fun (element:JsonElement) ->
+        Parser (fun element ->
             match element.ValueKind with
             | Kind.Null -> Ok None
             | _ ->

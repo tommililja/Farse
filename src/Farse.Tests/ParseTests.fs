@@ -1651,10 +1651,13 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when parsing duplicate keys`` () =
-            Parse.map Parse.int
-            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.parserError
+        let ``Should parse duplicate keys`` () =
+            let expected = Map [ "key1", 1; "key2", 2; "key3", 3 ]
+            let actual =
+                Parse.map Parse.int
+                |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1680,10 +1683,13 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when parsing duplicate keys`` () =
-            Parse.dict Parse.int
-            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.parserError
+        let ``Should parse duplicate keys`` () =
+            let expected = dict [ "key1", 1; "key2", 2; "key3", 3; ]
+            let actual =
+                Parse.dict Parse.int
+                |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1709,10 +1715,13 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when parsing duplicate keys`` () =
-            Parse.keyValuePairs Parse.int
-            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.parserError
+        let ``Should parse duplicate keys`` () =
+            let expected = [ "key1", 5; "key1", 1; "key2", 2; "key3", 3 ] |> List.map KeyValuePair
+            let actual =
+                Parse.keyValuePairs Parse.int
+                |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.sequenceEqual Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1738,10 +1747,13 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when parsing duplicate keys`` () =
-            Parse.tuples Parse.int
-            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.parserError
+        let ``Should parse duplicate keys`` () =
+            let expected = seq [| "key1", 5; "key1", 1; "key2", 2; "key3", 3 |]
+            let actual =
+                Parse.tuples Parse.int
+                |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -1767,10 +1779,13 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when parsing duplicate keys`` () =
-            Parse.keys
-            |> Parser.parse """{ "key1": 1, "key1": 1, "key2": 2, "key2": 2, "key3": 3 }"""
-            |> Expect.parserError
+        let ``Should parse duplicate keys`` () =
+            let expected = seq [ "key1"; "key1"; "key2"; "key3" ]
+            let actual =
+                Parse.keys
+                |> Parser.parse """{ "key1": 5, "key1": 1, "key2": 2, "key3": 3 }"""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.sequenceEqual Msg.none expected actual
 
     module Tuple2 =
 
