@@ -714,8 +714,8 @@ module Parse =
     /// <summary>Parses an object based on a string discriminator property.</summary>
     /// <example><code>let! x = Parse.oneOf "type" [ "a", a; "b", b ]</code></example>
     let oneOf name parsers : Parser<'r> =
+        let (Parser parse) = Prop.get name string
         customInternal (fun element ->
-            let (Parser parse) = Prop.get name string
             match parse element with
             | Ok disc ->
                 let parser = List.tryFind (fun (key, _) -> key = disc) parsers
