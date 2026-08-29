@@ -536,8 +536,8 @@ type ParseError = {
     Index: int option       // If the error occurred directly in an array.
     Details: string         // Parsing or validation error details.
     Value: string option    // Parsing succeeded, but validation failed.
-    Type: Type              // The Type that was being parsed.
+    Type: Type              // The type that was being parsed.
     Exn: exn option         // The exception if one occurred.
 }
 ```
-> Note: Farse does not throw exceptions unless something unexpected occurs.
+> Note: Farse should not throw exceptions unless something unexpected occurs.
