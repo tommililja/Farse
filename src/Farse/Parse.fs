@@ -149,13 +149,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.String</c> that matches a regular expression.</summary>
     /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
     let regex ([<StringSyntax("Regex")>] regex:string) =
-        custom (fun element ->
-            try
+        try
+            let cached = Regex(regex)
+            custom (fun element ->
                 let string = element.GetString()
-                if Regex.IsMatch(string, regex) then Ok string
+                if cached.IsMatch(string) then Ok string
                 else Error $"Expected the string to match '%s{regex}'."
-            with :? ArgumentException -> Error $"Invalid regex '%s{regex}'."
-        ) ExpectedKind.String
+            ) ExpectedKind.String
+        with :? ArgumentException -> Parser.fail $"Invalid regex '%s{regex}'."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
