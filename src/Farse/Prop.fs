@@ -5,10 +5,10 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private createPath array =
-        array
-        |> Array.map (sprintf ".%s")
-        |> String.concat String.Empty
+    let inline private createPath (array:string array) =
+        match array.Length with
+        | 0 -> String.Empty
+        | _ -> "." + String.concat "." array
         |> JsonPath
 
     let inline private select path count =
