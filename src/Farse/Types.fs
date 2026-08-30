@@ -47,18 +47,8 @@ type ExpectedKind =
     | Number
     | Object
     | String
-    | Undefined
 
 module internal ExpectedKind =
-
-    let fromKind = function
-        | Kind.Array -> ExpectedKind.Array
-        | Kind.Null -> ExpectedKind.Null
-        | Kind.Number -> ExpectedKind.Number
-        | Kind.Object -> ExpectedKind.Object
-        | Kind.String -> ExpectedKind.String
-        | Kind.True | Kind.False -> ExpectedKind.Bool
-        | Kind.Undefined -> ExpectedKind.Undefined
 
     let asString = function
         | ExpectedKind.Any -> "Any"
@@ -68,7 +58,6 @@ module internal ExpectedKind =
         | ExpectedKind.Number -> "Number"
         | ExpectedKind.Object -> "Object"
         | ExpectedKind.String -> "String"
-        | ExpectedKind.Undefined -> "Undefined"
 
 [<AutoOpen>]
 module internal Article =

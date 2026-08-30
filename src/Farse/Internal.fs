@@ -25,9 +25,6 @@ module internal Internal =
         member inline this.isNullOrUndefined =
             this.ValueKind = Kind.Null || this.ValueKind = Kind.Undefined
 
-        member inline this.isNotNull =
-            this.ValueKind <> Kind.Null
-
     module JsonElement =
 
         let inline tryGetValue (e:JsonElement) =
@@ -113,10 +110,18 @@ module internal Internal =
     [<AutoOpen>]
     module ActivePatterns =
 
-        let (|Equals|_|) actual expected =
-            expected = ExpectedKind.fromKind actual
+        let inline (|IsExpectedKind|_|) (e:JsonElement) expected =
+            let kind = e.ValueKind
+            match expected with
+            | ExpectedKind.Any -> not e.isUndefined
+            | ExpectedKind.Array -> kind = Kind.Array
+            | ExpectedKind.Bool -> kind = Kind.True || kind = Kind.False
+            | ExpectedKind.Null -> kind = Kind.Null
+            | ExpectedKind.Number -> kind = Kind.Number
+            | ExpectedKind.Object -> kind = Kind.Object
+            | ExpectedKind.String -> kind = Kind.String
 
-        let (|Prop|Path|) (string:string) =
+        let inline (|Prop|Path|) (string:string) =
             if string.Contains('.')
             then Path (string.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Prop string
