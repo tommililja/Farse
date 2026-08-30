@@ -95,20 +95,20 @@ module Json =
 
     /// <summary>Converts a <c>Json</c> to a <c>JsonNode</c>.</summary>
     /// <example><code>let node = Json.asJsonNode json</code></example>
-    let rec asJsonNode json =
+    let rec asJsonNode json : JsonNode | null =
         match json with
-        | JStr str -> JsonValue.Create(str).Root
+        | JStr str -> JsonValue.Create(str)
         | JNum str -> JsonNode.Parse(str)
-        | JBit bit -> JsonValue.Create(bit).Root
+        | JBit bit -> JsonValue.Create(bit)
         | JObj obj ->
             let object = JsonObject()
             // Take last instead of throwing an exception.
             for name, json in obj do object[name] <- asJsonNode json
-            object.Root
+            object
         | JArr arr ->
             let array = JsonArray()
             for json in arr do array.Add(asJsonNode json)
-            array.Root
+            array
         | JNil -> null
 
     /// <summary>Converts a <c>Json</c> to a <c>JsonElement</c>.</summary>
@@ -122,16 +122,11 @@ module Json =
     /// <summary>Converts a <c>Json</c> to a formatted JSON string.</summary>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
-        match asJsonNode json with
-        | node when isNull node -> "null"
-        | node ->
-            let options =
-                match format with
-                | Indented -> JsonSerializerOptions.Default
-                | Custom options -> options
-                | Raw -> null
-
-            node.ToJsonString(options)
+        match format, asJsonNode json with
+        | _, null -> "null"
+        | Indented, node -> node.ToJsonString(JsonSerializerOptions.Default)
+        | Custom options, node -> node.ToJsonString(options)
+        | Raw, node -> node.ToJsonString()
 
     /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
     /// <example>

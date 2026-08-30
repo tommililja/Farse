@@ -8,6 +8,7 @@
         <Description>Simple, explicit JSON parsing for F# using System.Text.Json.</Description>
         <EmbedAllSources>true</EmbedAllSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
         <PackageIcon>farse-64.png</PackageIcon>
         <PackageId>Farse</PackageId>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
