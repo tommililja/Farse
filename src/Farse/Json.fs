@@ -25,13 +25,6 @@ type JsonFormat =
 
 module Json =
 
-    let private serializerOptions =
-        JsonSerializerOptions (
-            WriteIndented = true,
-            IndentSize = 4,
-            NewLine = "\n"
-        )
-
     /// <summary>Sorts all properties in ascending order.</summary>
     /// <example><code>let sorted = Json.sort json</code></example>
     let rec sort json =
@@ -71,7 +64,7 @@ module Json =
     /// <example><code>let result = Json.fromString json</code></example>
     let fromString ([<StringSyntax("Json")>] json:string) =
         try
-            use document = JsonDocument.Parse(json, JsonDocumentOptions.preset)
+            use document = JsonDocument.Parse(json, JsonDocumentOptions.Default)
             Ok <| fromElement document.RootElement
         with
             | :? JsonException
@@ -83,7 +76,7 @@ module Json =
     let fromStreamAsync token stream =
         task {
             try
-                use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.preset, token)
+                use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token)
                 return Ok <| fromElement document.RootElement
             with
                 | :? JsonException
@@ -94,7 +87,7 @@ module Json =
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     let fromBytes (bytes:byte array) =
         try
-            use document = JsonDocument.Parse(bytes, JsonDocumentOptions.preset)
+            use document = JsonDocument.Parse(bytes, JsonDocumentOptions.Default)
             Ok <| fromElement document.RootElement
         with
             | :? JsonException
@@ -134,7 +127,7 @@ module Json =
         | node ->
             let options =
                 match format with
-                | Indented -> serializerOptions
+                | Indented -> JsonSerializerOptions.Default
                 | Custom options -> options
                 | Raw -> null
 

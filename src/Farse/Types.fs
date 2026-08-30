@@ -58,12 +58,3 @@ module internal ExpectedKind =
         | ExpectedKind.Number -> "Number"
         | ExpectedKind.Object -> "Object"
         | ExpectedKind.String -> "String"
-
-[<AutoOpen>]
-module internal Article =
-
-    [<Literal>]
-    let A = "a"
-
-    [<Literal>]
-    let An = "an"
