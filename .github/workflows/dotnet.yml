@@ -4,40 +4,40 @@
 name: .NET
 
 on:
-    push:
-        branches: [ "main" ]
-        tags: [ "v*" ]
-    pull_request:
-        branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-    build-and-test:
-        runs-on: ubuntu-latest
-        steps:
-            -   uses: actions/checkout@v4
-            -   name: Setup .NET
-                uses: actions/setup-dotnet@v4
-            -   name: Restore dependencies
-                working-directory: src
-                run: dotnet restore
-            -   name: Build
-                working-directory: src
-                run: dotnet build -c Release --no-restore
-            -   name: Test
-                working-directory: src
-                run: dotnet test -c Release --no-build --verbosity normal
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+      - name: Restore dependencies
+        working-directory: src
+        run: dotnet restore
+      - name: Build
+        working-directory: src
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        working-directory: src
+        run: dotnet test -c Release --no-build --verbosity normal
 
-    publish:
-        needs: build-and-test
-        runs-on: ubuntu-latest
-        if: startsWith(github.ref, 'refs/tags/v')
-        steps:
-            -   uses: actions/checkout@v4
-            -   name: Setup .NET
-                uses: actions/setup-dotnet@v4
-            -   name: Pack
-                working-directory: src
-                run: dotnet pack -c Release -o ./nupkg
-            -   name: Publish to NuGet
-                working-directory: src
-                run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+  publish:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+      - name: Pack
+        working-directory: src
+        run: dotnet pack -c Release -o ./nupkg
+      - name: Publish to NuGet
+        working-directory: src
+        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
