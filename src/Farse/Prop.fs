@@ -5,9 +5,9 @@ open System.Text.Json
 
 module Prop =
 
-    let inline private createPath (array:string array) =
-        match array.Length with
-        | 0 -> String.Empty
+    let private createPath array =
+        match array with
+        | [||] -> String.Empty
         | _ -> "." + String.concat "." array
         |> JsonPath
 
@@ -151,8 +151,8 @@ module Prop =
 
     /// <summary>Parses a required property.</summary>
     /// <remarks>
-    /// Property names are matched with ordinal, case-sensitive comparison.
-    /// The last occurrence is chosen when duplicate properties exist.
+    ///     Property names are matched with ordinal, case-sensitive comparison.
+    ///     The last occurrence is chosen when duplicate properties exist.
     /// </remarks>
     /// <example><code>let! int = Prop.get "prop.prop2" Parse.int</code></example>
     let get path parser =
@@ -162,8 +162,8 @@ module Prop =
 
     /// <summary>Parses an optional property.</summary>
     /// <remarks>
-    /// Property names are matched with ordinal, case-sensitive comparison.
-    /// The last occurrence is chosen when duplicate properties exist.
+    ///     Property names are matched with ordinal, case-sensitive comparison.
+    ///     The last occurrence is chosen when duplicate properties exist.
     /// </remarks>
     /// <example><code>let! int = Prop.tryGet "prop.prop2" Parse.int</code></example>
     let tryGet path parser =
@@ -173,8 +173,8 @@ module Prop =
 
     /// <summary>Parses an optional property, distinguishing between a missing property and a null value.</summary>
     /// <remarks>
-    /// Property names are matched with ordinal, case-sensitive comparison.
-    /// The last occurrence is chosen when duplicate properties exist.
+    ///     Property names are matched with ordinal, case-sensitive comparison.
+    ///     The last occurrence is chosen when duplicate properties exist.
     /// </remarks>
     /// <example><code>let! int = Prop.tryGet2 "prop.prop2" Parse.int</code></example>
     let tryGet2 path parser =

@@ -63,12 +63,12 @@ module Extensions =
         member this.Dict() =
             Parse.dict this
 
-        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt;</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
         /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.int.KeyValuePairs()</code></example>
         member this.KeyValuePairs() =
             Parse.keyValuePairs this
 
-        /// <summary>Parses an object's properties as <c>string * 'a</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>string * 'a Microsoft.FSharp.Collections.seq</c>.</summary>
         /// <example><code>let! tuples = "prop" &amp;= Parse.int.Tuples()</code></example>
         member this.Tuples() =
             Parse.tuples this

@@ -100,8 +100,7 @@ module internal Internal =
             | "Tuple" -> $"""(%s{args.Replace(", ", " * ")})"""
             | name -> $"%s{name}<%s{args}>"
 
-        let rec getName type' =
-            match type' with
+        let rec getName = function
             | x when x = typeof<unit> -> "unit"
             | x when x.IsArray -> $"%s{getName (x.GetElementType())} array"
             | x when x.IsGenericType ->
@@ -128,16 +127,14 @@ module internal Internal =
     [<AutoOpen>]
     module ActivePatterns =
 
-        let inline (|IsExpectedKind|_|) (e:JsonElement) expected =
-            let kind = e.ValueKind
-            match expected with
+        let inline (|IsExpectedKind|_|) (e:JsonElement) = function
             | ExpectedKind.Any -> not e.isUndefined
-            | ExpectedKind.Array -> kind = Kind.Array
-            | ExpectedKind.Bool -> kind = Kind.True || kind = Kind.False
-            | ExpectedKind.Null -> kind = Kind.Null
-            | ExpectedKind.Number -> kind = Kind.Number
-            | ExpectedKind.Object -> kind = Kind.Object
-            | ExpectedKind.String -> kind = Kind.String
+            | ExpectedKind.Array -> e.ValueKind = Kind.Array
+            | ExpectedKind.Bool -> e.ValueKind = Kind.True || e.ValueKind = Kind.False
+            | ExpectedKind.Null -> e.ValueKind = Kind.Null
+            | ExpectedKind.Number -> e.ValueKind = Kind.Number
+            | ExpectedKind.Object -> e.ValueKind = Kind.Object
+            | ExpectedKind.String -> e.ValueKind = Kind.String
 
         let inline (|Prop|Path|) (string:string) =
             if string.Contains('.')

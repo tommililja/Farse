@@ -97,8 +97,7 @@ module Parser =
     // Parsing
 
     let private parseDocument fn (Parser parse) =
-        try
-            use document: JsonDocument = fn ()
+        try use document: JsonDocument = fn ()
             parse document.RootElement
             |> Result.mapError Errors
         with
@@ -108,8 +107,7 @@ module Parser =
 
     let private parseDocumentAsync fn (Parser parse) =
         task {
-            try
-                use! document: JsonDocument = fn ()
+            try use! document: JsonDocument = fn ()
                 return
                     parse document.RootElement
                     |> Result.mapError Errors
@@ -144,7 +142,8 @@ module Parser =
     ///         AllowTrailingCommas = true,
     ///         CommentHandling = JsonCommentHandling.Skip
     ///     )
-    /// </code></remarks>
+    /// </code>
+    /// </remarks>
     /// <example><code>let! result = Parser.parseAsync stream token parser</code></example>
     let parseAsync stream token parser =
         parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token)) parser
@@ -162,7 +161,8 @@ module Parser =
     ///         AllowTrailingCommas = true,
     ///         CommentHandling = JsonCommentHandling.Skip
     ///     )
-    /// </code></remarks>
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Parser.parseBytes bytes parser</code></example>
     let parseBytes (bytes:byte array) parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default)) parser
@@ -179,7 +179,8 @@ module Parser =
     ///         AllowTrailingCommas = true,
     ///         CommentHandling = JsonCommentHandling.Skip
     ///     )
-    /// </code></remarks>
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Parser.parseMemory bytes parser</code></example>
     let parseMemory (bytes:ReadOnlyMemory<byte>) parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default)) parser
@@ -196,7 +197,8 @@ module Parser =
     ///         AllowTrailingCommas = true,
     ///         CommentHandling = JsonCommentHandling.Skip
     ///     )
-    /// </code></remarks>
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Parser.parseSequence sequence parser</code></example>
     let parseSequence (sequence:ReadOnlySequence<byte>) parser =
         parseDocument (fun () -> JsonDocument.Parse(sequence, JsonDocumentOptions.Default)) parser

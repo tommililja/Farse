@@ -41,30 +41,31 @@ module Json =
         | other -> other
 
     /// <summary>Converts a <c>JsonElement</c> into a <c>Json</c>.</summary>
+    /// <exception cref="System.ArgumentException">Thrown for undefined elements.</exception>
     /// <example><code>let json = Json.fromElement element</code></example>
-    let rec fromElement (element:JsonElement) =
-        match element.ValueKind with
-        | Kind.String -> JStr <| element.GetString()
-        | Kind.Number -> JNum <| element.GetRawText()
+    let rec fromElement (e:JsonElement) =
+        match e.ValueKind with
+        | Kind.String -> JStr <| e.GetString()
+        | Kind.Number -> JNum <| e.GetRawText()
         | Kind.True -> JBit true
         | Kind.False -> JBit false
         | Kind.Object ->
-            element.EnumerateObject()
+            e.EnumerateObject()
             |> Seq.map (fun prop -> prop.Name, fromElement prop.Value)
             |> Seq.toList
             |> JObj
         | Kind.Array ->
-            element.EnumerateArray()
+            e.EnumerateArray()
             |> Seq.map fromElement
             |> Seq.toList
             |> JArr
-        | Kind.Null | Kind.Undefined -> JNil
+        | Kind.Null -> JNil
+        | Kind.Undefined -> invalidArg (nameof e) "Element was undefined."
 
     /// <summary>Parses a <c>string</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromString json</code></example>
     let fromString ([<StringSyntax("Json")>] json:string) =
-        try
-            use document = JsonDocument.Parse(json, JsonDocumentOptions.Default)
+        try use document = JsonDocument.Parse(json, JsonDocumentOptions.Default)
             Ok <| fromElement document.RootElement
         with
             | :? JsonException
@@ -75,8 +76,7 @@ module Json =
     /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     let fromStreamAsync token stream =
         task {
-            try
-                use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token)
+            try use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token)
                 return Ok <| fromElement document.RootElement
             with
                 | :? JsonException
@@ -86,8 +86,7 @@ module Json =
     /// <summary>Parses a UTF-8 encoded <c>byte array</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     let fromBytes (bytes:byte array) =
-        try
-            use document = JsonDocument.Parse(bytes, JsonDocumentOptions.Default)
+        try use document = JsonDocument.Parse(bytes, JsonDocumentOptions.Default)
             Ok <| fromElement document.RootElement
         with
             | :? JsonException

@@ -51,7 +51,7 @@ module Parse =
                 |> Error.list
         ) expectedKind
 
-    /// <summary>Creates a custom <c>Parser</c>.</summary>
+    /// <summary>Creates a custom <c>Parser</c> for <c>'r</c>.</summary>
     /// <example>
     /// <code>
     ///     let parser =
@@ -183,7 +183,7 @@ module Parse =
             ) ExpectedKind.String
         with
             | :? ArgumentException
-            | :? ArgumentNullException -> Parser.fail $"Invalid regex '%s{regex}'."
+            | :? ArgumentNullException -> Parser.fail $"Invalid regex '%O{regex}'."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
@@ -254,7 +254,7 @@ module Parse =
             let string = element.GetString()
             match Guid.TryParseExact(string, format) with
             | true, guid -> Ok guid
-            | _ -> Error $"Expected a Guid string (%s{format})."
+            | _ -> Error $"Expected a Guid string (%O{format})."
         ) ExpectedKind.String
 
     /// <summary>Parses null as <c>FSharp.Core.Unit</c>.</summary>
@@ -344,7 +344,7 @@ module Parse =
             let string = element.GetString()
             match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, timeOnly -> Ok timeOnly
-            | _ -> Error $"Expected a TimeOnly string (%s{format})."
+            | _ -> Error $"Expected a TimeOnly string (%O{format})."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.TimeSpan</c>.</summary>
@@ -364,7 +364,7 @@ module Parse =
             let string = element.GetString()
             match TimeSpan.TryParseExact(string, format, CultureInfo.InvariantCulture) with
             | true, timeSpan -> Ok timeSpan
-            | _ -> Error $"Expected a TimeSpan string (%s{format})."
+            | _ -> Error $"Expected a TimeSpan string (%O{format})."
         ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateOnly</c>.</summary>
@@ -384,7 +384,7 @@ module Parse =
             let string = element.GetString()
             match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error $"Expected a DateOnly string (%s{format})."
+            | _ -> Error $"Expected a DateOnly string (%O{format})."
         ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateTime</c>.</summary>
@@ -412,7 +412,7 @@ module Parse =
             let string = element.GetString()
             match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTime -> Ok dateTime
-            | _ -> Error $"Expected a DateTime string (%s{format})."
+            | _ -> Error $"Expected a DateTime string (%O{format})."
         ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateTimeOffset</c>.</summary>
@@ -440,7 +440,7 @@ module Parse =
             let string = element.GetString()
             match DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateTimeOffset -> Ok dateTimeOffset
-            | _ -> Error $"Expected a DateTimeOffset string (%s{format})."
+            | _ -> Error $"Expected a DateTimeOffset string (%O{format})."
         ) ExpectedKind.String
 
     /// <summary>Parses a number as <c>System.DateTimeOffset</c> from a Unix timestamp in seconds.</summary>
@@ -659,15 +659,15 @@ module Parse =
     /// <example><code>let! dict = "prop" &amp;= Parse.dict Parse.int</code></example>
     let dict parser = keyValue dict parser
 
-    /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt;</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
-    /// <summary>Parses an object's properties as <c>string * 'a</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>string * 'a Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
     let tuples parser = keyValue Seq.ofSeq parser
 
-    /// <summary>Parses an object's keys as <c>System.String</c> <c>Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's keys as <c>System.String Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <example><code>let! keys = "prop" &amp;= Parse.keys</code></example>
     let keys = keyValue (Seq.map fst) none
 
