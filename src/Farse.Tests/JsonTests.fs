@@ -132,6 +132,18 @@ module JsonTests =
         |> Expect.isError $"Expected %s{nameof Json.fromString} to fail."
 
     [<Fact>]
+    let ``Should fail to create Json from string when JSON is null``() =
+        null
+        |> Json.fromString
+        |> Expect.isError $"Expected %s{nameof Json.fromString} to fail."
+
+    [<Fact>]
+    let ``Should fail to create Json from string when JSON is empty``() =
+        String.Empty
+        |> Json.fromString
+        |> Expect.isError $"Expected %s{nameof Json.fromString} to fail."
+
+    [<Fact>]
     let ``Should create Json from stream async`` () =
         task {
             let expected = Json.asString Indented Data.example
@@ -149,6 +161,13 @@ module JsonTests =
     [<Fact>]
     let ``Should fail to create Json from stream async when JSON is invalid`` () =
         "invalid"
+        |> MemoryStream.ofString
+        |> Json.fromStreamAsync CancellationToken.None
+        |> Task.map (Expect.isError $"Expected %s{nameof Json.fromStreamAsync} to fail.")
+
+    [<Fact>]
+    let ``Should fail to create Json from stream async when JSON is empty`` () =
+        String.Empty
         |> MemoryStream.ofString
         |> Json.fromStreamAsync CancellationToken.None
         |> Task.map (Expect.isError $"Expected %s{nameof Json.fromStreamAsync} to fail.")
