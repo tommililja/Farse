@@ -175,15 +175,16 @@ module Parse =
     /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
     let regex ([<StringSyntax("Regex")>] regex:string) =
         try
-            let cached = Regex(regex)
-            stringError (fun element ->
-                let string = element.GetString()
-                if cached.IsMatch(string) then Ok string
-                else Error $"Expected the string to match '%s{regex}'."
-            ) ExpectedKind.String
-        with
-            | :? ArgumentException
-            | :? ArgumentNullException -> Parser.fail $"Invalid regex '%O{regex}'."
+            if String.isEmpty regex
+            then Parser.fail "Regex was null or empty."
+            else
+                let cached = Regex(regex)
+                stringError (fun element ->
+                    let string = element.GetString()
+                    if cached.IsMatch(string) then Ok string
+                    else Error $"Expected the string to match '%s{regex}'."
+                ) ExpectedKind.String
+        with :? ArgumentException -> Parser.fail $"Invalid regex '%s{regex}'."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
@@ -250,12 +251,16 @@ module Parse =
     /// <summary>Parses a string as <c>System.Guid</c> with a specific format.</summary>
     /// <example><code>let! guid = "prop" &amp;= Parse.guidExact "N"</code></example>
     let guidExact ([<StringSyntax("GuidFormat")>] format:string) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match Guid.TryParseExact(string, format) with
-            | true, guid -> Ok guid
-            | _ -> Error $"Expected a Guid string (%O{format})."
-        ) ExpectedKind.String
+        if String.isEmpty format
+        then Parser.fail "Format was null or empty."
+        else
+            stringError (fun element ->
+                let string = element.GetString()
+                match Guid.TryParseExact(string, format) with
+                | true, guid -> Ok guid
+                | _ -> Error $"Expected a Guid string (%s{format})."
+            ) ExpectedKind.String
+
 
     /// <summary>Parses null as <c>FSharp.Core.Unit</c>.</summary>
     /// <example><code>do! "prop" &amp;= Parse.unit</code></example>
@@ -340,12 +345,15 @@ module Parse =
     /// <summary>Parses a string as <c>System.TimeOnly</c> with a specific format.</summary>
     /// <example><code>let! timeOnly = "prop" &amp;= Parse.timeOnlyExact "HH:mm:ss"</code></example>
     let timeOnlyExact ([<StringSyntax("TimeOnlyFormat")>] format:string) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-            | true, timeOnly -> Ok timeOnly
-            | _ -> Error $"Expected a TimeOnly string (%O{format})."
-        ) ExpectedKind.String
+        if String.isEmpty format
+        then Parser.fail "Format was null or empty."
+        else
+            stringError (fun element ->
+                let string = element.GetString()
+                match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | true, timeOnly -> Ok timeOnly
+                | _ -> Error $"Expected a TimeOnly string (%s{format})."
+            ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.TimeSpan</c>.</summary>
     /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpan</code></example>
@@ -360,12 +368,15 @@ module Parse =
     /// <summary>Parses a string as <c>System.TimeSpan</c> with a specific format.</summary>
     /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpanExact "c"</code></example>
     let timeSpanExact ([<StringSyntax("TimeSpanFormat")>] format:string) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match TimeSpan.TryParseExact(string, format, CultureInfo.InvariantCulture) with
-            | true, timeSpan -> Ok timeSpan
-            | _ -> Error $"Expected a TimeSpan string (%O{format})."
-        ) ExpectedKind.String
+        if String.isEmpty format
+        then Parser.fail "Format was null or empty."
+        else
+            stringError (fun element ->
+                let string = element.GetString()
+                match TimeSpan.TryParseExact(string, format, CultureInfo.InvariantCulture) with
+                | true, timeSpan -> Ok timeSpan
+                | _ -> Error $"Expected a TimeSpan string (%s{format})."
+            ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateOnly</c>.</summary>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnly</code></example>
@@ -380,12 +391,15 @@ module Parse =
     /// <summary>Parses a string as <c>System.DateOnly</c> with a specific format.</summary>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnlyExact "yyyy-MM-dd"</code></example>
     let dateOnlyExact ([<StringSyntax("DateOnlyFormat")>] format:string) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-            | true, dateOnly -> Ok dateOnly
-            | _ -> Error $"Expected a DateOnly string (%O{format})."
-        ) ExpectedKind.String
+        if String.isEmpty format
+        then Parser.fail "Format was null or empty."
+        else
+            stringError (fun element ->
+                let string = element.GetString()
+                match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | true, dateOnly -> Ok dateOnly
+                | _ -> Error $"Expected a DateOnly string (%s{format})."
+            ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateTime</c>.</summary>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTime</code></example>
@@ -408,12 +422,15 @@ module Parse =
     /// <summary>Parses a string as <c>System.DateTime</c> with a specific format.</summary>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-            | true, dateTime -> Ok dateTime
-            | _ -> Error $"Expected a DateTime string (%O{format})."
-        ) ExpectedKind.String
+        if String.isEmpty format
+        then Parser.fail "Format was null or empty."
+        else
+            stringError (fun element ->
+                let string = element.GetString()
+                match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | true, dateTime -> Ok dateTime
+                | _ -> Error $"Expected a DateTime string (%s{format})."
+            ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateTimeOffset</c>.</summary>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffset</code></example>
@@ -436,12 +453,15 @@ module Parse =
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> with a specific format.</summary>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</code></example>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-            | true, dateTimeOffset -> Ok dateTimeOffset
-            | _ -> Error $"Expected a DateTimeOffset string (%O{format})."
-        ) ExpectedKind.String
+        if String.isEmpty format
+        then Parser.fail "Format was null or empty."
+        else
+            stringError (fun element ->
+                let string = element.GetString()
+                match DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | true, dateTimeOffset -> Ok dateTimeOffset
+                | _ -> Error $"Expected a DateTimeOffset string (%s{format})."
+            ) ExpectedKind.String
 
     /// <summary>Parses a number as <c>System.DateTimeOffset</c> from a Unix timestamp in seconds.</summary>
     /// <example><code>let! unixSeconds = "prop" &amp;= Parse.unixSeconds</code></example>

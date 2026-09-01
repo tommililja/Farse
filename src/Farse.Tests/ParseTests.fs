@@ -449,6 +449,18 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when regex is null`` () =
+            Parse.regex null
+            |> Parser.parse "\"abc\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when regex is empty`` () =
+            Parse.regex String.Empty
+            |> Parser.parse "\"abc\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.regex "^[0-9]+$"
             |> Parser.parse "1"
@@ -662,6 +674,18 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
             Parse.guidExact "N"
+            |> Parser.parse "\"1732f607-fc13-4ed3-a54e-7851343278a5\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is null`` () =
+            Parse.guidExact null
+            |> Parser.parse "\"1732f607-fc13-4ed3-a54e-7851343278a5\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is empty`` () =
+            Parse.guidExact String.Empty
             |> Parser.parse "\"1732f607-fc13-4ed3-a54e-7851343278a5\""
             |> Expect.parserError
 
@@ -1016,6 +1040,18 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when format is null`` () =
+            Parse.timeOnlyExact null
+            |> Parser.parse "\"172845\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is empty`` () =
+            Parse.timeOnlyExact String.Empty
+            |> Parser.parse "\"172845\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.timeOnlyExact "HHmmss"
             |> Parser.parse "1"
@@ -1062,6 +1098,18 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when format is null`` () =
+            Parse.timeSpanExact null
+            |> Parser.parse "\"012845\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is empty`` () =
+            Parse.timeSpanExact String.Empty
+            |> Parser.parse "\"012845\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.timeSpanExact @"hh\mm\ss"
             |> Parser.parse "1"
@@ -1104,6 +1152,18 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
             Parse.dateOnlyExact "yyyyMMdd"
+            |> Parser.parse "\"2025-05-13\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is null`` () =
+            Parse.dateOnlyExact null
+            |> Parser.parse "\"2025-05-13\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is empty`` () =
+            Parse.dateOnlyExact String.Empty
             |> Parser.parse "\"2025-05-13\""
             |> Expect.parserError
 
@@ -1178,6 +1238,18 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when format is null`` () =
+            Parse.dateTimeExact null
+            |> Parser.parse "\"2025-05-13T17:28:45\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is empty`` () =
+            Parse.dateTimeExact String.Empty
+            |> Parser.parse "\"2025-05-13T17:28:45\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when element is not a string`` () =
             Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"
             |> Parser.parse "1"
@@ -1244,6 +1316,18 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
             Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz"
+            |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is null`` () =
+            Parse.dateTimeOffsetExact null
+            |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is empty`` () =
+            Parse.dateTimeOffsetExact String.Empty
             |> Parser.parse "\"2025-05-13 17:28 +02:00\""
             |> Expect.parserError
 

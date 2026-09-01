@@ -58,9 +58,11 @@ module internal Internal =
 
     module String =
 
-        let inline isNotEmpty string =
+        let inline isEmpty string =
             String.IsNullOrWhiteSpace(string)
-            |> not
+
+        let inline isNotEmpty string =
+            isEmpty string |> not
 
         let inline indent n (string:string) =
             string.Split('\n')
