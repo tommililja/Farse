@@ -699,7 +699,7 @@ module Parse =
             | actual when actual = expected -> fn element
             | actual ->
                 element
-                |> ParseError.invalidTuple actual expected typeof<'r>
+                |> ParseError.invalid $"Expected a tuple of %i{expected}, but got %i{actual}." typeof<'r>
                 |> Error.list
         ) ExpectedKind.Array
 
@@ -771,7 +771,7 @@ module Parse =
                 | Some (_, Parser parse) -> parse element
                 | None ->
                     element
-                    |> ParseError.missingParser disc typeof<'r>
+                    |> ParseError.invalid $"Discriminator '%s{disc}' is missing a parser." typeof<'r>
                     |> Error.list
             | Error e -> Error e
         ) ExpectedKind.Object
@@ -784,13 +784,13 @@ module Parse =
             match parsers with
             | [] ->
                 element
-                |> ParseError.emptyParsers typeof<'r>
+                |> ParseError.invalid "No parsers given." typeof<'r>
                 |> Error.list
             | _ ->
                 let rec loop errors = function
                     | [] ->
                         element
-                        |> ParseError.attempt errors typeof<'r>
+                        |> ParseError.invalid $"Tried %i{errors} parsers without success." typeof<'r>
                         |> Error.list
                     | Parser parse :: rest ->
                         match parse element with
@@ -867,7 +867,7 @@ module Parse =
             | Ok x when x = expected -> Ok ()
             | Ok x ->
                 element
-                |> ParseError.expectedValue x expected typeof<'a>
+                |> ParseError.invalid $"Expected %A{expected}, but got %A{x}." typeof<'a>
                 |> Error.list
             | Error e -> Error e
         )

@@ -87,67 +87,12 @@ module ParseError =
             Exn = None
         }
 
-    let internal expectedValue actual expected type' element =
-        {
-            Path = JsonPath.empty
-            Element = JsonElement.clone element
-            Index = None
-            Details = $"Expected %A{expected}, but got %A{actual}."
-            Value = None
-            Type = type'
-            Exn = None
-        }
-
     let internal invalidIndex n type' element =
         {
             Path = JsonPath.index n
             Element = JsonElement.clone element
             Index = Some n
             Details = "Index was out of range."
-            Value = None
-            Type = type'
-            Exn = None
-        }
-
-    let internal invalidTuple actual expected type' element =
-        {
-            Path = JsonPath.empty
-            Element = JsonElement.clone element
-            Index = None
-            Details = $"Expected a tuple of %i{expected}, but got %i{actual}."
-            Value = None
-            Type = type'
-            Exn = None
-        }
-
-    let internal missingParser disc type' element =
-        {
-            Path = JsonPath.empty
-            Element = JsonElement.clone element
-            Index = None
-            Details = $"Discriminator '%s{disc}' is missing a parser."
-            Value = None
-            Type = type'
-            Exn = None
-        }
-
-    let internal attempt parsers type' element =
-        {
-            Path = JsonPath.empty
-            Element = JsonElement.clone element
-            Index = None
-            Details = $"Tried %i{parsers} parsers without success."
-            Value = None
-            Type = type'
-            Exn = None
-        }
-
-    let internal emptyParsers type' element =
-        {
-            Path = JsonPath.empty
-            Element = JsonElement.clone element
-            Index = None
-            Details = "No parsers given."
             Value = None
             Type = type'
             Exn = None
