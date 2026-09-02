@@ -21,7 +21,7 @@ module Parse =
             | IsExpectedKind element -> fn element
             | _ ->
                 element
-                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
+                |> ParseError.expected expectedKind JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
@@ -37,7 +37,7 @@ module Parse =
                     |> Error.list
             | _ ->
                 element
-                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
+                |> ParseError.expected expectedKind JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
@@ -79,11 +79,11 @@ module Parse =
                         |> Error.list
                 with ex ->
                     element
-                    |> ParseError.invalidEx ex typeof<'r>
+                    |> ParseError.exn ex typeof<'r>
                     |> Error.list
             | _ ->
                 element
-                |> ParseError.expectedKind expectedKind JsonPath.empty typeof<'r>
+                |> ParseError.expected expectedKind JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
@@ -622,7 +622,7 @@ module Parse =
             | length when n >= 0 && length >= n + 1 -> parseIndex n parser element
             | _ ->
                 element
-                |> ParseError.invalidIndex n typeof<'r>
+                |> ParseError.index n typeof<'r>
                 |> Error.list
         ) ExpectedKind.Array
 
@@ -638,7 +638,7 @@ module Parse =
             | length when length > 0 -> parseIndex (length - 1) parser element
             | _ ->
                 element
-                |> ParseError.invalidIndex 0 typeof<'r>
+                |> ParseError.index 0 typeof<'r>
                 |> Error.list
         ) ExpectedKind.Array
 
@@ -847,7 +847,7 @@ module Parse =
                 | Ok x -> Ok x
                 | Error msg ->
                     element
-                    |> ParseError.validation $"%A{x}" msg typeof<'r>
+                    |> ParseError.invalid $"%A{x}" msg typeof<'r>
                     |> Error.list
             | Error e -> Error e
         )
@@ -860,7 +860,7 @@ module Parse =
             | Ok x when fn x -> Ok x
             | Ok x ->
                 element
-                |> ParseError.validation $"%A{x}" msg typeof<'r>
+                |> ParseError.invalid $"%A{x}" msg typeof<'r>
                 |> Error.list
             | Error e -> Error e
         )

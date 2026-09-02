@@ -43,7 +43,7 @@ module ParseError =
             Exn = None
         }
 
-    let internal validation value details type' element =
+    let internal invalid value details type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -65,7 +65,7 @@ module ParseError =
             Exn = None
         }
 
-    let internal invalidEx (exn:exn) type' element =
+    let internal exn (exn:exn) type' element =
         {
             Path = JsonPath.empty
             Element = JsonElement.clone element
@@ -76,7 +76,7 @@ module ParseError =
             Exn = Some exn
         }
 
-    let internal expectedKind expected path type' element =
+    let internal expected expected path type' element =
         {
             Path = path
             Element = JsonElement.clone element
@@ -87,7 +87,7 @@ module ParseError =
             Exn = None
         }
 
-    let internal invalidIndex n type' element =
+    let internal index n type' element =
         {
             Path = JsonPath.index n
             Element = JsonElement.clone element

@@ -42,7 +42,7 @@ module Prop =
                     |> Error.list
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
+                |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
@@ -61,7 +61,7 @@ module Prop =
                 | _ -> Ok None
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
+                |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
@@ -81,7 +81,7 @@ module Prop =
                 | _ -> Ok None
             | _ ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object JsonPath.empty typeof<'r>
+                |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
                 |> Error.list
         )
 
@@ -104,7 +104,7 @@ module Prop =
                     |> Error
             | element, count ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object (select path count) typeof<'r>
+                |> ParseError.expected ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
         )
 
@@ -124,7 +124,7 @@ module Prop =
                     |> Error
             | element, count ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object (select path count) typeof<'r>
+                |> ParseError.expected ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
         )
 
@@ -145,7 +145,7 @@ module Prop =
                     |> Error
             | element, count ->
                 element
-                |> ParseError.expectedKind ExpectedKind.Object (select path count) typeof<'r>
+                |> ParseError.expected ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
         )
 
