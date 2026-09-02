@@ -20,6 +20,7 @@ module Extensions =
             Parse.list this
 
         /// <summary>Parses an array as <c>'a Microsoft.FSharp.Core.array</c>.</summary>
+        /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
         /// <example><code>let! array = "prop" &amp;= Parse.int.Array()</code></example>
         member this.Array() =
             Parse.array this
@@ -30,6 +31,7 @@ module Extensions =
             Parse.hashSet this
 
         /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
         /// <example><code>let! seq = "prop" &amp;= Parse.int.Seq()</code></example>
         member this.Seq() =
             Parse.seq this

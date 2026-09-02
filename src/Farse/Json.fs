@@ -261,6 +261,7 @@ module Json =
 type JNum =
 
     /// <summary>Creates a <c>Json</c> from an <c>INumber</c>.</summary>
+    /// <remarks>Use <c>JNum&lt;int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum 1</code></example>
     static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
         match typeof<'a> with
@@ -295,17 +296,17 @@ module JStr =
     /// <example><code>"prop", JStr.empty</code></example>
     let empty = JStr String.Empty
 
-    /// <summary>Creates a JSON string or null from an optional value.</summary>
+    /// <summary>Creates a JSON string or null from an <c>option</c>.</summary>
     /// <example><code>"prop", JStr.option id (Some "string")</code></example>
     let inline option fn x =
         JNil.from fn JStr x
 
-    /// <summary>Creates a JSON string array from a sequence.</summary>
+    /// <summary>Creates a JSON string array from a <c>seq</c>.</summary>
     /// <example><code>"prop", JStr.array id [ "string" ]</code></example>
     let inline array fn x =
         JArr.from fn JStr x
 
-    /// <summary>Creates a JSON string array from a value.</summary>
+    /// <summary>Creates a JSON string array from <c>'a</c>.</summary>
     /// <example><code>"prop", JStr.singleton id "string"</code></example>
     let inline singleton fn x =
         JArr.from fn JStr [ x ]
@@ -317,33 +318,36 @@ module JNum =
     let zero = JNum 0
 
     /// <summary>Creates a JSON number or null from an optional value.</summary>
+    /// <remarks>Use <c>JNum.option&lt;'a, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.option id (Some 1)</code></example>
     let inline option<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JNil.from fn JNum x
 
-    /// <summary>Creates a JSON number array from a sequence.</summary>
+    /// <summary>Creates a JSON number array from a <c>seq</c>.</summary>
+    /// <remarks>Use <c>JNum.array&lt;'a, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.array id [ 1 ]</code></example>
     let inline array<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JArr.from fn JNum x
 
-    /// <summary>Creates a JSON number array from a value.</summary>
+    /// <summary>Creates a JSON number array from <c>'a</c>.</summary>
+    /// <remarks>Use <c>JNum.singleton&lt;'a, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.singleton id 1</code></example>
-    let inline singleton fn x =
+    let inline singleton<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
         JArr.from fn JNum [ x ]
 
 module JBit =
 
-    /// <summary>Creates a JSON bool or null from an optional value.</summary>
+    /// <summary>Creates a JSON bool or null from an <c>option</c>.</summary>
     /// <example><code>"prop", JBit.option id (Some true)</code></example>
     let inline option fn x =
         JNil.from fn JBit x
 
-    /// <summary>Creates a JSON bool array from a sequence.</summary>
+    /// <summary>Creates a JSON bool array from a <c>seq</c>.</summary>
     /// <example><code>"prop", JBit.array id [ true ]</code></example>
     let inline array fn x =
         JArr.from fn JBit x
 
-    /// <summary>Creates a JSON bool array from a value.</summary>
+    /// <summary>Creates a JSON bool array from <c>'a</c>.</summary>
     /// <example><code>"prop", JBit.singleton id true</code></example>
     let inline singleton fn x =
         JArr.from fn JBit [ x ]
@@ -354,22 +358,22 @@ module JObj =
     /// <example><code>"prop", JObj.empty</code></example>
     let empty = JObj List.empty
 
-    /// <summary>Creates a JSON object from a value.</summary>
+    /// <summary>Creates a JSON object from <c>'a</c>.</summary>
     /// <example><code>"prop", JObj.from (fun x -> [ "prop", JStr x.Prop ]) x</code></example>
     let inline from fn x =
         JObj <| fn x
 
-    /// <summary>Creates a JSON object or null from an optional value.</summary>
+    /// <summary>Creates a JSON object or null from an <c>option</c>.</summary>
     /// <example><code>"prop", JObj.option (fun x -> [ "prop", JStr x.Prop ]) (Some {| Prop = "value" |})</code></example>
     let inline option fn x =
         JNil.from fn JObj x
 
-    /// <summary>Creates a JSON object array from a sequence.</summary>
+    /// <summary>Creates a JSON object array from a <c>seq</c>.</summary>
     /// <example><code>"prop", JObj.array (fun x -> [ "prop", JStr x.Prop ]) [ {| Prop = "value" |} ]</code></example>
     let inline array fn x =
         JArr.from fn JObj x
 
-    /// <summary>Creates a JSON object array from a value.</summary>
+    /// <summary>Creates a JSON object array from <c>'a</c>.</summary>
     /// <example><code>"prop", JObj.singleton (fun x -> [ "prop", JStr x.Prop ]) {| Prop = "value" |}</code></example>
     let inline singleton fn x =
         JArr.from fn JObj [ x ]

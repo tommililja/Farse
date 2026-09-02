@@ -100,6 +100,14 @@ module ParseError =
 
     /// <summary>Converts a <c>ParseError</c> to a formatted <c>string</c>.</summary>
     /// <example><code>let string = ParseError.asString error</code></example>
+    /// <returns>
+    /// <code>
+    ///     at $.subscription.renewsAt
+    ///      | Tried parsing 'Instant.
+    ///      | The value string does not [...]
+    ///      = "202612-25T10:30:00Z"
+    /// </code>
+    /// </returns>
     let asString error =
         string {
             $"at %s{JsonPath.asString error.Path}"
@@ -122,6 +130,17 @@ module ParserError =
 
     /// <summary>Converts a <c>ParserError</c> to a formatted <c>string</c>.</summary>
     /// <example><code>let string = ParserError.asString error</code></example>
+    /// <returns>
+    /// <code>
+    ///     Parser yielded 1 error[s].
+    ///     &#160;
+    ///     Error[0]:
+    ///       at $.subscription.renewsAt
+    ///        | Tried parsing 'Instant.
+    ///        | The value string does not [...]
+    ///        = "202612-25T10:30:00Z"
+    /// </code>
+    /// </returns>
     let asString error =
         match error with
         | Json exn -> $"Could not parse JSON: %s{exn.Message}"

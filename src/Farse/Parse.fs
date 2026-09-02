@@ -53,7 +53,7 @@ module Parse =
 
     /// <summary>Creates a custom <c>Parser</c> for <c>'r</c>.</summary>
     /// <remarks>
-    ///     The given <c>fn</c> is not run unless the element's kind matches <c>expectedKind</c>.<br/>
+    ///     The given <c>fn</c> is not invoked unless the element's kind matches <c>expectedKind</c>.
     ///     Exceptions thrown by <c>fn</c> are caught and returned as an error.
     /// </remarks>
     /// <example>
@@ -264,7 +264,6 @@ module Parse =
                 | true, guid -> Ok guid
                 | _ -> Error $"Expected a Guid string (%s{format})."
             ) ExpectedKind.String
-
 
     /// <summary>Parses null as <c>FSharp.Core.Unit</c>.</summary>
     /// <example><code>do! "prop" &amp;= Parse.unit</code></example>

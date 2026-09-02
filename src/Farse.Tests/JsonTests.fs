@@ -333,13 +333,13 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create number array`` () =
-            JNum.array id [ 1; 2; 3 ]
+            JNum.array<int, int> id [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create number singleton`` () =
-            JNum.singleton id 1
+            JNum.singleton<int, int> id 1
             |> Json.asString Indented
             |> Expect.string
 
