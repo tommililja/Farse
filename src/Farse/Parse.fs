@@ -597,6 +597,7 @@ module Parse =
     let list parser = arr List.ofSeq parser
 
     /// <summary>Parses an array as <c>'a Microsoft.FSharp.Core.array</c>.</summary>
+    /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
     /// <example><code>let! array = "prop" &amp;= Parse.array Parse.int</code></example>
     let array parser = arr id parser
 
@@ -609,6 +610,7 @@ module Parse =
     let hashSet parser = arr HashSet parser
 
     /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
     /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
     let seq parser = arr Seq.ofSeq parser
 
