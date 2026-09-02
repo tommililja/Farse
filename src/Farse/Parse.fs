@@ -12,7 +12,7 @@ open System.Text.RegularExpressions
 
 module Parse =
 
-    let inline private message<'r> article =
+    let inline private expected<'r> article =
         $"Expected %s{article} %s{Type.getName typeof<'r>}."
 
     let inline private customError ([<InlineIfLambda>] fn) expectedKind : Parser<'r> =
@@ -33,7 +33,7 @@ module Parse =
                 | Ok x -> Ok x
                 | Error msg ->
                     element
-                    |> ParseError.invalid msg typeof<'r>
+                    |> ParseError.details msg typeof<'r>
                     |> Error.list
             | _ ->
                 element
@@ -47,7 +47,7 @@ module Parse =
             | true, x -> Ok x
             | false, _ ->
                 element
-                |> ParseError.invalid (message<'r> article) typeof<'r>
+                |> ParseError.details (expected<'r> article) typeof<'r>
                 |> Error.list
         ) expectedKind
 
@@ -71,7 +71,7 @@ module Parse =
                     | Ok x -> Ok x
                     | Error msg ->
                         element
-                        |> ParseError.invalid msg typeof<'r>
+                        |> ParseError.details msg typeof<'r>
                         |> Error.list
                 with ex ->
                     element
@@ -277,7 +277,7 @@ module Parse =
         match fn () with
         | true, x when Enum.IsDefined(enumType, x) -> Ok <| LanguagePrimitives.EnumOfValue<'e, 'r> x
         | true, _ -> Error $"Expected a value of %s{enumType.Name}."
-        | _ -> Error <| message<'e> article
+        | _ -> Error <| expected<'e> article
 
     /// <summary>Parses a string as an <c>Enum</c> type.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</code></example>
@@ -699,7 +699,7 @@ module Parse =
             | actual when actual = expected -> fn element
             | actual ->
                 element
-                |> ParseError.invalid $"Expected a tuple of %i{expected}, but got %i{actual}." typeof<'r>
+                |> ParseError.details $"Expected a tuple of %i{expected}, but got %i{actual}." typeof<'r>
                 |> Error.list
         ) ExpectedKind.Array
 
@@ -771,7 +771,7 @@ module Parse =
                 | Some (_, Parser parse) -> parse element
                 | None ->
                     element
-                    |> ParseError.invalid $"Discriminator '%s{disc}' is missing a parser." typeof<'r>
+                    |> ParseError.details $"Discriminator '%s{disc}' is missing a parser." typeof<'r>
                     |> Error.list
             | Error e -> Error e
         ) ExpectedKind.Object
@@ -784,13 +784,13 @@ module Parse =
             match parsers with
             | [] ->
                 element
-                |> ParseError.invalid "No parsers given." typeof<'r>
+                |> ParseError.details "No parsers given." typeof<'r>
                 |> Error.list
             | _ ->
                 let rec loop errors = function
                     | [] ->
                         element
-                        |> ParseError.invalid $"Tried %i{errors} parsers without success." typeof<'r>
+                        |> ParseError.details $"Tried %i{errors} parsers without success." typeof<'r>
                         |> Error.list
                     | Parser parse :: rest ->
                         match parse element with
@@ -867,7 +867,7 @@ module Parse =
             | Ok x when x = expected -> Ok ()
             | Ok x ->
                 element
-                |> ParseError.invalid $"Expected %A{expected}, but got %A{x}." typeof<'a>
+                |> ParseError.details $"Expected %A{expected}, but got %A{x}." typeof<'a>
                 |> Error.list
             | Error e -> Error e
         )

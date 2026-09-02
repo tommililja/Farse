@@ -28,7 +28,7 @@ module Parser =
             | Ok x -> Ok x
             | Error msg ->
                 element
-                |> ParseError.invalid msg typeof<'r>
+                |> ParseError.details msg typeof<'r>
                 |> Error.list
         )
 
