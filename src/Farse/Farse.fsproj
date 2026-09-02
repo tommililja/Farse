@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Farse</AssemblyName>
-        <Authors>Tommi Lilja</Authors>
+        <Authors>Tommi Lilja and contributors</Authors>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
         <Copyright>Copyright © Tommi Lilja 2026</Copyright>
         <DebugType>embedded</DebugType>
@@ -21,7 +21,7 @@
         <RootNamespace>Farse</RootNamespace>
         <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
         <Title>Farse</Title>
-        <Version>0.14.1</Version>
+        <Version>0.15.0</Version>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Types.fs" />
