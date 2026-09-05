@@ -153,24 +153,25 @@ module internal Internal =
 
         type StringBuilder() =
 
-            member inline _.Yield(line:string) = Seq.singleton line
+            member inline _.Yield(line:string) =
+                List.singleton line
 
             member inline _.Yield(line:string option) =
                 line
-                |> Option.map Seq.singleton
-                |> Option.defaultValue Seq.empty
+                |> Option.map List.singleton
+                |> Option.defaultValue []
 
-            member inline _.YieldFrom(lines:string seq) = lines
+            member inline _.YieldFrom(lines:string list) = lines
 
-            member inline _.Combine(a, b) = Seq.append a b
+            member inline _.Combine(a, b) = List.append a b
 
             member inline _.Delay([<InlineIfLambda>] fn) = fn ()
 
-            member inline _.Zero() = Seq.empty
+            member inline _.Zero() = []
 
             member inline _.Run(lines) =
                 lines
-                |> Seq.filter String.isNotEmpty
+                |> List.filter String.isNotEmpty
                 |> String.concat "\n"
 
         type ResultBuilder() =
