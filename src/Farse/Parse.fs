@@ -548,7 +548,7 @@ module Parse =
     let inline private arr convert (Parser parse) : Parser<'r> =
         customError (fun element ->
             match element.GetArrayLength() with
-            | 0 -> Ok <| convert Array.empty
+            | 0 -> Ok <| convert [||]
             | length ->
                 let mutable success, enumerator, i =
                     true, element.EnumerateArray(), 0
@@ -568,7 +568,7 @@ module Parse =
                     |> List.indexed
                     |> List.collect (fun (i, element) ->
                         match parse element with
-                        | Ok _ -> List.empty
+                        | Ok _ -> []
                         | Error list ->
                             list
                             |> List.map (ParseError.withIndex i)
@@ -646,7 +646,7 @@ module Parse =
     let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
         customError (fun element ->
             match element.GetPropertyCount() with
-            | 0 -> Ok <| convert Array.empty
+            | 0 -> Ok <| convert [||]
             | length ->
                 let mutable success, enumerator, i =
                     true, element.EnumerateObject(), 0
@@ -666,7 +666,7 @@ module Parse =
                     |> List.ofSeq
                     |> List.collect (fun prop ->
                         match parse prop.Value with
-                        | Ok _ -> List.empty
+                        | Ok _ -> []
                         | Error list ->
                             list
                             |> List.map (ParseError.withProp prop.Name)

@@ -282,7 +282,7 @@ module JArr =
 
     /// <summary>An empty JSON array.</summary>
     /// <example><code>"prop", JArr.empty</code></example>
-    let empty = JArr List.empty
+    let empty = JArr []
 
     let inline internal from fn json seq =
         seq
@@ -356,7 +356,7 @@ module JObj =
 
     /// <summary>An empty JSON object.</summary>
     /// <example><code>"prop", JObj.empty</code></example>
-    let empty = JObj List.empty
+    let empty = JObj []
 
     /// <summary>Creates a JSON object from <c>'a</c>.</summary>
     /// <example><code>"prop", JObj.from (fun x -> [ "prop", JStr x.Prop ]) x</code></example>
