@@ -22,8 +22,8 @@ module ParserBuilder =
                 | Ok a, Ok b -> fn (a, b) |> run element
                 | a, b ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
                     ]
             )
 
@@ -33,9 +33,9 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c -> fn (a, b, c) |> run element
                 | a, b, c ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
                     ]
             )
 
@@ -45,10 +45,10 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c, Ok d -> fn (a, b, c, d) |> run element
                 | a, b, c, d ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
                     ]
             )
 
@@ -58,11 +58,11 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c, Ok d, Ok e -> fn (a, b, c, d, e) |> run element
                 | a, b, c, d, e ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
-                        match e with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
+                        yield! Error.toList e
                     ]
             )
 
@@ -79,8 +79,8 @@ module ParserBuilder =
                 | Ok a, Ok b -> Ok <| fn (a, b)
                 | a, b ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
                     ]
             )
 
@@ -90,9 +90,9 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c -> Ok <| fn (a, b, c)
                 | a, b, c ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
                     ]
             )
 
@@ -102,10 +102,10 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c, Ok d -> Ok <| fn (a, b, c, d)
                 | a, b, c, d ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
                     ]
             )
 
@@ -115,11 +115,11 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c, Ok d, Ok e -> Ok <| fn (a, b, c, d, e)
                 | a, b, c, d, e ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
-                        match e with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
+                        yield! Error.toList e
                     ]
             )
 
@@ -129,8 +129,8 @@ module ParserBuilder =
                 | Ok a, Ok b -> Ok (a, b)
                 | a, b ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
                     ]
             )
 
@@ -140,9 +140,9 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c -> Ok (a, b, c)
                 | a, b, c ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
                     ]
             )
 
@@ -152,10 +152,10 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c, Ok d -> Ok (a, b, c, d)
                 | a, b, c, d ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
                     ]
             )
 
@@ -165,11 +165,11 @@ module ParserBuilder =
                 | Ok a, Ok b, Ok c, Ok d, Ok e -> Ok (a, b, c, d, e)
                 | a, b, c, d, e ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
-                        match e with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
+                        yield! Error.toList e
                     ]
             )
 

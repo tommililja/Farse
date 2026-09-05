@@ -117,6 +117,11 @@ module internal Internal =
 
     module Error =
 
+        let inline toList x =
+            match x with
+            | Ok _ -> []
+            | Error x -> x
+
         let inline list x =
             List.singleton x
             |> Error
@@ -182,8 +187,8 @@ module internal Internal =
                 | Ok a, Ok b -> Ok <| fn (a, b)
                 | a, b ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
                     ]
 
             member inline _.Bind3Return(a, b, c, [<InlineIfLambda>] fn) =
@@ -191,9 +196,9 @@ module internal Internal =
                 | Ok a, Ok b, Ok c -> Ok <| fn (a, b, c)
                 | a, b, c ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
                     ]
 
             member inline _.Bind4Return(a, b, c, d, [<InlineIfLambda>] fn) =
@@ -201,10 +206,10 @@ module internal Internal =
                 | Ok a, Ok b, Ok c, Ok d -> Ok <| fn (a, b, c, d)
                 | a, b, c, d ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
                     ]
 
             member inline _.Bind5Return(a, b, c, d, e, [<InlineIfLambda>] fn) =
@@ -212,11 +217,11 @@ module internal Internal =
                 | Ok a, Ok b, Ok c, Ok d, Ok e -> Ok <| fn (a, b, c, d, e)
                 | a, b, c, d, e ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
-                        match e with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
+                        yield! Error.toList e
                     ]
 
             member inline _.MergeSources(a, b) =
@@ -224,8 +229,8 @@ module internal Internal =
                 | Ok a, Ok b -> Ok (a, b)
                 | a, b ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
                     ]
 
             member inline _.MergeSources3(a, b, c) =
@@ -233,9 +238,9 @@ module internal Internal =
                 | Ok a, Ok b, Ok c -> Ok (a, b, c)
                 | a, b, c ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
                     ]
 
             member inline _.MergeSources4(a, b, c, d) =
@@ -243,10 +248,10 @@ module internal Internal =
                 | Ok a, Ok b, Ok c, Ok d -> Ok (a, b, c, d)
                 | a, b, c, d ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
                     ]
 
             member inline _.MergeSources5(a, b, c, d, e) =
@@ -254,11 +259,11 @@ module internal Internal =
                 | Ok a, Ok b, Ok c, Ok d, Ok e -> Ok (a, b, c, d, e)
                 | a, b, c, d, e ->
                     Error [
-                        match a with Error e -> yield! e | _ -> ()
-                        match b with Error e -> yield! e | _ -> ()
-                        match c with Error e -> yield! e | _ -> ()
-                        match d with Error e -> yield! e | _ -> ()
-                        match e with Error e -> yield! e | _ -> ()
+                        yield! Error.toList a
+                        yield! Error.toList b
+                        yield! Error.toList c
+                        yield! Error.toList d
+                        yield! Error.toList e
                     ]
 
             member inline _.Return(x) = Ok x
