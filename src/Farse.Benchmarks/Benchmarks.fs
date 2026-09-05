@@ -67,6 +67,15 @@ type ParserBenchmarks() =
         BenchmarkData.json 100
         |> Json.asString Indented
 
+    let options = JsonSerializerOptions (
+        PropertyNameCaseInsensitive = true
+    )
+
+    let settings =
+        let settings = JsonSerializerSettings()
+        settings.Converters.Add(CompactUnionJsonConverter())
+        settings
+
     let farse =
         parser {
             let! id = "id" &= Parse.guid
@@ -147,21 +156,12 @@ type ParserBenchmarks() =
         )
         |> Decode.array
 
-    let options = JsonSerializerOptions (
-        PropertyNameCaseInsensitive = true
-    )
-
-    let settings =
-        let settings = JsonSerializerSettings()
-        settings.Converters.Add(CompactUnionJsonConverter())
-        settings
-
     [<Benchmark(Description = "Newtonsoft.Json*")>]
-    member _.NewtonsoftJsonSerialization() =
+    member _.NewtonsoftJsonAuto() =
         JsonConvert.DeserializeObject<User array>(json, settings)
 
     [<Benchmark(Description = "System.Text.Json*")>]
-    member _.SystemTextJsonSerialization() =
+    member _.SystemTextJsonAuto() =
         System.Text.Json.JsonSerializer.Deserialize<User array>(json, options)
 
     [<Benchmark(Description = "Newtonsoft.Json")>]
