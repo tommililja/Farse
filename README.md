@@ -39,7 +39,7 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 | Newtonsoft.Json        | 278.0 us |  1.80 |  88.3789 | 34.6680 | 542.18 KB |        9.89 |
 | Thoth.Json.Net         | 378.4 us |  2.45 | 113.2813 | 33.2031 | 696.61 KB |       12.71 |
 
-* Automatic
+* Automatic deserialization
 ```
 
 ## Example
@@ -345,6 +345,7 @@ Validation can also be combined with sequences:
 ```fsharp
 let! tags = "tags" &= list tag
 let! tags = "tags" &= list (refine string Tag.fromString)
+let! tags = "tags" &= list (verify string (String.IsNullOrWhiteSpace >> not) "Tag was empty.")
 ```
 
 ### Errors
@@ -377,7 +378,7 @@ Parser yielded 1 error[s].
 
 We can create JSON structures using the [`Json`](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
 
-An example of building an object and converting it to an indented string:
+This example builds an object and converts it to an indented string:
 
 ```fsharp
 open Farse
