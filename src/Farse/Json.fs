@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Buffers
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
@@ -62,35 +63,47 @@ module Json =
         | Kind.Null -> JNil
         | Kind.Undefined -> invalidArg (nameof e) "Element was undefined."
 
-    /// <summary>Parses a <c>string</c> into a <c>Json</c>.</summary>
-    /// <example><code>let result = Json.fromString json</code></example>
-    let fromString ([<StringSyntax("Json")>] json:string) =
-        try use document = JsonDocument.Parse(json, JsonDocumentOptions.Default)
+    let inline private parseDocument ([<InlineIfLambda>] fn) =
+        try use document: JsonDocument = fn ()
             Ok <| fromElement document.RootElement
         with
             | :? JsonException
-            | :? ArgumentNullException as exn -> Error exn
+            | :? ArgumentException as exn -> Error exn
+
+    let inline private parseDocumentAsync ([<InlineIfLambda>] fn) =
+        task {
+            try use! document: JsonDocument = fn ()
+                return Ok <| fromElement document.RootElement
+            with
+                | :? JsonException
+                | :? ArgumentException as exn -> return Error exn
+        }
+
+    /// <summary>Parses a <c>string</c> into a <c>Json</c>.</summary>
+    /// <example><code>let result = Json.fromString json</code></example>
+    let fromString ([<StringSyntax("Json")>] json:string) =
+        parseDocument (fun () -> JsonDocument.Parse(json, JsonDocumentOptions.Default))
 
     /// <summary>Parses a UTF-8 encoded <c>Stream</c> asynchronously into a <c>Json</c>.</summary>
     /// <remarks>The <c>Stream</c> is read to completion.</remarks>
     /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     let fromStreamAsync token stream =
-        task {
-            try use! document = JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token)
-                return Ok <| fromElement document.RootElement
-            with
-                | :? JsonException
-                | :? ArgumentNullException as exn -> return Error exn
-        }
+        parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token))
 
     /// <summary>Parses a UTF-8 encoded <c>byte array</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     let fromBytes (bytes:byte array) =
-        try use document = JsonDocument.Parse(bytes, JsonDocumentOptions.Default)
-            Ok <| fromElement document.RootElement
-        with
-            | :? JsonException
-            | :? ArgumentNullException as exn -> Error exn
+        parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
+
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;bytes&gt;</c> into a <c>Json</c>.</summary>
+    /// <example><code>let result = Json.fromMemory bytes</code></example>
+    let fromMemory (bytes:ReadOnlyMemory<byte>) =
+        parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
+
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;bytes&gt;</c> into a <c>Json</c>.</summary>
+    /// <example><code>let result = Json.fromSequence bytes</code></example>
+    let fromSequence (bytes:ReadOnlySequence<byte>) =
+        parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
     /// <summary>Converts a <c>Json</c> to a <c>JsonNode</c>.</summary>
     /// <example><code>let node = Json.asJsonNode json</code></example>

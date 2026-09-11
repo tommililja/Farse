@@ -191,6 +191,42 @@ module JsonTests =
         |> Expect.isError $"Expected %s{nameof Json.fromBytes} to fail."
 
     [<Fact>]
+    let ``Should create Json from memory``() =
+        let expected = Json.asString Indented Data.example
+        let actual =
+            expected
+            |> ReadOnlyMemory.ofString
+            |> Json.fromMemory
+            |> Expect.wantOk $"Expected %s{nameof Json.fromMemory} to succeed."
+            |> Json.asString Indented
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should fail to create Json from memory when JSON is invalid``() =
+        "invalid"
+        |> ReadOnlyMemory.ofString
+        |> Json.fromMemory
+        |> Expect.isError $"Expected %s{nameof Json.fromMemory} to fail."
+
+    [<Fact>]
+    let ``Should create Json from a sequence``() =
+        let expected = Json.asString Indented Data.example
+        let actual =
+            expected
+            |> ReadOnlySequence.ofString
+            |> Json.fromSequence
+            |> Expect.wantOk $"Expected %s{nameof Json.fromSequence} to succeed."
+            |> Json.asString Indented
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should fail to create Json from sequence when JSON is invalid``() =
+        "invalid"
+        |> ReadOnlySequence.ofString
+        |> Json.fromSequence
+        |> Expect.isError $"Expected %s{nameof Json.fromSequence} to fail."
+
+    [<Fact>]
     let ``Should convert Json to JsonNode`` () =
         let expected =
             Data.example

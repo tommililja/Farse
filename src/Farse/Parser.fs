@@ -97,16 +97,15 @@ module Parser =
 
     // Parsing
 
-    let private parseDocument fn (Parser parse) =
+    let inline private parseDocument ([<InlineIfLambda>] fn) (Parser parse) =
         try use document: JsonDocument = fn ()
             parse document.RootElement
             |> Result.mapError Errors
         with
             | :? JsonException
-            | :? ArgumentException
-            | :? ArgumentNullException as exn -> Error <| Json exn
+            | :? ArgumentException as exn -> Error <| Json exn
 
-    let private parseDocumentAsync fn (Parser parse) =
+    let inline private parseDocumentAsync ([<InlineIfLambda>] fn) (Parser parse) =
         task {
             try use! document: JsonDocument = fn ()
                 return
@@ -114,8 +113,7 @@ module Parser =
                     |> Result.mapError Errors
             with
                 | :? JsonException
-                | :? ArgumentException
-                | :? ArgumentNullException as exn -> return Error <| Json exn
+                | :? ArgumentException as exn -> return Error <| Json exn
         }
 
     /// <summary>Parses a <c>string</c> with a <c>Parser</c>.</summary>
@@ -201,10 +199,10 @@ module Parser =
     /// </code>
     /// </remarks>
     /// <example><code>let result = Parser.parseSequence sequence parser</code></example>
-    let parseSequence (sequence:ReadOnlySequence<byte>) parser =
-        parseDocument (fun () -> JsonDocument.Parse(sequence, JsonDocumentOptions.Default)) parser
+    let parseSequence (bytes:ReadOnlySequence<byte>) parser =
+        parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default)) parser
 
     /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;byte&gt;</c> with a <c>Parser</c> and <c>JsonDocumentOptions</c>.</summary>
-    /// <example><code>let result = Parser.parseSequenceWith sequence options parser</code></example>
-    let parseSequenceWith (sequence:ReadOnlySequence<byte>) options parser =
-        parseDocument (fun () -> JsonDocument.Parse(sequence, options)) parser
+    /// <example><code>let result = Parser.parseSequenceWith bytes options parser</code></example>
+    let parseSequenceWith (bytes:ReadOnlySequence<byte>) options parser =
+        parseDocument (fun () -> JsonDocument.Parse(bytes, options)) parser
