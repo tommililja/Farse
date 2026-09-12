@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'int128.
-     | Expected an int128.
+     | Expected an int128 number.
      = 1.1

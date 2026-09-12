@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'Uri.
-     | Expected a Uri string (Absolute).
+     | Expected a Uri 'Absolute' string.
      = "123"

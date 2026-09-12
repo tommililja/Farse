@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'byte.
-     | Expected 0uy, but got 1uy.
+     | Expected '0uy', but got '1uy'.
      = 1

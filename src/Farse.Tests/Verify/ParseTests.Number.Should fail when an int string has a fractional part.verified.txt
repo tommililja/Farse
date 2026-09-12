@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'int.
-     | Expected an INumber string.
+     | Expected an int string.
      = "1.234"

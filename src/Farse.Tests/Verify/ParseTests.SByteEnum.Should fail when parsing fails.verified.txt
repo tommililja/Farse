@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'SByteEnum.
-     | Expected an sbyte.
+     | Expected an sbyte number.
      = 1.1

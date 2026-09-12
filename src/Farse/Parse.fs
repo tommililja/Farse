@@ -12,8 +12,9 @@ open System.Text.RegularExpressions
 
 module Parse =
 
-    let inline private expected<'r> article =
-        $"Expected %s{article} %s{Type.getName typeof<'r>}."
+    // Currently only used for numbers.
+    let inline private expected<'r> kind =
+        $"Expected %s{Type.getArticle<'r>} %s{Type.getName typeof<'r>} %s{kind}."
 
     let inline private customError ([<InlineIfLambda>] fn) expectedKind : Parser<'r> =
         Parser (fun element ->
@@ -41,13 +42,13 @@ module Parse =
                 |> Error.list
         )
 
-    let inline private fromTuple ([<InlineIfLambda>] fn) article expectedKind : Parser<'r> =
+    let inline private fromTuple ([<InlineIfLambda>] fn) expectedKind : Parser<'r> =
         customError (fun element ->
             match fn element with
             | true, x -> Ok x
             | false, _ ->
                 element
-                |> ParseError.details (expected<'r> article) typeof<'r>
+                |> ParseError.details (expected<'r> "number") typeof<'r>
                 |> Error.list
         ) expectedKind
 
@@ -91,15 +92,15 @@ module Parse =
 
     /// <summary>Parses a number as <c>System.Int32</c>.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.int</code></example>
-    let int = fromTuple _.TryGetInt32() An ExpectedKind.Number
+    let int = fromTuple _.TryGetInt32() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Int16</c>.</summary>
     /// <example><code>let! int16 = "prop" &amp;= Parse.int16</code></example>
-    let int16 = fromTuple _.TryGetInt16() An ExpectedKind.Number
+    let int16 = fromTuple _.TryGetInt16() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Int64</c>.</summary>
     /// <example><code>let! int64 = "prop" &amp;= Parse.int64</code></example>
-    let int64 = fromTuple _.TryGetInt64() An ExpectedKind.Number
+    let int64 = fromTuple _.TryGetInt64() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Int128</c>.</summary>
     /// <example><code>let! int128 = "prop" &amp;= Parse.int128</code></example>
@@ -108,20 +109,20 @@ module Parse =
             let string = element.GetRawText()
             match Int128.TryParse(string, NumberStyles.Integer, CultureInfo.InvariantCulture) with
             | true, int128 -> Ok int128
-            | _ -> Error "Expected an int128."
+            | _ -> Error <| expected<Int128> "number"
         ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.UInt16</c>.</summary>
     /// <example><code>let! uint64 = "prop" &amp;= Parse.uint16</code></example>
-    let uint16 = fromTuple _.TryGetUInt16() A ExpectedKind.Number
+    let uint16 = fromTuple _.TryGetUInt16() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.UInt32</c>.</summary>
     /// <example><code>let! uint32 = "prop" &amp;= Parse.uint32</code></example>
-    let uint32 = fromTuple _.TryGetUInt32() A ExpectedKind.Number
+    let uint32 = fromTuple _.TryGetUInt32() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.UInt64</c>.</summary>
     /// <example><code>let! uint64 = "prop" &amp;= Parse.uint64</code></example>
-    let uint64 = fromTuple _.TryGetUInt64() A ExpectedKind.Number
+    let uint64 = fromTuple _.TryGetUInt64() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.UInt128</c>.</summary>
     /// <example><code>let! uint128 = "prop" &amp;= Parse.uint128</code></example>
@@ -130,28 +131,28 @@ module Parse =
             let string = element.GetRawText()
             match UInt128.TryParse(string, NumberStyles.Integer, CultureInfo.InvariantCulture) with
             | true, uint128 -> Ok uint128
-            | _ -> Error "Expected a uint128."
+            | _ -> Error <| expected<UInt128> "number"
         ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Double</c>.</summary>
     /// <example><code>let! float = "prop" &amp;= Parse.float</code></example>
-    let float = fromTuple _.TryGetDouble() A ExpectedKind.Number
+    let float = fromTuple _.TryGetDouble() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Single</c>.</summary>
     /// <example><code>let! float32 = "prop" &amp;= Parse.float32</code></example>
-    let float32 = fromTuple _.TryGetSingle() A ExpectedKind.Number
+    let float32 = fromTuple _.TryGetSingle() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Decimal</c>.</summary>
     /// <example><code>let! decimal = "prop" &amp;= Parse.decimal</code></example>
-    let decimal = fromTuple _.TryGetDecimal() A ExpectedKind.Number
+    let decimal = fromTuple _.TryGetDecimal() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Byte</c>.</summary>
     /// <example><code>let! byte = "prop" &amp;= Parse.byte</code></example>
-    let byte = fromTuple _.TryGetByte() A ExpectedKind.Number
+    let byte = fromTuple _.TryGetByte() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.SByte</c>.</summary>
     /// <example><code>let! sbyte = "prop" &amp;= Parse.sbyte</code></example>
-    let sbyte = fromTuple _.TryGetSByte() An ExpectedKind.Number
+    let sbyte = fromTuple _.TryGetSByte() ExpectedKind.Number
 
     /// <summary>Parses a string as <c>System.Char</c>.</summary>
     /// <example><code>let! char = "prop" &amp;= Parse.char</code></example>
@@ -178,10 +179,9 @@ module Parse =
     /// <summary>Parses a string as <c>System.String</c> that matches a regular expression.</summary>
     /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
     let regex ([<StringSyntax("Regex")>] regex:string) =
-        try
-            if String.isEmpty regex
-            then Parser.fail "Regex was null or empty."
-            else
+        try match regex with
+            | Empty -> Parser.fail "Regex was null or empty."
+            | _ ->
                 let cached = Regex(regex)
                 stringError (fun element ->
                     let string = element.GetString()
@@ -197,7 +197,7 @@ module Parse =
             let string = element.GetString()
             match 'r.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
             | true, number -> Ok number
-            | _ -> Error "Expected an INumber string."
+            | _ -> Error <| expected<'r> "string"
         ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as <c>System.String</c>.</summary>
@@ -225,7 +225,7 @@ module Parse =
             let string = element.GetRawText()
             match BigInteger.TryParse(string, NumberStyles.Integer, CultureInfo.InvariantCulture) with
             | true, bigint -> Ok bigint
-            | _ -> Error "Expected a bigint."
+            | _ -> Error <| expected<bigint> "number"
         ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Half</c>.</summary>
@@ -236,7 +236,7 @@ module Parse =
             let string = element.GetRawText()
             match Half.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
             | true, half -> Ok half
-            | _ -> Error "Expected a Half."
+            | _ -> Error <| expected<Half> "number"
         ) ExpectedKind.Number
 
     /// <summary>Parses a bool as <c>System.Boolean</c>.</summary>
@@ -255,14 +255,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.Guid</c> with a specific format.</summary>
     /// <example><code>let! guid = "prop" &amp;= Parse.guidExact "N"</code></example>
     let guidExact ([<StringSyntax("GuidFormat")>] format:string) =
-        if String.isEmpty format
-        then Parser.fail "Format was null or empty."
-        else
+        match format with
+        | Empty -> Parser.fail "Format was null or empty."
+        | _ ->
             stringError (fun element ->
                 let string = element.GetString()
                 match Guid.TryParseExact(string, format) with
                 | true, guid -> Ok guid
-                | _ -> Error $"Expected a Guid string (%s{format})."
+                | _ -> Error $"Expected a Guid '%s{format}' string."
             ) ExpectedKind.String
 
     /// <summary>Parses null as <c>FSharp.Core.Unit</c>.</summary>
@@ -275,12 +275,12 @@ module Parse =
 
     // Enums
 
-    let inline private parseEnum<'r, 'e when 'r: enum<'e>> article fn =
+    let inline private parseEnum<'r, 'e when 'r: enum<'e>> fn =
         let enumType = typeof<'r>
         match fn () with
         | true, x when Enum.IsDefined(enumType, x) -> Ok <| LanguagePrimitives.EnumOfValue<'e, 'r> x
         | true, _ -> Error $"Expected a value of %s{enumType.Name}."
-        | _ -> Error <| expected<'e> article
+        | _ -> Error <| expected<'e> "number"
 
     /// <summary>Parses a string as an <c>Enum</c> type.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</code></example>
@@ -296,42 +296,42 @@ module Parse =
     /// <summary>Parses a number as a <c>System.Int32 enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.intEnum&lt;Enum&gt;</code></example>
     let intEnum<'r when 'r : enum<int>> =
-        stringError (_.TryGetInt32 >> parseEnum<'r, int> An) ExpectedKind.Number
+        stringError (_.TryGetInt32 >> parseEnum<'r, int>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.Int16 enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.int16Enum&lt;Enum&gt;</code></example>
     let int16Enum<'r when 'r : enum<int16>> =
-        stringError (_.TryGetInt16 >> parseEnum<'r, int16> An) ExpectedKind.Number
+        stringError (_.TryGetInt16 >> parseEnum<'r, int16>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.Int64 enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.int64Enum&lt;Enum&gt;</code></example>
     let int64Enum<'r when 'r : enum<int64>> =
-        stringError (_.TryGetInt64 >> parseEnum<'r, int64> An) ExpectedKind.Number
+        stringError (_.TryGetInt64 >> parseEnum<'r, int64>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.UInt16 enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.uint16Enum&lt;Enum&gt;</code></example>
     let uint16Enum<'r when 'r : enum<uint16>> =
-        stringError (_.TryGetUInt16 >> parseEnum<'r, uint16> A) ExpectedKind.Number
+        stringError (_.TryGetUInt16 >> parseEnum<'r, uint16>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.UInt32 enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.uint32Enum&lt;Enum&gt;</code></example>
     let uint32Enum<'r when 'r : enum<uint32>> =
-        stringError (_.TryGetUInt32 >> parseEnum<'r, uint32> A) ExpectedKind.Number
+        stringError (_.TryGetUInt32 >> parseEnum<'r, uint32>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.UInt64 enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.uint64Enum&lt;Enum&gt;</code></example>
     let uint64Enum<'r when 'r : enum<uint64>> =
-        stringError (_.TryGetUInt64 >> parseEnum<'r, uint64> A) ExpectedKind.Number
+        stringError (_.TryGetUInt64 >> parseEnum<'r, uint64>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.Byte enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.byteEnum&lt;Enum&gt;</code></example>
     let byteEnum<'r when 'r : enum<byte>> =
-        stringError (_.TryGetByte >> parseEnum<'r, byte> A) ExpectedKind.Number
+        stringError (_.TryGetByte >> parseEnum<'r, byte>) ExpectedKind.Number
 
     /// <summary>Parses a number as a <c>System.SByte enum</c>.</summary>
     /// <example><code>let! enum = "prop" &amp;= Parse.sbyteEnum&lt;Enum&gt;</code></example>
     let sbyteEnum<'r when 'r : enum<sbyte>> =
-        stringError (_.TryGetSByte >> parseEnum<'r, sbyte> An) ExpectedKind.Number
+        stringError (_.TryGetSByte >> parseEnum<'r, sbyte>) ExpectedKind.Number
 
     // Date and time
 
@@ -348,14 +348,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.TimeOnly</c> with a specific format.</summary>
     /// <example><code>let! timeOnly = "prop" &amp;= Parse.timeOnlyExact "HH:mm:ss"</code></example>
     let timeOnlyExact ([<StringSyntax("TimeOnlyFormat")>] format:string) =
-        if String.isEmpty format
-        then Parser.fail "Format was null or empty."
-        else
+        match format with
+        | Empty -> Parser.fail "Format was null or empty."
+        | _ ->
             stringError (fun element ->
                 let string = element.GetString()
                 match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
                 | true, timeOnly -> Ok timeOnly
-                | _ -> Error $"Expected a TimeOnly string (%s{format})."
+                | _ -> Error $"Expected a TimeOnly '%s{format}' string."
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.TimeSpan</c>.</summary>
@@ -371,14 +371,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.TimeSpan</c> with a specific format.</summary>
     /// <example><code>let! timeSpan = "prop" &amp;= Parse.timeSpanExact "c"</code></example>
     let timeSpanExact ([<StringSyntax("TimeSpanFormat")>] format:string) =
-        if String.isEmpty format
-        then Parser.fail "Format was null or empty."
-        else
+        match format with
+        | Empty -> Parser.fail "Format was null or empty."
+        | _ ->
             stringError (fun element ->
                 let string = element.GetString()
                 match TimeSpan.TryParseExact(string, format, CultureInfo.InvariantCulture) with
                 | true, timeSpan -> Ok timeSpan
-                | _ -> Error $"Expected a TimeSpan string (%s{format})."
+                | _ -> Error $"Expected a TimeSpan '%s{format}' string."
             ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateOnly</c>.</summary>
@@ -394,14 +394,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.DateOnly</c> with a specific format.</summary>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnlyExact "yyyy-MM-dd"</code></example>
     let dateOnlyExact ([<StringSyntax("DateOnlyFormat")>] format:string) =
-        if String.isEmpty format
-        then Parser.fail "Format was null or empty."
-        else
+        match format with
+        | Empty -> Parser.fail "Format was null or empty."
+        | _ ->
             stringError (fun element ->
                 let string = element.GetString()
                 match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
                 | true, dateOnly -> Ok dateOnly
-                | _ -> Error $"Expected a DateOnly string (%s{format})."
+                | _ -> Error $"Expected a DateOnly '%s{format}' string."
             ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateTime</c>.</summary>
@@ -425,14 +425,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.DateTime</c> with a specific format.</summary>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
-        if String.isEmpty format
-        then Parser.fail "Format was null or empty."
-        else
+        match format with
+        | Empty -> Parser.fail "Format was null or empty."
+        | _ ->
             stringError (fun element ->
                 let string = element.GetString()
                 match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
                 | true, dateTime -> Ok dateTime
-                | _ -> Error $"Expected a DateTime string (%s{format})."
+                | _ -> Error $"Expected a DateTime '%s{format}' string."
             ) ExpectedKind.String
 
     /// <summary>Parses a string (ISO 8601) as <c>System.DateTimeOffset</c>.</summary>
@@ -456,14 +456,14 @@ module Parse =
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> with a specific format.</summary>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</code></example>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
-        if String.isEmpty format
-        then Parser.fail "Format was null or empty."
-        else
+        match format with
+        | Empty -> Parser.fail "Format was null or empty."
+        | _ ->
             stringError (fun element ->
                 let string = element.GetString()
                 match DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
                 | true, dateTimeOffset -> Ok dateTimeOffset
-                | _ -> Error $"Expected a DateTimeOffset string (%s{format})."
+                | _ -> Error $"Expected a DateTimeOffset '%s{format}' string."
             ) ExpectedKind.String
 
     /// <summary>Parses a number as <c>System.DateTimeOffset</c> from a Unix timestamp in seconds.</summary>
@@ -472,7 +472,7 @@ module Parse =
         stringError (fun element ->
             match element.TryGetInt64() with
             | true, seconds -> Ok <| DateTimeOffset.FromUnixTimeSeconds(seconds)
-            | _ -> Error "Expected an int64 Unix timestamp (seconds)."
+            | _ -> Error <| expected<int64> "number"
         ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.DateTimeOffset</c> from a Unix timestamp in milliseconds.</summary>
@@ -481,7 +481,7 @@ module Parse =
         stringError (fun element ->
             match element.TryGetInt64() with
             | true, milliseconds -> Ok <| DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
-            | _ -> Error "Expected an int64 Unix timestamp (milliseconds)."
+            | _ -> Error <| expected<int64> "number"
         ) ExpectedKind.Number
 
     // Other
@@ -493,7 +493,7 @@ module Parse =
             let string = element.GetString()
             match Uri.TryCreate(string, kind) with
             | true, uri -> Ok uri
-            | _ -> Error $"Expected a Uri string (%O{kind})."
+            | _ -> Error $"Expected a Uri '%O{kind}' string."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.Version</c>.</summary>
@@ -872,7 +872,7 @@ module Parse =
             | Ok x when x = expected -> Ok ()
             | Ok x ->
                 element
-                |> ParseError.details $"Expected %A{expected}, but got %A{x}." typeof<'a>
+                |> ParseError.details $"Expected '%A{expected}', but got '%A{x}'." typeof<'a>
                 |> Error.list
             | Error e -> Error e
         )

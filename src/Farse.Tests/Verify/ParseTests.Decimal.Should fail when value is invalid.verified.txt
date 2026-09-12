@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'decimal.
-     | Expected a decimal.
+     | Expected a decimal number.
      = 1e999

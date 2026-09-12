@@ -6,15 +6,6 @@ open System.Text.Json
 [<AutoOpen>]
 module internal Internal =
 
-    [<AutoOpen>]
-    module Article =
-
-        [<Literal>]
-        let A = "a"
-
-        [<Literal>]
-        let An = "an"
-
     module JsonDocumentOptions =
 
         let Default =
@@ -115,6 +106,13 @@ module internal Internal =
                 fromGenericType args name
             | x -> fromType x.Name
 
+        // Currently only used for numbers.
+        let inline getArticle<'r> =
+            match typeof<'r> with
+            | r when r.Name.StartsWith("Int")
+                  || r.Name.StartsWith("SByte") -> "an"
+            | _ -> "a"
+
     module Error =
 
         let inline toList x =
@@ -147,6 +145,9 @@ module internal Internal =
             if string.Contains('.')
             then Path (string.Split('.', StringSplitOptions.RemoveEmptyEntries))
             else Prop string
+
+        let inline (|Empty|_|) string =
+            String.isEmpty(string)
 
     [<AutoOpen>]
     module Builders =

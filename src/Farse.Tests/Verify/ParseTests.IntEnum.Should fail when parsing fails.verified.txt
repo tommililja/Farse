@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'IntEnum.
-     | Expected an int.
+     | Expected an int number.
      = 1.1

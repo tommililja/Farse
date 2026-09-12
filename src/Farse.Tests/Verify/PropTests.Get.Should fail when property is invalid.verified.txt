@@ -3,5 +3,5 @@
   Error[0]:
     at $.prop
      | Tried parsing 'int.
-     | Expected an int.
+     | Expected an int number.
      = 1.1

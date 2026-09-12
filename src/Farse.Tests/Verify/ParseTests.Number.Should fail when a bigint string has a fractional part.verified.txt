@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'bigint.
-     | Expected an INumber string.
+     | Expected a bigint string.
      = "1.234"
