@@ -20,10 +20,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Expecto" Version="11.1.0" />
-        <PackageReference Include="NodaTime" Version="3.3.3" />
-        <PackageReference Include="Verify.XunitV3" Version="32.0.0" />
+        <PackageReference Include="NodaTime" Version="3.3.4" />
+        <PackageReference Include="Verify.XunitV3" Version="32.0.1" />
         <PackageReference Include="xunit.v3" Version="4.0.0" />
-        <PackageReference Update="FSharp.Core" Version="10.1.400" />
+        <PackageReference Update="FSharp.Core" Version="10.1.401" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Farse\Farse.fsproj"/>
