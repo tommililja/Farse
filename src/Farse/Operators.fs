@@ -6,6 +6,7 @@ module Operators =
     /// <remarks>
     ///     Property names are matched with ordinal, case-sensitive comparison.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
     /// <example><code>let! int = "prop.prop2" &amp;= Parse.int</code></example>
     let inline (&=) path parser =
@@ -15,6 +16,7 @@ module Operators =
     /// <remarks>
     ///     Property names are matched with ordinal, case-sensitive comparison.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
     /// <example><code>let! int = "prop.prop2" ?= Parse.int</code></example>
     let inline (?=) path parser =
@@ -24,6 +26,7 @@ module Operators =
     /// <remarks>
     ///     Property names are matched with ordinal, case-sensitive comparison.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
     /// <example><code>let! int = "prop.prop2" ??= Parse.int</code></example>
     let inline (??=) path parser =

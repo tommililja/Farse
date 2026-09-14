@@ -1,0 +1,6 @@
+﻿Parser yielded 1 error[s].
+
+  Error[0]:
+    at $['prop.prop2']
+     | Tried parsing 'int.
+     | Missing required property.

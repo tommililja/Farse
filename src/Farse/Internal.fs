@@ -2,6 +2,7 @@ namespace Farse
 
 open System
 open System.Text.Json
+open System.Text.RegularExpressions
 
 [<AutoOpen>]
 module internal Internal =
@@ -132,6 +133,8 @@ module internal Internal =
     [<AutoOpen>]
     module ActivePatterns =
 
+        let private pathRegex = Regex(@"(?:\\\.|[^.])+")
+
         let inline (|IsExpectedKind|_|) (e:JsonElement) = function
             | ExpectedKind.Any -> not e.isUndefined
             | ExpectedKind.Array -> e.ValueKind = Kind.Array
@@ -141,10 +144,16 @@ module internal Internal =
             | ExpectedKind.Object -> e.ValueKind = Kind.Object
             | ExpectedKind.String -> e.ValueKind = Kind.String
 
-        let inline (|Prop|Path|) (string:string) =
-            if string.Contains('.')
-            then Path (string.Split('.', StringSplitOptions.RemoveEmptyEntries))
-            else Prop string
+        let inline (|Prop|Path|) (path: string) =
+            let segments =
+                pathRegex.Matches(path)
+                |> Seq.map _.Value.Replace("\\.", ".")
+                |> Seq.toArray
+
+            match segments with
+            | [||] -> Prop path
+            | [| name |] -> Prop name
+            | segments -> Path segments
 
         let inline (|Empty|_|) string =
             String.isEmpty(string)

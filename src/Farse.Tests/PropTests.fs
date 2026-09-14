@@ -488,3 +488,83 @@ module PropTests =
             Prop.tryGet2 "prop.prop2.prop3" Parse.int
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
             |> Expect.parserError
+
+module PathTests =
+
+    [<Fact>]
+    let ``Should parse a name containing an escaped dot`` () =
+        let expected = 1
+        let actual =
+            Prop.get "prop\.prop2" Parse.int
+            |> Parser.parse """{ "prop.prop2": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should traverse a path with an escaped dot in a middle segment`` () =
+        let expected = 1
+        let actual =
+            Prop.get "a.b\.c.d" Parse.int
+            |> Parser.parse """{ "a": { "b.c": { "d": 1 } } }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a name containing a backslash and an escaped dot`` () =
+        let expected = 1
+        let actual =
+            Prop.get @"prop\\.prop2" Parse.int
+            |> Parser.parse """{ "prop\\.prop2": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a name ending with a backslash`` () =
+        let expected = 1
+        let actual =
+            Prop.get @"prop\" Parse.int
+            |> Parser.parse """{ "prop\\": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse an empty name`` () =
+        let expected = 1
+        let actual =
+            Prop.get "" Parse.int
+            |> Parser.parse """{ "": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a name containing a single quote`` () =
+        let expected = 1
+        let actual =
+            Prop.get "prop's" Parse.int
+            |> Parser.parse """{ "prop's": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should render a bracketed path for a name with an escaped dot`` () =
+        Prop.get "prop\.prop2" Parse.int
+        |> Parser.parse """{ "prop.prop2": "1" }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should render a bracketed path for a name with a quote and a dot`` () =
+        Prop.get "prop's\.prop2" Parse.int
+        |> Parser.parse """{ "prop's.prop2": "1" }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should render dotted and bracketed segments in the same path`` () =
+        Prop.get "a.b\.c.d" Parse.int
+        |> Parser.parse """{ "a": { "b.c": { "d": "1" } } }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should treat a backslash before a dot as a path separator when not escaped`` () =
+        Prop.get "prop\\.prop2" Parse.int
+        |> Parser.parse """{ "prop\\.prop2": "1" }"""
+        |> Expect.parserError

@@ -5,10 +5,10 @@ open System.Text.Json
 
 module Prop =
 
-    let private createPath array =
-        match array with
-        | [||] -> String.Empty
-        | _ -> "." + String.concat "." array
+    let inline private createPath (array:string array) =
+        array
+        |> Array.map JsonPath.segment
+        |> String.concat String.Empty
         |> JsonPath
 
     let inline private select path count =
@@ -153,6 +153,7 @@ module Prop =
     /// <remarks>
     ///     Property names are matched with ordinal, case-sensitive comparison.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
     /// <example><code>let! int = Prop.get "prop.prop2" Parse.int</code></example>
     let get path parser =
@@ -164,6 +165,7 @@ module Prop =
     /// <remarks>
     ///     Property names are matched with ordinal, case-sensitive comparison.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
     /// <example><code>let! int = Prop.tryGet "prop.prop2" Parse.int</code></example>
     let tryGet path parser =
@@ -175,6 +177,7 @@ module Prop =
     /// <remarks>
     ///     Property names are matched with ordinal, case-sensitive comparison.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
     /// <example><code>let! int = Prop.tryGet2 "prop.prop2" Parse.int</code></example>
     let tryGet2 path parser =

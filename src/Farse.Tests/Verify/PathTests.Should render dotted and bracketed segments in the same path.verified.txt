@@ -1,0 +1,7 @@
+﻿Parser yielded 1 error[s].
+
+  Error[0]:
+    at $.a['b.c'].d
+     | Tried parsing 'int.
+     | Expected Number, but got String.
+     = "1"
