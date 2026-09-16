@@ -8,7 +8,7 @@ module internal ActivePatterns =
 
     let private pathRegex = Regex(@"(?:\\\.|[^.])+")
 
-    let (|IsExpectedKind|_|) (e:JsonElement) = function
+    let inline (|IsExpectedKind|_|) (e:JsonElement) = function
         | ExpectedKind.Any -> not e.isUndefined
         | ExpectedKind.Array -> e.ValueKind = Kind.Array
         | ExpectedKind.Bool -> e.ValueKind = Kind.True || e.ValueKind = Kind.False
@@ -17,7 +17,7 @@ module internal ActivePatterns =
         | ExpectedKind.Object -> e.ValueKind = Kind.Object
         | ExpectedKind.String -> e.ValueKind = Kind.String
 
-    let (|Prop|Path|) (path:string) =
+    let inline (|Prop|Path|) (path:string) =
         let segments =
             pathRegex.Matches(path)
             |> Seq.map _.Value.Replace("\\.", ".")
@@ -28,5 +28,5 @@ module internal ActivePatterns =
         | [| name |] -> Prop name
         | segments -> Path segments
 
-    let (|Empty|_|) string =
+    let inline (|Empty|_|) string =
         String.isEmpty(string)
