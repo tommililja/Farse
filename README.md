@@ -21,7 +21,7 @@ dotnet package add Farse
 The benchmarks can be found [here](https://github.com/tommililja/Farse/blob/main/src/Farse.Benchmarks/Benchmarks.fs).
 
 ```shell
-BenchmarkDotNet v0.15.8, macOS Tahoe 26.6.2 (25G83) [Darwin 25.6.0]
+BenchmarkDotNet v0.15.8, macOS 27.0 (26A428) [Darwin 27.0.0]
 Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 .NET SDK 10.0.302
   [Host]     : .NET 10.0.10 (10.0.10, 10.0.1026.32716), Arm64 RyuJIT armv8.0-a DEBUG
@@ -31,13 +31,13 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 ```shell
 | Method                 | Mean     | Ratio | Gen0     | Gen1    | Allocated | Alloc Ratio |
 |----------------------- |---------:|------:|---------:|--------:|----------:|------------:|
-| System.Text.Json       | 139.6 us |  0.90 |   7.0801 |  0.7324 |  44.63 KB |        0.81 |
-| Farse                  | 154.5 us |  1.00 |   8.7891 |  1.2207 |   54.8 KB |        1.00 |
-| System.Text.Json*      | 123.2 us |  0.80 |  10.9863 |  1.4648 |  67.47 KB |        1.23 |
-| Newtonsoft.Json*       | 222.0 us |  1.44 |  41.5039 |  5.6152 | 254.46 KB |        4.64 |
-| Thoth.System.Text.Json | 243.9 us |  1.58 |  67.3828 | 17.0898 | 416.76 KB |        7.60 |
-| Newtonsoft.Json        | 278.0 us |  1.80 |  88.3789 | 34.6680 | 542.18 KB |        9.89 |
-| Thoth.Json.Net         | 378.4 us |  2.45 | 113.2813 | 33.2031 | 696.61 KB |       12.71 |
+| System.Text.Json       | 138.7 us |  0.90 |   7.0801 |  0.7324 |  44.63 KB |        0.81 |
+| Farse                  | 154.3 us |  1.00 |   8.7891 |  1.2207 |  54.78 KB |        1.00 |
+| System.Text.Json*      | 121.8 us |  0.79 |  10.9863 |  1.4648 |  67.47 KB |        1.23 |
+| Newtonsoft.Json*       | 223.0 us |  1.45 |  41.5039 |  5.6152 | 254.46 KB |        4.65 |
+| Thoth.System.Text.Json | 242.0 us |  1.57 |  67.6270 | 16.8457 | 416.76 KB |        7.61 |
+| Newtonsoft.Json        | 271.5 us |  1.76 |  88.3789 | 34.6680 | 542.18 KB |        9.90 |
+| Thoth.Json.Net         | 374.8 us |  2.43 | 113.2813 | 33.2031 | 696.61 KB |       12.72 |
 
 * Automatic deserialization
 ```
