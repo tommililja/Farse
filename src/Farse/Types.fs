@@ -8,19 +8,18 @@ type JsonPath = JsonPath of string
 
 module JsonPath =
 
-    let private escapeQuotes (name:string) =
-        name.Replace("\\", "\\\\").Replace("'", "\\'")
-
     let internal segment (name:string) =
         if name.Contains('.') || name.Contains('\'') || name.Contains('\\')
-        then $"['%s{escapeQuotes name}']"
+        then
+            let name = name.Replace("\\", "\\\\").Replace("'", "\\'")
+            $"['%s{name}']"
         else $".%s{name}"
 
     let internal empty =
         JsonPath String.Empty
 
     let internal prop (name:string) =
-        JsonPath <| segment name
+        JsonPath (segment name)
 
     let internal index n =
         JsonPath $"[%i{n}]"

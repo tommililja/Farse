@@ -25,7 +25,9 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Types.fs" />
-        <Compile Include="Internal.fs" />
+        <Compile Include="Internal\Common.fs" />
+        <Compile Include="Internal\ActivePatterns.fs" />
+        <Compile Include="Internal\Builders.fs" />
         <Compile Include="ParserError.fs" />
         <Compile Include="Parser.fs"/>
         <Compile Include="ParserBuilder.fs" />
