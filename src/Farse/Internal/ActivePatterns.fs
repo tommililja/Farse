@@ -17,7 +17,7 @@ module internal ActivePatterns =
         | ExpectedKind.Object -> e.ValueKind = Kind.Object
         | ExpectedKind.String -> e.ValueKind = Kind.String
 
-    let inline (|Prop|Path|) (path:string) =
+    let (|Prop|Path|) (path:string) =
         let segments =
             pathRegex.Matches(path)
             |> Seq.map _.Value.Replace("\\.", ".")
