@@ -1,6 +1,6 @@
 # Contributing
 
-Bug reports, feature requests and pull requests are all welcome.
+Bug reports, feature and pull requests are welcome.
 
 ### Issues
 
