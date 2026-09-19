@@ -545,4 +545,4 @@ type ParseError = {
 
 ## Contributing
 
-Bug reports, feature requests, and pull requests are all welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports, feature and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
