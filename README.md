@@ -542,3 +542,7 @@ type ParseError = {
 }
 ```
 > Note: Farse should not throw exceptions unless something unexpected occurs.
+
+## Contributing
+
+Bug reports, feature requests, and pull requests are all welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
