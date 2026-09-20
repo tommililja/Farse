@@ -22,15 +22,15 @@ module JsonTests =
 
     [<Fact>]
     let ``Should be equal after properties are sorted`` () =
-        let a = JObj [ "a", JNum 1; "b", JNum 2 ]
-        let b = JObj [ "b", JNum 2; "a", JNum 1 ]
+        let a = JObj [ "a", JNum.from 1; "b", JNum.from 2 ]
+        let b = JObj [ "b", JNum.from 2; "a", JNum.from 1 ]
         let equal = Json.equal a b
         Expect.isTrue "Expected values to be equal." equal
 
     [<Fact>]
     let ``Should not be equal after properties are sorted`` () =
-        let a = JObj [ "a", JNum 1; "b", JNum 2 ]
-        let b = JObj [ "b", JNum 1; "a", JNum 2 ]
+        let a = JObj [ "a", JNum.from 1; "b", JNum.from 2 ]
+        let b = JObj [ "b", JNum.from 1; "a", JNum.from 2 ]
         let equal = Json.equal a b
         Expect.isFalse "Expected values to not be equal." equal
 
@@ -38,8 +38,8 @@ module JsonTests =
     let ``Should not be equal and return a message`` () =
         let x =
             JObj [
-                "same", JNum 2
-                "changed", JNum 1
+                "same", JNum.from 2
+                "changed", JNum.from 1
                 "onlyInX", JStr "present"
                 "nested",
                     JObj [
@@ -47,17 +47,17 @@ module JsonTests =
                         "changed", JBit true
                         "onlyInX", JStr "present"
                     ]
-                "sameArray", JArr [ JNum 1; JNum 2 ]
-                "sameLengthArray", JArr [ JObj [ "id", JNum 1; "role", JStr "Engineer" ]; JNum 2 ]
-                "diffLengthArray", JArr [ JNum 1; JNum 2; JNum 3 ]
+                "sameArray", JArr [ JNum.from 1; JNum.from 2 ]
+                "sameLengthArray", JArr [ JObj [ "id", JNum.from 1; "role", JStr "Engineer" ]; JNum.from 2 ]
+                "diffLengthArray", JArr [ JNum.from 1; JNum.from 2; JNum.from 3 ]
                 "nullBoth", JNil
                 "nullVsValue", JNil
             ]
 
         let y =
             JObj [
-                "same", JNum 1
-                "changed", JNum 2
+                "same", JNum.from 1
+                "changed", JNum.from 2
                 "onlyInB", JStr "present"
                 "nested",
                     JObj [
@@ -65,9 +65,9 @@ module JsonTests =
                         "changed", JBit false
                         "onlyInY", JStr "present"
                     ]
-                "sameArray", JArr [ JNum 1; JNum 2 ]
-                "sameLengthArray", JArr [ JObj [ "id", JNum 1; "role", JStr "Manager" ]; JNum 2 ]
-                "diffLengthArray", JArr [ JNum 1; JNum 2 ]
+                "sameArray", JArr [ JNum.from 1; JNum.from 2 ]
+                "sameLengthArray", JArr [ JObj [ "id", JNum.from 1; "role", JStr "Manager" ]; JNum.from 2 ]
+                "diffLengthArray", JArr [ JNum.from 1; JNum.from 2 ]
                 "nullBoth", JNil
                 "nullVsValue", JStr "now a string"
             ]
@@ -80,13 +80,13 @@ module JsonTests =
     let ``Should be equal when object keys are in a different order`` () =
         let x =
             JObj [
-                "id", JNum 1
+                "id", JNum.from 1
                 "name", JStr "Alice"
                 "active", JBit true
                 "nested",
                     JObj [
-                        "x", JNum 1
-                        "y", JNum 2
+                        "x", JNum.from 1
+                        "y", JNum.from 2
                     ]
                 "tags", JArr [ JStr "a"; JStr "b" ]
             ]
@@ -96,11 +96,11 @@ module JsonTests =
                 "tags", JArr [ JStr "a"; JStr "b" ]
                 "nested",
                     JObj [
-                        "y", JNum 2
-                        "x", JNum 1
+                        "y", JNum.from 2
+                        "x", JNum.from 1
                     ]
                 "active", JBit true
-                "id", JNum 1
+                "id", JNum.from 1
                 "name", JStr "Alice"
             ]
 
@@ -345,7 +345,7 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create number`` () =
-            JNum<int> 5
+            JNum.from<int> 5
             |> Json.asString Indented
             |> Expect.string
 
@@ -382,30 +382,30 @@ module JsonTests =
     [<Fact>]
     let ``Should format numbers correctly when converting to string`` () =
         [
-            JNum Int16.MaxValue, "32767"
-            JNum Int32.MaxValue, "2147483647"
-            JNum Int64.MaxValue, "9223372036854775807"
-            JNum Int16.MinValue, "-32768"
-            JNum Int32.MinValue, "-2147483648"
-            JNum Int64.MinValue, "-9223372036854775808"
-            JNum UInt16.MaxValue, "65535"
-            JNum UInt32.MaxValue, "4294967295"
-            JNum UInt64.MaxValue, "18446744073709551615"
-            JNum Int128.MaxValue, "170141183460469231731687303715884105727"
-            JNum Int128.MinValue, "-170141183460469231731687303715884105728"
-            JNum Byte.MaxValue, "255"
-            JNum SByte.MaxValue, "127"
-            JNum Single.MaxValue, "3.40282347E+38"
-            JNum Single.MinValue, "-3.40282347E+38"
-            JNum Double.MaxValue, "1.7976931348623157E+308"
-            JNum Double.MinValue, "-1.7976931348623157E+308"
-            JNum Half.MinValue, "-65504"
-            JNum Half.MaxValue, "65504"
-            JNum Decimal.MaxValue, "79228162514264337593543950335"
-            JNum Decimal.MinValue, "-79228162514264337593543950335"
-            JNum (Decimal.Parse("12345678900.12345678900", CultureInfo.InvariantCulture)), "12345678900.12345678900"
-            JNum (BigInteger.Parse("99999999999999999999999999999")), "99999999999999999999999999999"
-            JNum (BigInteger.Parse("-99999999999999999999999999999")), "-99999999999999999999999999999"
+            JNum.from Int16.MaxValue, "32767"
+            JNum.from Int32.MaxValue, "2147483647"
+            JNum.from Int64.MaxValue, "9223372036854775807"
+            JNum.from Int16.MinValue, "-32768"
+            JNum.from Int32.MinValue, "-2147483648"
+            JNum.from Int64.MinValue, "-9223372036854775808"
+            JNum.from UInt16.MaxValue, "65535"
+            JNum.from UInt32.MaxValue, "4294967295"
+            JNum.from UInt64.MaxValue, "18446744073709551615"
+            JNum.from Int128.MaxValue, "170141183460469231731687303715884105727"
+            JNum.from Int128.MinValue, "-170141183460469231731687303715884105728"
+            JNum.from Byte.MaxValue, "255"
+            JNum.from SByte.MaxValue, "127"
+            JNum.from Single.MaxValue, "3.40282347E+38"
+            JNum.from Single.MinValue, "-3.40282347E+38"
+            JNum.from Double.MaxValue, "1.7976931348623157E+308"
+            JNum.from Double.MinValue, "-1.7976931348623157E+308"
+            JNum.from Half.MinValue, "-65504"
+            JNum.from Half.MaxValue, "65504"
+            JNum.from Decimal.MaxValue, "79228162514264337593543950335"
+            JNum.from Decimal.MinValue, "-79228162514264337593543950335"
+            JNum.from (Decimal.Parse("12345678900.12345678900", CultureInfo.InvariantCulture)), "12345678900.12345678900"
+            JNum.from (BigInteger.Parse("99999999999999999999999999999")), "99999999999999999999999999999"
+            JNum.from (BigInteger.Parse("-99999999999999999999999999999")), "-99999999999999999999999999999"
         ]
         |> List.iter (fun (json, expected) ->
             let actual = Json.asString Raw json
@@ -446,7 +446,7 @@ module JsonTests =
     module JObj =
 
         let ``Should create object`` () =
-            JObj [ "1", JNum 1; "2", JNum 2; "3", JNum 3 ]
+            JObj [ "1", JNum.from 1; "2", JNum.from 2; "3", JNum.from 3 ]
             |> Json.asString Indented
             |> Expect.string
 
@@ -458,13 +458,13 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object from value`` () =
-            JObj.from (fun x -> [ "value", JNum x ]) 1
+            JObj.from (fun x -> [ "value", JNum.from x ]) 1
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create object when Some`` () =
-            JObj.option (fun x -> [ "value", JNum x ]) (Some 1)
+            JObj.option (fun x -> [ "value", JNum.from x ]) (Some 1)
             |> Json.asString Indented
             |> Expect.string
 
@@ -476,20 +476,20 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object array`` () =
-            JObj.array (fun x -> [ "value", JNum x ]) [ 1; 2; 3 ]
+            JObj.array (fun x -> [ "value", JNum.from x ]) [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create object singleton`` () =
-            JObj.singleton (fun (n, v) -> [ n, JNum v ]) ("value", 1)
+            JObj.singleton (fun (n, v) -> [ n, JNum.from v ]) ("value", 1)
             |> Json.asString Indented
             |> Expect.string
 
     module JArr =
 
         let ``Should create array`` () =
-            JArr [ JNum 1; JNum 2; JNum 3 ]
+            JArr [ JNum.from 1; JNum.from 2; JNum.from 3 ]
             |> Json.asString Indented
             |> Expect.string
 

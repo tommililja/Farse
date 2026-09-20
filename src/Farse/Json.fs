@@ -270,21 +270,6 @@ module Json =
 
             Some $"Diff yielded %i{diffs.Length} difference[s].\n\n%s{list}"
 
-[<AutoOpen>]
-type JNum =
-
-    /// <summary>Creates a <c>Json</c> from an <c>INumber</c>.</summary>
-    /// <remarks>Use <c>JNum&lt;int&gt;</c> to be explicit.</remarks>
-    /// <example><code>"prop", JNum 1</code></example>
-    static member inline JNum<'a when 'a :> INumber<'a>>(number:'a) =
-        match typeof<'a> with
-        | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
-        | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
-        | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
-        | x when x = typeof<Half> -> number.ToString("G5", CultureInfo.InvariantCulture)
-        | _ -> number.ToString(null, CultureInfo.InvariantCulture) // Safe default for decimal, integers and custom types.
-        |> Json.JNum
-
 module internal JNil =
 
     let inline from map fn = function
@@ -328,25 +313,37 @@ module JNum =
 
     /// <summary>A JSON number with the value 0.</summary>
     /// <example><code>"prop", JNum.zero</code></example>
-    let zero = JNum 0
+    let zero = JNum "0"
+
+    /// <summary>Creates a <c>Json</c> from an <c>INumber</c>.</summary>
+    /// <remarks>Use <c>JNum.from&lt;int&gt;</c> to be explicit.</remarks>
+    /// <example><code>"prop", JNum.from 1</code></example>
+    let from<'a when 'a :> INumber<'a>>(number:'a) =
+        match typeof<'a> with
+        | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
+        | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
+        | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
+        | x when x = typeof<Half> -> number.ToString("G5", CultureInfo.InvariantCulture)
+        | _ -> number.ToString(null, CultureInfo.InvariantCulture) // Safe default for decimal, integers and custom types.
+        |> Json.JNum
 
     /// <summary>Creates a JSON number or null from an optional value.</summary>
     /// <remarks>Use <c>JNum.option&lt;'a, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.option id (Some 1)</code></example>
     let inline option<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
-        JNil.from fn JNum x
+        JNil.from fn from x
 
     /// <summary>Creates a JSON number array from a <c>seq</c>.</summary>
     /// <remarks>Use <c>JNum.array&lt;'a, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.array id [ 1 ]</code></example>
     let inline array<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
-        JArr.from fn JNum x
+        JArr.from fn from x
 
     /// <summary>Creates a JSON number array from <c>'a</c>.</summary>
     /// <remarks>Use <c>JNum.singleton&lt;'a, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.singleton id 1</code></example>
     let inline singleton<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
-        JArr.from fn JNum [ x ]
+        JArr.from fn from [ x ]
 
 module JBit =
 
