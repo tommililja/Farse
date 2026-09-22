@@ -3,19 +3,53 @@ namespace Farse
 open System
 open System.Buffers
 open System.Diagnostics.CodeAnalysis
-open System.Globalization
 open System.Numerics
 open System.Text
 open System.Text.Json
 open System.Text.Json.Nodes
 
+type Number =
+    private | Value of string
+
+    override this.ToString() =
+        let (Value value) = this
+        value
+
+    static member private From(x) =
+        Value <| INumber.format x
+
+    static member op_Implicit(x:int) = Number.From x
+    static member op_Implicit(x:int16) = Number.From x
+    static member op_Implicit(x:int64) = Number.From x
+    static member op_Implicit(x:Int128) = Number.From x
+    static member op_Implicit(x:uint16) = Number.From x
+    static member op_Implicit(x:uint32) = Number.From x
+    static member op_Implicit(x:uint64) = Number.From x
+    static member op_Implicit(x:UInt128) = Number.From x
+    static member op_Implicit(x:float) = Number.From x
+    static member op_Implicit(x:float32) = Number.From x
+    static member op_Implicit(x:decimal) = Number.From x
+    static member op_Implicit(x:byte) = Number.From x
+    static member op_Implicit(x:sbyte) = Number.From x
+    static member op_Implicit(x:Half) = Number.From x
+    static member op_Implicit(x:bigint) = Number.From x
+
 [<NoComparison>]
 type Json =
+    /// <summary>A JSON string.</summary>
     | JStr of string
-    | JNum of string
+    /// <summary>A JSON number.</summary>
+    /// <remarks>Use <c>JNum.number</c> or suppress <c>FS3391</c> as <c>Number</c> uses implicit conversions.</remarks>
+    | JNum of Number
+    /// <summary>A JSON boolean.</summary>
     | JBit of bool
+    /// <summary>A JSON object.</summary>
+    /// <remarks>Property order is preserved.</remarks>
     | JObj of (string * Json) list
+    /// <summary>A JSON array.</summary>
+    /// <remarks>Element order is preserved.</remarks>
     | JArr of Json list
+    /// <summary>A JSON null.</summary>
     | JNil
 
 [<NoComparison>]
@@ -44,24 +78,24 @@ module Json =
     /// <summary>Converts a <c>JsonElement</c> into a <c>Json</c>.</summary>
     /// <exception cref="System.ArgumentException">Thrown for undefined elements.</exception>
     /// <example><code>let json = Json.fromElement element</code></example>
-    let rec fromElement (e:JsonElement) =
-        match e.ValueKind with
-        | Kind.String -> JStr <| e.GetString()
-        | Kind.Number -> JNum <| e.GetRawText()
+    let rec fromElement (element:JsonElement) =
+        match element.ValueKind with
+        | Kind.String -> JStr <| element.GetString()
+        | Kind.Number -> JNum <| Value (element.GetRawText())
         | Kind.True -> JBit true
         | Kind.False -> JBit false
         | Kind.Object ->
-            e.EnumerateObject()
+            element.EnumerateObject()
             |> Seq.map (fun prop -> prop.Name, fromElement prop.Value)
             |> Seq.toList
             |> JObj
         | Kind.Array ->
-            e.EnumerateArray()
+            element.EnumerateArray()
             |> Seq.map fromElement
             |> Seq.toList
             |> JArr
         | Kind.Null -> JNil
-        | Kind.Undefined -> invalidArg (nameof e) "Element was undefined."
+        | Kind.Undefined -> invalidArg (nameof element) "Element was undefined."
 
     let inline private parseDocument ([<InlineIfLambda>] fn) =
         try use document: JsonDocument = fn ()
@@ -106,11 +140,15 @@ module Json =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
     /// <summary>Converts a <c>Json</c> to a <c>JsonNode</c>.</summary>
+    /// <remarks>
+    ///     Returns <c>null</c> for <c>JNil</c>.<br/>
+    ///     The last occurrence is chosen when duplicate properties exist.
+    /// </remarks>
     /// <example><code>let node = Json.asJsonNode json</code></example>
     let rec asJsonNode json : JsonNode | null =
         match json with
         | JStr str -> JsonValue.Create(str)
-        | JNum str -> JsonNode.Parse(str)
+        | JNum str -> JsonNode.Parse(str.ToString())
         | JBit bit -> JsonValue.Create(bit)
         | JObj obj ->
             let object = JsonObject()
@@ -124,14 +162,17 @@ module Json =
         | JNil -> null
 
     /// <summary>Converts a <c>Json</c> to a <c>JsonElement</c>.</summary>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let element = Json.asJsonElement json</code></example>
     let asJsonElement = asJsonNode >> JsonSerializer.SerializeToElement
 
     /// <summary>Converts a <c>Json</c> to a <c>JsonDocument</c>.</summary>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>use document = Json.asJsonDocument json</code></example>
     let asJsonDocument = asJsonNode >> JsonSerializer.SerializeToDocument
 
     /// <summary>Converts a <c>Json</c> to a formatted JSON string.</summary>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
         match format, asJsonNode json with
@@ -153,7 +194,7 @@ module Json =
     let writeTo (writer:Utf8JsonWriter) json =
         let rec write = function
             | JStr str -> writer.WriteStringValue(str)
-            | JNum str -> writer.WriteRawValue(str)
+            | JNum str -> writer.WriteRawValue(str.ToString())
             | JBit bit -> writer.WriteBooleanValue(bit)
             | JObj obj ->
                 writer.WriteStartObject()
@@ -172,6 +213,7 @@ module Json =
         write json
 
     /// <summary>Converts a <c>Json</c> to a UTF-8 encoded <c>byte array</c>.</summary>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let bytes = Json.asBytes Indented json</code></example>
     let asBytes format json =
         asString format json
@@ -197,7 +239,7 @@ module Json =
     let diff x y =
         let render = function
             | JStr str -> $"\"%s{str}\""
-            | JNum str -> str
+            | JNum str -> str.ToString()
             | JBit bit -> bit.ToString().ToLower()
             | JNil -> "null"
             | other ->
@@ -282,10 +324,12 @@ module JArr =
     /// <example><code>"prop", JArr.empty</code></example>
     let empty = JArr []
 
-    let inline internal from fn json seq =
-        seq
-        |> List.ofSeq
-        |> List.map (fn >> json)
+    /// <summary>Creates a JSON array from <c>'a seq</c>.</summary>
+    /// <example><code>"prop", JArr.from JNum.number [ 1; 2; 3 ] </code></example>
+    let inline from fn x =
+        x
+        |> Seq.map fn
+        |> Seq.toList
         |> JArr
 
 module JStr =
@@ -294,56 +338,62 @@ module JStr =
     /// <example><code>"prop", JStr.empty</code></example>
     let empty = JStr String.Empty
 
+    /// <summary>Creates a JSON string from an <c>INumber</c>.</summary>
+    /// <remarks>
+    ///     Use <c>JStr.number&lt;int&gt;</c> to be explicit.
+    ///     Formats the number with invariant culture and round-trippable precision.
+    /// </remarks>
+    /// <example><code>"prop", JStr.number 1</code></example>
+    let inline number<'a when 'a :> INumber<'a>>(x:'a) =
+        JStr <| INumber.format x
+
     /// <summary>Creates a JSON string or null from an <c>option</c>.</summary>
     /// <example><code>"prop", JStr.option id (Some "string")</code></example>
     let inline option fn x =
         JNil.from fn JStr x
 
-    /// <summary>Creates a JSON string array from a <c>seq</c>.</summary>
+    /// <summary>Creates a JSON string array from <c>'a seq</c>.</summary>
     /// <example><code>"prop", JStr.array id [ "string" ]</code></example>
     let inline array fn x =
-        JArr.from fn JStr x
+        JArr.from (fn >> JStr) x
 
-    /// <summary>Creates a JSON string array from <c>'a</c>.</summary>
-    /// <example><code>"prop", JStr.singleton id "string"</code></example>
-    let inline singleton fn x =
-        JArr.from fn JStr [ x ]
+    /// <summary>Creates a JSON string array with a single element from <c>'a</c>.</summary>
+    /// <example><code>"prop", JStr.single id "string"</code></example>
+    let inline single fn x =
+        JArr.from (fn >> JStr) [ x ]
 
 module JNum =
 
     /// <summary>A JSON number with the value 0.</summary>
     /// <example><code>"prop", JNum.zero</code></example>
-    let zero = JNum "0"
+    let zero = JNum <| Value "0"
 
-    /// <summary>Creates a <c>Json</c> from an <c>INumber</c>.</summary>
-    /// <remarks>Use <c>JNum.from&lt;int&gt;</c> to be explicit.</remarks>
-    /// <example><code>"prop", JNum.from 1</code></example>
-    let from<'a when 'a :> INumber<'a>>(number:'a) =
-        match typeof<'a> with
-        | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
-        | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
-        | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
-        | x when x = typeof<Half> -> number.ToString("G5", CultureInfo.InvariantCulture)
-        | _ -> number.ToString(null, CultureInfo.InvariantCulture) // Safe default for decimal, integers and custom types.
-        |> Json.JNum
+    /// <summary>Creates a JSON number from an <c>INumber</c>.</summary>
+    /// <remarks>
+    ///     Use <c>JNum.number&lt;int&gt;</c> to be explicit.
+    ///     Formats the number with round-trippable precision.
+    /// </remarks>
+    /// <example><code>"prop", JNum.number 1</code></example>
+    let number<'a when 'a :> INumber<'a>>(x:'a) =
+        JNum <| Value (INumber.format x)
 
-    /// <summary>Creates a JSON number or null from an optional value.</summary>
-    /// <remarks>Use <c>JNum.option&lt;'a, int&gt;</c> to be explicit.</remarks>
+    /// <summary>Creates a JSON number or null from an <c>option</c>.</summary>
+    /// <remarks>Use <c>JNum.option&lt;_, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.option id (Some 1)</code></example>
     let inline option<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
-        JNil.from fn from x
+        JNil.from fn number x
 
-    /// <summary>Creates a JSON number array from a <c>seq</c>.</summary>
-    /// <remarks>Use <c>JNum.array&lt;'a, int&gt;</c> to be explicit.</remarks>
+    /// <summary>Creates a JSON number array from <c>'a seq</c>.</summary>
+    /// <remarks>Use <c>JNum.array&lt;_, int&gt;</c> to be explicit.</remarks>
     /// <example><code>"prop", JNum.array id [ 1 ]</code></example>
     let inline array<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
-        JArr.from fn from x
+        JArr.from (fn >> number) x
 
-    /// <summary>Creates a JSON number array from <c>'a</c>.</summary>
-    /// <remarks>Use <c>JNum.singleton&lt;'a, int&gt;</c> to be explicit.</remarks>
-    /// <example><code>"prop", JNum.singleton id 1</code></example>
-    let inline singleton<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
-        JArr.from fn from [ x ]
+    /// <summary>Creates a JSON number array with a single element from <c>'a</c>.</summary>
+    /// <remarks>Use <c>JNum.single&lt;_, int&gt;</c> to be explicit.</remarks>
+    /// <example><code>"prop", JNum.single id 1</code></example>
+    let inline single<'a, 'b when 'b :> INumber<'b>> (fn:'a -> 'b) x =
+        JArr.from (fn >> number) [ x ]
 
 module JBit =
 
@@ -352,15 +402,15 @@ module JBit =
     let inline option fn x =
         JNil.from fn JBit x
 
-    /// <summary>Creates a JSON bool array from a <c>seq</c>.</summary>
+    /// <summary>Creates a JSON bool array from <c>'a seq</c>.</summary>
     /// <example><code>"prop", JBit.array id [ true ]</code></example>
     let inline array fn x =
-        JArr.from fn JBit x
+        JArr.from (fn >> JBit) x
 
-    /// <summary>Creates a JSON bool array from <c>'a</c>.</summary>
-    /// <example><code>"prop", JBit.singleton id true</code></example>
-    let inline singleton fn x =
-        JArr.from fn JBit [ x ]
+    /// <summary>Creates a JSON bool array with a single element from <c>'a</c>.</summary>
+    /// <example><code>"prop", JBit.single id true</code></example>
+    let inline single fn x =
+        JArr.from (fn >> JBit) [ x ]
 
 module JObj =
 
@@ -378,12 +428,12 @@ module JObj =
     let inline option fn x =
         JNil.from fn JObj x
 
-    /// <summary>Creates a JSON object array from a <c>seq</c>.</summary>
+    /// <summary>Creates a JSON object array from <c>'a seq</c>.</summary>
     /// <example><code>"prop", JObj.array (fun x -> [ "prop", JStr x.Prop ]) [ {| Prop = "value" |} ]</code></example>
     let inline array fn x =
-        JArr.from fn JObj x
+        JArr.from (fn >> JObj) x
 
-    /// <summary>Creates a JSON object array from <c>'a</c>.</summary>
-    /// <example><code>"prop", JObj.singleton (fun x -> [ "prop", JStr x.Prop ]) {| Prop = "value" |}</code></example>
-    let inline singleton fn x =
-        JArr.from fn JObj [ x ]
+    /// <summary>Creates a JSON object array with a single element from <c>'a</c>.</summary>
+    /// <example><code>"prop", JObj.single (fun x -> [ "prop", JStr x.Prop ]) {| Prop = "value" |}</code></example>
+    let inline single fn x =
+        JArr.from (fn >> JObj) [ x ]

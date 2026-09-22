@@ -29,4 +29,4 @@ module internal ActivePatterns =
         | segments -> Path segments
 
     let inline (|Empty|_|) string =
-        String.isEmpty(string)
+        String.isEmpty string

@@ -1,6 +1,8 @@
 namespace Farse
 
 open System
+open System.Globalization
+open System.Numerics
 open System.Text.Json
 
 [<AutoOpen>]
@@ -107,11 +109,20 @@ module internal Common =
             | x -> fromType x.Name
 
         // Currently only used for numbers.
-        let inline getArticle<'r> =
-            match typeof<'r> with
-            | r when r.Name.StartsWith("Int")
-                  || r.Name.StartsWith("SByte") -> "an"
+        let inline articleOf<'a> =
+            match typeof<'a>.Name with
+            | "Int16" | "Int32" | "Int64" | "Int128" | "SByte" -> "an"
             | _ -> "a"
+
+    module INumber =
+
+        let inline format<'a when 'a :> INumber<'a>> (number:'a) =
+            match typeof<'a> with
+            | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
+            | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
+            | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
+            | x when x = typeof<Half> -> number.ToString("G5", CultureInfo.InvariantCulture)
+            | _ -> number.ToString(null, CultureInfo.InvariantCulture) // Safe default for decimal, integers and custom types.
 
     module Error =
 

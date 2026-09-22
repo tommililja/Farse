@@ -404,7 +404,7 @@ module User =
     let asJsonString =
         asJson >> Json.asString Indented
 ```
-> Note: Use JNum.from<'a> and JNum.option<'a, 'b> to be explicit.
+> Note: JNum uses implicit conversions. Use JNum.number<int> and JNum.option<_, int> to be explicit.
 
 Which is the same as:
 
@@ -415,7 +415,7 @@ let asJson user =
         "name", JStr user.Name
         "age",
             user.Age
-            |> Option.map (Age.asByte >> JNum.from)
+            |> Option.map (Age.asByte >> JNum)
             |> Option.defaultValue JNil
         "email", JStr (Email.asString user.Email)
         "profiles",

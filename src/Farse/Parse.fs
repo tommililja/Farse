@@ -14,7 +14,7 @@ module Parse =
 
     // Currently only used for numbers.
     let inline private expected<'r> kind =
-        $"Expected %s{Type.getArticle<'r>} %s{Type.getName typeof<'r>} %s{kind}."
+        $"Expected %s{Type.articleOf<'r>} %s{Type.getName typeof<'r>} %s{kind}."
 
     let inline private customError ([<InlineIfLambda>] fn) expectedKind : Parser<'r> =
         Parser (fun element ->
