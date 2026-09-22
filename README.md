@@ -2,7 +2,7 @@
 
 # Farse
 [![NuGet](https://img.shields.io/nuget/v/Farse.svg?label=NuGet)](https://www.nuget.org/packages/Farse)
-> Simple, explicit JSON parsing for F#.
+> Simple, explicit JSON parsing for F#
 
 Inspired by [Thoth.Json](https://github.com/thoth-org/Thoth.Json) and its composability.
 
