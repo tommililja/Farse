@@ -404,7 +404,7 @@ module User =
     let asJsonString =
         asJson >> Json.asString Indented
 ```
-> Note: JNum uses implicit conversions. Use JNum.number<int> and JNum.option<_, int> to be explicit.
+> Note: JNum uses implicit conversions. Use JNum.number<int> to be explicit.
 
 Which is the same as:
 
