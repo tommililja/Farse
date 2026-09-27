@@ -8,6 +8,10 @@ open System.Text.Json
 [<AutoOpen>]
 module internal Common =
 
+    let inline (!) x = not x
+
+    let inline (!!) x y = x y |> not
+
     module JsonDocumentOptions =
 
         let Default =
@@ -53,9 +57,6 @@ module internal Common =
 
         let inline isEmpty string =
             String.IsNullOrWhiteSpace(string)
-
-        let inline isNotEmpty string =
-            isEmpty string |> not
 
         let inline indent n (string:string) =
             string.Split('\n')

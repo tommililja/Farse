@@ -17,7 +17,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should sort properties in ascending order`` () =
-        Data.example
+        Json.example
         |> Json.sort
         |> Json.asString Indented
         |> Expect.string
@@ -111,7 +111,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from JsonElement`` () =
-        let expected = Json.asString Indented Data.example
+        let expected = Json.asString Indented Json.example
         let actual =
             JsonElement.Parse expected
             |> Json.fromElement
@@ -120,7 +120,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from string`` () =
-        let expected = Json.asString Indented Data.example
+        let expected = Json.asString Indented Json.example
         let actual =
             Json.fromString expected
             |> Expect.wantOk $"Expected %s{nameof Json.fromString} to succeed."
@@ -148,7 +148,7 @@ module JsonTests =
     [<Fact>]
     let ``Should create Json from stream async`` () =
         task {
-            let expected = Json.asString Indented Data.example
+            let expected = Json.asString Indented Json.example
             let! actual =
                 expected
                 |> MemoryStream.ofString
@@ -176,7 +176,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from bytes``() =
-        let expected = Json.asString Indented Data.example
+        let expected = Json.asString Indented Json.example
         let actual =
             expected
             |> String.asBytes
@@ -194,7 +194,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from memory``() =
-        let expected = Json.asString Indented Data.example
+        let expected = Json.asString Indented Json.example
         let actual =
             expected
             |> ReadOnlyMemory.ofString
@@ -212,7 +212,7 @@ module JsonTests =
 
     [<Fact>]
     let ``Should create Json from a sequence``() =
-        let expected = Json.asString Indented Data.example
+        let expected = Json.asString Indented Json.example
         let actual =
             expected
             |> ReadOnlySequence.ofString
@@ -231,39 +231,39 @@ module JsonTests =
     [<Fact>]
     let ``Should convert Json to JsonNode`` () =
         let expected =
-            Data.example
+            Json.example
             |> Json.asString Indented
             |> JsonNode.Parse
         let actual =
-            Data.example
+            Json.example
             |> Json.asJsonNode
         Expect.isTrue Msg.none (JsonNode.DeepEquals(expected, actual))
 
     [<Fact>]
     let ``Should convert Json to JsonElement`` () =
         let expected =
-            Data.example
+            Json.example
             |> Json.asString Indented
             |> JsonElement.Parse
         let actual =
-            Data.example
+            Json.example
             |> Json.asJsonElement
         Expect.isTrue Msg.none (JsonElement.DeepEquals(expected, actual))
 
     [<Fact>]
     let ``Should convert Json to JsonDocument`` () =
         let expected =
-            Data.example
+            Json.example
             |> Json.asString Indented
             |> JsonDocument.Parse
         use actual =
-            Data.example
+            Json.example
             |> Json.asJsonDocument
         Expect.isTrue Msg.none (JsonElement.DeepEquals(expected.RootElement, actual.RootElement))
 
     [<Fact>]
     let ``Should convert Json to indented JSON string`` () =
-        Data.example
+        Json.example
         |> Json.asString Indented
         |> Expect.string
 
@@ -277,13 +277,13 @@ module JsonTests =
             )
             |> Custom
 
-        Data.example
+        Json.example
         |> Json.asString options
         |> Expect.string
 
     [<Fact>]
     let ``Should convert Json to raw JSON string`` () =
-        Data.example
+        Json.example
         |> Json.asString Raw
         |> Expect.string
 
@@ -292,17 +292,17 @@ module JsonTests =
         task {
             let stream = new MemoryStream()
             use writer = new Utf8JsonWriter(stream)
-            Json.writeTo writer Data.example
+            Json.writeTo writer Json.example
             do! writer.FlushAsync()
-            let expected = Json.asString Raw Data.example
+            let expected = Json.asString Raw Json.example
             let actual = stream.ToArray() |> String.ofBytes
             Expect.equal Msg.none expected actual
         }
 
     [<Fact>]
     let ``Should convert Json to bytes`` () =
-        let expected = Json.asString Indented Data.example
-        let actual = Json.asBytes Indented Data.example |> String.ofBytes
+        let expected = Json.asString Indented Json.example
+        let actual = Json.asBytes Indented Json.example |> String.ofBytes
         Expect.equal Msg.none expected actual
 
     module JStr =

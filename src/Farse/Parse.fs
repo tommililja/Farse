@@ -172,8 +172,8 @@ module Parse =
     let stringNonEmpty =
         stringError (fun element ->
             match element.GetString() with
-            | string when String.isNotEmpty string -> Ok string
-            | _ -> Error "Expected a non-empty string."
+            | Empty -> Error "Expected a non-empty string."
+            | string -> Ok string
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.String</c> that matches a regular expression.</summary>
