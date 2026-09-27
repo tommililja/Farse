@@ -45,6 +45,7 @@ module internal Kind =
         | Kind.True | Kind.False -> "Bool"
         | Kind.Undefined -> "Undefined"
 
+/// <summary>Represents the expected <c>JsonValueKind</c> of a <c>JsonElement</c>, excluding <c>Undefined</c>.</summary>
 [<RequireQualifiedAccess>]
 type ExpectedKind =
     | Any

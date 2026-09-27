@@ -3,6 +3,7 @@ namespace Farse
 open System
 open System.Text.Json
 
+/// <summary>Represents an error when a <c>Parser</c> fails.</summary>
 [<NoComparison>]
 type ParseError = {
     Path: JsonPath
@@ -102,10 +103,10 @@ module ParseError =
     /// <example><code>let string = ParseError.asString error</code></example>
     /// <returns>
     /// <code>
-    ///     at $.subscription.renewsAt
-    ///      | Tried parsing 'Instant.
-    ///      | The value string does not [...]
-    ///      = "202612-25T10:30:00Z"
+    ///     at $.prop[1].prop2
+    ///      | Tried parsing 'Type.
+    ///      | Error details.
+    ///      = "value"
     /// </code>
     /// </returns>
     let asString error =
@@ -121,9 +122,12 @@ module ParseError =
             |> Option.map (sprintf " = %s")
         }
 
+/// <summary>Represents the result of a failed <c>Parser</c>.</summary>
 [<NoComparison>]
 type ParserError =
+    /// <summary>The JSON document could not be parsed.</summary>
     | Json of exn
+    /// <summary>A list of <c>ParseError</c> that occurred.</summary>
     | Errors of ParseError list
 
 module ParserError =
@@ -133,12 +137,12 @@ module ParserError =
     /// <returns>
     /// <code>
     ///     Parser yielded 1 error[s].
-    ///     &#160;
+    /// &#160;
     ///     Error[0]:
-    ///       at $.subscription.renewsAt
-    ///        | Tried parsing 'Instant.
-    ///        | The value string does not [...]
-    ///        = "202612-25T10:30:00Z"
+    ///       at $.prop[1].prop2
+    ///        | Tried parsing 'Type.
+    ///        | Error details.
+    ///        = "value"
     /// </code>
     /// </returns>
     let asString error =

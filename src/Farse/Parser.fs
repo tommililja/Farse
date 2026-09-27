@@ -5,6 +5,7 @@ open System.Buffers
 open System.Diagnostics.CodeAnalysis
 open System.Text.Json
 
+/// <summary>Represents a function that parses a <c>JsonElement</c> into <c>'r</c>, or <c>ParseError list</c>.</summary>
 [<Struct; NoComparison; NoEquality>]
 type Parser<'r> = Parser of (JsonElement -> Result<'r, ParseError list>)
 

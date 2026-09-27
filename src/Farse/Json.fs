@@ -8,6 +8,7 @@ open System.Text
 open System.Text.Json
 open System.Text.Json.Nodes
 
+/// <summary>Represents a JSON number.</summary>
 type Number =
     private | Value of string
 
@@ -34,6 +35,7 @@ type Number =
     static member op_Implicit(x:Half) = Number.From x
     static member op_Implicit(x:bigint) = Number.From x
 
+/// <summary>Represents a JSON value.</summary>
 [<NoComparison>]
 type Json =
     /// <summary>A JSON string.</summary>
@@ -52,10 +54,14 @@ type Json =
     /// <summary>A JSON null.</summary>
     | JNil
 
+/// <summary>Represents the JSON string format.</summary>
 [<NoComparison>]
 type JsonFormat =
+    /// <summary>Indented with four spaces.</summary>
     | Indented
+    /// <summary>Formatted with the given <c>JsonSerializerOptions</c>.</summary>
     | Custom of JsonSerializerOptions
+    /// <summary>Compact, without whitespace.</summary>
     | Raw
 
 module Json =

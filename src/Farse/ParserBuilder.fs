@@ -173,4 +173,19 @@ module ParserBuilder =
                     ]
             )
 
+    /// <summary>Builds a <c>Parser</c> by combining parsers.</summary>
+    /// <remarks>Use <c>and!</c> to collect errors instead of returning on the first error.</remarks>
+    /// <example>
+    /// <code>
+    ///     let parser =
+    ///         parser {
+    ///             let! x = "x" &= Parse.int
+    ///             and! y = "y" &= Parse.int
+    /// &#160;
+    ///             do! "z" &= Parse.unit
+    /// &#160;
+    ///             return x + y
+    ///         }
+    /// </code>
+    /// </example>
     let parser = ParserBuilder()
