@@ -1,14 +1,15 @@
 <Solution>
     <Folder Name="/Solution/">
-        <File Path="Directory.Build.props" />
-        <File Path="..\README.md" />
-        <File Path="..\CONTRIBUTING.md" />
-        <File Path="..\LICENSE.md" />
-        <File Path="..\global.json" />
-        <File Path="..\.editorconfig" />
+        <File Path="Directory.Build.props"/>
+        <File Path="..\README.md"/>
+        <File Path="..\CONTRIBUTING.md"/>
+        <File Path="..\LICENSE.md"/>
+        <File Path="..\global.json"/>
+        <File Path="..\.editorconfig"/>
         <File Path="..\.github\workflows\build-and-test.yml"/>
+        <File Path="..\.github\workflows\publish.yml"/>
     </Folder>
-    <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj" />
-    <Project Path="Farse.Tests/Farse.Tests.fsproj" />
-    <Project Path="Farse/Farse.fsproj" />
+    <Project Path="Farse.Benchmarks/Farse.Benchmarks.fsproj"/>
+    <Project Path="Farse.Tests/Farse.Tests.fsproj"/>
+    <Project Path="Farse/Farse.fsproj"/>
 </Solution>
