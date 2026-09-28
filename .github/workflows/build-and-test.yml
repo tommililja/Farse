@@ -9,6 +9,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
 
     steps:
       - uses: actions/checkout@v4
@@ -17,13 +20,10 @@ jobs:
         uses: actions/setup-dotnet@v4
 
       - name: Restore
-        working-directory: src
         run: dotnet restore
 
       - name: Build
-        working-directory: src
         run: dotnet build -c Release --no-restore
 
       - name: Test
-        working-directory: src
         run: dotnet test -c Release --no-build --verbosity normal

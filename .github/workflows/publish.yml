@@ -16,9 +16,11 @@ jobs:
   publish:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
+    defaults:
+      run:
+        working-directory: src
 
     steps:
       - uses: actions/checkout@v4
@@ -27,23 +29,18 @@ jobs:
         uses: actions/setup-dotnet@v4
 
       - name: Restore
-        working-directory: src
         run: dotnet restore
 
       - name: Build
-        working-directory: src
         run: dotnet build -c Release --no-restore
 
       - name: Test
-        working-directory: src
         run: dotnet test -c Release --no-build --verbosity normal
 
       - name: Pack
-        working-directory: src
         run: dotnet pack Farse/Farse.fsproj -c Release --no-build -o ./nupkg -p:PackageVersion=${{ inputs.version }}
 
       - name: Publish
-        working-directory: src
         run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create tag
