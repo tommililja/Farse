@@ -620,7 +620,7 @@ module Parse =
     let index n parser : Parser<'r> =
         customError (fun element ->
             match element.GetArrayLength() with
-            | length when n >= 0 && length >= n + 1 -> parseIndex n parser element
+            | length when n >= 0 && n < length -> parseIndex n parser element
             | _ ->
                 element
                 |> ParseError.index n typeof<'r>
