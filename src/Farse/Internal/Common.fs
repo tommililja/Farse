@@ -93,15 +93,21 @@ module internal Common =
             | "Object" -> "obj"
             | name -> name
 
-        let private fromGenericType args = function
-            | "FSharpOption" -> $"%s{args} option"
-            | "FSharpList" -> $"%s{args} list"
-            | "FSharpSet" -> $"%s{args} Set"
-            | "FSharpMap" -> $"Map<%s{args}>"
-            | "FSharpResult" -> $"Result<%s{args}>"
-            | "IEnumerable" -> $"%s{args} seq"
-            | "Tuple" -> $"""(%s{args.Replace(", ", " * ")})"""
-            | name -> $"%s{name}<%s{args}>"
+        let private fromGenericType (args:string array) name =
+            let first = args[0]
+            let joined = String.concat ", " args
+
+            match name with
+            | "FSharpOption" -> $"%s{first} option"
+            | "FSharpValueOption" -> $"%s{first} voption"
+            | "FSharpList" -> $"%s{first} list"
+            | "FSharpSet" -> $"%s{first} Set"
+            | "FSharpMap" -> $"Map<%s{joined}>"
+            | "FSharpResult" -> $"Result<%s{joined}>"
+            | "IEnumerable" -> $"%s{first} seq"
+            | "Tuple" -> $"""(%s{String.concat " * " args})"""
+            | "ValueTuple" -> $"""struct (%s{String.concat " * " args})"""
+            | _ -> $"%s{name}<%s{joined}>"
 
         let rec getName = function
             | x when x = typeof<unit> -> "unit"
@@ -111,7 +117,6 @@ module internal Common =
                 let args =
                     x.GetGenericArguments()
                     |> Array.map getName
-                    |> String.concat ", "
 
                 fromGenericType args name
             | x -> fromType x.Name
