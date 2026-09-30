@@ -376,6 +376,18 @@ module JsonTests =
             |> Expect.string
 
         [<Fact>]
+        let ``Should create nan number as zero explicit`` () =
+            JNum.number<float> nan
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
+        let ``Should create infinite number as zero explicit`` () =
+            JNum.number<float> infinity
+            |> Json.asString Indented
+            |> Expect.string
+
+        [<Fact>]
         let ``Should create number with zero`` () =
             JNum.zero
             |> Json.asString Indented
