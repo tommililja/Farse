@@ -3,6 +3,7 @@ namespace Farse
 open System
 open System.Globalization
 open System.Numerics
+open System.Text.Encodings.Web
 open System.Text.Json
 
 [<AutoOpen>]
@@ -26,7 +27,13 @@ module internal Common =
             JsonSerializerOptions (
                 WriteIndented = true,
                 IndentSize = 4,
-                NewLine = "\n"
+                NewLine = "\n",
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            )
+
+        let Raw =
+            JsonSerializerOptions (
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )
 
     type JsonElement with

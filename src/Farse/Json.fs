@@ -185,7 +185,7 @@ module Json =
         | _, null -> "null"
         | Indented, node -> node.ToJsonString(JsonSerializerOptions.Default)
         | Custom options, node -> node.ToJsonString(options)
-        | Raw, node -> node.ToJsonString()
+        | Raw, node -> node.ToJsonString(JsonSerializerOptions.Raw)
 
     /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
     /// <example>
