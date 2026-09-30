@@ -125,12 +125,7 @@ module internal Common =
     module INumber =
 
         let inline format<'a when 'a :> INumber<'a>> (number:'a) =
-            match typeof<'a> with
-            | x when x = typeof<float> -> number.ToString("G17", CultureInfo.InvariantCulture)
-            | x when x = typeof<float32> -> number.ToString("G9", CultureInfo.InvariantCulture)
-            | x when x = typeof<bigint> -> number.ToString("R", CultureInfo.InvariantCulture)
-            | x when x = typeof<Half> -> number.ToString("G5", CultureInfo.InvariantCulture)
-            | _ -> number.ToString(null, CultureInfo.InvariantCulture) // Safe default for decimal, integers and custom types.
+            number.ToString(null, CultureInfo.InvariantCulture)
 
     module Error =
 

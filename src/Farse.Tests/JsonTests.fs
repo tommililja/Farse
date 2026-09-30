@@ -433,22 +433,61 @@ module JsonTests =
             JNum Int128.MinValue, "-170141183460469231731687303715884105728"
             JNum Byte.MaxValue, "255"
             JNum SByte.MaxValue, "127"
-            JNum Single.MaxValue, "3.40282347E+38"
-            JNum Single.MinValue, "-3.40282347E+38"
+            JNum Single.MaxValue, "3.4028235E+38"
+            JNum Single.MinValue, "-3.4028235E+38"
             JNum Double.MaxValue, "1.7976931348623157E+308"
             JNum Double.MinValue, "-1.7976931348623157E+308"
-            JNum Half.MinValue, "-65504"
-            JNum Half.MaxValue, "65504"
+            JNum Half.MinValue, "-65500"
+            JNum Half.MaxValue, "65500"
             JNum Decimal.MaxValue, "79228162514264337593543950335"
             JNum Decimal.MinValue, "-79228162514264337593543950335"
             JNum (Decimal.Parse("12345678900.12345678900", CultureInfo.InvariantCulture)), "12345678900.12345678900"
             JNum (BigInteger.Parse("99999999999999999999999999999")), "99999999999999999999999999999"
             JNum (BigInteger.Parse("-99999999999999999999999999999")), "-99999999999999999999999999999"
+            JNum UInt128.MaxValue, "340282366920938463463374607431768211455"
+            JNum 0.1, "0.1"
+            JNum 0.3f, "0.3"
+            JNum 1e21, "1E+21"
+            JNum Double.Epsilon, "5E-324"
+            JNum 0.0, "0"
+            JNum -0.0, "-0"
+            JNum Double.NaN, "0"
+            JNum Double.PositiveInfinity, "0"
+            JNum Double.NegativeInfinity, "0"
+            JNum Single.NaN, "0"
+            JNum Half.PositiveInfinity, "0"
         ]
         |> List.iter (fun (json, expected) ->
             let actual = Json.asString Raw json
             Expect.equal Msg.none expected actual
         )
+
+    [<Fact>]
+    let ``Should round-trip floating point numbers`` () =
+        let roundTrip (x:float) =
+            let actual = Json.asString Raw (JNum x)
+            Expect.equal Msg.none x (Double.Parse(actual, CultureInfo.InvariantCulture))
+
+        [ 0.1; 0.3; 1e21; Double.MaxValue; Double.MinValue; Double.Epsilon; -0.0 ]
+        |> List.iter roundTrip
+
+    [<Fact>]
+    let ``Should round-trip float32 numbers`` () =
+        let roundTrip (x:float32) =
+            let actual = Json.asString Raw (JNum x)
+            Expect.equal Msg.none x (Single.Parse(actual, CultureInfo.InvariantCulture))
+
+        [ 0.1f; 0.3f; 1e21f; Single.MaxValue; Single.MinValue; Single.Epsilon; -0.0f ]
+        |> List.iter roundTrip
+
+    [<Fact>]
+    let ``Should round-trip half numbers`` () =
+        let roundTrip (x:Half) =
+            let actual = Json.asString Raw (JNum x)
+            Expect.equal Msg.none x (Half.Parse(actual, CultureInfo.InvariantCulture))
+
+        [ Half.MinValue; Half.MaxValue; Half.Epsilon; Half.Parse("0.1", CultureInfo.InvariantCulture) ]
+        |> List.iter roundTrip
 
     module JBit =
 
