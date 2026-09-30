@@ -471,7 +471,8 @@ module Parse =
     let unixSeconds =
         stringError (fun element ->
             match element.TryGetInt64() with
-            | true, seconds -> Ok <| DateTimeOffset.FromUnixTimeSeconds(seconds)
+            | true, s when s >= -62135596800L && s <= 253402300799L -> Ok <| DateTimeOffset.FromUnixTimeSeconds(s)
+            | true, _ -> Error "Unix timestamp was out of range."
             | _ -> Error <| expected<int64> "number"
         ) ExpectedKind.Number
 
@@ -480,7 +481,8 @@ module Parse =
     let unixMilliseconds =
         stringError (fun element ->
             match element.TryGetInt64() with
-            | true, milliseconds -> Ok <| DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
+            | true, ms when ms >= -62135596800000L && ms <= 253402300799999L -> Ok <| DateTimeOffset.FromUnixTimeMilliseconds(ms)
+            | true, _ -> Error "Unix timestamp was out of range."
             | _ -> Error <| expected<int64> "number"
         ) ExpectedKind.Number
 

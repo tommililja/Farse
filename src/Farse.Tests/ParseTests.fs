@@ -1355,6 +1355,12 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when timestamp is out of range`` () =
+            Parse.unixSeconds
+            |> Parser.parse "99999999999999"
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when element is not a number`` () =
             Parse.unixSeconds
             |> Parser.parse "true"
@@ -1375,6 +1381,12 @@ module ParseTests =
         let ``Should fail when parsing fails`` () =
             Parse.unixMilliseconds
             |> Parser.parse "100.5"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when timestamp is out of range`` () =
+            Parse.unixMilliseconds
+            |> Parser.parse "99999999999999999"
             |> Expect.parserError
 
         [<Fact>]
