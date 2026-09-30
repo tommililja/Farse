@@ -182,7 +182,7 @@ module Parse =
         try match regex with
             | Empty -> Parser.fail "Regex was null or empty."
             | _ ->
-                let cached = Regex(regex)
+                let cached = Regex(regex, RegexOptions.NonBacktracking)
                 stringError (fun element ->
                     let string = element.GetString()
                     if cached.IsMatch(string) then Ok string
