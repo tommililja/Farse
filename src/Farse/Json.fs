@@ -16,8 +16,9 @@ type Number =
         let (Value value) = this
         value
 
-    static member private From(x) =
-        Value <| INumber.format x
+    static member internal From(x:'a when 'a :> INumber<'a>) =
+        if 'a.IsFinite(x) then Value <| INumber.format x
+        else Value "0"
 
     static member op_Implicit(x:int) = Number.From x
     static member op_Implicit(x:int16) = Number.From x
@@ -381,7 +382,7 @@ module JNum =
     /// </remarks>
     /// <example><code>"prop", JNum.number 1</code></example>
     let number<'a when 'a :> INumber<'a>>(x:'a) =
-        JNum <| Value (INumber.format x)
+        JNum <| Number.From x
 
     /// <summary>Creates a JSON number or null from an <c>option</c>.</summary>
     /// <remarks>Use <c>JNum.option&lt;_, int&gt;</c> to be explicit.</remarks>
