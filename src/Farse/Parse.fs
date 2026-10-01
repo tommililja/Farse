@@ -416,13 +416,18 @@ module Parse =
             | _ -> Error "Expected a DateTime string."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 8601) as <c>System.DateTime</c> and converts it to UTC.</summary>
+    /// <summary>Parses a string (ISO 8601) in UTC as <c>System.DateTime</c>.</summary>
+    /// <remarks>The string must be UTC, either ending in <c>Z</c> or with an offset of <c>+00:00</c>.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeUtc</code></example>
     let dateTimeUtc =
         stringError (fun element ->
             match element.TryGetDateTime() with
-            | true, dateTime -> Ok <| dateTime.ToUniversalTime()
-            | _ -> Error "Expected a DateTime string."
+            | true, dateTime when dateTime.Kind = DateTimeKind.Utc -> Ok dateTime
+            | true, dateTime when dateTime.Kind = DateTimeKind.Local ->
+                match element.TryGetDateTimeOffset() with
+                | true, offset when offset.Offset = TimeSpan.Zero -> Ok offset.UtcDateTime
+                | _ -> Error "Expected a DateTime 'UTC' string."
+            | _ -> Error "Expected a DateTime 'UTC' string."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTime</c> with a specific format.</summary>
@@ -447,13 +452,17 @@ module Parse =
             | _ -> Error "Expected a DateTimeOffset string."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 8601) as <c>System.DateTimeOffset</c> and converts it to UTC.</summary>
+    /// <summary>Parses a string (ISO 8601) in UTC as <c>System.DateTimeOffset</c>.</summary>
+    /// <remarks>The string must be UTC, either ending in <c>Z</c> or with an offset of <c>+00:00</c>.</remarks>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetUtc</code></example>
     let dateTimeOffsetUtc =
         stringError (fun element ->
-            match element.TryGetDateTimeOffset() with
-            | true, dateTimeOffset -> Ok <| dateTimeOffset.ToUniversalTime()
-            | _ -> Error "Expected a DateTimeOffset string."
+            match element.TryGetDateTime() with
+            | true, dateTime when dateTime.Kind <> DateTimeKind.Unspecified ->
+                match element.TryGetDateTimeOffset() with
+                | true, offset when offset.Offset = TimeSpan.Zero -> Ok offset
+                | _ -> Error "Expected a DateTimeOffset 'UTC' string."
+            | _ -> Error "Expected a DateTimeOffset 'UTC' string."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> with a specific format.</summary>

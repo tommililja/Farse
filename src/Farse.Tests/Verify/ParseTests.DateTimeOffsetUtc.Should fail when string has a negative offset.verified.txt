@@ -4,4 +4,4 @@
     at $
      | Tried parsing 'DateTimeOffset.
      | Expected a DateTimeOffset 'UTC' string.
-     = "2025-05-25100000"
+     = "2025-05-25T05:00:00-05:00"
