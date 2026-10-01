@@ -841,7 +841,7 @@ module Parse =
                 | Error e -> Error e
         )
 
-    /// <summary>Catches all errors, excluding exceptions.</summary>
+    /// <summary>Catches all parser errors, excluding exceptions.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.catch Parse.int</code></example>
     let catch (Parser parse) =
         Parser (fun element ->

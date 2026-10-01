@@ -87,7 +87,7 @@ module Extensions =
         member this.Option() =
             Parse.option this
 
-        /// <summary>Catches all errors.</summary>
+        /// <summary>Catches all parser errors, excluding exceptions.</summary>
         /// <example><code>let! int = "prop" &amp;= Parse.int.Catch()</code></example>
         member this.Catch() =
             Parse.catch this

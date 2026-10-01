@@ -193,6 +193,7 @@ module Json =
         | Raw, node -> node.ToJsonString(JsonSerializerOptions.Raw)
 
     /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
+    /// <remarks>Includes duplicate properties.</remarks>
     /// <example>
     /// <code>
     ///    task {
