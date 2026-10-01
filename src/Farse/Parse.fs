@@ -384,7 +384,7 @@ module Parse =
                 | _ -> Error $"Expected a TimeSpan '%s{format}' string."
             ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 8601) as <c>System.DateOnly</c>.</summary>
+    /// <summary>Parses a string as <c>System.DateOnly</c>.</summary>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnly</code></example>
     let dateOnly =
         stringError (fun element ->
@@ -702,7 +702,7 @@ module Parse =
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
-    /// <summary>Parses an object's properties as <c>string * 'a Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>(string * 'a) Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
     let tuples parser = keyValue Seq.ofSeq parser
 
@@ -841,7 +841,7 @@ module Parse =
                 | Error e -> Error e
         )
 
-    /// <summary>Catches all errors.</summary>
+    /// <summary>Catches all errors, excluding exceptions.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.catch Parse.int</code></example>
     let catch (Parser parse) =
         Parser (fun element ->

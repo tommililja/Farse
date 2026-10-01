@@ -42,7 +42,11 @@ type Json =
     /// <summary>A JSON string.</summary>
     | JStr of string
     /// <summary>A JSON number.</summary>
-    /// <remarks>Use <c>JNum.number</c> or suppress <c>FS3391</c> as <c>Number</c> uses implicit conversions.</remarks>
+    /// <remarks>
+    ///     Use <c>JNum.number</c> to be explicit or suppress <c>FS3391</c> as <c>Number</c> uses implicit conversions.<br/><br/>
+    ///     Formats the number with invariant culture. Floating-point values use the shortest representation that round-trips to the same type.
+    ///     NaN and infinity are written as <c>0</c>.
+    /// </remarks>
     | JNum of Number
     /// <summary>A JSON boolean.</summary>
     | JBit of bool
@@ -227,7 +231,7 @@ module Json =
         |> Encoding.UTF8.GetBytes
 
     /// <summary>Determines whether two <c>Json</c> values are equal.</summary>
-    /// <remarks>Properties are compared regardless of order.</remarks>
+    /// <remarks>Properties are compared regardless of order and by their text, so 1 and 1.0 are different.</remarks>
     /// <example><code>let equal = Json.equal x y</code></example>
     let equal x y =
         let x = sort x
@@ -235,7 +239,7 @@ module Json =
         x = y
 
     /// <summary>Compares two <c>Json</c> values and returns a message when they differ.</summary>
-    /// <remarks>Properties are compared regardless of order.</remarks>
+    /// <remarks>Properties are compared regardless of order and by their text, so 1 and 1.0 are different.</remarks>
     /// <example>
     /// <code>
     ///     match Json.diff x y with
@@ -347,8 +351,9 @@ module JStr =
 
     /// <summary>Creates a JSON string from an <c>INumber</c>.</summary>
     /// <remarks>
-    ///     Use <c>JStr.number&lt;int&gt;</c> to be explicit.
-    ///     Formats the number with invariant culture and round-trippable precision.
+    ///     Use <c>JStr.number&lt;int&gt;</c> to be explicit.<br/><br/>
+    ///     Formats the number with invariant culture. Floating-point values use the shortest representation that round-trips to the same type.
+    ///     NaN and infinity are written as <c>NaN</c>, <c>Infinity</c> and <c>-Infinity</c>.
     /// </remarks>
     /// <example><code>"prop", JStr.number 1</code></example>
     let inline number<'a when 'a :> INumber<'a>>(x:'a) =
@@ -377,8 +382,9 @@ module JNum =
 
     /// <summary>Creates a JSON number from an <c>INumber</c>.</summary>
     /// <remarks>
-    ///     Use <c>JNum.number&lt;int&gt;</c> to be explicit.
-    ///     Formats the number with round-trippable precision.
+    ///     Use <c>JNum.number&lt;int&gt;</c> to be explicit.<br/><br/>
+    ///     Formats the number with invariant culture. Floating-point values use the shortest representation that round-trips to the same type.
+    ///     NaN and infinity are written as <c>0</c>.
     /// </remarks>
     /// <example><code>"prop", JNum.number 1</code></example>
     let number<'a when 'a :> INumber<'a>>(x:'a) =

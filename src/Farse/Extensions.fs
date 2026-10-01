@@ -70,7 +70,7 @@ module Extensions =
         member this.KeyValuePairs() =
             Parse.keyValuePairs this
 
-        /// <summary>Parses an object's properties as <c>string * 'a Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>(string * 'a) Microsoft.FSharp.Collections.seq</c>.</summary>
         /// <example><code>let! tuples = "prop" &amp;= Parse.int.Tuples()</code></example>
         member this.Tuples() =
             Parse.tuples this
