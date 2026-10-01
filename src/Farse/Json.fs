@@ -264,7 +264,7 @@ module Json =
             |> List.map fn
 
         let pathKey path key =
-            $"%s{path}.%s{key}"
+            $"%s{path}%s{JsonPath.segment key}"
 
         let renderDiff x y (path:string) =
             string {
