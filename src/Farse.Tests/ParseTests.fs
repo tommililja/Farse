@@ -449,6 +449,12 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when regex is unsupported`` () =
+            Parse.regex "^(?=a)a$"
+            |> Parser.parse "\"abc\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when regex is null`` () =
             Parse.regex null
             |> Parser.parse "\"abc\""

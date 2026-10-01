@@ -177,6 +177,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.String</c> that matches a regular expression.</summary>
+    /// <remarks>Uses <c>RegexOptions.NonBacktracking</c>.</remarks>
     /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
     let regex ([<StringSyntax("Regex")>] regex:string) =
         try match regex with
@@ -188,7 +189,9 @@ module Parse =
                     if cached.IsMatch(string) then Ok string
                     else Error $"Expected the string to match '%s{regex}'."
                 ) ExpectedKind.String
-        with :? ArgumentException -> Parser.fail $"Invalid regex '%s{regex}'."
+        with
+            | :? ArgumentException -> Parser.fail $"Invalid regex '%s{regex}'."
+            | :? NotSupportedException -> Parser.fail $"Regex '%s{regex}' not supported with RegexOptions.NonBacktracking."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
