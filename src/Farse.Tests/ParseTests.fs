@@ -612,13 +612,49 @@ module ParseTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
-        let ``Should parse number that is out of range`` () =
-            let expected = Half.PositiveInfinity
+        let ``Should parse the maximum Half value`` () =
+            let expected = Half.MaxValue
             let actual =
                 Parse.half
-                |> Parser.parse "999999"
+                |> Parser.parse "65504"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should parse the minimum Half value`` () =
+            let expected = Half.MinValue
+            let actual =
+                Parse.half
+                |> Parser.parse "-65504"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should parse number that underflows to zero`` () =
+            let expected = Half.Zero
+            let actual =
+                Parse.half
+                |> Parser.parse "1e-10"
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should fail when number is above the range`` () =
+            Parse.half
+            |> Parser.parse "999999"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when number is below the range`` () =
+            Parse.half
+            |> Parser.parse "-999999"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when number is just above the maximum`` () =
+            Parse.half
+            |> Parser.parse "65536"
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a number`` () =

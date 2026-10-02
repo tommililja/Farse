@@ -232,13 +232,12 @@ module Parse =
         ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Half</c>.</summary>
-    /// <remarks>Values outside the valid range are parsed as positive or negative infinity.</remarks>
     /// <example><code>let! half = "prop" &amp;= Parse.half</code></example>
     let half =
         stringError (fun element ->
             let string = element.GetRawText()
             match Half.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
-            | true, half -> Ok half
+            | true, half when Half.IsFinite(half) -> Ok half
             | _ -> Error <| expected<Half> "number"
         ) ExpectedKind.Number
 
