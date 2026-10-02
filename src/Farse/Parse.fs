@@ -78,7 +78,7 @@ module Parse =
                         element
                         |> ParseError.details msg typeof<'r>
                         |> Error.list
-                with ex ->
+                with ex when not (ex :? OutOfMemoryException) ->
                     element
                     |> ParseError.exn ex typeof<'r>
                     |> Error.list
