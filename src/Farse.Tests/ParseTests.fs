@@ -63,6 +63,14 @@ module ParseTests =
             |> Parser.parse "1"
             |> Expect.parserError
 
+        [<Fact>]
+        let ``Should not catch OutOfMemoryException`` () =
+            Expect.throws $"Expected %s{nameof Parse.custom} to throw." (fun () ->
+                Parse.custom (fun _ -> raise (OutOfMemoryException())) ExpectedKind.Number
+                |> Parser.parse "1"
+                |> ignore
+            )
+
     module Int =
 
         [<Fact>]
