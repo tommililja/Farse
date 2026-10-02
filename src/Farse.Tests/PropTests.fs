@@ -71,6 +71,12 @@ module PropTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
+        let ``Should parse null element as None`` () =
+            Prop.tryGet "prop.prop2.prop3" Parse.int
+            |> Parser.parse "null"
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+
+        [<Fact>]
         let ``Should parse first null property as None`` () =
             let expected = None
             let actual =
@@ -135,12 +141,6 @@ module PropTests =
             Prop.tryGet "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1.1 } }"""
             |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when element is null`` () =
-            Prop.tryGet "prop.prop2.prop3" Parse.int
-            |> Parser.parse "null"
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
@@ -400,6 +400,12 @@ module PropTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
+        let ``Should parse null element as None`` () =
+            Prop.tryGet2 "prop.prop2.prop3" Parse.int
+            |> Parser.parse "null"
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+
+        [<Fact>]
         let ``Should parse first null property as None`` () =
             let expected = None
             let actual =
@@ -464,12 +470,6 @@ module PropTests =
             Prop.tryGet2 "prop.prop2" Parse.int
             |> Parser.parse """{ "prop": { "prop2": 1.1 } }"""
             |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when element is null`` () =
-            Prop.tryGet2 "prop.prop2.prop3" Parse.int
-            |> Parser.parse "null"
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
 
         [<Fact>]
         let ``Should fail when element is not an object`` () =
