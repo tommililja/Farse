@@ -98,8 +98,8 @@ module Extensions =
             Parse.refine this fn
 
         /// <summary>Verifies a parsed value.</summary>
-        /// <example><code>let! int = "prop" &amp;= Parse.int.Verify(fun x -> x > 0, "message")</code></example>
-        member this.Verify(fn, msg) =
+        /// <example><code>let! int = "prop" &amp;= Parse.int.Verify("message", fun x -> x > 0)</code></example>
+        member this.Verify(msg, fn) =
             Parse.verify this fn msg
 
     // Workaround: These need extra constraints.
