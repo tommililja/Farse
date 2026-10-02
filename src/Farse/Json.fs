@@ -359,7 +359,7 @@ module JStr =
     /// </remarks>
     /// <example><code>"prop", JStr.number 1</code></example>
     let inline number<'a when 'a :> INumber<'a>>(x:'a) =
-        JStr <| x.ToString(null, NumberFormatInfo.InvariantInfo)
+        JStr <| x.ToString(null, CultureInfo.InvariantCulture)
 
     /// <summary>Creates a JSON string or null from an <c>option</c>.</summary>
     /// <example><code>"prop", JStr.option id (Some "string")</code></example>
