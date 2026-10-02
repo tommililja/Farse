@@ -648,6 +648,10 @@ module Parse =
         customError (fun element ->
             match element.GetArrayLength() with
             | length when length > 0 -> parseIndex (length - 1) parser element
+            | length when length = 0 ->
+                element
+                |> ParseError.details "Array was empty." typeof<'r>
+                |> Error.list
             | _ ->
                 element
                 |> ParseError.index 0 typeof<'r>
