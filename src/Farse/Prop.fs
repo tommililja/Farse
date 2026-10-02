@@ -36,8 +36,8 @@ module Prop =
                         errors
                         |> List.map (ParseError.withProp name)
                         |> Error
-                | _, prop ->
-                    prop
+                | _ ->
+                    element
                     |> ParseError.required (JsonPath.prop name) typeof<'r>
                     |> Error.list
             | _ ->
@@ -86,10 +86,13 @@ module Prop =
         )
 
     let private traverse path (Parser parse) : Parser<'r> =
-        Parser (fun element ->
-            match fold path element with
+        Parser (fun root ->
+            match fold path root with
             | element, count when element.isUndefined ->
-                element
+                // Quick and dirty to get the parent element.
+                let parent, _ = fold (Array.take (max 0 (count - 1)) path) root
+
+                parent
                 |> ParseError.required (select path count) typeof<'r>
                 |> Error.list
             | element, count when count = path.Length ->
