@@ -233,15 +233,35 @@ module Json =
         |> Encoding.UTF8.GetBytes
 
     /// <summary>Determines whether two <c>Json</c> values are equal.</summary>
-    /// <remarks>Properties are compared regardless of order and by their text, so 1 and 1.0 are different.</remarks>
+    /// <remarks>
+    ///     Properties are compared regardless of order. Numbers are compared by their text, so 1 and 1.0 are different.
+    ///     The last occurrence is chosen when duplicate properties exist.
+    /// </remarks>
     /// <example><code>let equal = Json.equal x y</code></example>
     let equal x y =
-        let x = sort x
-        let y = sort y
+        let rec normalize json =
+            match json with
+            | JObj list ->
+                list
+                |> List.rev
+                |> List.distinctBy fst
+                |> List.map (fun (k, v) -> k, normalize v)
+                |> List.sortBy fst
+                |> JObj
+            | JArr list ->
+                list
+                |> List.map normalize
+                |> JArr
+            | other -> other
+        let x = normalize x
+        let y = normalize y
         x = y
 
     /// <summary>Compares two <c>Json</c> values and returns a message when they differ.</summary>
-    /// <remarks>Properties are compared regardless of order and by their text, so 1 and 1.0 are different.</remarks>
+    /// <remarks>
+    ///     Properties are compared regardless of order. Numbers are compared by their text, so 1 and 1.0 are different.
+    ///     The last occurrence is chosen when duplicate properties exist.
+    /// </remarks>
     /// <example>
     /// <code>
     ///     match Json.diff x y with

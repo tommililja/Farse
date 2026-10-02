@@ -24,24 +24,52 @@ module JsonTests =
 
     [<Fact>]
     let ``Should be equal after properties are sorted`` () =
-        let a = JObj [ "a", JNum.number 1; "b", JNum.number 2 ]
-        let b = JObj [ "b", JNum.number 2; "a", JNum.number 1 ]
+        let a = JObj [ "a", JNum 1; "b", JNum 2 ]
+        let b = JObj [ "b", JNum 2; "a", JNum 1 ]
         let equal = Json.equal a b
         Expect.isTrue "Expected values to be equal." equal
 
     [<Fact>]
     let ``Should not be equal after properties are sorted`` () =
-        let a = JObj [ "a", JNum.number 1; "b", JNum.number 2 ]
-        let b = JObj [ "b", JNum.number 1; "a", JNum.number 2 ]
+        let a = JObj [ "a", JNum 1; "b", JNum 2 ]
+        let b = JObj [ "b", JNum 1; "a", JNum 2 ]
         let equal = Json.equal a b
         Expect.isFalse "Expected values to not be equal." equal
+
+    [<Fact>]
+    let ``Should be equal when the last duplicate property matches`` () =
+        let a = JObj [ "a", JNum 1; "a", JNum 2 ]
+        let b = JObj [ "a", JNum 2 ]
+        let equal = Json.equal a b
+        Expect.isTrue "Expected values to be equal." equal
+
+    [<Fact>]
+    let ``Should not be equal when only an earlier duplicate property matches`` () =
+        let a = JObj [ "a", JNum 1; "a", JNum 2 ]
+        let b = JObj [ "a", JNum 1 ]
+        let equal = Json.equal a b
+        Expect.isFalse "Expected values to not be equal." equal
+
+    [<Fact>]
+    let ``Should be equal regardless of order when duplicate properties exist`` () =
+        let a = JObj [ "a", JNum 1; "b", JNum 2; "b", JNum 2 ]
+        let b = JObj [ "b", JNum 2; "a", JNum 1 ]
+        let equal = Json.equal a b
+        Expect.isTrue "Expected values to be equal." equal
+
+    [<Fact>]
+    let ``Should be equal when nested duplicate properties collapse`` () =
+        let a = JArr [ JObj [ "a", JNum 1; "a", JNum 2 ] ]
+        let b = JArr [ JObj [ "a", JNum 2 ] ]
+        let equal = Json.equal a b
+        Expect.isTrue "Expected values to be equal." equal
 
     [<Fact>]
     let ``Should not be equal and return a message`` () =
         let x =
             JObj [
-                "same", JNum.number 2
-                "changed", JNum.number 1
+                "same", JNum 2
+                "changed", JNum 1
                 "onlyInX", JStr "present"
                 "nested",
                     JObj [
@@ -49,17 +77,17 @@ module JsonTests =
                         "changed", JBit true
                         "onlyInX", JStr "present"
                     ]
-                "sameArray", JArr [ JNum.number 1; JNum.number 2 ]
-                "sameLengthArray", JArr [ JObj [ "id", JNum.number 1; "role", JStr "Engineer" ]; JNum.number 2 ]
-                "diffLengthArray", JArr [ JNum.number 1; JNum.number 2; JNum.number 3 ]
+                "sameArray", JArr [ JNum 1; JNum 2 ]
+                "sameLengthArray", JArr [ JObj [ "id", JNum 1; "role", JStr "Engineer" ]; JNum 2 ]
+                "diffLengthArray", JArr [ JNum 1; JNum 2; JNum 3 ]
                 "nullBoth", JNil
                 "nullVsValue", JNil
             ]
 
         let y =
             JObj [
-                "same", JNum.number 1
-                "changed", JNum.number 2
+                "same", JNum 1
+                "changed", JNum 2
                 "onlyInB", JStr "present"
                 "nested",
                     JObj [
@@ -67,9 +95,9 @@ module JsonTests =
                         "changed", JBit false
                         "onlyInY", JStr "present"
                     ]
-                "sameArray", JArr [ JNum.number 1; JNum.number 2 ]
-                "sameLengthArray", JArr [ JObj [ "id", JNum.number 1; "role", JStr "Manager" ]; JNum.number 2 ]
-                "diffLengthArray", JArr [ JNum.number 1; JNum.number 2 ]
+                "sameArray", JArr [ JNum 1; JNum 2 ]
+                "sameLengthArray", JArr [ JObj [ "id", JNum 1; "role", JStr "Manager" ]; JNum 2 ]
+                "diffLengthArray", JArr [ JNum 1; JNum 2 ]
                 "nullBoth", JNil
                 "nullVsValue", JStr "now a string"
             ]
@@ -82,13 +110,13 @@ module JsonTests =
     let ``Should be equal when object keys are in a different order`` () =
         let x =
             JObj [
-                "id", JNum.number 1
+                "id", JNum 1
                 "name", JStr "Alice"
                 "active", JBit true
                 "nested",
                     JObj [
-                        "x", JNum.number 1
-                        "y", JNum.number 2
+                        "x", JNum 1
+                        "y", JNum 2
                     ]
                 "tags", JArr [ JStr "a"; JStr "b" ]
             ]
@@ -98,16 +126,52 @@ module JsonTests =
                 "tags", JArr [ JStr "a"; JStr "b" ]
                 "nested",
                     JObj [
-                        "y", JNum.number 2
-                        "x", JNum.number 1
+                        "y", JNum 2
+                        "x", JNum 1
                     ]
                 "active", JBit true
-                "id", JNum.number 1
+                "id", JNum 1
                 "name", JStr "Alice"
             ]
 
         Json.diff x y
         |> Expect.isNone Msg.none
+
+    [<Fact>]
+    let ``Should be equal when object keys are in a different order or duplicated`` () =
+        let x =
+            JObj [
+                "id", JNum 0
+                "name", JStr "Alice"
+                "active", JBit true
+                "nested",
+                    JObj [
+                        "x", JNum 9
+                        "x", JNum 1
+                        "y", JNum 2
+                    ]
+                "tags", JArr [ JStr "a"; JStr "b" ]
+                "id", JNum 1
+            ]
+
+        let y =
+            JObj [
+                "tags", JArr [ JStr "a"; JStr "b" ]
+                "nested",
+                    JObj [
+                        "y", JNum 2
+                        "x", JNum 1
+                    ]
+                "active", JBit true
+                "id", JNum 1
+                "name", JStr "Alice"
+            ]
+
+        Json.diff x y
+        |> Expect.isNone Msg.none
+
+        Json.equal x y
+        |> Expect.isTrue "Expected values to be equal."
 
     [<Fact>]
     let ``Should create Json from JsonElement`` () =
@@ -523,7 +587,7 @@ module JsonTests =
     module JObj =
 
         let ``Should create object`` () =
-            JObj [ "1", JNum.number 1; "2", JNum.number 2; "3", JNum.number 3 ]
+            JObj [ "1", JNum 1; "2", JNum 2; "3", JNum 3 ]
             |> Json.asString Indented
             |> Expect.string
 
@@ -535,13 +599,13 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object from value`` () =
-            JObj.from (fun x -> [ "value", JNum.number x ]) 1
+            JObj.from (fun x -> [ "value", JNum x ]) 1
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create object when Some`` () =
-            JObj.option (fun x -> [ "value", JNum.number x ]) (Some 1)
+            JObj.option (fun x -> [ "value", JNum x ]) (Some 1)
             |> Json.asString Indented
             |> Expect.string
 
@@ -553,20 +617,20 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create object array`` () =
-            JObj.array (fun x -> [ "value", JNum.number x ]) [ 1; 2; 3 ]
+            JObj.array (fun x -> [ "value", JNum x ]) [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 
         [<Fact>]
         let ``Should create object singleton`` () =
-            JObj.single (fun (n, v) -> [ n, JNum.number v ]) ("value", 1)
+            JObj.single (fun (n, v) -> [ n, JNum v ]) ("value", 1)
             |> Json.asString Indented
             |> Expect.string
 
     module JArr =
 
         let ``Should create array`` () =
-            JArr [ JNum.number 1; JNum.number 2; JNum.number 3 ]
+            JArr [ JNum 1; JNum 2; JNum 3 ]
             |> Json.asString Indented
             |> Expect.string
 
@@ -578,7 +642,7 @@ module JsonTests =
 
         [<Fact>]
         let ``Should create array from value`` () =
-            JArr.from (fun x -> JNum.number x) [ 1; 2; 3 ]
+            JArr.from (fun x -> JNum x) [ 1; 2; 3 ]
             |> Json.asString Indented
             |> Expect.string
 
