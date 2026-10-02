@@ -1,8 +1,6 @@
 namespace Farse
 
 open System
-open System.Globalization
-open System.Numerics
 open System.Text.Encodings.Web
 open System.Text.Json
 
@@ -126,11 +124,6 @@ module internal Common =
             match typeof<'a>.Name with
             | "Int16" | "Int32" | "Int64" | "Int128" | "SByte" -> "an"
             | _ -> "a"
-
-    module INumber =
-
-        let inline format<'a when 'a :> INumber<'a>> (number:'a) =
-            number.ToString(null, CultureInfo.InvariantCulture)
 
     module Error =
 

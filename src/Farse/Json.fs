@@ -3,6 +3,7 @@ namespace Farse
 open System
 open System.Buffers
 open System.Diagnostics.CodeAnalysis
+open System.Globalization
 open System.Numerics
 open System.Text
 open System.Text.Json
@@ -17,7 +18,7 @@ type Number =
         value
 
     static member internal From(x:'a when 'a :> INumber<'a>) =
-        if 'a.IsFinite(x) then Value <| INumber.format x
+        if 'a.IsFinite(x) then Value <| x.ToString(null, CultureInfo.InvariantCulture)
         else Value "0"
 
     static member op_Implicit(x:int) = Number.From x
@@ -358,7 +359,7 @@ module JStr =
     /// </remarks>
     /// <example><code>"prop", JStr.number 1</code></example>
     let inline number<'a when 'a :> INumber<'a>>(x:'a) =
-        JStr <| INumber.format x
+        JStr <| x.ToString(null, NumberFormatInfo.InvariantInfo)
 
     /// <summary>Creates a JSON string or null from an <c>option</c>.</summary>
     /// <example><code>"prop", JStr.option id (Some "string")</code></example>
