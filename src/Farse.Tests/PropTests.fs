@@ -568,3 +568,30 @@ module PathTests =
         Prop.get "prop\\.prop2" Parse.int
         |> Parser.parse """{ "prop\\.prop2": "1" }"""
         |> Expect.parserError
+
+    [<Fact>]
+    let ``Should ignore empty segments in a path`` () =
+        let expected = 1
+        let actual =
+            Prop.get "a..b" Parse.int
+            |> Parser.parse """{ "a": { "b": 1 } }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should ignore a leading and a trailing dot in a path`` () =
+        let expected = 1
+        let actual =
+            Prop.get ".a.b." Parse.int
+            |> Parser.parse """{ "a": { "b": 1 } }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a property named with a single dot`` () =
+        let expected = 1
+        let actual =
+            Prop.get "." Parse.int
+            |> Parser.parse """{ ".": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual

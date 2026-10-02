@@ -8,8 +8,10 @@ type JsonPath = JsonPath of string
 
 module JsonPath =
 
+    let private special = [| '.'; '\''; '\\'; '['; ']' |]
+
     let internal segment (name:string) =
-        if name.Contains('.') || name.Contains('\'') || name.Contains('\\')
+        if name.Length = 0 || name.IndexOfAny(special) >= 0
         then
             let name = name.Replace("\\", "\\\\").Replace("'", "\\'")
             $"['%s{name}']"
