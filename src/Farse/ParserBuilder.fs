@@ -14,6 +14,8 @@ module ParserBuilder =
 
         member inline _.Zero() = from ()
 
+        member inline _.Combine(a:Parser<unit>, b) = bind (fun () -> b) a
+
         member inline _.Bind(x, [<InlineIfLambda>] fn) = bind fn x
 
         member inline _.Bind2(Parser a, Parser b, [<InlineIfLambda>] fn) =
