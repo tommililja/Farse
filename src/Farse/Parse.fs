@@ -699,14 +699,17 @@ module Parse =
     let dict parser = keyValue dict parser
 
     /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <remarks>Returns duplicate properties.</remarks>
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
     /// <summary>Parses an object's properties as <c>(string * 'a) Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <remarks>Returns duplicate properties.</remarks>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
     let tuples parser = keyValue Seq.ofSeq parser
 
     /// <summary>Parses an object's keys as <c>System.String Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <remarks>Returns duplicate keys.</remarks>
     /// <example><code>let! keys = "prop" &amp;= Parse.keys</code></example>
     let keys = keyValue (Seq.map fst) none
 
