@@ -26,7 +26,8 @@ module ParseError =
         append (JsonPath.prop name) x
 
     let internal withIndex n x =
-        append (JsonPath.index n) x
+        let index = x.Index |> Option.orElse (Some n)
+        { append (JsonPath.index n) x with Index = index }
 
     let internal withPath path x =
         append path x
