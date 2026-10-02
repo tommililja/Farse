@@ -65,6 +65,13 @@ module JsonTests =
         Expect.isTrue "Expected values to be equal." equal
 
     [<Fact>]
+    let ``Should treat JStr null as JNil`` () =
+        let a = JArr [ JStr null ]
+        let b = JArr [ JNil ]
+        let equal = Json.equal a b
+        Expect.isTrue "Expected values to be equal." equal
+
+    [<Fact>]
     let ``Should not be equal and return a message`` () =
         let x =
             JObj [
@@ -172,6 +179,13 @@ module JsonTests =
 
         Json.equal x y
         |> Expect.isTrue "Expected values to be equal."
+
+    [<Fact>]
+    let ``Should treat JNil as JNull with no diff`` () =
+        let x = JArr [ JStr null ]
+        let y = JArr [ JNil ]
+        Json.diff x y
+        |> Expect.isNone Msg.none
 
     [<Fact>]
     let ``Should create Json from JsonElement`` () =

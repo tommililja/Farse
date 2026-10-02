@@ -252,6 +252,7 @@ module Json =
                 list
                 |> List.map normalize
                 |> JArr
+            | JStr null -> JNil
             | other -> other
         let x = normalize x
         let y = normalize y
@@ -297,6 +298,8 @@ module Json =
 
         let rec diff path x y =
             match x, y with
+            | JStr null, y -> diff path JNil y
+            | x, JStr null -> diff path x JNil
             | JStr x, JStr y when x = y -> []
             | JNum x, JNum y when x = y -> []
             | JBit x, JBit y when x = y -> []
