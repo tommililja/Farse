@@ -1,6 +1,7 @@
 ﻿Parser yielded 1 error[s].
 
   Error[0]:
-    at $
+    at $.disc
      | Tried parsing 'int.
      | Discriminator 'a' is missing a parser.
+     = "a"

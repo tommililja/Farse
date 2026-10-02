@@ -795,8 +795,9 @@ module Parse =
                 match parser with
                 | Some (_, Parser parse) -> parse element
                 | None ->
-                    element
+                    element.GetProperty(name) // We know it exists.
                     |> ParseError.details $"Discriminator '%s{disc}' is missing a parser." typeof<'r>
+                    |> ParseError.withProp name
                     |> Error.list
             | Error e -> Error e
         ) ExpectedKind.Object
