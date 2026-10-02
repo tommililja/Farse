@@ -194,7 +194,7 @@ module Parse =
             | :? NotSupportedException -> Parser.fail $"Regex '%s{regex}' not supported with RegexOptions.NonBacktracking."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
-    /// <example><code>let! int = "prop" &amp;= Parse.number&lt;int&gt;</code></example>
+    /// <example><code>let! int = "prop" &amp;= Parse.number Parse.int</code></example>
     let number<'r when 'r :> INumber<'r>> (_:Parser<'r>) =
         stringError (fun element ->
             let string = element.GetString()
