@@ -1,0 +1,7 @@
+﻿Parser yielded 1 error[s].
+
+  Error[0]:
+    at $.type
+     | Tried parsing 'string.
+     | Expected String, but got Number.
+     = 1

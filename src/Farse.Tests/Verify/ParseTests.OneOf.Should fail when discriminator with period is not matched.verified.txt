@@ -1,0 +1,7 @@
+﻿Parser yielded 1 error[s].
+
+  Error[0]:
+    at $['meta.type']
+     | Tried parsing 'int.
+     | Discriminator 'b' is missing a parser.
+     = "b"

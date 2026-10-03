@@ -782,20 +782,26 @@ module Parse =
 
     /// <summary>Parses an object based on a string discriminator property.</summary>
     /// <example><code>let! x = Parse.oneOf "type" [ "a", a; "b", b ]</code></example>
-    let oneOf name parsers : Parser<'r> =
-        let (Parser parse) = Prop.get name string
-        customError (fun element ->
-            match parse element with
-            | Ok disc ->
-                let parser = List.tryFind (fun (key, _) -> key = disc) parsers
-                match parser with
+    let oneOf (name:string) parsers : Parser<'r> =
+        customError (fun (element:JsonElement) ->
+            match element.TryGetProperty(name) with
+            | false, _ ->
+                element
+                |> ParseError.required (JsonPath.prop name) typeof<string>
+                |> Error.list
+            | true, disc when !disc.IsString ->
+                disc
+                |> ParseError.expected ExpectedKind.String (JsonPath.prop name) typeof<string>
+                |> Error.list
+            | true, disc ->
+                let value = disc.GetString()
+                match List.tryFind (fun (k, _) -> k = value) parsers with
                 | Some (_, Parser parse) -> parse element
                 | None ->
-                    element.GetProperty(name) // We know it exists.
-                    |> ParseError.details $"Discriminator '%s{disc}' is missing a parser." typeof<'r>
+                    disc
+                    |> ParseError.details $"Discriminator '%s{value}' is missing a parser." typeof<'r>
                     |> ParseError.withProp name
                     |> Error.list
-            | Error e -> Error e
         ) ExpectedKind.Object
 
     /// <summary>Parses an element by trying each <c>Parser</c> in order.</summary>

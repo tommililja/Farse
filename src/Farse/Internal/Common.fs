@@ -45,6 +45,9 @@ module internal Common =
         member inline this.isNullOrUndefined =
             this.ValueKind = Kind.Null || this.ValueKind = Kind.Undefined
 
+        member inline this.IsString =
+            this.ValueKind = Kind.String
+
     module JsonElement =
 
         let inline tryGetValue (e:JsonElement) =

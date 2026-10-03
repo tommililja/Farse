@@ -2177,6 +2177,31 @@ module ParseTests =
             |> Parser.parse """{ "disc": "a", "prop2": 1, "prop3": 2 }"""
             |> Expect.parserError
 
+        [<Fact>]
+        let ``Should match discriminator name literally`` () =
+            Parse.oneOf "meta.type" [ "a", Prop.get "value" Parse.int ]
+            |> Parser.parse """{ "meta.type": "a", "value": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parse.oneOf} to succeed."
+            |> Expect.equal Msg.none 1
+
+        [<Fact>]
+        let ``Should not treat discriminator name as a path`` () =
+            Parse.oneOf "meta.type" [ "a", Parse.int ]
+            |> Parser.parse """{ "meta": { "type": "a" } }"""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when discriminator with period is not matched`` () =
+            Parse.oneOf "meta.type" [ "a", Parse.int ]
+            |> Parser.parse """{ "meta.type": "b" }"""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when discriminator is not a string`` () =
+            Parse.oneOf "type" [ "a", Parse.int ]
+            |> Parser.parse """{ "type": 1 }"""
+            |> Expect.parserError
+
     module Attempt =
 
         type TestDu =
