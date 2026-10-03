@@ -113,7 +113,7 @@ module Parse =
         ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.UInt16</c>.</summary>
-    /// <example><code>let! uint64 = "prop" &amp;= Parse.uint16</code></example>
+    /// <example><code>let! uint16 = "prop" &amp;= Parse.uint16</code></example>
     let uint16 = fromTuple _.TryGetUInt16() ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.UInt32</c>.</summary>

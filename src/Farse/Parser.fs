@@ -172,7 +172,7 @@ module Parser =
     let parseBytesWith (bytes:byte array) options parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, options)) parser
 
-    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;bytes&gt;</c> with a <c>Parser</c>.</summary>
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;byte&gt;</c> with a <c>Parser</c>.</summary>
     /// <remarks>Uses the following <c>JsonDocumentOptions</c>.
     /// <code>
     ///     JsonDocumentOptions (
@@ -185,12 +185,12 @@ module Parser =
     let parseMemory (bytes:ReadOnlyMemory<byte>) parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default)) parser
 
-    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;bytes&gt;</c> with a <c>Parser</c> and <c>JsonDocumentOptions</c>.</summary>
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;byte&gt;</c> with a <c>Parser</c> and <c>JsonDocumentOptions</c>.</summary>
     /// <example><code>let result = Parser.parseMemoryWith bytes options parser</code></example>
     let parseMemoryWith (bytes:ReadOnlyMemory<byte>) options parser =
         parseDocument (fun () -> JsonDocument.Parse(bytes, options)) parser
 
-    /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;bytes&gt;</c> with a <c>Parser</c>.</summary>
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;byte&gt;</c> with a <c>Parser</c>.</summary>
     /// <remarks>Uses the following <c>JsonDocumentOptions</c>.
     /// <code>
     ///     JsonDocumentOptions (
