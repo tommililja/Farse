@@ -24,6 +24,14 @@ module Prop =
             | _ -> element, count
         ) (element, 0)
 
+    let inline private foldWithParent path element =
+        path
+        |> Array.fold (fun (element:JsonElement, parent:JsonElement, count) (name:string) ->
+            match element.ValueKind with
+            | Kind.Object -> element.TryGetProperty(name) |> snd, element, count + 1
+            | _ -> element, parent, count
+        ) (element, element, 0)
+
     let private parse (name:string) (Parser parse) : Parser<'r> =
         Parser (fun element ->
             match element.ValueKind with
@@ -87,15 +95,12 @@ module Prop =
 
     let private traverse path (Parser parse) : Parser<'r> =
         Parser (fun root ->
-            match fold path root with
-            | element, count when element.isUndefined ->
-                // Quick and dirty to get the parent element.
-                let parent, _ = fold (Array.take (max 0 (count - 1)) path) root
-
+            match foldWithParent path root with
+            | element, parent, count when element.isUndefined ->
                 parent
                 |> ParseError.required (select path count) typeof<'r>
                 |> Error.list
-            | element, count when count = path.Length ->
+            | element, _, count when count = path.Length ->
                 match parse element with
                 | Ok x -> Ok x
                 | Error errors ->
@@ -105,7 +110,7 @@ module Prop =
                         |> ParseError.withPath
                     )
                     |> Error
-            | element, count ->
+            | element, _, count ->
                 element
                 |> ParseError.expected ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list
