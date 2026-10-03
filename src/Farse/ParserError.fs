@@ -34,7 +34,7 @@ module ParseError =
 
     // Errors
 
-    let internal required path type' element  =
+    let internal required path type' element =
         {
             Path = path
             Element = JsonElement.clone element

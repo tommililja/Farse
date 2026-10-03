@@ -894,7 +894,7 @@ module Parse =
             | Ok x when x = expected -> Ok ()
             | Ok x ->
                 element
-                |> ParseError.details $"Expected '%A{expected}', but got '%A{x}'." typeof<'a>
+                |> ParseError.details $"Expected %A{expected}, but got %A{x}." typeof<'a>
                 |> Error.list
             | Error e -> Error e
         )
