@@ -89,6 +89,17 @@ module ParseError =
             Exn = None
         }
 
+    let internal prop name details type' element =
+        {
+            Path = JsonPath.prop name
+            Element = JsonElement.clone element
+            Index = None
+            Details = details
+            Value = None
+            Type = type'
+            Exn = None
+        }
+
     let internal index n type' element =
         {
             Path = JsonPath.index n

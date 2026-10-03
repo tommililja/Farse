@@ -799,8 +799,7 @@ module Parse =
                 | Some (_, Parser parse) -> parse element
                 | None ->
                     disc
-                    |> ParseError.details $"Discriminator '%s{value}' is missing a parser." typeof<'r>
-                    |> ParseError.withProp name
+                    |> ParseError.prop name $"Discriminator '%s{value}' is missing a parser." typeof<'r>
                     |> Error.list
         ) ExpectedKind.Object
 
