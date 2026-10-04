@@ -3,7 +3,7 @@ namespace Farse
 [<AutoOpen>]
 module internal Builders =
 
-    type StringBuilder() =
+    type MultilineBuilder() =
 
         member inline _.Yield(line:string) =
             List.singleton line
@@ -127,6 +127,6 @@ module internal Builders =
 
         member inline _.Zero() = Ok ()
 
-    let string = StringBuilder()
+    let multiline = MultilineBuilder()
 
     let result = ResultBuilder()

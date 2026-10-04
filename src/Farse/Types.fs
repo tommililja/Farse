@@ -1,6 +1,7 @@
 namespace Farse
 
 open System
+open System.Text
 open System.Text.Json
 
 [<Struct>]
@@ -8,14 +9,33 @@ type JsonPath = JsonPath of string
 
 module JsonPath =
 
-    let private special = [| '.'; '\''; '\\'; '['; ']' |]
+    // RFC 9535 member-name-shorthand, restricted to ASCII.
+    // Non-ASCII names fall back to brackets, which are always valid.
+    let private isShorthand (name:string) =
+        (Char.IsAsciiLetter(name[0]) || name[0] = '_')
+        && name |> Seq.forall (fun c -> Char.IsAsciiLetterOrDigit(c) || c = '_')
 
-    let internal segment (name:string) =
-        if name.Length = 0 || name.IndexOfAny(special) >= 0
-        then
-            let name = name.Replace("\\", "\\\\").Replace("'", "\\'")
-            $"['%s{name}']"
-        else $".%s{name}"
+    // RFC 9535 single-quoted string escaping.
+    let private escape (name:string) =
+        let sb = StringBuilder()
+        for c in name do
+            match c with
+            | '\\' -> sb.Append("\\\\")
+            | '\'' -> sb.Append("\\'")
+            | '\b' -> sb.Append("\\b")
+            | '\u000C' -> sb.Append("\\f")
+            | '\n' -> sb.Append("\\n")
+            | '\r' -> sb.Append("\\r")
+            | '\t' -> sb.Append("\\t")
+            | c when c < ' ' -> sb.Append($"\\u%04x{int c}")
+            | c -> sb.Append(c)
+            |> ignore
+        sb.ToString()
+
+    let internal segment = function
+        | name when String.IsNullOrEmpty(name) -> "['']"
+        | name when isShorthand name -> $".%s{name}"
+        | name -> $"['%s{escape name}']"
 
     let internal empty =
         JsonPath String.Empty

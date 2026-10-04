@@ -122,7 +122,7 @@ module ParseError =
     /// </code>
     /// </returns>
     let asString error =
-        string {
+        multiline {
             $"at %s{JsonPath.asString error.Path}"
             $" | Tried parsing '%s{Type.getName error.Type}."
 

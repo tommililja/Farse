@@ -288,7 +288,7 @@ module Json =
             $"%s{path}%s{JsonPath.segment key}"
 
         let renderDiff x y (path:string) =
-            string {
+            multiline {
                 path
                 $"  x: %s{x}"
                 $"  y: %s{y}"
