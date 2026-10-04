@@ -1227,17 +1227,42 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string as DateTime`` () =
-            let expected = DateTime.Parse("2025-05-13T17:28:45")
+            let expected = DateTime(2025, 5, 13, 17, 28, 45)
             let actual =
                 Parse.dateTime
                 |> Parser.parse "\"2025-05-13T17:28:45\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none DateTimeKind.Unspecified actual.Kind
             Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should fail when string ends with Z`` () =
+            Parse.dateTime
+            |> Parser.parse "\"2025-05-13T17:28:45Z\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when string has a zero offset`` () =
+            Parse.dateTime
+            |> Parser.parse "\"2025-05-13T17:28:45+00:00\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when string has a positive offset`` () =
+            Parse.dateTime
+            |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when string has a negative offset`` () =
+            Parse.dateTime
+            |> Parser.parse "\"2025-05-13T17:28:45-05:00\""
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.dateTime
-                |> Parser.parse "\"2025-05-13T172845\""
+            |> Parser.parse "\"2025-05-13T172845\""
             |> Expect.parserError
 
         [<Fact>]

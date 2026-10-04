@@ -384,7 +384,7 @@ module Parse =
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateOnly</c>.</summary>
-    /// <remarks>The string must be in ISO8601 <c>yyyy-MM-dd</c> format.</remarks>
+    /// <remarks>Requires an <c>ISO 8601</c> string in <c>yyyy-MM-dd</c> format.</remarks>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnly</code></example>
     let dateOnly =
         stringError (fun element ->
@@ -407,12 +407,14 @@ module Parse =
                 | _ -> Error $"Expected a DateOnly '%s{format}' string."
             ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 8601) as <c>System.DateTime</c>.</summary>
+    /// <summary>Parses a string as <c>System.DateTime</c> with <c>DateTimeKind.Unspecified</c>.</summary>
+    /// <remarks>Requires an <c>ISO 8601</c> string without offset or time zone.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTime</code></example>
     let dateTime =
         stringError (fun element ->
             match element.TryGetDateTime() with
-            | true, dateTime -> Ok dateTime
+            | true, dateTime when dateTime.Kind = DateTimeKind.Unspecified -> Ok dateTime
+            | true, _ -> Error "Expected a DateTime string without offset or time zone."
             | _ -> Error "Expected a DateTime string."
         ) ExpectedKind.String
 
