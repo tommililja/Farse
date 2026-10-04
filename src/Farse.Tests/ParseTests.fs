@@ -1492,35 +1492,58 @@ module ParseTests =
     module DateTimeOffsetExact =
 
         [<Fact>]
-        let ``Should parse string as DateTimeOffset exact`` () =
-            let expected = DateTimeOffset.Parse("2025-05-13T17:28:00+02:00")
+        let ``Should parse string as DateTimeOffset`` () =
+            let expected = DateTimeOffset(2025, 5, 13, 17, 28, 45, TimeSpan.FromHours 2.0)
             let actual =
-                Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm zzz"
-                |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+                Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"
+                |> Parser.parse "\"2025-05-13 17:28:45 +02:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
+            Expect.equal Msg.none expected.Offset actual.Offset
+
+        [<Fact>]
+        let ``Should parse string ending in Z as DateTimeOffset`` () =
+            let expected = DateTimeOffset(2025, 5, 13, 17, 28, 45, TimeSpan.Zero)
+            let actual =
+                Parse.dateTimeOffsetExact "yyyy-MM-ddTHH:mm:ssK"
+                |> Parser.parse "\"2025-05-13T17:28:45Z\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
+            Expect.equal Msg.none expected.Offset actual.Offset
+
+        [<Fact>]
+        let ``Should fail when string has no offset`` () =
+            Parse.dateTimeOffsetExact "yyyy-MM-ddTHH:mm:ssK"
+            |> Parser.parse "\"2025-05-13T17:28:45\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format has no offset`` () =
+            Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss"
+            |> Parser.parse "\"2025-05-13 17:28:45\""
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
-            Parse.dateTimeOffsetExact "yyyyMMdd HH:mm:ss zzz"
-            |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+            Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"
+            |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when format is null`` () =
             Parse.dateTimeOffsetExact null
-            |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+            |> Parser.parse "\"2025-05-13 17:28:45 +02:00\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when format is empty`` () =
             Parse.dateTimeOffsetExact String.Empty
-            |> Parser.parse "\"2025-05-13 17:28 +02:00\""
+            |> Parser.parse "\"2025-05-13 17:28:45 +02:00\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-            Parse.dateTimeOffsetExact "\"yyyyMMdd HH:mm:ss zzz\""
+            Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"
             |> Parser.parse "1"
             |> Expect.parserError
 
