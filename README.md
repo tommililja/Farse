@@ -532,13 +532,13 @@ With the available information:
 
 ```fsharp
 type ParseError = {
-    Path: JsonPath          // The full JSON path where the error occurred.
-    Element: JsonElement    // The element that was parsed, or the parent.
-    Index: int option       // The index in the innermost array.
+    Path: JsonPath          // Path where the error occurred.
+    Element: JsonElement    // Element that was parsed, or the parent.
+    Index: int option       // Index in the innermost array.
     Details: string         // Parsing or validation error details.
-    Value: string option    // Parsing succeeded, but validation failed.
-    Type: Type              // The type that was being parsed.
-    Exn: exn option         // The exception if one occurred.
+    Value: string option    // Populated when parsing succeeded, but validation failed.
+    Type: Type              // Type that was being parsed.
+    Exn: exn option         // Exception, if one occurred.
 }
 ```
 > Note: Farse should not throw exceptions unless something unexpected occurs.
