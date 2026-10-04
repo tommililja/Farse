@@ -1,0 +1,5 @@
+﻿Diff yielded 1 difference[s].
+
+  $.a
+    x: "quote \" and\nnewline"
+    y: "other"

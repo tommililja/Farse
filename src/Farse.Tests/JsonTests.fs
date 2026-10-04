@@ -181,6 +181,14 @@ module JsonTests =
         |> Expect.isTrue "Expected values to be equal."
 
     [<Fact>]
+    let ``Should escape strings in diff message`` () =
+        let x = JObj [ "a", JStr "quote \" and\nnewline" ]
+        let y = JObj [ "a", JStr "other" ]
+        Json.diff x y
+        |> Expect.wantSome $"Expected %s{nameof Json.diff} to return a message."
+        |> Expect.string
+
+    [<Fact>]
     let ``Should treat JNil as JNull with no diff`` () =
         let x = JArr [ JStr null ]
         let y = JArr [ JNil ]

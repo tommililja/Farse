@@ -272,14 +272,12 @@ module Json =
     /// </example>
     let diff x y =
         let render = function
-            | JStr str -> $"\"%s{str}\""
-            | JNum str -> str.ToString()
-            | JBit bit -> bit.ToString().ToLower()
-            | JNil -> "null"
-            | other ->
-                asString Indented other
+            | JObj _
+            | JArr _ as json ->
+                asString Indented json
                 |> String.indent 4
                 |> (+) "\n"
+            | json -> asString Raw json
 
         let missing fn x y =
             Set.difference x y
