@@ -181,10 +181,10 @@ module ParserBuilder =
     /// <code>
     ///     let parser =
     ///         parser {
-    ///             let! x = "x" &= Parse.int
-    ///             and! y = "y" &= Parse.int
+    ///             let! x = "x" &amp;= Parse.int
+    ///             and! y = "y" &amp;= Parse.int
     /// &#160;
-    ///             do! "z" &= Parse.unit
+    ///             do! "z" &amp;= Parse.unit
     /// &#160;
     ///             return x + y
     ///         }
