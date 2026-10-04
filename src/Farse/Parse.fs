@@ -414,7 +414,7 @@ module Parse =
         stringError (fun element ->
             match element.TryGetDateTime() with
             | true, dateTime when dateTime.Kind = DateTimeKind.Unspecified -> Ok dateTime
-            | true, _ -> Error "Expected a DateTime string without offset or time zone."
+            | true, _ -> Error "Expected a DateTime string without offset or Z."
             | _ -> Error "Expected a DateTime string."
         ) ExpectedKind.String
 
@@ -429,7 +429,8 @@ module Parse =
             | _ -> Error "Expected a DateTime string."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string as <c>System.DateTime</c> with a specific format.</summary>
+    /// <summary>Parses a string as <c>System.DateTime</c> with a specific format and <c>DateTimeKind.Unspecified</c>.</summary>
+    /// <remarks>Requires a string without offset or <c>Z</c>.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         match format with
@@ -438,7 +439,8 @@ module Parse =
             stringError (fun element ->
                 let string = element.GetString()
                 match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | true, dateTime -> Ok dateTime
+                | true, dateTime when dateTime.Kind = DateTimeKind.Unspecified -> Ok dateTime
+                | true, _ -> Error $"Expected a DateTime '%s{format}' string without offset or Z."
                 | _ -> Error $"Expected a DateTime '%s{format}' string."
             ) ExpectedKind.String
 
