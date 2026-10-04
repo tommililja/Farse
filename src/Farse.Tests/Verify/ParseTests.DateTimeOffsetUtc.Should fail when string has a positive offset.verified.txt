@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'DateTimeOffset.
-     | Expected a DateTimeOffset 'UTC' string.
-     = "2025-05-25T11:00:00+01:00"
+     | Expected a DateTimeOffset 'Utc' string.
+     = "2025-05-13T17:28:45+02:00"

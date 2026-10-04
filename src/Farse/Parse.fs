@@ -455,17 +455,15 @@ module Parse =
             | _ -> Error "Expected a DateTimeOffset string."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 8601) in UTC as <c>System.DateTimeOffset</c>.</summary>
-    /// <remarks>The string must be UTC, either ending in <c>Z</c> or with an offset of <c>+00:00</c>.</remarks>
+    /// <summary>Parses a string as <c>System.DateTimeOffset</c> in UTC.</summary>
+    /// <remarks>Requires an <c>ISO 8601</c> with an offset of <c>+00:00</c> or <c>Z</c>.</remarks>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetUtc</code></example>
     let dateTimeOffsetUtc =
         stringError (fun element ->
-            match element.TryGetDateTime() with
-            | true, dateTime when dateTime.Kind <> DateTimeKind.Unspecified ->
-                match element.TryGetDateTimeOffset() with
-                | true, offset when offset.Offset = TimeSpan.Zero -> Ok offset
-                | _ -> Error "Expected a DateTimeOffset 'UTC' string."
-            | _ -> Error "Expected a DateTimeOffset 'UTC' string."
+            match element.TryGetDateTime(), element.TryGetDateTimeOffset() with
+            | (true, dateTime), (true, offset) when dateTime.Kind <> DateTimeKind.Unspecified && offset.Offset = TimeSpan.Zero -> Ok offset
+            | (true, _), _ -> Error "Expected a DateTimeOffset 'Utc' string."
+            | _ -> Error "Expected a DateTimeOffset string."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> with a specific format.</summary>

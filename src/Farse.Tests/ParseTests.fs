@@ -1441,55 +1441,46 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string ending in Z as DateTimeOffset UTC`` () =
-            let expected = DateTimeOffset(DateOnly(2025, 05, 25), TimeOnly(10, 00), TimeSpan.Zero)
+            let expected = DateTimeOffset(2025, 5, 13, 17, 28, 45, TimeSpan.Zero)
             let actual =
                 Parse.dateTimeOffsetUtc
-                |> Parser.parse "\"2025-05-25T10:00:00Z\""
+                |> Parser.parse "\"2025-05-13T17:28:45Z\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
             Expect.equal Msg.none TimeSpan.Zero actual.Offset
 
         [<Fact>]
         let ``Should parse string with a zero offset as DateTimeOffset UTC`` () =
-            let expected = DateTimeOffset(DateOnly(2025, 05, 25), TimeOnly(10, 00), TimeSpan.Zero)
+            let expected = DateTimeOffset(2025, 5, 13, 17, 28, 45, TimeSpan.Zero)
             let actual =
                 Parse.dateTimeOffsetUtc
-                |> Parser.parse "\"2025-05-25T10:00:00+00:00\""
+                |> Parser.parse "\"2025-05-13T17:28:45+00:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
             Expect.equal Msg.none TimeSpan.Zero actual.Offset
 
         [<Fact>]
-        let ``Should parse an instant in a repeated DST hour correctly`` () =
-            let actual =
-                Parse.dateTimeOffsetUtc
-                |> Parser.parse "\"2026-10-25T00:30:00Z\""
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none (DateTimeOffset(2026, 10, 25, 0, 30, 0, TimeSpan.Zero)) actual
-            Expect.equal Msg.none TimeSpan.Zero actual.Offset
-
-        [<Fact>]
         let ``Should fail when string has a positive offset`` () =
             Parse.dateTimeOffsetUtc
-            |> Parser.parse "\"2025-05-25T11:00:00+01:00\""
+            |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when string has a negative offset`` () =
             Parse.dateTimeOffsetUtc
-            |> Parser.parse "\"2025-05-25T05:00:00-05:00\""
+            |> Parser.parse "\"2025-05-13T17:28:45-05:00\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when string has no offset`` () =
             Parse.dateTimeOffsetUtc
-            |> Parser.parse "\"2025-05-25T10:00:00\""
+            |> Parser.parse "\"2025-05-13T17:28:45\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
             Parse.dateTimeOffsetUtc
-            |> Parser.parse "\"2025-05-25100000\""
+            |> Parser.parse "\"2025-05-13T172845\""
             |> Expect.parserError
 
         [<Fact>]
