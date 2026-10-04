@@ -87,7 +87,7 @@ type ParserBenchmarks() =
             and! subscription = "subscription" &= parser {
                 let! plan = "plan" &= Parse.string
                 and! isCanceled = "isCanceled" &= Parse.bool
-                and! renewsAt = "renewsAt" ?= Parse.dateTime
+                and! renewsAt = "renewsAt" ?= Parse.dateTimeUtc
 
                 return {
                     Plan = plan
