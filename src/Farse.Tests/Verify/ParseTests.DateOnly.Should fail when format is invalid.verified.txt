@@ -4,4 +4,4 @@
     at $
      | Tried parsing 'DateOnly.
      | Expected a DateOnly 'yyyy-MM-dd' string.
-     = "2025-0513"
+     = "01/01/2001"

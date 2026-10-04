@@ -384,13 +384,14 @@ module Parse =
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateOnly</c>.</summary>
+    /// <remarks>The string must be in ISO8601 <c>yyyy-MM-dd</c> format.</remarks>
     /// <example><code>let! dateOnly = "prop" &amp;= Parse.dateOnly</code></example>
     let dateOnly =
         stringError (fun element ->
             let string = element.GetString()
-            match DateOnly.TryParse(string, CultureInfo.InvariantCulture) with
+            match DateOnly.TryParseExact(string, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | true, dateOnly -> Ok dateOnly
-            | _ -> Error "Expected a DateOnly string."
+            | _ -> Error "Expected a DateOnly 'yyyy-MM-dd' string."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateOnly</c> with a specific format.</summary>

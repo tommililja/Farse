@@ -1172,14 +1172,14 @@ module ParseTests =
             let expected = DateOnly.Parse("2025-05-13")
             let actual =
                 Parse.dateOnly
-                |> Parser.parse "\"2025-05-13T17:28:45\""
+                |> Parser.parse "\"2025-05-13\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
 
         [<Fact>]
-        let ``Should fail when parsing fails`` () =
+        let ``Should fail when format is invalid`` () =
             Parse.dateOnly
-            |> Parser.parse "\"2025-0513\""
+            |> Parser.parse "\"01/01/2001\""
             |> Expect.parserError
 
         [<Fact>]
