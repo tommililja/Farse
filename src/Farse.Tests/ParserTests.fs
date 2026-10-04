@@ -44,15 +44,15 @@ module ParserTests =
 
     [<Fact>]
     let ``Should create Parser from Result that fails`` () =
-        Error "msg"
-        |> Parser.fromResult
+        let parser:Parser<int> = Error "msg" |> Parser.fromResult
+        parser
         |> Parser.parse "1"
         |> Expect.parserError
 
     [<Fact>]
     let ``Should create Parser that fails`` () =
-        "msg"
-        |> Parser.fail
+        let parser:Parser<int> = "msg" |> Parser.fail
+        parser
         |> Parser.parse "1"
         |> Expect.parserError
 

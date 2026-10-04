@@ -2,6 +2,6 @@
 
   Error[0]:
     at $
-     | Tried parsing 'obj.
+     | Tried parsing 'byte.
      | msg
      = 1uy

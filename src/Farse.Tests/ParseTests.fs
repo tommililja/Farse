@@ -65,8 +65,9 @@ module ParseTests =
 
         [<Fact>]
         let ``Should not catch OutOfMemoryException`` () =
+            let parser:Parser<int> = Parse.custom (fun _ -> raise (OutOfMemoryException())) ExpectedKind.Number
             Expect.throws $"Expected %s{nameof Parse.custom} to throw." (fun () ->
-                Parse.custom (fun _ -> raise (OutOfMemoryException())) ExpectedKind.Number
+                parser
                 |> Parser.parse "1"
                 |> ignore
             )
@@ -2321,14 +2322,15 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when all parsers fail`` () =
-            let parser = Parser.fail "msg"
+            let parser:Parser<int> = Parser.fail "msg"
             Parse.attempt [ parser; parser; parser ]
             |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when list is empty`` () =
-            Parse.attempt []
+            let parser:Parser<int> = Parse.attempt []
+            parser
             |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
             |> Expect.parserError
 
@@ -2411,7 +2413,8 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when validation fails`` () =
-            Parse.refine Parse.byte (fun _ -> Error "msg")
+            let parser:Parser<byte> = Parse.refine Parse.byte (fun _ -> Error "msg")
+            parser
             |> Parser.parse "1"
             |> Expect.parserError
 

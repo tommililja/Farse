@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarnOn>$(WarnOn);1182;3579;3390</WarnOn>
+        <WarnOn>$(WarnOn);1182;3579;3390;3559</WarnOn>
         <NoWarn>104</NoWarn>
         <Features>strict</Features>
         <WarningLevel>5</WarningLevel>

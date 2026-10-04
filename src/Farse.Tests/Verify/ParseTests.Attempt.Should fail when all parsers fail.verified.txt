@@ -2,5 +2,5 @@
 
   Error[0]:
     at $
-     | Tried parsing 'obj.
+     | Tried parsing 'int.
      | Tried 3 parsers without success.
