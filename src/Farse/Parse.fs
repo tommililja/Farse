@@ -419,7 +419,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTime</c> with <c>DateTimeKind.Utc</c>.</summary>
-    /// <remarks>Requires an <c>ISO 8601</c> with an offset of <c>+00:00</c> or <c>Z</c>.</remarks>
+    /// <remarks>Requires an <c>ISO 8601</c> string with an offset of <c>+00:00</c> or <c>Z</c>.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeUtc</code></example>
     let dateTimeUtc =
         stringError (fun element ->
@@ -430,7 +430,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTime</c> with a specific format and <c>DateTimeKind.Unspecified</c>.</summary>
-    /// <remarks>Requires an <c>ISO 8601</c> string without an offset or <c>Z</c>.</remarks>
+    /// <remarks>Requires a string without an offset or <c>Z</c>.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeExact "yyyy-MM-dd HH:mm:ss"</code></example>
     let dateTimeExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         match format with
@@ -456,7 +456,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> in UTC.</summary>
-    /// <remarks>Requires an <c>ISO 8601</c> with an offset of <c>+00:00</c> or <c>Z</c>.</remarks>
+    /// <remarks>Requires an <c>ISO 8601</c> string with an offset of <c>+00:00</c> or <c>Z</c>.</remarks>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetUtc</code></example>
     let dateTimeOffsetUtc =
         stringError (fun element ->
@@ -467,7 +467,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> with a specific format.</summary>
-    /// <remarks>Requires an <c>ISO 8601</c> string with an offset or <c>Z</c>.</remarks>
+    /// <remarks>Requires a string with an offset or <c>Z</c>.</remarks>
     /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</code></example>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         match format with

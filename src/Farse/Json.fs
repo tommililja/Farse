@@ -141,12 +141,12 @@ module Json =
     let fromBytes (bytes:byte array) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
-    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;bytes&gt;</c> into a <c>Json</c>.</summary>
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;byte&gt;</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromMemory bytes</code></example>
     let fromMemory (bytes:ReadOnlyMemory<byte>) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
-    /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;bytes&gt;</c> into a <c>Json</c>.</summary>
+    /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;byte&gt;</c> into a <c>Json</c>.</summary>
     /// <example><code>let result = Json.fromSequence bytes</code></example>
     let fromSequence (bytes:ReadOnlySequence<byte>) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
