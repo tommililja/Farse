@@ -408,7 +408,7 @@ module Parse =
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTime</c> with <c>DateTimeKind.Unspecified</c>.</summary>
-    /// <remarks>Requires an <c>ISO 8601</c> string without offset or time zone.</remarks>
+    /// <remarks>Requires an <c>ISO 8601</c> string without offset or <c>Z</c>.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTime</code></example>
     let dateTime =
         stringError (fun element ->
@@ -418,18 +418,15 @@ module Parse =
             | _ -> Error "Expected a DateTime string."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 8601) in UTC as <c>System.DateTime</c>.</summary>
-    /// <remarks>The string must be UTC, either ending in <c>Z</c> or with an offset of <c>+00:00</c>.</remarks>
+    /// <summary>Parses a string as <c>System.DateTime</c> with <c>DateTimeKind.Utc</c>.</summary>
+    /// <remarks>Requires an <c>ISO 8601</c> string in <c>UTC</c> with offset <c>+00:00</c> or <c>Z</c>.</remarks>
     /// <example><code>let! dateTime = "prop" &amp;= Parse.dateTimeUtc</code></example>
     let dateTimeUtc =
         stringError (fun element ->
-            match element.TryGetDateTime() with
-            | true, dateTime when dateTime.Kind = DateTimeKind.Utc -> Ok dateTime
-            | true, dateTime when dateTime.Kind = DateTimeKind.Local ->
-                match element.TryGetDateTimeOffset() with
-                | true, offset when offset.Offset = TimeSpan.Zero -> Ok offset.UtcDateTime
-                | _ -> Error "Expected a DateTime 'UTC' string."
-            | _ -> Error "Expected a DateTime 'UTC' string."
+            match element.TryGetDateTime(), element.TryGetDateTimeOffset() with
+            | (true, dateTime), (true, offset) when dateTime.Kind <> DateTimeKind.Unspecified && offset.Offset = TimeSpan.Zero -> Ok offset.UtcDateTime
+            | (true, _), _ -> Error "Expected a DateTime 'Utc' string."
+            | _ -> Error "Expected a DateTime string."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTime</c> with a specific format.</summary>

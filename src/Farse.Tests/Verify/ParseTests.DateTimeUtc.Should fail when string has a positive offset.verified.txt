@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'DateTime.
-     | Expected a DateTime 'UTC' string.
+     | Expected a DateTime 'Utc' string.
      = "2025-05-25T12:00:00+02:00"

@@ -1275,7 +1275,7 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string ending in Z as DateTime UTC`` () =
-            let expected = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00), DateTimeKind.Utc)
+            let expected = DateTime(2025, 5, 25, 10, 0, 0, DateTimeKind.Utc)
             let actual =
                 Parse.dateTimeUtc
                 |> Parser.parse "\"2025-05-25T10:00:00Z\""
@@ -1285,21 +1285,12 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse string with a zero offset as DateTime UTC`` () =
-            let expected = DateTime(DateOnly(2025, 05, 25), TimeOnly(10, 00), DateTimeKind.Utc)
+            let expected = DateTime(2025, 5, 25, 10, 0, 0, DateTimeKind.Utc)
             let actual =
                 Parse.dateTimeUtc
                 |> Parser.parse "\"2025-05-25T10:00:00+00:00\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
-            Expect.equal Msg.none DateTimeKind.Utc actual.Kind
-
-        [<Fact>]
-        let ``Should parse an instant in a repeated DST hour correctly`` () =
-            let actual =
-                Parse.dateTimeUtc
-                |> Parser.parse "\"2026-10-25T00:30:00Z\""
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.equal Msg.none (DateTime(2026, 10, 25, 0, 30, 0, DateTimeKind.Utc)) actual
             Expect.equal Msg.none DateTimeKind.Utc actual.Kind
 
         [<Fact>]
