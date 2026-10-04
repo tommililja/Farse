@@ -126,7 +126,7 @@ module ParseError =
             $"at %s{JsonPath.asString error.Path}"
             $" | Tried parsing '%s{Type.getName error.Type}."
 
-            if !!String.isEmpty error.Details then
+            if !String.isEmpty error.Details then
                 $" | %s{error.Details}"
 
             error.Value

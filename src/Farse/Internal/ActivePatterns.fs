@@ -9,7 +9,7 @@ module internal ActivePatterns =
     let private pathRegex = Regex(@"(?:\\\.|[^.])+")
 
     let inline (|IsExpectedKind|_|) (e:JsonElement) = function
-        | ExpectedKind.Any -> !e.isUndefined
+        | ExpectedKind.Any -> not e.isUndefined
         | ExpectedKind.Array -> e.ValueKind = Kind.Array
         | ExpectedKind.Bool -> e.ValueKind = Kind.True || e.ValueKind = Kind.False
         | ExpectedKind.Null -> e.ValueKind = Kind.Null

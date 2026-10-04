@@ -23,7 +23,7 @@ module internal Builders =
 
         member inline _.Run(lines) =
             lines
-            |> List.filter !!String.isEmpty
+            |> List.filter !String.isEmpty
             |> String.concat "\n"
 
     type ResultBuilder() =

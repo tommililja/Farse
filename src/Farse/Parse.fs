@@ -794,7 +794,7 @@ module Parse =
                 element
                 |> ParseError.required (JsonPath.prop name) typeof<string>
                 |> Error.list
-            | true, disc when !disc.IsString ->
+            | true, disc when not disc.IsString ->
                 disc
                 |> ParseError.expected ExpectedKind.String (JsonPath.prop name) typeof<string>
                 |> Error.list

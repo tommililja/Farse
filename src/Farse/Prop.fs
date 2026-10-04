@@ -59,7 +59,7 @@ module Prop =
             match element.ValueKind with
             | Kind.Object ->
                 match element.TryGetProperty(name) with
-                | true, prop when !prop.isNull ->
+                | true, prop when not prop.isNull ->
                     match parse prop with
                     | Ok x -> Ok <| Some x
                     | Error errors ->

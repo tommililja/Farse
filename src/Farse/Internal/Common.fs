@@ -7,9 +7,7 @@ open System.Text.Json
 [<AutoOpen>]
 module internal Common =
 
-    let inline (!) x = not x
-
-    let inline (!!) x y = x y |> not
+    let inline (!) x y = x y |> not
 
     module JsonDocumentOptions =
 
