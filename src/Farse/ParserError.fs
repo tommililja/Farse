@@ -6,12 +6,19 @@ open System.Text.Json
 /// <summary>Represents an error when a <c>Parser</c> fails.</summary>
 [<NoComparison>]
 type ParseError = {
+    /// <summary>Path where the error occurred.</summary>
     Path: JsonPath
+    /// <summary>Element that was parsed, or the parent.</summary>
     Element: JsonElement
+    /// <summary>Index in the innermost array.</summary>
     Index: int option
+    /// <summary>Parsing or validation error details.</summary>
     Details: string
+    /// <summary>Populated when parsing succeeded, but validation failed.</summary>
     Value: string option
+    /// <summary>Type that was being parsed.</summary>
     Type: Type
+    /// <summary>Exception, if one occurred.</summary>
     Exn: exn option
 }
 

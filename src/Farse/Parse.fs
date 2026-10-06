@@ -13,8 +13,8 @@ open System.Text.RegularExpressions
 module Parse =
 
     // Currently only used for numbers.
-    let inline private expected<'r> kind =
-        $"Expected %s{Type.articleOf<'r>} %s{Type.getName typeof<'r>} %s{kind}."
+    let inline private expected<'a> kind =
+        $"Expected %s{Type.articleOf<'a>} %s{Type.getName typeof<'a>} %s{kind}."
 
     let inline private customError ([<InlineIfLambda>] fn) expectedKind : Parser<'r> =
         Parser (fun element ->
@@ -544,7 +544,7 @@ module Parse =
             | _ -> Error "Expected a MailAddress string."
         ) ExpectedKind.String
 
-    /// <summary>Parses a string (ISO 3166) as <c>System.Globalization.RegionInfo</c>.</summary>
+    /// <summary>Parses a string as <c>System.Globalization.RegionInfo</c>.</summary>
     /// <example><code>let! region = "prop" &amp;= Parse.regionInfo</code></example>
     let regionInfo =
         stringError (fun element ->
@@ -609,24 +609,24 @@ module Parse =
             |> Ok
         ) ExpectedKind.Array
 
-    /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.list</c>.</summary>
+    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.list</c>.</summary>
     /// <example><code>let! list = "prop" &amp;= Parse.list Parse.int</code></example>
     let list parser = arr List.ofSeq parser
 
-    /// <summary>Parses an array as <c>'a Microsoft.FSharp.Core.array</c>.</summary>
+    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Core.array</c>.</summary>
     /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
     /// <example><code>let! array = "prop" &amp;= Parse.array Parse.int</code></example>
     let array parser = arr id parser
 
-    /// <summary>Parses an array as <c>Microsoft.FSharp.Collections.Set&lt;'a&gt;</c>.</summary>
+    /// <summary>Parses an array as <c>Microsoft.FSharp.Collections.Set&lt;'r&gt;</c>.</summary>
     /// <example><code>let! set = "prop" &amp;= Parse.set Parse.int</code></example>
     let set parser = arr Set.ofSeq parser
 
-    /// <summary>Parses an array as <c>System.Collections.Generic.HashSet&lt;'a&gt;</c>.</summary>
+    /// <summary>Parses an array as <c>System.Collections.Generic.HashSet&lt;'r&gt;</c>.</summary>
     /// <example><code>let! hashSet = "prop" &amp;= Parse.hashSet Parse.int</code></example>
     let hashSet parser = arr HashSet parser
 
-    /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
     /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
     let seq parser = arr Seq.ofSeq parser
@@ -692,22 +692,22 @@ module Parse =
                     |> Error
         ) ExpectedKind.Object
 
-    /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'a&gt;</c>.</summary>
+    /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'r&gt;</c>.</summary>
     /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let! map = "prop" &amp;= Parse.map Parse.int</code></example>
     let map parser = keyValue Map.ofSeq parser
 
-    /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'a&gt;</c>.</summary>
+    /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'r&gt;</c>.</summary>
     /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let! dict = "prop" &amp;= Parse.dict Parse.int</code></example>
     let dict parser = keyValue dict parser
 
-    /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'r&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <remarks>Returns duplicate properties.</remarks>
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
     let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
 
-    /// <summary>Parses an object's properties as <c>(string * 'a) Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>(string * 'r) Microsoft.FSharp.Collections.seq</c>.</summary>
     /// <remarks>Returns duplicate properties.</remarks>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
     let tuples parser = keyValue Seq.ofSeq parser
@@ -893,13 +893,13 @@ module Parse =
 
     /// <summary>Parses an exact value and returns <c>FSharp.Core.Unit</c>.</summary>
     /// <example><code>do! "prop" &amp;= Parse.exact Parse.int 1</code></example>
-    let exact (Parser parse) (expected:'a) =
+    let exact (Parser parse) (expected:'r) =
         Parser (fun element ->
             match parse element with
             | Ok x when x = expected -> Ok ()
             | Ok x ->
                 element
-                |> ParseError.details $"Expected %A{expected}, but got %A{x}." typeof<'a>
+                |> ParseError.details $"Expected %A{expected}, but got %A{x}." typeof<'r>
                 |> Error.list
             | Error e -> Error e
         )

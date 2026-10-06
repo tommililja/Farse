@@ -14,23 +14,23 @@ module Extensions =
         member this.Choose() =
             Parse.choose this
 
-        /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.list</c>.</summary>
+        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.list</c>.</summary>
         /// <example><code>let! list = "prop" &amp;= Parse.int.List()</code></example>
         member this.List() =
             Parse.list this
 
-        /// <summary>Parses an array as <c>'a Microsoft.FSharp.Core.array</c>.</summary>
+        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Core.array</c>.</summary>
         /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
         /// <example><code>let! array = "prop" &amp;= Parse.int.Array()</code></example>
         member this.Array() =
             Parse.array this
 
-        /// <summary>Parses an array as <c>System.Collections.Generic.HashSet&lt;'a&gt;</c>.</summary>
+        /// <summary>Parses an array as <c>System.Collections.Generic.HashSet&lt;'r&gt;</c>.</summary>
         /// <example><code>let! hashSet = "prop" &amp;= Parse.int.HashSet()</code></example>
         member this.HashSet() =
             Parse.hashSet this
 
-        /// <summary>Parses an array as <c>'a Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
         /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
         /// <example><code>let! seq = "prop" &amp;= Parse.int.Seq()</code></example>
         member this.Seq() =
@@ -53,24 +53,26 @@ module Extensions =
 
         // Key/Value
 
-        /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'a&gt;</c>.</summary>
+        /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'r&gt;</c>.</summary>
         /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
         /// <example><code>let! map = "prop" &amp;= Parse.int.Map()</code></example>
         member this.Map() =
             Parse.map this
 
-        /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'a&gt;</c>.</summary>
+        /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'r&gt;</c>.</summary>
         /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
         /// <example><code>let! dict = "prop" &amp;= Parse.int.Dict()</code></example>
         member this.Dict() =
             Parse.dict this
 
-        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'a&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'r&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <remarks>Returns duplicate properties.</remarks>
         /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.int.KeyValuePairs()</code></example>
         member this.KeyValuePairs() =
             Parse.keyValuePairs this
 
-        /// <summary>Parses an object's properties as <c>(string * 'a) Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>(string * 'r) Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <remarks>Returns duplicate properties.</remarks>
         /// <example><code>let! tuples = "prop" &amp;= Parse.int.Tuples()</code></example>
         member this.Tuples() =
             Parse.tuples this
@@ -112,7 +114,7 @@ module Extensions =
         static member Exact(parser, value) =
             Parse.exact parser value
 
-        /// <summary>Parses an array as <c>Microsoft.FSharp.Collections.Set&lt;'a&gt;</c>.</summary>
+        /// <summary>Parses an array as <c>Microsoft.FSharp.Collections.Set&lt;'r&gt;</c>.</summary>
         /// <example><code>let! set = "prop" &amp;= Parse.int.Set()</code></example>
         [<Extension>]
         static member Set(parser) =

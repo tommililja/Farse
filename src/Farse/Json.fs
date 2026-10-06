@@ -126,27 +126,68 @@ module Json =
         }
 
     /// <summary>Parses a <c>string</c> into a <c>Json</c>.</summary>
+    /// <remarks>Uses the following <c>JsonDocumentOptions</c>.
+    /// <code>
+    ///     JsonDocumentOptions (
+    ///         AllowTrailingCommas = true,
+    ///         CommentHandling = JsonCommentHandling.Skip
+    ///     )
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Json.fromString json</code></example>
     let fromString ([<StringSyntax("Json")>] json:string) =
         parseDocument (fun () -> JsonDocument.Parse(json, JsonDocumentOptions.Default))
 
     /// <summary>Parses a UTF-8 encoded <c>Stream</c> asynchronously into a <c>Json</c>.</summary>
-    /// <remarks>The <c>Stream</c> is read to completion.</remarks>
+    /// <remarks>
+    ///     The <c>Stream</c> is read to completion.<br/><br/>
+    ///     Uses the following <c>JsonDocumentOptions</c>.
+    ///     <code>
+    ///         JsonDocumentOptions (
+    ///             AllowTrailingCommas = true,
+    ///             CommentHandling = JsonCommentHandling.Skip
+    ///         )
+    ///     </code>
+    /// </remarks>
     /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     let fromStreamAsync token stream =
         parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token))
 
     /// <summary>Parses a UTF-8 encoded <c>byte array</c> into a <c>Json</c>.</summary>
+    /// <remarks>Uses the following <c>JsonDocumentOptions</c>.
+    /// <code>
+    ///     JsonDocumentOptions (
+    ///         AllowTrailingCommas = true,
+    ///         CommentHandling = JsonCommentHandling.Skip
+    ///     )
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Json.fromBytes bytes</code></example>
     let fromBytes (bytes:byte array) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
     /// <summary>Parses a UTF-8 encoded <c>ReadOnlyMemory&lt;byte&gt;</c> into a <c>Json</c>.</summary>
+    /// <remarks>Uses the following <c>JsonDocumentOptions</c>.
+    /// <code>
+    ///     JsonDocumentOptions (
+    ///         AllowTrailingCommas = true,
+    ///         CommentHandling = JsonCommentHandling.Skip
+    ///     )
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Json.fromMemory bytes</code></example>
     let fromMemory (bytes:ReadOnlyMemory<byte>) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
     /// <summary>Parses a UTF-8 encoded <c>ReadOnlySequence&lt;byte&gt;</c> into a <c>Json</c>.</summary>
+    /// <remarks>Uses the following <c>JsonDocumentOptions</c>.
+    /// <code>
+    ///     JsonDocumentOptions (
+    ///         AllowTrailingCommas = true,
+    ///         CommentHandling = JsonCommentHandling.Skip
+    ///     )
+    /// </code>
+    /// </remarks>
     /// <example><code>let result = Json.fromSequence bytes</code></example>
     let fromSequence (bytes:ReadOnlySequence<byte>) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
