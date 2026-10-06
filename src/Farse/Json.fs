@@ -149,6 +149,7 @@ module Json =
     ///         )
     ///     </code>
     /// </remarks>
+    /// <exception cref="System.OperationCanceledException">Thrown when the token is cancelled.</exception>
     /// <example><code>let! result = Json.fromStreamAsync token stream</code></example>
     let fromStreamAsync token stream =
         parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token))
