@@ -99,22 +99,37 @@ module Parser =
     // Parsing
 
     let inline private parseDocument ([<InlineIfLambda>] fn) (Parser parse) =
-        try use document: JsonDocument = fn ()
-            parse document.RootElement
-            |> Result.mapError Errors
-        with
-            | :? JsonException
-            | :? ArgumentException as exn -> Error <| Json exn
+        result {
+            use! document:JsonDocument =
+                try Ok <| fn ()
+                with
+                    | :? JsonException
+                    | :? ArgumentException as exn -> Error <| Json exn
+
+            return!
+                parse document.RootElement
+                |> Result.mapError Errors
+        }
 
     let inline private parseDocumentAsync ([<InlineIfLambda>] fn) (Parser parse) =
         task {
-            try use! document: JsonDocument = fn ()
-                return
+            let! document =
+                task {
+                    try
+                        let! document = fn ()
+                        return Ok document
+                    with
+                        | :? JsonException
+                        | :? ArgumentException as exn -> return Error exn
+                }
+
+            return
+                match document with
+                | Ok (document:JsonDocument) ->
+                    use document = document
                     parse document.RootElement
                     |> Result.mapError Errors
-            with
-                | :? JsonException
-                | :? ArgumentException as exn -> return Error <| Json exn
+                | Error exn -> Error <| Json exn
         }
 
     /// <summary>Parses a <c>string</c> with a <c>Parser</c>.</summary>

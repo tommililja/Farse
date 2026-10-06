@@ -1,5 +1,7 @@
 namespace Farse
 
+open System
+
 [<AutoOpen>]
 module internal Builders =
 
@@ -122,6 +124,10 @@ module internal Builders =
         member inline _.Return(x) = Ok x
 
         member inline _.ReturnFrom(x) = x
+
+        member inline _.Using(resource:#IDisposable, [<InlineIfLambda>] fn) =
+            use resource = resource
+            fn resource
 
         member inline _.Delay([<InlineIfLambda>] fn) = fn ()
 
