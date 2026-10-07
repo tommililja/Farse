@@ -462,8 +462,8 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTimeOffset</c> with a specific format.</summary>
-    /// <remarks>Expects a string with an offset or <c>Z</c>.</remarks>
-    /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"</code></example>
+    /// <remarks>Expects a string with an offset or <c>Z</c>. Use <c>K</c> in the format to match either, or <c>zzz</c> to match only an offset.</remarks>
+    /// <example><code>let! dateTimeOffset = "prop" &amp;= Parse.dateTimeOffsetExact "yyyy-MM-ddTHH:mm:ssK"</code></example>
     let dateTimeOffsetExact ([<StringSyntax("DateTimeFormat")>] format:string) =
         match format with
         | Empty -> Parser.fail "Format was null or empty."
