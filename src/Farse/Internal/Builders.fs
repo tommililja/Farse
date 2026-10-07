@@ -25,7 +25,7 @@ module internal Builders =
 
         member inline _.Run(lines) =
             lines
-            |> List.filter !String.isEmpty
+            |> List.filter !String.IsNullOrWhiteSpace
             |> String.concat "\n"
 
     type ResultBuilder() =

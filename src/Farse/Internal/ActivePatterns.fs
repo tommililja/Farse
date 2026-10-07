@@ -1,5 +1,6 @@
 namespace Farse
 
+open System
 open System.Text.Json
 open System.Text.RegularExpressions
 
@@ -20,8 +21,8 @@ module internal ActivePatterns =
     let (|Prop|Path|Invalid|) (path:string) =
         match separator.Split(path) with
         | [| name |] -> Prop (name.Replace("\\.", "."))
-        | segments when Array.exists String.isEmpty segments -> Invalid
+        | segments when Array.exists String.IsNullOrEmpty segments -> Invalid
         | segments -> Path (segments |> Array.map _.Replace("\\.", "."))
 
     let inline (|Empty|_|) string =
-        String.isEmpty string
+        String.IsNullOrWhiteSpace(string)

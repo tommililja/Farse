@@ -61,9 +61,6 @@ module internal Common =
 
     module String =
 
-        let inline isEmpty string =
-            String.IsNullOrWhiteSpace(string)
-
         let inline indent n (string:string) =
             string.Split('\n')
             |> Array.map (fun line -> String.replicate n " " + line)
