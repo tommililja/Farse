@@ -1,7 +1,0 @@
-﻿Parser yielded 1 error[s].
-
-  Error[0]:
-    at $
-     | Tried parsing 'DateOnly.
-     | Expected a DateOnly 'yyyy-MM-dd' string.
-     = "2025-0513"
