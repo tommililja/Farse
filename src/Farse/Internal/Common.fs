@@ -111,7 +111,7 @@ module internal Common =
         let rec getName = function
             | x when x = typeof<unit> -> "unit"
             | x when x.IsArray -> $"%s{getName (x.GetElementType())} array"
-            | x when x.IsGenericType ->
+            | x when x.IsGenericType && x.Name.IndexOf('`') >= 0 ->
                 let name = x.Name.Substring(0, x.Name.IndexOf('`'))
                 let args =
                     x.GetGenericArguments()
