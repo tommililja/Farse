@@ -152,7 +152,6 @@ module Parser =
 
     /// <summary>Parses a UTF-8 encoded <c>Stream</c> asynchronously with a <c>Parser</c>.</summary>
     /// <remarks>The <c>Stream</c> is read to completion.<br/><br/>Uses the following <c>JsonDocumentOptions</c>.
-    /// <exception cref="System.OperationCanceledException">Thrown when the token is cancelled.</exception>
     /// <code>
     ///     JsonDocumentOptions (
     ///         AllowTrailingCommas = true,
@@ -160,6 +159,7 @@ module Parser =
     ///     )
     /// </code>
     /// </remarks>
+    /// <exception cref="System.OperationCanceledException">Thrown when the token is cancelled.</exception>
     /// <example><code>let! result = Parser.parseAsync stream token parser</code></example>
     let parseAsync stream token parser =
         parseDocumentAsync (fun () -> JsonDocument.ParseAsync(stream, JsonDocumentOptions.Default, token)) parser
