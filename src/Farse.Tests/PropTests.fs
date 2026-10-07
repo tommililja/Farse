@@ -489,6 +489,111 @@ module PropTests =
             |> Parser.parse """{ "prop": { "prop2": [] } }"""
             |> Expect.parserError
 
+module PathTests =
+
+    [<Fact>]
+    let ``Should parse a name containing an escaped dot`` () =
+        let expected = 1
+        let actual =
+            Prop.get "prop\.prop2" Parse.int
+            |> Parser.parse """{ "prop.prop2": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should traverse a path with an escaped dot in a middle segment`` () =
+        let expected = 1
+        let actual =
+            Prop.get "a.b\.c.d" Parse.int
+            |> Parser.parse """{ "a": { "b.c": { "d": 1 } } }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a name containing a backslash and an escaped dot`` () =
+        let expected = 1
+        let actual =
+            Prop.get @"prop\\.prop2" Parse.int
+            |> Parser.parse """{ "prop\\.prop2": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a name ending with a backslash`` () =
+        let expected = 1
+        let actual =
+            Prop.get @"prop\" Parse.int
+            |> Parser.parse """{ "prop\\": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse an empty name`` () =
+        let expected = 1
+        let actual =
+            Prop.get "" Parse.int
+            |> Parser.parse """{ "": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Fact>]
+    let ``Should parse a name that is an escaped dot`` () =
+        let expected = 1
+        let actual =
+            Prop.get "\." Parse.int
+            |> Parser.parse """{ ".": 1 }"""
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+        Expect.equal Msg.none expected actual
+
+    [<Theory>]
+    [<InlineData(".")>]
+    [<InlineData("..")>]
+    [<InlineData(".prop")>]
+    [<InlineData("prop.")>]
+    [<InlineData("prop..prop2")>]
+    [<InlineData("prop.prop2.")>]
+    let ``Should fail when path has an empty segment`` (path:string) =
+        let json = """{ "prop": { "prop2": 1 }, ".prop": 1, "prop.": 1, ".": 1 }"""
+        Prop.get path Parse.int
+        |> Parser.parse json
+        |> Expect.isError $"Expected %s{nameof Prop.get} to fail."
+        Prop.tryGet path Parse.int
+        |> Parser.parse json
+        |> Expect.isError $"Expected %s{nameof Prop.tryGet} to fail."
+        Prop.tryGet2 path Parse.int
+        |> Parser.parse json
+        |> Expect.isError $"Expected %s{nameof Prop.tryGet2} to fail."
+
+    [<Fact>]
+    let ``Should fail when path ends with a dot`` () =
+        Prop.get "prop." Parse.int
+        |> Parser.parse """{ "prop": 1 }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should fail when path has consecutive dots`` () =
+        Prop.get "prop..prop2" Parse.int
+        |> Parser.parse """{ "prop": { "prop2": 1 } }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should render a bracketed path for a name with an escaped dot`` () =
+        Prop.get "prop\.prop2" Parse.int
+        |> Parser.parse """{ "prop.prop2": "1" }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should render a bracketed path for a name with a quote and a dot`` () =
+        Prop.get "prop's\.prop2" Parse.int
+        |> Parser.parse """{ "prop's.prop2": "1" }"""
+        |> Expect.parserError
+
+    [<Fact>]
+    let ``Should render dotted and bracketed segments in the same path`` () =
+        Prop.get "a.b\.c.d" Parse.int
+        |> Parser.parse """{ "a": { "b.c": { "d": "1" } } }"""
+        |> Expect.parserError
+
 module JsonPathTests =
 
     [<Theory>]

@@ -6,7 +6,7 @@ open System.Text.RegularExpressions
 [<AutoOpen>]
 module internal ActivePatterns =
 
-    let private pathRegex = Regex(@"(?:\\\.|[^.])+")
+    let private separator = Regex(@"(?<!\\)\.")
 
     let inline (|IsExpectedKind|_|) (e:JsonElement) = function
         | ExpectedKind.Any -> not e.isUndefined
@@ -17,16 +17,11 @@ module internal ActivePatterns =
         | ExpectedKind.Object -> e.ValueKind = Kind.Object
         | ExpectedKind.String -> e.ValueKind = Kind.String
 
-    let (|Prop|Path|) (path:string) =
-        let segments =
-            pathRegex.Matches(path)
-            |> Seq.map _.Value.Replace("\\.", ".")
-            |> Seq.toArray
-
-        match segments with
-        | [||] -> Prop path
-        | [| name |] -> Prop name
-        | segments -> Path segments
+    let (|Prop|Path|Invalid|) (path:string) =
+        match separator.Split(path) with
+        | [| name |] -> Prop (name.Replace("\\.", "."))
+        | segments when Array.exists String.isEmpty segments -> Invalid
+        | segments -> Path (segments |> Array.map _.Replace("\\.", "."))
 
     let inline (|Empty|_|) string =
         String.isEmpty string
