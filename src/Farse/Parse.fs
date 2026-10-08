@@ -190,7 +190,7 @@ module Parse =
                     else Error $"Expected the string to match '%s{regex}'."
                 ) ExpectedKind.String
         with
-            | :? ArgumentException -> Parser.fail $"Invalid regex '%s{regex}'."
+            | :? ArgumentException -> Parser.fail $"Regex '%s{regex}' is invalid."
             | :? NotSupportedException -> Parser.fail $"Regex '%s{regex}' not supported with RegexOptions.NonBacktracking."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>

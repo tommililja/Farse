@@ -168,7 +168,7 @@ module Prop =
         match path with
         | Prop name -> parse name parser
         | Path path -> traverse path parser
-        | Invalid -> Parser.fail $"Invalid path: '%s{path}'"
+        | Invalid -> Parser.fail $"Path '%s{path}' is invalid."
 
     /// <summary>Parses an optional property.</summary>
     /// <remarks>
@@ -181,7 +181,7 @@ module Prop =
         match path with
         | Prop name -> tryParse name parser
         | Path path -> tryTraverse path parser
-        | Invalid -> Parser.fail $"Invalid path: '%s{path}'"
+        | Invalid -> Parser.fail $"Path '%s{path}' is invalid."
 
     /// <summary>Parses an optional property, distinguishing between a missing property and a null value.</summary>
     /// <remarks>
@@ -194,4 +194,4 @@ module Prop =
         match path with
         | Prop name -> tryParse2 name parser
         | Path path -> tryTraverse2 path parser
-        | Invalid -> Parser.fail $"Invalid path: '%s{path}'"
+        | Invalid -> Parser.fail $"Path '%s{path}' is invalid."
