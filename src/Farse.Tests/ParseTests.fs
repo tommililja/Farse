@@ -1091,6 +1091,12 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Parse.timeOnlyExact "Q"
+            |> Parser.parse "\"172845\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when format is null`` () =
             Parse.timeOnlyExact null
             |> Parser.parse "\"172845\""
@@ -1203,6 +1209,12 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
             Parse.dateOnlyExact "yyyyMMdd"
+            |> Parser.parse "\"2025-05-13\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Parse.dateOnlyExact "Q"
             |> Parser.parse "\"2025-05-13\""
             |> Expect.parserError
 
@@ -1371,6 +1383,12 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Parse.dateTimeExact "Q"
+            |> Parser.parse "\"2025-05-13T17:28:45\""
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when format is null`` () =
             Parse.dateTimeExact null
             |> Parser.parse "\"2025-05-13T17:28:45\""
@@ -1527,6 +1545,12 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
             Parse.dateTimeOffsetExact "yyyy-MM-dd HH:mm:ss zzz"
+            |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Parse.dateTimeOffsetExact "Q"
             |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
             |> Expect.parserError
 

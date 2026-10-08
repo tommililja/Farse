@@ -355,9 +355,10 @@ module Parse =
         | _ ->
             stringError (fun element ->
                 let string = element.GetString()
-                match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | true, timeOnly -> Ok timeOnly
-                | _ -> Error $"Expected a TimeOnly '%s{format}' string."
+                try match TimeOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                    | true, timeOnly -> Ok timeOnly
+                    | _ -> Error $"Expected a TimeOnly '%s{format}' string."
+                with :? FormatException -> Error $"Format '%s{format}' is invalid."
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.TimeSpan</c>.</summary>
@@ -402,9 +403,10 @@ module Parse =
         | _ ->
             stringError (fun element ->
                 let string = element.GetString()
-                match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | true, dateOnly -> Ok dateOnly
-                | _ -> Error $"Expected a DateOnly '%s{format}' string."
+                try match DateOnly.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                    | true, dateOnly -> Ok dateOnly
+                    | _ -> Error $"Expected a DateOnly '%s{format}' string."
+                with :? FormatException -> Error $"Format '%s{format}' is invalid."
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTime</c> with <c>DateTimeKind.Unspecified</c>.</summary>
@@ -436,9 +438,10 @@ module Parse =
         | _ ->
             stringError (fun element ->
                 let string = element.GetString()
-                match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | true, dateTime when dateTime.Kind = DateTimeKind.Unspecified -> Ok dateTime
-                | _ -> Error $"Expected a local DateTime '%s{format}' string."
+                try match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                    | true, dateTime when dateTime.Kind = DateTimeKind.Unspecified -> Ok dateTime
+                    | _ -> Error $"Expected a local DateTime '%s{format}' string."
+                with :? FormatException -> Error $"Format '%s{format}' is invalid."
             ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.DateTimeOffset</c>.</summary>
@@ -470,10 +473,11 @@ module Parse =
         | _ ->
             stringError (fun element ->
                 let string = element.GetString()
-                match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None),
-                      DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | (true, dateTime), (true, offset) when dateTime.Kind <> DateTimeKind.Unspecified -> Ok offset
-                | _ -> Error $"Expected a DateTimeOffset '%s{format}' string."
+                try match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                          DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                    | (true, dateTime), (true, offset) when dateTime.Kind <> DateTimeKind.Unspecified -> Ok offset
+                    | _ -> Error $"Expected a DateTimeOffset '%s{format}' string."
+                with :? FormatException -> Error $"Format '%s{format}' is invalid."
             ) ExpectedKind.String
 
     /// <summary>Parses a number as <c>System.DateTimeOffset</c> from a Unix timestamp in seconds.</summary>
