@@ -3,4 +3,4 @@
   Error[0]:
     at $
      | Tried parsing 'int.
-     | Invalid path: 'prop.'
+     | Path 'prop.' is invalid.

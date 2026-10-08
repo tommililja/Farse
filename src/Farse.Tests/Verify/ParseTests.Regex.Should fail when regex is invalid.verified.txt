@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'string.
-     | Invalid regex '^[0-9+$'.
+     | Regex '^[0-9+$' is invalid.
      = "abc"
