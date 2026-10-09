@@ -18,10 +18,10 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Expecto" Version="11.1.0" />
+        <PackageReference Include="Expecto" Version="11.1.1" />
         <PackageReference Include="NodaTime" Version="3.3.5" />
-        <PackageReference Include="Verify.XunitV3" Version="33.3.1" />
-        <PackageReference Include="xunit.v3" Version="4.0.1" />
+        <PackageReference Include="Verify.XunitV3" Version="33.3.2" />
+        <PackageReference Include="xunit.v3" Version="4.0.2" />
         <PackageReference Update="FSharp.Core" Version="10.1.401" />
     </ItemGroup>
     <ItemGroup>
