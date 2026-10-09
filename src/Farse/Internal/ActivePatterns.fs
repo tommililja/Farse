@@ -19,10 +19,12 @@ module internal ActivePatterns =
         | ExpectedKind.String -> e.ValueKind = Kind.String
 
     let (|Prop|Path|Invalid|) (path:string) =
-        match separator.Split(path) with
-        | [| name |] -> Prop (name.Replace("\\.", "."))
-        | segments when Array.exists String.IsNullOrEmpty segments -> Invalid
-        | segments -> Path (segments |> Array.map _.Replace("\\.", "."))
+        if path = null then Invalid
+        else
+            match separator.Split(path) with
+            | [| name |] -> Prop (name.Replace("\\.", "."))
+            | segments when Array.exists String.IsNullOrEmpty segments -> Invalid
+            | segments -> Path (segments |> Array.map _.Replace("\\.", "."))
 
     let inline (|Empty|_|) string =
         String.IsNullOrWhiteSpace(string)

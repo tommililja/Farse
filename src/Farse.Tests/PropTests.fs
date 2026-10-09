@@ -59,6 +59,12 @@ module PropTests =
             |> Parser.parse "null"
             |> Expect.parserError
 
+        [<Fact>]
+        let ``Should fail when path is null`` () =
+            Prop.tryGet null Parse.int
+            |> Parser.parse """{ "": 1 }"""
+            |> Expect.parserError
+
     module TryGetTraverse =
 
         [<Fact>]
@@ -225,6 +231,12 @@ module PropTests =
             |> Parser.parse "null"
             |> Expect.parserError
 
+        [<Fact>]
+        let ``Should fail when path is null`` () =
+            Prop.get null Parse.int
+            |> Parser.parse """{ "": 1 }"""
+            |> Expect.parserError
+
     module GetTraverse =
 
         [<Fact>]
@@ -377,6 +389,12 @@ module PropTests =
         let ``Should fail when element is null`` () =
             Prop.tryGet2 "prop" Parse.int
             |> Parser.parse "null"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when path is null`` () =
+            Prop.tryGet2 null Parse.int
+            |> Parser.parse """{ "": 1 }"""
             |> Expect.parserError
 
     module TryGet2Traverse =

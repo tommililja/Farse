@@ -61,6 +61,11 @@ module internal Common =
 
     module String =
 
+        let inline nullable string =
+            match string with
+            | null -> "null"
+            | string -> string
+
         let inline indent n (string:string) =
             string.Split('\n')
             |> Array.map (fun line -> String.replicate n " " + line)
