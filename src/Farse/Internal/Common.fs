@@ -19,7 +19,7 @@ module internal Common =
 
     module JsonSerializerOptions =
 
-        let Default =
+        let indented =
             JsonSerializerOptions (
                 WriteIndented = true,
                 IndentSize = 4,
@@ -27,7 +27,7 @@ module internal Common =
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )
 
-        let Raw =
+        let raw =
             JsonSerializerOptions (
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )

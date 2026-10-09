@@ -5,7 +5,7 @@ open System.Buffers
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
-open System.Text
+open System.Text.Encodings.Web
 open System.Text.Json
 open System.Text.Json.Nodes
 
@@ -69,6 +69,13 @@ type JsonFormat =
     | Custom of JsonSerializerOptions
     /// <summary>Compact, without whitespace.</summary>
     | Raw
+
+module internal JsonFormat =
+
+    let getOptions = function
+        | Indented -> JsonSerializerOptions.indented
+        | Custom options -> options
+        | Raw -> JsonSerializerOptions.raw
 
 module Json =
 
@@ -229,11 +236,13 @@ module Json =
     /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
-        match format, asJsonNode json with
-        | _, null -> "null"
-        | Indented, node -> node.ToJsonString(JsonSerializerOptions.Default)
-        | Custom options, node -> node.ToJsonString(options)
-        | Raw, node -> node.ToJsonString(JsonSerializerOptions.Raw)
+        JsonSerializer.Serialize(asJsonNode json, JsonFormat.getOptions format)
+
+    /// <summary>Converts a <c>Json</c> to a UTF-8 encoded <c>byte array</c>.</summary>
+    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
+    /// <example><code>let bytes = Json.asBytes Indented json</code></example>
+    let asBytes format json =
+        JsonSerializer.SerializeToUtf8Bytes(asJsonNode json, JsonFormat.getOptions format)
 
     /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
     /// <remarks>Includes duplicate properties.</remarks>
@@ -266,13 +275,6 @@ module Json =
             | JNil -> writer.WriteNullValue()
 
         write json
-
-    /// <summary>Converts a <c>Json</c> to a UTF-8 encoded <c>byte array</c>.</summary>
-    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
-    /// <example><code>let bytes = Json.asBytes Indented json</code></example>
-    let asBytes format json =
-        asString format json
-        |> Encoding.UTF8.GetBytes
 
     /// <summary>Determines whether two <c>Json</c> values are equal.</summary>
     /// <remarks>
@@ -346,13 +348,12 @@ module Json =
                     yKeys
                     |> Set.intersect xKeys
                     |> Set.toList
-                    |> List.sort
                     |> List.collect (fun key -> diff (pathKey path key) xMap[key] yMap[key])
 
                 yMissing @ xMissing @ differing
             | JArr x, JArr y when x.Length = y.Length ->
-                List.zip x y
-                |> List.mapi (fun i (x, y) -> diff $"%s{path}[%d{i}]" x y)
+                y
+                |> List.mapi2 (fun i -> diff $"%s{path}[%d{i}]") x
                 |> List.concat
             | JNil, JNil -> []
             | x, y ->
