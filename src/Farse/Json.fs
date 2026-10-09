@@ -280,6 +280,7 @@ module Json =
     /// <remarks>
     ///     Properties are compared regardless of order.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Numbers are compared by value, so 1, 1.0 and 1e0 are equal.
     /// </remarks>
     /// <example><code>let equal = Json.equal x y</code></example>
     let equal x y = JsonElement.DeepEquals(asJsonElement x, asJsonElement y)
@@ -288,6 +289,7 @@ module Json =
     /// <remarks>
     ///     Properties are compared regardless of order.
     ///     The last occurrence is chosen when duplicate properties exist.
+    ///     Numbers are compared by value, so 1, 1.0 and 1e0 are equal.
     /// </remarks>
     /// <example>
     /// <code>
