@@ -5,7 +5,7 @@ open System.Text
 open System.Text.Json
 
 [<Struct>]
-type JsonPath = JsonPath of string
+type JsonPath = internal JsonPath of string
 
 module JsonPath =
 
