@@ -67,6 +67,7 @@ module Prop =
                         |> List.map (ParseError.withProp name)
                         |> Error
                 | _ -> Ok None
+            | Kind.Null -> Ok None
             | _ ->
                 element
                 |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
@@ -87,6 +88,7 @@ module Prop =
                         |> List.map (ParseError.withProp name)
                         |> Error
                 | _ -> Ok None
+            | Kind.Null -> Ok None
             | _ ->
                 element
                 |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
