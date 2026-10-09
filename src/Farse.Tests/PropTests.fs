@@ -509,59 +509,32 @@ module PropTests =
 
 module PathTests =
 
-    [<Fact>]
-    let ``Should parse a name containing an escaped dot`` () =
-        let expected = 1
-        let actual =
-            Prop.get "prop\.prop2" Parse.int
-            |> Parser.parse """{ "prop.prop2": 1 }"""
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none expected actual
+    [<Theory>]
+    [<InlineData(@"prop\.prop2", """{ "prop.prop2": 1 }""")>]
+    [<InlineData(@"a.b\.c.d", """{ "a": { "b.c": { "d": 1 } } }""")>]
+    [<InlineData(@"prop\\.prop2", """{ "prop\\.prop2": 1 }""")>]
+    [<InlineData(@"prop\", """{ "prop\\": 1 }""")>]
+    [<InlineData(@"", """{ "": 1 }""")>]
+    [<InlineData(@"\.", """{ ".": 1 }""")>]
+    let ``Should parse an escaped or unusual path`` (path:string, json:string) =
+        let get =
+            Prop.get path Parse.int
+            |> Parser.parse json
+            |> Expect.wantOk $"Expected %s{nameof Prop.get} to succeed."
 
-    [<Fact>]
-    let ``Should traverse a path with an escaped dot in a middle segment`` () =
-        let expected = 1
-        let actual =
-            Prop.get "a.b\.c.d" Parse.int
-            |> Parser.parse """{ "a": { "b.c": { "d": 1 } } }"""
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none expected actual
+        let tryGet =
+            Prop.tryGet path Parse.int
+            |> Parser.parse json
+            |> Expect.wantOk $"Expected %s{nameof Prop.tryGet} to succeed."
 
-    [<Fact>]
-    let ``Should parse a name containing a backslash and an escaped dot`` () =
-        let expected = 1
-        let actual =
-            Prop.get @"prop\\.prop2" Parse.int
-            |> Parser.parse """{ "prop\\.prop2": 1 }"""
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none expected actual
+        let tryGet2 =
+            Prop.tryGet2 path Parse.int
+            |> Parser.parse json
+            |> Expect.wantOk $"Expected %s{nameof Prop.tryGet2} to succeed."
 
-    [<Fact>]
-    let ``Should parse a name ending with a backslash`` () =
-        let expected = 1
-        let actual =
-            Prop.get @"prop\" Parse.int
-            |> Parser.parse """{ "prop\\": 1 }"""
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none expected actual
-
-    [<Fact>]
-    let ``Should parse an empty name`` () =
-        let expected = 1
-        let actual =
-            Prop.get "" Parse.int
-            |> Parser.parse """{ "": 1 }"""
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none expected actual
-
-    [<Fact>]
-    let ``Should parse a name that is an escaped dot`` () =
-        let expected = 1
-        let actual =
-            Prop.get "\." Parse.int
-            |> Parser.parse """{ ".": 1 }"""
-            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-        Expect.equal Msg.none expected actual
+        Expect.equal Msg.none 1 get
+        Expect.equal Msg.none (Some 1) tryGet
+        Expect.equal Msg.none (Some (Some 1)) tryGet2
 
     [<Theory>]
     [<InlineData(".")>]
