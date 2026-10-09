@@ -42,7 +42,7 @@ module internal Common =
         member inline this.isNullOrUndefined =
             this.ValueKind = Kind.Null || this.ValueKind = Kind.Undefined
 
-        member inline this.IsString =
+        member inline this.isString =
             this.ValueKind = Kind.String
 
     module JsonElement =
