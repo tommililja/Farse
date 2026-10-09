@@ -5,7 +5,7 @@ open System.Text.Json
 
 /// <summary>Represents an error when a <c>Parser</c> fails.</summary>
 [<NoComparison>]
-type ParseError = internal {
+type ParseError = {
     /// <summary>Path where the error occurred.</summary>
     Path: JsonPath
     /// <summary>Element that was parsed, or the parent.</summary>
@@ -144,7 +144,6 @@ module ParseError =
 /// <summary>Represents the result of a failed <c>Parser</c>.</summary>
 [<NoComparison>]
 type ParserError =
-    internal
     /// <summary>The JSON document could not be parsed.</summary>
     | Json of exn
     /// <summary>A list of <c>ParseError</c> that occurred.</summary>
