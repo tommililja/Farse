@@ -180,6 +180,31 @@ module JsonTests =
         Json.equal x y
         |> Expect.isTrue "Expected values to be equal."
 
+    [<Theory>]
+    [<InlineData("1", "1.0")>]
+    [<InlineData("100", "1e2")>]
+    [<InlineData("0.1", "1e-1")>]
+    [<InlineData("-1.50", "-15E-1")>]
+    [<InlineData("-0", "0")>]
+    [<InlineData("1e400", "10e399")>]
+    [<InlineData("""{"a":1,"b":[2.0]}""", """{"b":[2],"a":1.00}""")>]
+    let ``Should be equal when numbers have the same value`` (a:string, b:string) =
+        let a = Json.fromString a |> Expect.wantOk "Expected valid JSON."
+        let b = Json.fromString b |> Expect.wantOk "Expected valid JSON."
+        Expect.isTrue "Expected values to be equal." (Json.equal a b)
+        Expect.isNone "Expected no diff." (Json.diff a b)
+
+    [<Theory>]
+    [<InlineData("1", "-1")>]
+    [<InlineData("10", "1")>]
+    [<InlineData("0.1", "0.01")>]
+    [<InlineData("12345678901234567891", "12345678901234567890")>]
+    let ``Should not be equal when numbers have different values`` (a:string, b:string) =
+        let a = Json.fromString a |> Expect.wantOk "Expected valid JSON."
+        let b = Json.fromString b |> Expect.wantOk "Expected valid JSON."
+        Expect.isFalse "Expected values to not be equal." (Json.equal a b)
+        Expect.isSome "Expected a diff." (Json.diff a b)
+
     [<Fact>]
     let ``Should escape strings in diff message`` () =
         let x = JObj [ "a", JStr "quote \" and\nnewline" ]

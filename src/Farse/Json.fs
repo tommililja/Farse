@@ -276,33 +276,15 @@ module Json =
 
     /// <summary>Determines whether two <c>Json</c> values are equal.</summary>
     /// <remarks>
-    ///     Properties are compared regardless of order. Numbers are compared by their text, so 1 and 1.0 are different.
+    ///     Properties are compared regardless of order.
     ///     The last occurrence is chosen when duplicate properties exist.
     /// </remarks>
     /// <example><code>let equal = Json.equal x y</code></example>
-    let equal x y =
-        let rec normalize json =
-            match json with
-            | JObj list ->
-                list
-                |> List.rev
-                |> List.distinctBy fst
-                |> List.map (fun (k, v) -> k, normalize v)
-                |> List.sortBy fst
-                |> JObj
-            | JArr list ->
-                list
-                |> List.map normalize
-                |> JArr
-            | JStr null -> JNil
-            | other -> other
-        let x = normalize x
-        let y = normalize y
-        x = y
+    let equal x y = JsonElement.DeepEquals(asJsonElement x, asJsonElement y)
 
     /// <summary>Compares two <c>Json</c> values and returns a message when they differ.</summary>
     /// <remarks>
-    ///     Properties are compared regardless of order. Numbers are compared by their text, so 1 and 1.0 are different.
+    ///     Properties are compared regardless of order.
     ///     The last occurrence is chosen when duplicate properties exist.
     /// </remarks>
     /// <example>
@@ -341,7 +323,7 @@ module Json =
             | JStr null, y -> diff path JNil y
             | x, JStr null -> diff path x JNil
             | JStr x, JStr y when x = y -> []
-            | JNum x, JNum y when x = y -> []
+            | JNum x, JNum y when equal (JNum x) (JNum y) -> []
             | JBit x, JBit y when x = y -> []
             | JArr x, JArr y when x = y -> []
             | JObj x, JObj y ->
