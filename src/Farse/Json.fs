@@ -5,7 +5,6 @@ open System.Buffers
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
-open System.Text.Encodings.Web
 open System.Text.Json
 open System.Text.Json.Nodes
 

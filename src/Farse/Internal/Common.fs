@@ -1,6 +1,5 @@
 namespace Farse
 
-open System
 open System.Text.Encodings.Web
 open System.Text.Json
 
