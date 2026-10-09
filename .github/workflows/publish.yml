@@ -32,13 +32,13 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c Release --no-restore
+        run: dotnet build -c Release --no-restore -p:Version=${{ inputs.version }}
 
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal
 
       - name: Pack
-        run: dotnet pack Farse/Farse.fsproj -c Release --no-build -o ./nupkg -p:PackageVersion=${{ inputs.version }}
+        run: dotnet pack Farse/Farse.fsproj -c Release --no-build -o ./nupkg -p:Version=${{ inputs.version }}
 
       - name: Publish
         run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
