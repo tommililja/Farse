@@ -3,5 +3,5 @@
   Error[0]:
     at $
      | Tried parsing 'string.
-     | Regex '^(?=a)a$' not supported with RegexOptions.NonBacktracking.
+     | Regex '^(?=a)a$' is not supported with RegexOptions.NonBacktracking.
      = "abc"

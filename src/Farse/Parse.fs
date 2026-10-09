@@ -191,7 +191,7 @@ module Parse =
                 ) ExpectedKind.String
         with
             | :? ArgumentException -> Parser.fail $"Regex '%s{regex}' is invalid."
-            | :? NotSupportedException -> Parser.fail $"Regex '%s{regex}' not supported with RegexOptions.NonBacktracking."
+            | :? NotSupportedException -> Parser.fail $"Regex '%s{regex}' is not supported with RegexOptions.NonBacktracking."
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
     /// <example><code>let! int = "prop" &amp;= Parse.number Parse.int</code></example>
