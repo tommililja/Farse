@@ -305,6 +305,78 @@ Parser yielded 1 error[s].
      = "202612-25T10:30:00Z"
 ```
 
+## Recursive parsers
+
+The computation expression is lazy, so parsers can reference themselves.
+
+```fsharp
+type Tree =
+    | Leaf of int
+    | Branch of Tree * Tree
+
+let rec tree =
+    Parse.oneOf "type" [
+        "leaf",
+            parser {
+                let! value = Prop.get "value" Parse.int
+                return Leaf value
+            }
+        "branch",
+            parser {
+                let! left = Prop.get "left" tree
+                let! right = Prop.get "right" tree
+                return Branch (left, right)
+            }
+    ]
+```
+
+Mutually recursive parsers:
+
+```fsharp
+type Value = {
+    Id: string
+    Fields: Field array
+}
+
+and Field = {
+    Name: string
+    Values: Value array
+}
+
+let rec valueParser =
+    parser {
+        let! id = Prop.get "id" Parse.string
+        and! fields = Prop.get "fields" (Parse.array fieldParser)
+        return { Id = id; Fields = fields }
+    }
+
+and fieldParser =
+    parser {
+        let! name = Prop.get "name" Parse.string
+        and! values = Prop.get "values" (Parse.array valueParser)
+        return { Name = name; Values = values }
+    }
+```
+
+Suppress the warnings or use a function:
+
+```fsharp
+let rec tree () = ...
+let rec valueParser () = ...
+```
+
+Recursive references must be inside a computation expression:
+
+```fsharp
+type Nested = Nested of Nested list
+
+let rec nested =
+    parser {
+        let! items = Parse.list nested
+        return Nested items
+    }
+```
+
 ## One-of
 
 For objects with a string discriminator:
@@ -372,49 +444,6 @@ Parser yielded 1 error[s].
      | Tried parsing 'Tag.
      | Tag 'user' not found.
      = "user"
-```
-
-## Recursive parsers
-
-`parser { }` is lazy, so parsers can reference themselves with `let rec`.
-
-```fsharp
-type Tree =
-    | Leaf of int
-    | Branch of Tree * Tree
-
-let rec tree =
-    Parse.oneOf "type" [
-        "leaf",
-            parser {
-                let! value = Prop.get "value" Parse.int
-                return Leaf value
-            }
-        "branch",
-            parser {
-                let! left = Prop.get "left" tree
-                let! right = Prop.get "right" tree
-                return Branch (left, right)
-            }
-    ]
-```
-
-Suppress the warning with `#nowarn 21` or use a function:
-
-```fsharp
-let rec tree () = ...
-```
-
-Recursive references must be inside a `parser { }`:
-
-```fsharp
-type Nested = Nested of Nested list
-
-let rec nested =
-    parser {
-        let! items = Parse.list nested
-        return Nested items
-    }
 ```
 
 ## Creating JSON
