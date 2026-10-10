@@ -374,6 +374,49 @@ Parser yielded 1 error[s].
      = "user"
 ```
 
+## Recursive parsers
+
+`parser { }` is lazy, so parsers can reference themselves with `let rec`.
+
+```fsharp
+type Tree =
+    | Leaf of int
+    | Branch of Tree * Tree
+
+let rec tree =
+    Parse.oneOf "type" [
+        "leaf",
+            parser {
+                let! value = Prop.get "value" Parse.int
+                return Leaf value
+            }
+        "branch",
+            parser {
+                let! left = Prop.get "left" tree
+                let! right = Prop.get "right" tree
+                return Branch (left, right)
+            }
+    ]
+```
+
+Suppress the warning with `#nowarn 21` or use a function:
+
+```fsharp
+let rec tree () = ...
+```
+
+Recursive references must be inside a `parser { }`:
+
+```fsharp
+type Nested = Nested of Nested list
+
+let rec nested =
+    parser {
+        let! items = Parse.list nested
+        return Nested items
+    }
+```
+
 ## Creating JSON
 
 We can create JSON structures using the [`Json`](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.

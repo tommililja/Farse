@@ -10,6 +10,7 @@
         <Compile Include="JsonTests.fs" />
         <Compile Include="ParseTests.fs" />
         <Compile Include="ParserTests.fs" />
+        <Compile Include="ParserBuilderTests.fs" />
         <Compile Include="PropTests.fs" />
         <Compile Include="Example.fs" />
     </ItemGroup>
