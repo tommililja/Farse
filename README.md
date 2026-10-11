@@ -307,7 +307,7 @@ Parser yielded 1 error[s].
 
 ## Recursive parsers
 
-The `parser` builder is lazy, so parsers can reference themselves:
+The `parser` builder is lazy, so a parser can reference itself:
 
 ```fsharp
 type Tree =
@@ -330,7 +330,7 @@ let rec tree =
     ]
 ```
 
-Mutually recursive:
+Parsers can also reference each other:
 
 ```fsharp
 type Value = {
@@ -362,7 +362,6 @@ Functions avoid the compiler warnings but impact performance:
 
 ```fsharp
 let rec tree () = ...
-let rec value () = ...
 ```
 
 > Note: Recursive references must be used inside a `parser { }` block.
