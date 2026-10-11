@@ -35,11 +35,12 @@ module ParserTests =
 
     [<Fact>]
     let ``Should create Parser from Result`` () =
-        let expected = Ok ()
+        let expected = ()
         let actual =
-            expected
+            Ok expected
             |> Parser.fromResult
             |> Parser.parse "1"
+            |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
         Expect.equal Msg.none expected actual
 
     [<Fact>]

@@ -4,7 +4,7 @@ open System
 open System.Text.Json
 
 /// <summary>Represents an error when a <c>Parser</c> fails.</summary>
-[<NoComparison>]
+[<NoComparison; NoEquality>]
 type ParseError = {
     /// <summary>Path where the error occurred.</summary>
     Path: JsonPath
@@ -142,7 +142,7 @@ module ParseError =
         }
 
 /// <summary>Represents the result of a failed <c>Parser</c>.</summary>
-[<NoComparison>]
+[<NoComparison; NoEquality>]
 type ParserError =
     /// <summary>The JSON document could not be parsed.</summary>
     | Json of exn
