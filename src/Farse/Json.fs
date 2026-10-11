@@ -5,6 +5,7 @@ open System.Buffers
 open System.Diagnostics.CodeAnalysis
 open System.Globalization
 open System.Numerics
+open System.Text
 open System.Text.Json
 open System.Text.Json.Nodes
 
@@ -64,17 +65,17 @@ type Json =
 type JsonFormat =
     /// <summary>Indented with four spaces.</summary>
     | Indented
-    /// <summary>Formatted with the given <c>JsonSerializerOptions</c>.</summary>
-    | Custom of JsonSerializerOptions
+    /// <summary>Formatted with the given <c>JsonWriterOptions</c>.</summary>
+    | Custom of JsonWriterOptions
     /// <summary>Compact, without whitespace.</summary>
     | Raw
 
 module internal JsonFormat =
 
     let getOptions = function
-        | Indented -> JsonSerializerOptions.indented
+        | Indented -> JsonWriterOptions.indented
         | Custom options -> options
-        | Raw -> JsonSerializerOptions.raw
+        | Raw -> JsonWriterOptions.raw
 
 module Json =
 
@@ -199,6 +200,44 @@ module Json =
     let fromSequence (bytes:ReadOnlySequence<byte>) =
         parseDocument (fun () -> JsonDocument.Parse(bytes, JsonDocumentOptions.Default))
 
+    /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
+    /// <example>
+    /// <code>
+    ///    task {
+    ///        use writer = new Utf8JsonWriter(ctx.Response.BodyWriter)
+    ///        Json.writeTo writer json
+    ///        do! writer.FlushAsync()
+    ///    }
+    /// </code>
+    /// </example>
+    let writeTo (writer:Utf8JsonWriter) json =
+        let options = writer.Options
+        let writeNumber inArray (number:Number) =
+            let text = number.ToString()
+            if inArray && options.Indented then
+                let indent = String(options.IndentCharacter, options.IndentSize * writer.CurrentDepth)
+                writer.WriteRawValue(options.NewLine + indent + text, skipInputValidation = true)
+            else
+                writer.WriteRawValue(text, skipInputValidation = true)
+
+        let rec write inArray = function
+            | JStr str -> writer.WriteStringValue(str)
+            | JNum str -> writeNumber inArray str
+            | JBit bit -> writer.WriteBooleanValue(bit)
+            | JObj obj ->
+                writer.WriteStartObject()
+                for k, v in obj do
+                    writer.WritePropertyName(k)
+                    write false v
+                writer.WriteEndObject()
+            | JArr arr ->
+                writer.WriteStartArray()
+                for v in arr do write true v
+                writer.WriteEndArray()
+            | JNil -> writer.WriteNullValue()
+
+        write false json
+
     /// <summary>Converts a <c>Json</c> to a <c>JsonNode</c>.</summary>
     /// <remarks>
     ///     Returns <c>null</c> for <c>JNil</c>.<br/>
@@ -208,7 +247,7 @@ module Json =
     let rec asJsonNode json : JsonNode | null =
         match json with
         | JStr str -> JsonValue.Create(str)
-        | JNum str -> JsonNode.Parse(str.ToString())
+        | JNum num -> JsonNode.Parse(num.ToString())
         | JBit bit -> JsonValue.Create(bit)
         | JObj obj ->
             let object = JsonObject()
@@ -231,49 +270,25 @@ module Json =
     /// <example><code>use document = Json.asJsonDocument json</code></example>
     let asJsonDocument = asJsonNode >> JsonSerializer.SerializeToDocument
 
+    let private writeToBuffer format json =
+        let buffer = ArrayBufferWriter<byte>()
+        let options = JsonFormat.getOptions format
+        use writer = new Utf8JsonWriter(buffer, options)
+        writeTo writer json
+        writer.Flush()
+        buffer
+
     /// <summary>Converts a <c>Json</c> to a formatted JSON string.</summary>
-    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let string = Json.asString Indented json</code></example>
     let asString format json =
-        JsonSerializer.Serialize(asJsonNode json, JsonFormat.getOptions format)
+        let array = writeToBuffer format json
+        Encoding.UTF8.GetString(array.WrittenSpan)
 
     /// <summary>Converts a <c>Json</c> to a UTF-8 encoded <c>byte array</c>.</summary>
-    /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let bytes = Json.asBytes Indented json</code></example>
     let asBytes format json =
-        JsonSerializer.SerializeToUtf8Bytes(asJsonNode json, JsonFormat.getOptions format)
-
-    /// <summary>Writes a <c>Json</c> to a <c>Utf8JsonWriter</c>.</summary>
-    /// <remarks>Includes duplicate properties.</remarks>
-    /// <example>
-    /// <code>
-    ///    task {
-    ///        use writer = new Utf8JsonWriter(ctx.Response.BodyWriter)
-    ///        Json.writeTo writer json
-    ///        do! writer.FlushAsync()
-    ///    }
-    /// </code>
-    /// </example>
-    let writeTo (writer:Utf8JsonWriter) json =
-        let rec write = function
-            | JStr str -> writer.WriteStringValue(str)
-            | JNum str -> writer.WriteRawValue(str.ToString())
-            | JBit bit -> writer.WriteBooleanValue(bit)
-            | JObj obj ->
-                writer.WriteStartObject()
-                obj
-                |> List.iter (fun (k, v) ->
-                    writer.WritePropertyName(k)
-                    write v
-                )
-                writer.WriteEndObject()
-            | JArr arr ->
-                writer.WriteStartArray()
-                List.iter write arr
-                writer.WriteEndArray()
-            | JNil -> writer.WriteNullValue()
-
-        write json
+        let array = writeToBuffer format json
+        array.WrittenSpan.ToArray()
 
     /// <summary>Determines whether two <c>Json</c> values are equal.</summary>
     /// <remarks>

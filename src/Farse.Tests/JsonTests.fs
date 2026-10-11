@@ -381,8 +381,8 @@ module JsonTests =
     [<Fact>]
     let ``Should convert Json to custom JSON string`` () =
         let options =
-            JsonSerializerOptions(
-                WriteIndented = true,
+            JsonWriterOptions(
+                Indented = true,
                 IndentSize = 1,
                 IndentCharacter = char 9
             )

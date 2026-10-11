@@ -16,18 +16,18 @@ module internal Common =
                 CommentHandling = JsonCommentHandling.Skip
             )
 
-    module JsonSerializerOptions =
+    module JsonWriterOptions =
 
         let indented =
-            JsonSerializerOptions (
-                WriteIndented = true,
+            JsonWriterOptions (
+                Indented = true,
                 IndentSize = 4,
                 NewLine = "\n",
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )
 
         let raw =
-            JsonSerializerOptions (
+            JsonWriterOptions (
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )
 
