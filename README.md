@@ -330,7 +330,7 @@ let rec tree =
     ]
 ```
 
-Mutually recursive parsers:
+Mutually recursive:
 
 ```fsharp
 type Value = {
@@ -358,26 +358,14 @@ and field =
     }
 ```
 
-Values are preferred for performance but produce compiler warnings.\
-&nbsp;\
-Functions avoid the warnings but rebuild the parser on every nested call:
+Functions avoid the compiler warnings but impact performance:
 
 ```fsharp
-let rec tree () = ... Prop.get "left" (tree ())
-let rec value () = ... Parse.array (field ())
+let rec tree () = ...
+let rec value () = ...
 ```
 
-Recursive references must be used inside a `parser { }` block:
-
-```fsharp
-type Nested = Nested of Nested list
-
-let rec nested =
-    parser {
-        let! items = Parse.list nested
-        return Nested items
-    }
-```
+> Note: Recursive references must be used inside a `parser { }` block.
 
 ## One-of
 
