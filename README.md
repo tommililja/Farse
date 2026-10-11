@@ -136,7 +136,7 @@ module User =
         }
 ```
 
-> Note: The custom parsers are defined under the same module name as included parsers.
+> Note: Custom parsers are defined in a Parse module, alongside the built-in ones.
 
 For the types:
 
@@ -343,26 +343,28 @@ and Field = {
     Values: Value array
 }
 
-let rec valueParser =
+let rec value =
     parser {
         let! id = Prop.get "id" Parse.string
-        and! fields = Prop.get "fields" (Parse.array fieldParser)
+        and! fields = Prop.get "fields" (Parse.array field)
         return { Id = id; Fields = fields }
     }
 
-and fieldParser =
+and field =
     parser {
         let! name = Prop.get "name" Parse.string
-        and! values = Prop.get "values" (Parse.array valueParser)
+        and! values = Prop.get "values" (Parse.array value)
         return { Name = name; Values = values }
     }
 ```
 
-Suppress the warnings or use a function:
+Values are preferred for performance but produce compiler warnings.\
+&nbsp;\
+Functions avoid the warnings but rebuild the parser on every nested call:
 
 ```fsharp
-let rec tree () = ...
-let rec valueParser () = ...
+let rec tree () = ... Prop.get "left" (tree ())
+let rec value () = ... Parse.array (field ())
 ```
 
 Recursive references must be used inside a `parser { }` block:
@@ -431,7 +433,7 @@ Parser yielded 1 error[s].
     at $.age
      | Tried parsing 'Age.
      | The minimum age is 12.
-     = 10
+     = 10uy
 ```
 
 Tag:
@@ -487,7 +489,7 @@ let asJson user =
         "name", JStr user.Name
         "age",
             user.Age
-            |> Option.map (Age.asByte >> JNum)
+            |> Option.map (Age.asByte >> JNum.number)
             |> Option.defaultValue JNil
         "email", JStr (Email.asString user.Email)
         "profiles",
@@ -548,8 +550,7 @@ Parsing a `Stream` asynchronously:
 ```fsharp
 task {
     let! result = Json.fromStreamAsync token stream
-
-    return Result.defaultWith (_.Message >> failwith) result
+    return result |> Result.defaultWith (_.Message >> failwith)
 }
 ```
 
@@ -617,4 +618,4 @@ type ParseError = {
 
 ## Contributing
 
-Bug reports, feature and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports, feature requests and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
