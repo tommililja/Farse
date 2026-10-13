@@ -23,12 +23,14 @@ module internal Common =
                 Indented = true,
                 IndentSize = 4,
                 NewLine = "\n",
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                SkipValidation = true
             )
 
         let raw =
             JsonWriterOptions (
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                SkipValidation = true
             )
 
     type JsonElement with
