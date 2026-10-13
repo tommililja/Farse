@@ -10,12 +10,14 @@ open System.Text.Json
 open System.Text.Json.Nodes
 
 /// <summary>Represents a JSON number.</summary>
+[<Struct>]
 type Number =
     private | Value of string
 
     override this.ToString() =
-        let (Value value) = this
-        value
+        match this with
+        | Value null -> "0"
+        | Value value -> value
 
     static member internal From(x:'a when 'a :> INumber<'a>) =
         if 'a.IsFinite(x) then Value <| x.ToString(null, CultureInfo.InvariantCulture)
