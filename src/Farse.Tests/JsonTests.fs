@@ -379,6 +379,12 @@ module JsonTests =
         |> Expect.string
 
     [<Fact>]
+    let ``Should convert Json to indented JSON string with numbers`` () =
+        JNum.array id [ 1; 2; 3; 4; 5 ]
+        |> Json.asString Indented
+        |> Expect.string
+
+    [<Fact>]
     let ``Should convert Json to custom JSON string`` () =
         let options =
             JsonWriterOptions(
@@ -574,7 +580,7 @@ module JsonTests =
         )
 
     [<Fact>]
-    let ``Should round-trip floating point numbers`` () =
+    let ``Should round-trip float numbers`` () =
         let roundTrip (x:float) =
             let actual = Json.asString Raw (JNum x)
             Expect.equal Msg.none x (Double.Parse(actual, CultureInfo.InvariantCulture))
@@ -599,6 +605,12 @@ module JsonTests =
 
         [ Half.MinValue; Half.MaxValue; Half.Epsilon; Half.Parse("0.1", CultureInfo.InvariantCulture) ]
         |> List.iter roundTrip
+
+    [<Fact>]
+    let ``Should convert JNum to a number node`` () =
+        let actual = Json.asJsonNode (JNum 1.5) |> _.GetValueKind()
+        let expected = JsonValueKind.Number
+        Expect.equal "Expected a number." expected actual
 
     module JBit =
 
