@@ -382,7 +382,7 @@ let! x =
     match disc with
     | "a" -> "prop" &= a
     | "b" -> "prop" &= b
-    | x -> Parser.fail $"Discriminator '%s{x}' is missing a parser."
+    | x -> Parser.fail $"Unknown discriminator '%s{x}'."
 ```
 
 We can also try each `Parser` in order:
@@ -548,7 +548,7 @@ Converting a `Json` to a string:
 ```fsharp
 type JsonFormat =
     | Indented
-    | Custom of JsonSerializerOptions
+    | Custom of JsonWriterOptions
     | Raw
 ```
 
@@ -605,4 +605,6 @@ type ParseError = {
 
 ## Contributing
 
-Bug reports, feature requests and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports, feature requests and pull requests are welcome.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
