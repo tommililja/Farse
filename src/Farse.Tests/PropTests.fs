@@ -1,5 +1,6 @@
 namespace Farse.Tests
 
+open System
 open Expecto.Flip
 open Xunit
 open Farse
@@ -64,9 +65,10 @@ module PropTests =
 
         [<Fact>]
         let ``Should fail when path is null`` () =
-            Prop.tryGet null Parse.int
-            |> Parser.parse """{ "": 1 }"""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.tryGet} to throw." (fun () ->
+                Prop.tryGet null Parse.int
+                |> ignore
+            )
 
     module TryGetTraverse =
 
@@ -236,9 +238,10 @@ module PropTests =
 
         [<Fact>]
         let ``Should fail when path is null`` () =
-            Prop.get null Parse.int
-            |> Parser.parse """{ "": 1 }"""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.get} to throw." (fun () ->
+                Prop.get null Parse.int
+                |> ignore
+            )
 
     module GetTraverse =
 
@@ -399,9 +402,10 @@ module PropTests =
 
         [<Fact>]
         let ``Should fail when path is null`` () =
-            Prop.tryGet2 null Parse.int
-            |> Parser.parse """{ "": 1 }"""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.tryGet2} to throw." (fun () ->
+                Prop.tryGet2 null Parse.int
+                |> ignore
+            )
 
     module TryGet2Traverse =
 
@@ -550,28 +554,32 @@ module PathTests =
     [<InlineData("prop..prop2")>]
     [<InlineData("prop.prop2.")>]
     let ``Should fail when path has an empty segment`` (path:string) =
-        let json = """{ "prop": { "prop2": 1 }, ".prop": 1, "prop.": 1, ".": 1 }"""
-        Prop.get path Parse.int
-        |> Parser.parse json
-        |> Expect.isError $"Expected %s{nameof Prop.get} to fail."
-        Prop.tryGet path Parse.int
-        |> Parser.parse json
-        |> Expect.isError $"Expected %s{nameof Prop.tryGet} to fail."
-        Prop.tryGet2 path Parse.int
-        |> Parser.parse json
-        |> Expect.isError $"Expected %s{nameof Prop.tryGet2} to fail."
+        Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.get} to throw." (fun () ->
+            Prop.get path Parse.int
+            |> ignore
+        )
+        Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.tryGet} to throw." (fun () ->
+            Prop.tryGet path Parse.int
+            |> ignore
+        )
+        Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.tryGet2} to throw." (fun () ->
+            Prop.tryGet2 path Parse.int
+            |> ignore
+        )
 
     [<Fact>]
     let ``Should fail when path ends with a dot`` () =
-        Prop.get "prop." Parse.int
-        |> Parser.parse """{ "prop": 1 }"""
-        |> Expect.parserError
+        Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.get} to throw." (fun () ->
+            Prop.get "prop." Parse.int
+            |> ignore
+        )
 
     [<Fact>]
     let ``Should fail when path has consecutive dots`` () =
-        Prop.get "prop..prop2" Parse.int
-        |> Parser.parse """{ "prop": { "prop2": 1 } }"""
-        |> Expect.parserError
+        Expect.throwsT<ArgumentException> $"Expected %s{nameof Prop.get} to throw." (fun () ->
+            Prop.get "prop..prop2" Parse.int
+            |> ignore
+        )
 
     [<Fact>]
     let ``Should render a bracketed path for a name with an escaped dot`` () =

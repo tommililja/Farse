@@ -7,6 +7,7 @@ open System.Net
 open System.Net.Mail
 open System.Numerics
 open System.Text.Json
+open System.Text.RegularExpressions
 open Expecto.Flip
 open Xunit
 open Farse
@@ -66,7 +67,7 @@ module ParseTests =
         [<Fact>]
         let ``Should not catch OutOfMemoryException`` () =
             let parser:Parser<int> = Parse.custom (fun _ -> raise (OutOfMemoryException())) ExpectedKind.Number
-            Expect.throws $"Expected %s{nameof Parse.custom} to throw." (fun () ->
+            Expect.throwsT<OutOfMemoryException> $"Expected %s{nameof Parse.custom} to throw." (fun () ->
                 parser
                 |> Parser.parse "1"
                 |> ignore
@@ -452,28 +453,24 @@ module ParseTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
-        let ``Should fail when regex is invalid`` () =
-            Parse.regex "^[0-9+$"
-            |> Parser.parse "\"abc\""
-            |> Expect.parserError
+        let ``Should fail when regex is null`` () =
+            Expect.throwsT<ArgumentNullException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
+                Parse.regex null
+                |> ignore
+            )
 
+        [<Fact>]
+        let ``Should fail when regex is invalid`` () =
+            Expect.throwsT<RegexParseException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
+                Parse.regex "^[0-9+$"
+                |> ignore
+            )
         [<Fact>]
         let ``Should fail when regex is unsupported`` () =
-            Parse.regex "^(?=a)a$"
-            |> Parser.parse "\"abc\""
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when regex is null`` () =
-            Parse.regex null
-            |> Parser.parse "\"abc\""
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when regex is empty`` () =
-            Parse.regex String.Empty
-            |> Parser.parse "\"abc\""
-            |> Expect.parserError
+            Expect.throwsT<NotSupportedException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
+                Parse.regex "^(?=a)a$"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -730,15 +727,24 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when format is null`` () =
-            Parse.guidExact null
-            |> Parser.parse "\"1732f607-fc13-4ed3-a54e-7851343278a5\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.guidExact} to throw." (fun () ->
+                Parse.guidExact null
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when format is empty`` () =
-            Parse.guidExact String.Empty
-            |> Parser.parse "\"1732f607-fc13-4ed3-a54e-7851343278a5\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.guidExact} to throw." (fun () ->
+                Parse.guidExact String.Empty
+                |> ignore
+            )
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.guidExact} to throw." (fun () ->
+                Parse.guidExact "Q"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -1091,22 +1097,25 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when format is invalid`` () =
-            Parse.timeOnlyExact "Q"
-            |> Parser.parse "\"172845\""
-            |> Expect.parserError
-
-        [<Fact>]
         let ``Should fail when format is null`` () =
-            Parse.timeOnlyExact null
-            |> Parser.parse "\"172845\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.timeOnlyExact} to throw." (fun () ->
+                Parse.timeOnlyExact null
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when format is empty`` () =
-            Parse.timeOnlyExact String.Empty
-            |> Parser.parse "\"172845\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.timeOnlyExact} to throw." (fun () ->
+                Parse.timeOnlyExact String.Empty
+                |> ignore
+            )
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.timeOnlyExact} to throw." (fun () ->
+                Parse.timeOnlyExact "Q"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -1150,21 +1159,30 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when format is incorrect`` () =
-            Parse.timeSpanExact @"hh:mm:ss"
-            |> Parser.parse "\"012845\""
+            Parse.timeSpanExact "hhmmss"
+            |> Parser.parse "\"01:23:45\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when format is null`` () =
-            Parse.timeSpanExact null
-            |> Parser.parse "\"012845\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.timeSpanExact} to throw." (fun () ->
+                Parse.timeSpanExact null
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when format is empty`` () =
-            Parse.timeSpanExact String.Empty
-            |> Parser.parse "\"012845\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.timeSpanExact} to throw." (fun () ->
+                Parse.timeSpanExact String.Empty
+                |> ignore
+            )
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.timeSpanExact} to throw." (fun () ->
+                Parse.timeSpanExact "Q"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -1213,22 +1231,25 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when format is invalid`` () =
-            Parse.dateOnlyExact "Q"
-            |> Parser.parse "\"2025-05-13\""
-            |> Expect.parserError
-
-        [<Fact>]
         let ``Should fail when format is null`` () =
-            Parse.dateOnlyExact null
-            |> Parser.parse "\"2025-05-13\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateOnlyExact} to throw." (fun () ->
+                Parse.dateOnlyExact null
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when format is empty`` () =
-            Parse.dateOnlyExact String.Empty
-            |> Parser.parse "\"2025-05-13\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateOnlyExact} to throw." (fun () ->
+                Parse.dateOnlyExact String.Empty
+                |> ignore
+            )
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateOnlyExact} to throw." (fun () ->
+                Parse.dateOnlyExact "Q"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -1383,22 +1404,25 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when format is invalid`` () =
-            Parse.dateTimeExact "Q"
-            |> Parser.parse "\"2025-05-13T17:28:45\""
-            |> Expect.parserError
-
-        [<Fact>]
         let ``Should fail when format is null`` () =
-            Parse.dateTimeExact null
-            |> Parser.parse "\"2025-05-13T17:28:45\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateTimeExact} to throw." (fun () ->
+                Parse.dateTimeExact null
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when format is empty`` () =
-            Parse.dateTimeExact String.Empty
-            |> Parser.parse "\"2025-05-13T17:28:45\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateTimeExact} to throw." (fun () ->
+                Parse.dateTimeExact String.Empty
+                |> ignore
+            )
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateTimeExact} to throw." (fun () ->
+                Parse.dateTimeExact "Q"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -1549,22 +1573,24 @@ module ParseTests =
             |> Expect.parserError
 
         [<Fact>]
-        let ``Should fail when format is invalid`` () =
-            Parse.dateTimeOffsetExact "Q"
-            |> Parser.parse "\"2025-05-13T17:28:45+02:00\""
-            |> Expect.parserError
-
-        [<Fact>]
         let ``Should fail when format is null`` () =
-            Parse.dateTimeOffsetExact null
-            |> Parser.parse "\"2025-05-13 17:28:45 +02:00\""
-            |> Expect.parserError
-
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateTimeOffsetExact} to throw." (fun () ->
+                Parse.dateTimeOffsetExact null
+                |> ignore
+            )
         [<Fact>]
         let ``Should fail when format is empty`` () =
-            Parse.dateTimeOffsetExact String.Empty
-            |> Parser.parse "\"2025-05-13 17:28:45 +02:00\""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateTimeOffsetExact} to throw." (fun () ->
+                Parse.dateTimeOffsetExact String.Empty
+                |> ignore
+            )
+
+        [<Fact>]
+        let ``Should fail when format is invalid`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.dateTimeOffsetExact} to throw." (fun () ->
+                Parse.dateTimeOffsetExact "Q"
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
@@ -1893,6 +1919,13 @@ module ParseTests =
             Parse.index 3 Parse.int
             |> Parser.parse "[ 1, 2, 3 ]"
             |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when index is negative`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.index} to throw." (fun () ->
+                Parse.index -1 Parse.int
+                |> ignore
+            )
 
         [<Fact>]
         let ``Should fail when parsing fails`` () =
@@ -2313,6 +2346,24 @@ module ParseTests =
             |> Parser.parse """{ "type": 1 }"""
             |> Expect.parserError
 
+        let ``Should fail when name is null`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.oneOf} to throw." (fun () ->
+                let _:Parser<int> = Parse.oneOf null []
+                ()
+            )
+
+        let ``Should fail when discriminators are empty`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.oneOf} to throw." (fun () ->
+                let _:Parser<int> = Parse.oneOf "prop" []
+                ()
+            )
+
+        let ``Should fail when discriminators are duplicated`` () =
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.oneOf} to throw." (fun () ->
+                Parse.oneOf "prop" [ "a", Parse.int; "a", Parse.int ]
+                |> ignore
+            )
+
     module Attempt =
 
         type TestDu =
@@ -2353,10 +2404,10 @@ module ParseTests =
 
         [<Fact>]
         let ``Should fail when list is empty`` () =
-            let parser:Parser<int> = Parse.attempt []
-            parser
-            |> Parser.parse """{ "prop2": 1, "prop3": 2 }"""
-            |> Expect.parserError
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.attempt} to throw." (fun () ->
+                let _:Parser<int> = Parse.attempt []
+                ()
+            )
 
     module Nil =
 

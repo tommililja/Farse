@@ -165,12 +165,13 @@ module Prop =
     ///     The last occurrence is chosen when duplicate properties exist.
     ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
+    /// <exception cref="System.ArgumentException">Thrown when the path is null or has an empty segment.</exception>
     /// <example><code>let! int = Prop.get "prop.prop2" Parse.int</code></example>
     let get path parser =
         match path with
         | Prop name -> parse name parser
         | Path path -> traverse path parser
-        | Invalid -> Parser.fail $"Path '%s{String.nullable path}' is invalid."
+        | Invalid -> invalidArg (nameof path) $"Path '%s{String.nullable path}' was invalid."
 
     /// <summary>Parses an optional property.</summary>
     /// <remarks>
@@ -178,12 +179,13 @@ module Prop =
     ///     The last occurrence is chosen when duplicate properties exist.
     ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
+    /// <exception cref="System.ArgumentException">Thrown when the path is null or has an empty segment.</exception>
     /// <example><code>let! int = Prop.tryGet "prop.prop2" Parse.int</code></example>
     let tryGet path parser =
         match path with
         | Prop name -> tryParse name parser
         | Path path -> tryTraverse path parser
-        | Invalid -> Parser.fail $"Path '%s{String.nullable path}' is invalid."
+        | Invalid -> invalidArg (nameof path) $"Path '%s{String.nullable path}' was invalid."
 
     /// <summary>Parses an optional property, distinguishing between a missing property and a null value.</summary>
     /// <remarks>
@@ -191,9 +193,10 @@ module Prop =
     ///     The last occurrence is chosen when duplicate properties exist.
     ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
+    /// <exception cref="System.ArgumentException">Thrown when the path is null or has an empty segment.</exception>
     /// <example><code>let! int = Prop.tryGet2 "prop.prop2" Parse.int</code></example>
     let tryGet2 path parser =
         match path with
         | Prop name -> tryParse2 name parser
         | Path path -> tryTraverse2 path parser
-        | Invalid -> Parser.fail $"Path '%s{String.nullable path}' is invalid."
+        | Invalid -> invalidArg (nameof path) $"Path '%s{String.nullable path}' was invalid."

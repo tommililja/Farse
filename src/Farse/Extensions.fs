@@ -37,6 +37,7 @@ module Extensions =
             Parse.seq this
 
         /// <summary>Parses an array at a specific index.</summary>
+        /// <exception cref="System.ArgumentException">Thrown when the index is negative.</exception>
         /// <example><code>let! int = "prop" &amp;= Parse.int.Index(0)</code></example>
         member this.Index(index:int) =
             Parse.index index this

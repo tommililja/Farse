@@ -3,5 +3,5 @@
   Error[0]:
     at $.disc
      | Tried parsing 'int.
-     | Discriminator 'a' is missing a parser.
+     | Unknown discriminator 'a'.
      = "a"

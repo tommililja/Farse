@@ -3,5 +3,5 @@
   Error[0]:
     at $['meta.type']
      | Tried parsing 'int.
-     | Discriminator 'b' is missing a parser.
+     | Unknown discriminator 'b'.
      = "b"
