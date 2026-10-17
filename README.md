@@ -595,7 +595,7 @@ type ParseError = {
     Path: JsonPath          // Path where the error occurred.
     Index: int option       // Index in the innermost array.
     Details: string         // Parsing or validation error details.
-    Value: string option    // Raw JSON value or the parsed value.</summary>
+    Value: string option    // Raw JSON value or the parsed value.
     Type: Type              // Type that was being parsed.
     Exn: exn option         // Exception, if one occurred.
 }

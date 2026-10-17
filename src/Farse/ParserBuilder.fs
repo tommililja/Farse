@@ -183,6 +183,7 @@ module ParserBuilder =
     /// <remarks>
     ///     The body is lazy, evaluated on first use and then reused.
     ///     Code before the first <c>let!</c> or <c>do!</c> therefore only runs once.
+    ///     Use <c>and!</c> to collect errors instead of returning on the first.
     /// </remarks>
     /// <example>
     /// <code>
