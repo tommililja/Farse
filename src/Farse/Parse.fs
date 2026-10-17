@@ -9,6 +9,7 @@ open System.Net.Mail
 open System.Numerics
 open System.Text.Json
 open System.Text.RegularExpressions
+open Microsoft.FSharp.Core.CompilerServices
 
 module Parse =
 
@@ -571,30 +572,26 @@ module Parse =
             match element.GetArrayLength() with
             | 0 -> Ok <| convert [||]
             | length ->
-                let mutable success, enumerator, i =
-                    true, element.EnumerateArray(), 0
+                let mutable errors = ListCollector<ParseError>()
+                let mutable enumerator = element.EnumerateArray()
+                let mutable success = true
+                let mutable i = 0
 
                 let items = Array.zeroCreate length
 
-                while success && enumerator.MoveNext() do
+                while enumerator.MoveNext() do
                     match parse enumerator.Current with
-                    | Ok x -> items[i] <- x; i <- i + 1
-                    | Error _ -> success <- false
+                    | Ok x when success -> items[i] <- x
+                    | Ok _ -> ()
+                    | Error list ->
+                        success <- false
+                        for error in list do
+                            errors.Add(ParseError.withIndex i error)
+                    i <- i + 1
 
-                match success with
-                | true -> Ok <| convert items
-                | false ->
-                    element.EnumerateArray()
-                    |> List.ofSeq
-                    |> List.indexed
-                    |> List.collect (fun (i, element) ->
-                        match parse element with
-                        | Ok _ -> []
-                        | Error list ->
-                            list
-                            |> List.map (ParseError.withIndex i)
-                    )
-                    |> Error
+                if success
+                then Ok <| convert items
+                else Error <| errors.Close()
         ) ExpectedKind.Array
 
     /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
@@ -673,31 +670,27 @@ module Parse =
             match element.GetPropertyCount() with
             | 0 -> Ok <| convert [||]
             | length ->
-                let mutable success, enumerator, i =
-                    true, element.EnumerateObject(), 0
+                let mutable errors = ListCollector<ParseError>()
+                let mutable enumerator = element.EnumerateObject()
+                let mutable success = true
+                let mutable i = 0
 
                 let items = Array.zeroCreate length
 
-                while success && enumerator.MoveNext() do
-                    let current = enumerator.Current
-                    match parse current.Value with
-                    | Ok x -> items[i] <- current.Name, x; i <- i + 1
-                    | Error _ -> success <- false
+                while enumerator.MoveNext() do
+                    match parse enumerator.Current.Value with
+                    | Ok x when success -> items[i] <- enumerator.Current.Name, x
+                    | Ok _ -> ()
+                    | Error list ->
+                        success <- false
+                        for error in list do
+                            errors.Add(ParseError.withProp enumerator.Current.Name error)
+                    i <- i + 1
 
-                match success with
-                | true -> Ok <| convert items
-                | false ->
-                    element.EnumerateObject()
-                    |> List.ofSeq
-                    |> List.collect (fun prop ->
-                        match parse prop.Value with
-                        | Ok _ -> []
-                        | Error list ->
-                            list
-                            |> List.map (ParseError.withProp prop.Name)
-                    )
-                    |> Error
-        ) ExpectedKind.Object
+                if success
+                then Ok <| convert items
+                else Error <| errors.Close()
+            ) ExpectedKind.Object
 
     /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'r&gt;</c>.</summary>
     /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
