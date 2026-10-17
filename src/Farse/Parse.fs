@@ -480,7 +480,7 @@ module Parse =
 
         stringError (fun element ->
             let string = element.GetString()
-            match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None),
+            match DateTime.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal),
                   DateTimeOffset.TryParseExact(string, format, CultureInfo.InvariantCulture, DateTimeStyles.None) with
             | (true, dateTime), (true, offset) when dateTime.Kind <> DateTimeKind.Unspecified -> Ok offset
             | _ -> Error $"Expected a DateTimeOffset '%s{format}' string."
