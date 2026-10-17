@@ -1774,9 +1774,9 @@ module ParseTests =
     module Choose =
 
         [<Fact>]
-        let ``Should parse array as value seq`` () =
+        let ``Should parse array as value array`` () =
             let expected = seq [ 1; 2; 3; ]
-            let actual: _ seq =
+            let actual: _ array =
                 Parse.choose Parse.int
                 |> Parser.parse """[ 1, null, 2, 3, "4" ]"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
@@ -1877,29 +1877,6 @@ module ParseTests =
         [<Fact>]
         let ``Should fail when element is not an array`` () =
             Parse.hashSet Parse.int
-            |> Parser.parse "{}"
-            |> Expect.parserError
-
-    module Seq =
-
-        [<Fact>]
-        let ``Should parse array as value seq`` () =
-            let expected = seq [ 1; 2; 3; ]
-            let actual: _ seq =
-                Parse.seq Parse.int
-                |> Parser.parse "[ 1, 2, 3 ]"
-                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
-            Expect.sequenceEqual Msg.none expected actual
-
-        [<Fact>]
-        let ``Should fail when parsing fails`` () =
-            Parse.seq Parse.int
-            |> Parser.parse """[ "1", "2", "3" ]"""
-            |> Expect.parserError
-
-        [<Fact>]
-        let ``Should fail when element is not an array`` () =
-            Parse.seq Parse.int
             |> Parser.parse "{}"
             |> Expect.parserError
 
@@ -2065,8 +2042,8 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse object properties as KeyValuePair seq`` () =
-            let expected = seq [ "key1", 1; "key2", 2; "key3", 3 ] |> Seq.map KeyValuePair
-            let actual: _ seq =
+            let expected = [| "key1", 1; "key2", 2; "key3", 3 |] |> Array.map KeyValuePair
+            let actual: _ array =
                 Parse.keyValuePairs Parse.int
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
@@ -2097,8 +2074,8 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse object properties as tuple seq`` () =
-            let expected = seq [ "key1", 1; "key2", 2; "key3", 3 ]
-            let actual: _ seq =
+            let expected = [| "key1", 1; "key2", 2; "key3", 3 |]
+            let actual: _ array =
                 Parse.tuples Parse.int
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
@@ -2129,8 +2106,8 @@ module ParseTests =
 
         [<Fact>]
         let ``Should parse object keys as string seq`` () =
-            let expected = seq [ "key1"; "key2"; "key3" ]
-            let actual: _ seq =
+            let expected = [| "key1"; "key2"; "key3" |]
+            let actual: _ array =
                 Parse.keys
                 |> Parser.parse """{ "key1": 1, "key2": 2, "key3": 3 }"""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."

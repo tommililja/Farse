@@ -594,24 +594,27 @@ module Parse =
                 else Error <| errors.Close()
         ) ExpectedKind.Array
 
-    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Core.array</c>.</summary>
     /// <remarks>Ignores null and invalid values.</remarks>
-    /// <example><code>let! seq = "prop" &amp;= Parse.choose Parse.int</code></example>
-    let choose (Parser parse) : Parser<'r seq> =
+    /// <example><code>let! array = "prop" &amp;= Parse.choose Parse.int</code></example>
+    let choose (Parser parse) : Parser<'r array> =
         customError (fun element ->
-            element.EnumerateArray()
-            |> Seq.choose (fun element ->
-                match parse element with
-                | Ok x -> Some x
-                | Error _ -> None
-            )
-            |> Seq.toArray :> seq<_>
-            |> Ok
+            let mutable items = Array.zeroCreate (element.GetArrayLength())
+            let mutable enumerator = element.EnumerateArray()
+            let mutable i = 0
+
+            while enumerator.MoveNext() do
+                match parse enumerator.Current with
+                | Ok x -> items[i] <- x; i <- i + 1
+                | Error _ -> ()
+
+            Array.Resize(&items, i)
+            Ok items
         ) ExpectedKind.Array
 
     /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.list</c>.</summary>
     /// <example><code>let! list = "prop" &amp;= Parse.list Parse.int</code></example>
-    let list parser = arr List.ofSeq parser
+    let list parser = arr List.ofArray parser
 
     /// <summary>Parses an array as <c>'r Microsoft.FSharp.Core.array</c>.</summary>
     /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
@@ -625,11 +628,6 @@ module Parse =
     /// <summary>Parses an array as <c>System.Collections.Generic.HashSet&lt;'r&gt;</c>.</summary>
     /// <example><code>let! hashSet = "prop" &amp;= Parse.hashSet Parse.int</code></example>
     let hashSet parser = arr HashSet parser
-
-    /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
-    /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
-    /// <example><code>let! seq = "prop" &amp;= Parse.seq Parse.int</code></example>
-    let seq parser = arr Seq.ofSeq parser
 
     /// <summary>Parses an array at a specific index.</summary>
     /// <exception cref="System.ArgumentException">Thrown when the index is negative.</exception>
@@ -665,7 +663,7 @@ module Parse =
 
     // Key/Value
 
-    let inline private keyValue ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
+    let inline private keyValue ([<InlineIfLambda>] create)([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
         customError (fun element ->
             match element.GetPropertyCount() with
             | 0 -> Ok <| convert [||]
@@ -679,7 +677,7 @@ module Parse =
 
                 while enumerator.MoveNext() do
                     match parse enumerator.Current.Value with
-                    | Ok x when success -> items[i] <- enumerator.Current.Name, x
+                    | Ok x when success -> items[i] <- create (enumerator.Current.Name, x)
                     | Ok _ -> ()
                     | Error list ->
                         success <- false
@@ -695,27 +693,27 @@ module Parse =
     /// <summary>Parses an object's properties as <c>Microsoft.FSharp.Collections.Map&lt;string, 'r&gt;</c>.</summary>
     /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let! map = "prop" &amp;= Parse.map Parse.int</code></example>
-    let map parser = keyValue Map.ofSeq parser
+    let map parser = keyValue id Map.ofArray parser
 
     /// <summary>Parses an object's properties as <c>System.Collections.Generic.IDictionary&lt;string, 'r&gt;</c>.</summary>
     /// <remarks>The last occurrence is chosen when duplicate properties exist.</remarks>
     /// <example><code>let! dict = "prop" &amp;= Parse.dict Parse.int</code></example>
-    let dict parser = keyValue dict parser
+    let dict parser = keyValue id dict parser
 
-    /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'r&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'r&gt; Microsoft.FSharp.Core.array</c>.</summary>
     /// <remarks>Returns duplicate properties.</remarks>
     /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.keyValuePairs Parse.int</code></example>
-    let keyValuePairs parser = keyValue (Seq.map KeyValuePair.Create) parser
+    let keyValuePairs parser = keyValue KeyValuePair id parser
 
-    /// <summary>Parses an object's properties as <c>(string * 'r) Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's properties as <c>(string * 'r) Microsoft.FSharp.Core.array</c>.</summary>
     /// <remarks>Returns duplicate properties.</remarks>
     /// <example><code>let! tuples = "prop" &amp;= Parse.tuples Parse.int</code></example>
-    let tuples parser = keyValue Seq.ofSeq parser
+    let tuples parser = keyValue id id parser
 
-    /// <summary>Parses an object's keys as <c>System.String Microsoft.FSharp.Collections.seq</c>.</summary>
+    /// <summary>Parses an object's keys as <c>System.String Microsoft.FSharp.Core.array</c>.</summary>
     /// <remarks>Returns duplicate keys.</remarks>
     /// <example><code>let! keys = "prop" &amp;= Parse.keys</code></example>
-    let keys = keyValue (Seq.map fst) none
+    let keys = keyValue fst id none
 
     // Tuples
 

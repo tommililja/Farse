@@ -2,5 +2,5 @@
 
   Error[0]:
     at $
-     | Tried parsing '(string * int) seq.
+     | Tried parsing '(string * int) array.
      | Expected Object, but got Array.

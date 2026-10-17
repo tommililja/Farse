@@ -2,5 +2,5 @@
 
   Error[0]:
     at $
-     | Tried parsing 'KeyValuePair<string, int> seq.
+     | Tried parsing 'KeyValuePair<string, int> array.
      | Expected Object, but got Array.

@@ -139,8 +139,3 @@ module internal Common =
         let inline list x =
             List.singleton x
             |> Error
-
-    module Seq =
-
-        let inline ofSeq x =
-            x :> seq<_>

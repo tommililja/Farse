@@ -8,9 +8,9 @@ module Extensions =
 
         // Sequences
 
-        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Core.array</c>.</summary>
         /// <remarks>Ignores null and invalid values.</remarks>
-        /// <example><code>let! seq = "prop" &amp;= Parse.int.Choose()</code></example>
+        /// <example><code>let! array = "prop" &amp;= Parse.int.Choose()</code></example>
         member this.Choose() =
             Parse.choose this
 
@@ -29,12 +29,6 @@ module Extensions =
         /// <example><code>let! hashSet = "prop" &amp;= Parse.int.HashSet()</code></example>
         member this.HashSet() =
             Parse.hashSet this
-
-        /// <summary>Parses an array as <c>'r Microsoft.FSharp.Collections.seq</c>.</summary>
-        /// <remarks>Returns the underlying <c>array</c> without conversion or copying.</remarks>
-        /// <example><code>let! seq = "prop" &amp;= Parse.int.Seq()</code></example>
-        member this.Seq() =
-            Parse.seq this
 
         /// <summary>Parses an array at a specific index.</summary>
         /// <exception cref="System.ArgumentException">Thrown when the index is negative.</exception>
@@ -66,13 +60,13 @@ module Extensions =
         member this.Dict() =
             Parse.dict this
 
-        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'r&gt; Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>System.Collections.Generic.KeyValuePair&lt;string, 'r&gt; Microsoft.FSharp.Core.array</c>.</summary>
         /// <remarks>Returns duplicate properties.</remarks>
         /// <example><code>let! keyValuePairs = "prop" &amp;= Parse.int.KeyValuePairs()</code></example>
         member this.KeyValuePairs() =
             Parse.keyValuePairs this
 
-        /// <summary>Parses an object's properties as <c>(string * 'r) Microsoft.FSharp.Collections.seq</c>.</summary>
+        /// <summary>Parses an object's properties as <c>(string * 'r) Microsoft.FSharp.Core.array</c>.</summary>
         /// <remarks>Returns duplicate properties.</remarks>
         /// <example><code>let! tuples = "prop" &amp;= Parse.int.Tuples()</code></example>
         member this.Tuples() =
