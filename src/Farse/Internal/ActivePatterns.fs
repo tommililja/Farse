@@ -20,6 +20,7 @@ module internal ActivePatterns =
 
     let (|Prop|Path|Invalid|) (path:string) =
         if path = null then Invalid
+        elif path.IndexOf('.') < 0 then Prop path
         else
             match separator.Split(path) with
             | [| name |] -> Prop (name.Replace("\\.", "."))
