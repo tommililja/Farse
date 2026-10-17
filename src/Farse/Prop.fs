@@ -24,14 +24,6 @@ module Prop =
             | _ -> element, count
         ) (element, 0)
 
-    let inline private foldWithParent path element =
-        path
-        |> Array.fold (fun (element:JsonElement, parent:JsonElement, count) (name:string) ->
-            match element.ValueKind with
-            | Kind.Object -> element.TryGetProperty(name) |> snd, element, count + 1
-            | _ -> element, parent, count
-        ) (element, element, 0)
-
     let private parse (name:string) (Parser parse) : Parser<'r> =
         Parser (fun element ->
             match element.ValueKind with
@@ -45,8 +37,8 @@ module Prop =
                         |> List.map (ParseError.withProp name)
                         |> Error
                 | _ ->
-                    element
-                    |> ParseError.required (JsonPath.prop name) typeof<'r>
+                    typeof<'r>
+                    |> ParseError.required (JsonPath.prop name)
                     |> Error.list
             | _ ->
                 element
@@ -97,12 +89,12 @@ module Prop =
 
     let private traverse path (Parser parse) : Parser<'r> =
         Parser (fun root ->
-            match foldWithParent path root with
-            | element, parent, count when element.isUndefined ->
-                parent
-                |> ParseError.required (select path count) typeof<'r>
+            match fold path root with
+            | element, count when element.isUndefined ->
+                typeof<'r>
+                |> ParseError.required (select path count)
                 |> Error.list
-            | element, _, count when count = path.Length ->
+            | element, count when count = path.Length ->
                 match parse element with
                 | Ok x -> Ok x
                 | Error errors ->
@@ -112,7 +104,7 @@ module Prop =
                         |> ParseError.withPath
                     )
                     |> Error
-            | element, _, count ->
+            | element, count ->
                 element
                 |> ParseError.expected ExpectedKind.Object (select path count) typeof<'r>
                 |> Error.list

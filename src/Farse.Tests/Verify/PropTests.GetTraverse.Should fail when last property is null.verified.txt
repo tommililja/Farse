@@ -4,3 +4,4 @@
     at $.prop.prop2.prop3
      | Tried parsing 'int.
      | Expected Number, but got Null.
+     = null

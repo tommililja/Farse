@@ -4,3 +4,4 @@
     at $.prop
      | Tried parsing 'int.
      | Expected Object, but got Null.
+     = null

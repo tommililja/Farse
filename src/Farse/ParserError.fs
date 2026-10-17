@@ -8,13 +8,12 @@ open System.Text.Json
 type ParseError = {
     /// <summary>Path where the error occurred.</summary>
     Path: JsonPath
-    /// <summary>Element that was parsed, or the parent.</summary>
-    Element: JsonElement
     /// <summary>Index in the innermost array.</summary>
     Index: int option
     /// <summary>Parsing or validation error details.</summary>
     Details: string
-    /// <summary>Populated when parsing succeeded, but validation failed.</summary>
+    /// <summary>Raw JSON value or the parsed value.</summary>
+    /// <remarks>Excludes arrays and objects.</remarks>
     Value: string option
     /// <summary>Type that was being parsed.</summary>
     Type: Type
@@ -41,10 +40,9 @@ module ParseError =
 
     // Errors
 
-    let internal required path type' element =
+    let internal required path type' =
         {
             Path = path
-            Element = JsonElement.clone element
             Index = None
             Details = "Missing required property."
             Value = None
@@ -52,10 +50,9 @@ module ParseError =
             Exn = None
         }
 
-    let internal invalid value details type' element =
+    let internal invalid value details type' =
         {
             Path = JsonPath.empty
-            Element = JsonElement.clone element
             Index = None
             Details = details
             Value = Some value
@@ -66,10 +63,9 @@ module ParseError =
     let internal details details type' element =
         {
             Path = JsonPath.empty
-            Element = JsonElement.clone element
             Index = None
             Details = details
-            Value = None
+            Value = JsonElement.tryGetValue element
             Type = type'
             Exn = None
         }
@@ -77,21 +73,19 @@ module ParseError =
     let internal exn (exn:exn) type' element =
         {
             Path = JsonPath.empty
-            Element = JsonElement.clone element
             Index = None
             Details = exn.Message
-            Value = None
+            Value = JsonElement.tryGetValue element
             Type = type'
             Exn = Some exn
         }
 
-    let internal expected expected path type' element =
+    let internal expected expected path type' (element:JsonElement) =
         {
             Path = path
-            Element = JsonElement.clone element
             Index = None
             Details = $"Expected %s{ExpectedKind.asString expected}, but got %s{Kind.asString element.ValueKind}."
-            Value = None
+            Value = JsonElement.tryGetValue element
             Type = type'
             Exn = None
         }
@@ -99,18 +93,16 @@ module ParseError =
     let internal prop name details type' element =
         {
             Path = JsonPath.prop name
-            Element = JsonElement.clone element
             Index = None
             Details = details
-            Value = None
+            Value = JsonElement.tryGetValue element
             Type = type'
             Exn = None
         }
 
-    let internal index n type' element =
+    let internal index n type' =
         {
             Path = JsonPath.index n
-            Element = JsonElement.clone element
             Index = Some n
             Details = "Index was out of range."
             Value = None
@@ -137,7 +129,6 @@ module ParseError =
                 $" | %s{error.Details}"
 
             error.Value
-            |> Option.orElse (JsonElement.tryGetValue error.Element)
             |> Option.map (sprintf " = %s")
         }
 

@@ -640,8 +640,8 @@ module Parse =
             match element.GetArrayLength() with
             | length when n < length -> parseIndex n parser element
             | _ ->
-                element
-                |> ParseError.index n typeof<'r>
+                typeof<'r>
+                |> ParseError.index n
                 |> Error.list
         ) ExpectedKind.Array
 
@@ -655,8 +655,8 @@ module Parse =
         customError (fun element ->
             match element.GetArrayLength() with
             | 0 ->
-                element
-                |> ParseError.index 0 typeof<'r>
+                typeof<'r>
+                |> ParseError.index 0
                 |> Error.list
             | length -> parseIndex (length - 1) parser element
         ) ExpectedKind.Array
@@ -802,8 +802,8 @@ module Parse =
         customError (fun (element:JsonElement) ->
             match element.TryGetProperty(name) with
             | false, _ ->
-                element
-                |> ParseError.required (JsonPath.prop name) typeof<string>
+                typeof<string>
+                |> ParseError.required (JsonPath.prop name)
                 |> Error.list
             | true, disc when not disc.isString ->
                 disc
@@ -881,8 +881,8 @@ module Parse =
                 match fn x with
                 | Ok x -> Ok x
                 | Error msg ->
-                    element
-                    |> ParseError.invalid $"%A{x}" msg typeof<'r>
+                    typeof<'r>
+                    |> ParseError.invalid $"%A{x}" msg
                     |> Error.list
             | Error e -> Error e
         )
@@ -894,8 +894,8 @@ module Parse =
             match parse element with
             | Ok x when fn x -> Ok x
             | Ok x ->
-                element
-                |> ParseError.invalid $"%A{x}" msg typeof<'r>
+                typeof<'r>
+                |> ParseError.invalid $"%A{x}" msg
                 |> Error.list
             | Error e -> Error e
         )

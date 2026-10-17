@@ -51,7 +51,8 @@ module internal Common =
 
         let inline tryGetValue (e:JsonElement) =
             match e.ValueKind with
-            | Kind.Null | Kind.Undefined | Kind.Object | Kind.Array -> None
+            | Kind.Undefined | Kind.Object | Kind.Array -> None
+            | Kind.Null -> Some "null"
             | _ -> Some <| e.GetRawText()
 
         // Undefined elements are not clonable.

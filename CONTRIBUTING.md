@@ -1,10 +1,10 @@
 # Contributing
 
-Bug reports, feature requests and pull requests are welcome.
+Bug reports, feature requests, and pull requests are welcome.
 
 ### Issues
 
-Found a bug, missing something or have feedback? Open an [issue](https://github.com/tommililja/Farse/issues).
+Found a bug, missing something, or have feedback? Open an [issue](https://github.com/tommililja/Farse/issues).
 
 ### Pull requests
 

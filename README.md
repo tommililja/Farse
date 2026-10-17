@@ -593,10 +593,9 @@ With the available information:
 ```fsharp
 type ParseError = {
     Path: JsonPath          // Path where the error occurred.
-    Element: JsonElement    // Element that was parsed, or the parent.
     Index: int option       // Index in the innermost array.
     Details: string         // Parsing or validation error details.
-    Value: string option    // Populated when parsing succeeded, but validation failed.
+    Value: string option    // Raw JSON value or the parsed value.</summary>
     Type: Type              // Type that was being parsed.
     Exn: exn option         // Exception, if one occurred.
 }
@@ -605,6 +604,6 @@ type ParseError = {
 
 ## Contributing
 
-Bug reports, feature requests and pull requests are welcome.
+Bug reports, feature requests, and pull requests are welcome.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
