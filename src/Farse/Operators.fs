@@ -8,7 +8,7 @@ module Operators =
     ///     The last occurrence is chosen when duplicate properties exist.
     ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
-    /// <exception cref="System.ArgumentException">Thrown when the path is null or has an empty segment.</exception>
+    /// <exception cref="System.ArgumentException">Thrown when the path is null, or a path with periods has an empty segment.</exception>
     /// <example><code>let! int = "prop.prop2" &amp;= Parse.int</code></example>
     let inline (&=) path parser =
         Prop.get path parser
@@ -19,7 +19,7 @@ module Operators =
     ///     The last occurrence is chosen when duplicate properties exist.
     ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
-    /// <exception cref="System.ArgumentException">Thrown when the path is null or has an empty segment.</exception>
+    /// <exception cref="System.ArgumentException">Thrown when the path is null, or a path with periods has an empty segment.</exception>
     /// <example><code>let! int = "prop.prop2" ?= Parse.int</code></example>
     let inline (?=) path parser =
         Prop.tryGet path parser
@@ -30,7 +30,7 @@ module Operators =
     ///     The last occurrence is chosen when duplicate properties exist.
     ///     Use <c>"prop\.prop2"</c> to escape periods in property names.
     /// </remarks>
-    /// <exception cref="System.ArgumentException">Thrown when the path is null or has an empty segment.</exception>
+    /// <exception cref="System.ArgumentException">Thrown when the path is null, or a path with periods has an empty segment.</exception>
     /// <example><code>let! int = "prop.prop2" ??= Parse.int</code></example>
     let inline (??=) path parser =
         Prop.tryGet2 path parser
