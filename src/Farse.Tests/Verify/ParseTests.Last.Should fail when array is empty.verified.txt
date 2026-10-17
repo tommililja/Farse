@@ -1,6 +1,6 @@
 ﻿Parser yielded 1 error[s].
 
   Error[0]:
-    at $
+    at $[0]
      | Tried parsing 'int.
-     | Array was empty.
+     | Index was out of range.

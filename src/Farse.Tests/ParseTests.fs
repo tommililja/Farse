@@ -1951,7 +1951,7 @@ module ParseTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
-        let ``Should fail when index is out of range`` () =
+        let ``Should fail when array is empty`` () =
             Parse.first Parse.int
             |> Parser.parse "[]"
             |> Expect.parserError
@@ -1980,7 +1980,7 @@ module ParseTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
-        let ``Should fail when index is out of range`` () =
+        let ``Should fail when array is empty`` () =
             Parse.last Parse.int
             |> Parser.parse "[]"
             |> Expect.parserError

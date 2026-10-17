@@ -659,11 +659,11 @@ module Parse =
     let last parser : Parser<'r> =
         customError (fun element ->
             match element.GetArrayLength() with
-            | length when length > 0 -> parseIndex (length - 1) parser element
-            | _ ->
+            | 0 ->
                 element
-                |> ParseError.details "Array was empty." typeof<'r>
+                |> ParseError.index 0 typeof<'r>
                 |> Error.list
+            | length -> parseIndex (length - 1) parser element
         ) ExpectedKind.Array
 
     // Key/Value

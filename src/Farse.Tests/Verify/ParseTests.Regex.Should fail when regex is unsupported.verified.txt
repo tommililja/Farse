@@ -1,7 +1,0 @@
-﻿Parser yielded 1 error[s].
-
-  Error[0]:
-    at $
-     | Tried parsing 'string.
-     | Regex '^(?=a)a$' is not supported with RegexOptions.NonBacktracking.
-     = "abc"
