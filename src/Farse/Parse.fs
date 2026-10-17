@@ -663,7 +663,7 @@ module Parse =
 
     // Key/Value
 
-    let inline private keyValue ([<InlineIfLambda>] create)([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
+    let inline private keyValue ([<InlineIfLambda>] create) ([<InlineIfLambda>] convert) (Parser parse) : Parser<'r> =
         customError (fun element ->
             match element.GetPropertyCount() with
             | 0 -> Ok <| convert [||]
@@ -676,13 +676,14 @@ module Parse =
                 let items = Array.zeroCreate length
 
                 while enumerator.MoveNext() do
+                    let name = enumerator.Current.Name
                     match parse enumerator.Current.Value with
-                    | Ok x when success -> items[i] <- create (enumerator.Current.Name, x)
+                    | Ok x when success -> items[i] <- create (name, x)
                     | Ok _ -> ()
                     | Error list ->
                         success <- false
                         for error in list do
-                            errors.Add(ParseError.withProp enumerator.Current.Name error)
+                            errors.Add(ParseError.withProp name error)
                     i <- i + 1
 
                 if success
