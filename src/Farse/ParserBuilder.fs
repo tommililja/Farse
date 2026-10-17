@@ -181,8 +181,8 @@ module ParserBuilder =
 
     /// <summary>Builds a <c>Parser</c> by combining parsers.</summary>
     /// <remarks>
-    ///     The body is lazy and evaluated on first use.
-    ///     Use <c>and!</c> to collect errors instead of returning on the first.
+    ///     The body is lazy, evaluated on first use and then reused.
+    ///     Code before the first <c>let!</c> or <c>do!</c> therefore only runs once.
     /// </remarks>
     /// <example>
     /// <code>
