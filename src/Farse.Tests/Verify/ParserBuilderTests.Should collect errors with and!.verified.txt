@@ -1,0 +1,11 @@
+﻿Parser yielded 2 error[s].
+
+  Error[0]:
+    at $.x
+     | Tried parsing 'int.
+     | Missing required property.
+  
+  Error[1]:
+    at $.y
+     | Tried parsing 'int.
+     | Missing required property.
