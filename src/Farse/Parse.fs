@@ -186,17 +186,19 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.String</c> that matches a regular expression.</summary>
-    /// <remarks>Uses <c>RegexOptions.NonBacktracking</c>.</remarks>
-    /// <exception cref="System.ArgumentException">Thrown when the regex is invalid.</exception>
-    /// <exception cref="System.ArgumentNullException">Thrown when the regex is null.</exception>
-    /// <exception cref="System.NotSupportedException">Thrown when the regex is not supported with <c>RegexOptions.NonBacktracking</c>.</exception>
-    /// <example><code>let! string = "prop" &amp;= Parse.regex "^[0-9]+$"</code></example>
-    let regex ([<StringSyntax("Regex")>] regex:string) =
-        let cached = Regex(regex, RegexOptions.NonBacktracking)
+    /// <exception cref="System.ArgumentException">Thrown when the <c>Regex</c> is <c>null</c>.</exception>
+    /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">Thrown when a time-out occurs.</exception>
+    /// <example><code>let! string = "prop" &amp;= Parse.regex regex</code></example>
+    let regex (regex:Regex | null) =
+        let regex =
+            match regex with
+            | null -> invalidArg (nameof regex) "Regex was null."
+            | regex -> regex
+
         stringError (fun element ->
             let string = element.GetString()
-            if cached.IsMatch(string) then Ok string
-            else Error $"Expected the string to match '%s{regex}'."
+            if regex.IsMatch(string) then Ok string
+            else Error $"Expected the string to match '%s{regex.ToString()}'."
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>

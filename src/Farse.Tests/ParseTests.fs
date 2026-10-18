@@ -443,44 +443,34 @@ module ParseTests =
 
     module Regex =
 
+        let private regex = Regex("^[0-9]+$")
+
         [<Fact>]
         let ``Should parse string as string with regex`` () =
             let expected = "12345"
             let actual =
-                Parse.regex "^[0-9]+$"
+                Parse.regex regex
                 |> Parser.parse "\"12345\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
 
         [<Fact>]
         let ``Should fail when regex is null`` () =
-            Expect.throwsT<ArgumentNullException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
+            Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
                 Parse.regex null
-                |> ignore
-            )
-
-        [<Fact>]
-        let ``Should fail when regex is invalid`` () =
-            Expect.throwsT<RegexParseException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
-                Parse.regex "^[0-9+$"
-                |> ignore
-            )
-        [<Fact>]
-        let ``Should fail when regex is unsupported`` () =
-            Expect.throwsT<NotSupportedException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
-                Parse.regex "^(?=a)a$"
+                |> Parser.parse "\"1\""
                 |> ignore
             )
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-            Parse.regex "^[0-9]+$"
+            Parse.regex regex
             |> Parser.parse "1"
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when regex does not match`` () =
-            Parse.regex "^[0-9]+$"
+            Parse.regex regex
             |> Parser.parse "\"abc\""
             |> Expect.parserError
 
