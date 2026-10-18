@@ -186,6 +186,7 @@ module Parse =
         ) ExpectedKind.String
 
     /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
+    /// <remarks>Accepts a sign, decimal point and exponent, but no whitespace. Floating-point types also accept <c>NaN</c> and <c>Infinity</c>.</remarks>
     /// <example><code>let! int = "prop" &amp;= Parse.stringNumber&lt;int&gt;</code></example>
     let stringNumber<'r when 'r :> INumber<'r>> =
         stringError (fun element ->
