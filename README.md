@@ -307,24 +307,24 @@ Parser yielded 1 error[s].
 
 ## Recursive parsers
 
-The `parser` builder is lazy, so a parser can reference itself:
+Use `Parse.delay` to define recursive parsers:
 
 ```fsharp
 type Tree =
     | Leaf of int
     | Branch of Tree * Tree
 
-let rec tree =
-    Parse.oneOf "type" [
+let rec tree () =
+    oneOf "type" [
         "leaf",
             parser {
-                let! value = Prop.get "value" Parse.int
+                let! value = "value" &= int
                 return Leaf value
             }
         "branch",
             parser {
-                let! left = Prop.get "left" tree
-                let! right = Prop.get "right" tree
+                let! left = "left" &= delay tree
+                let! right = "right" &= delay tree
                 return Branch (left, right)
             }
     ]
@@ -343,28 +343,20 @@ and Field = {
     Values: Value array
 }
 
-let rec value =
+let rec value () =
     parser {
-        let! id = Prop.get "id" Parse.string
-        and! fields = Prop.get "fields" (Parse.array field)
+        let! id = "id" &= string
+        and! fields = "fields" &= array (delay field)
         return { Id = id; Fields = fields }
     }
 
-and field =
+and field () =
     parser {
-        let! name = Prop.get "name" Parse.string
-        and! values = Prop.get "values" (Parse.array value)
+        let! name = "name" &= string
+        and! values = "values" &= array (delay value)
         return { Name = name; Values = values }
     }
 ```
-
-Functions avoid the compiler warnings but impact performance:
-
-```fsharp
-let rec tree () = ...
-```
-
-> Note: Recursive references must be used inside a `parser { }` block.
 
 ## One-of
 

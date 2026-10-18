@@ -12,13 +12,9 @@ module ParserBuilder =
 
         member inline _.Zero() = from ()
 
-        member inline _.Combine(a:Parser<unit>, fn:unit -> Parser<'r>) = bind fn a
+        member inline _.Combine(a:Parser<unit>, b) = bind (fun () -> b) a
 
-        member inline _.Delay(fn) = fn
-
-        member _.Run(fn) =
-            let deferred = lazy (fn ())
-            Parser (fun element -> run element deferred.Value)
+        member inline _.Delay([<InlineIfLambda>] fn) = fn ()
 
         member inline _.Bind(x, [<InlineIfLambda>] fn) = bind fn x
 
@@ -181,8 +177,6 @@ module ParserBuilder =
 
     /// <summary>Builds a <c>Parser</c> by combining parsers.</summary>
     /// <remarks>
-    ///     The body is lazy, evaluated on first use and then reused.
-    ///     Code before the first <c>let!</c> or <c>do!</c> therefore only runs once.
     ///     Use <c>and!</c> to collect errors instead of returning on the first.
     /// </remarks>
     /// <example>

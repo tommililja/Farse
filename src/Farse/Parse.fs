@@ -917,6 +917,34 @@ module Parse =
             | Error e -> Error e
         )
 
+    /// <summary>Delays getting a <c>Parser</c> until it runs.</summary>
+    /// <remarks>Used for recursive parsers.</remarks>
+    /// <example>
+    /// <code>
+    ///     type Tree =
+    ///         | Leaf of int
+    ///         | Branch of Tree * Tree
+    /// &#160;
+    ///     let rec tree () =
+    ///         oneOf "type" [
+    ///             "leaf",
+    ///                 parser {
+    ///                     let! value = "value" &amp;= int
+    ///                     return Leaf value
+    ///                 }
+    ///             "branch",
+    ///                 parser {
+    ///                     let! left = "left" &amp;= delay tree
+    ///                     let! right = "right" &amp;= delay tree
+    ///                     return Branch (left, right)
+    ///                 }
+    ///         ]
+    /// </code>
+    /// </example>
+    let delay fn =
+        let parser = lazy (fn ())
+        Parser (fun element -> Parser.run element parser.Value)
+
     // Json
 
     /// <summary>Parses an element's kind as <c>System.Text.Json.JsonValueKind</c>.</summary>
