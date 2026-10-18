@@ -473,13 +473,13 @@ module ParseTests =
             |> Parser.parse "\"abc\""
             |> Expect.parserError
 
-    module Number =
+    module StringNumber =
 
         [<Fact>]
         let ``Should parse string as bigint`` () =
             let expected = BigInteger.Parse("1")
             let actual =
-                Parse.number Parse.bigint
+                Parse.stringNumber<bigint>
                 |> Parser.parse "\"1\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
@@ -488,7 +488,7 @@ module ParseTests =
         let ``Should parse string as int`` () =
             let expected = 42
             let actual =
-                Parse.number Parse.int
+                Parse.stringNumber<int>
                 |> Parser.parse "\"42\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
@@ -497,33 +497,74 @@ module ParseTests =
         let ``Should parse a string as float`` () =
             let expected = 1.234
             let actual =
-                Parse.number Parse.float
+                Parse.stringNumber<float>
                 |> Parser.parse "\"1.234\""
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
 
         [<Fact>]
+        let ``Should parse a float string as NaN`` () =
+            let actual =
+                Parse.stringNumber<float>
+                |> Parser.parse "\"NaN\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.isTrue Msg.none (Double.IsNaN actual)
+
+        [<Fact>]
+        let ``Should parse a float string as Infinity`` () =
+            let expected = Double.PositiveInfinity
+            let actual =
+                Parse.stringNumber<float>
+                |> Parser.parse "\"Infinity\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should parse a negative int string`` () =
+            let expected = -42
+            let actual =
+                Parse.stringNumber<int>
+                |> Parser.parse "\"-42\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should parse an int string with an exponent`` () =
+            let expected = 1000
+            let actual =
+                Parse.stringNumber<int>
+                |> Parser.parse "\"1e3\""
+                |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
+            Expect.equal Msg.none expected actual
+
+        [<Fact>]
         let ``Should fail when value is invalid`` () =
-            Parse.number Parse.int
+            Parse.stringNumber<int>
             |> Parser.parse "\"a\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when a bigint string has a fractional part`` () =
-            Parse.number Parse.bigint
+            Parse.stringNumber<bigint>
             |> Parser.parse "\"1.234\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when an int string has a fractional part`` () =
-            Parse.number Parse.int
+            Parse.stringNumber<int>
             |> Parser.parse "\"1.234\""
             |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when element is not a string`` () =
-            Parse.number Parse.int
+            Parse.stringNumber<int>
             |> Parser.parse "1"
+            |> Expect.parserError
+
+        [<Fact>]
+        let ``Should fail when string has whitespace`` () =
+            Parse.stringNumber<int>
+            |> Parser.parse "\" 42 \""
             |> Expect.parserError
 
     module Base64String =

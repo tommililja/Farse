@@ -185,6 +185,17 @@ module Parse =
             | string -> Ok string
         ) ExpectedKind.String
 
+    /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
+    /// <example><code>let! int = "prop" &amp;= Parse.stringNumber&lt;int&gt;</code></example>
+    let stringNumber<'r when 'r :> INumber<'r>> =
+        stringError (fun element ->
+            let string = element.GetString()
+            let style = NumberStyles.AllowLeadingSign ||| NumberStyles.AllowDecimalPoint ||| NumberStyles.AllowExponent
+            match 'r.TryParse(string, style, CultureInfo.InvariantCulture) with
+            | true, number -> Ok number
+            | _ -> Error <| expected<'r> "string"
+        ) ExpectedKind.String
+
     /// <summary>Parses a string as <c>System.String</c> that matches a regular expression.</summary>
     /// <exception cref="System.ArgumentException">Thrown when the <c>Regex</c> is <c>null</c>.</exception>
     /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">Thrown when a time-out occurs.</exception>
@@ -199,16 +210,6 @@ module Parse =
             let string = element.GetString()
             if regex.IsMatch(string) then Ok string
             else Error $"Expected the string to match '%s{regex.ToString()}'."
-        ) ExpectedKind.String
-
-    /// <summary>Parses a string as <c>System.Numerics.INumber</c>.</summary>
-    /// <example><code>let! int = "prop" &amp;= Parse.number Parse.int</code></example>
-    let number<'r when 'r :> INumber<'r>> (_:Parser<'r>) =
-        stringError (fun element ->
-            let string = element.GetString()
-            match 'r.TryParse(string, NumberStyles.Float, CultureInfo.InvariantCulture) with
-            | true, number -> Ok number
-            | _ -> Error <| expected<'r> "string"
         ) ExpectedKind.String
 
     /// <summary>Parses a base64 string as <c>System.String</c>.</summary>
