@@ -458,7 +458,6 @@ module ParseTests =
         let ``Should fail when regex is null`` () =
             Expect.throwsT<ArgumentException> $"Expected %s{nameof Parse.regex} to throw." (fun () ->
                 Parse.regex null
-                |> Parser.parse "\"1\""
                 |> ignore
             )
 
