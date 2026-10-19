@@ -427,6 +427,32 @@ Parser yielded 1 error[s].
      = "user"
 ```
 
+## Operators
+
+Tables that describe operator behavior.
+
+```shell
+| Operator          | {}    | { "a": null } | { "a": 1 }    |
+|------------------ |------ |-------------- |-------------- |
+| "a" &= int        | Error | Error         | 1             |
+| "a" &= option int | Error | None          | Some 1        |
+| "a" ?= int        | None  | None          | Some 1        |
+| "a" ??= int       | None  | Some None     | Some (Some 1) |
+```
+
+Nested properties:
+
+```shell
+| Operator            | {}    | { "a": null } | { "a": {} } | { "a": { "b": null } } | { "a": { "b": 1 } } |
+|-------------------- |------ |-------------- |------------ |----------------------- |-------------------- |
+| "a.b" &= int        | Error | Error         | Error       | Error                  | 1                   |
+| "a.b" &= option int | Error | Error         | Error       | None                   | Some 1              |
+| "a.b" ?= int        | None  | None          | None        | None                   | Some 1              |
+| "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
+```
+
+A missing or null segment anywhere in the path counts as missing.
+
 ## Creating JSON
 
 We can create JSON structures using the [`Json`](https://github.com/tommililja/Farse/blob/main/src/Farse/Json.fs) type.
