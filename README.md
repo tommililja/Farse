@@ -427,6 +427,41 @@ Parser yielded 1 error[s].
      = "user"
 ```
 
+## Computation expression
+
+Parsers are immutable and can be reused, so define them once as values.
+
+`let!` runs parsers in order and returns on the first error.  
+`and!` runs every parser in the group and collects errors.
+
+```fsharp
+let parser =
+    parser {
+        let! x = "x" &= int
+        and! y = "y" &= int
+
+        do! "z" &= unit
+
+        if x = 0 then
+            do! Parser.fail "Parser failed."
+
+        return x + y
+    }
+```
+
+Depending on how the expression is written, parsers may be rebuilt on every parse, so create expensive objects outside the parser:
+
+```fsharp
+let private slugRegex = Regex("^[a-z0-9-]+$")
+
+let parser =
+    parser {
+        let! id = "id" &= int
+        let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
+        return id, slug
+    }
+```
+
 ## Operators
 
 Tables that describe operator behavior.
@@ -440,8 +475,6 @@ Tables that describe operator behavior.
 | "a" ??= int       | None  | Some None     | Some (Some 1) |
 ```
 
-Nested properties:
-
 ```shell
 | Operator            | {}    | { "a": null } | { "a": {} } | { "a": { "b": null } } | { "a": { "b": 1 } } |
 |-------------------- |------ |-------------- |------------ |----------------------- |-------------------- |
@@ -450,8 +483,7 @@ Nested properties:
 | "a.b" ?= int        | None  | None          | None        | None                   | Some 1              |
 | "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
 ```
-
-A missing or null segment anywhere in the path counts as missing.
+> Note: A missing or null segment anywhere in the path counts as missing.
 
 ## Creating JSON
 
