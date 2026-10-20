@@ -449,7 +449,7 @@ let parser =
     }
 ```
 
-Depending on how the expression is written, parsers may be rebuilt on every parse, so create expensive objects outside the parser:
+Parsers may be rebuilt on every parse, so create expensive objects outside:
 
 ```fsharp
 let private slugRegex = Regex("^[a-z0-9-]+$")
@@ -461,6 +461,8 @@ let parser =
         return id, slug
     }
 ```
+
+Prefer `and!` for independent values, as it's faster than `let!`.
 
 ## Operators
 
@@ -483,7 +485,8 @@ Tables that describe operator behavior.
 | "a.b" ?= int        | None  | None          | None        | None                   | Some 1              |
 | "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
 ```
-> Note: A missing or null segment anywhere in the path counts as missing.
+
+A missing or null segment anywhere in the path counts as missing.
 
 ## Creating JSON
 
