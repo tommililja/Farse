@@ -295,7 +295,7 @@ Parser yielded 1 error[s].
      = "user"
 ```
 
-## Custom parsers
+## Custom
 
 `Parse.custom` can be used to build parsers for third-party types or to avoid unnecessary operations:
 
@@ -370,7 +370,7 @@ We can also try each `Parser` in order:
 let! x = "prop" &= attempt [ a; b ]
 ```
 
-## Recursive parsers
+## Recursive
 
 Use `Parse.delay` to define recursive parsers:
 
@@ -427,8 +427,8 @@ and field () =
 
 Parsers are immutable and can be reused, so define them once as values.
 
-`let!` runs parsers in order and returns on the first error.  
-`and!` runs every parser in the group and collects errors.
+- `let!` runs parsers in order and returns on the first error.  
+- `and!` runs every parser in the group and collects errors.
 
 ```fsharp
 let parser =
@@ -482,7 +482,7 @@ Tables that describe operator behavior.
 | "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
 ```
 
-A missing or null segment anywhere in the path counts as missing.
+> Note: A missing or null segment anywhere in the path counts as missing.
 
 ## Errors
 
@@ -518,7 +518,7 @@ type ParseError = {
     Exn: exn option         // Exception, if one occurred.
 }
 ```
-> Note: Farse should not throw exceptions unless something unexpected occurs.
+> Note: Farse _should_ not throw when parsing, but some parsers may throw on invalid arguments.
 
 ## Creating JSON
 
