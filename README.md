@@ -253,6 +253,48 @@ task {
 }
 ```
 
+## Validation
+
+There are a few different ways to validate parsed values:
+
+```fsharp
+let! age = "age" ?= age // Custom parser that uses Age.fromByte.
+let! age = "age" ?= refine byte Age.fromByte
+let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is 12."
+```
+
+Validation can also be combined with sequences:
+
+```fsharp
+let! tags = "tags" &= list tag
+let! tags = "tags" &= list (refine string Tag.fromString)
+let! tags = "tags" &= list (verify string (String.IsNullOrWhiteSpace >> not) "Tag was empty.")
+```
+
+Age:
+
+```fsharp
+Parser yielded 1 error[s].
+
+  Error[0]:
+    at $.age
+     | Tried parsing 'Age.
+     | The minimum age is 12.
+     = 10uy
+```
+
+Tag:
+
+```fsharp
+Parser yielded 1 error[s].
+
+  Error[0]:
+    at $.tags[0]
+     | Tried parsing 'Tag.
+     | Tag 'user' not found.
+     = "user"
+```
+
 ## Custom parsers
 
 `Parse.custom` can be used to build parsers for third-party types or to avoid unnecessary operations:
@@ -279,8 +321,6 @@ module Parse =
 ```
 > Note: This is recommended for frequently parsed types.
 
-### Errors
-
 ProfileId:
 
 ```fsharp
@@ -303,6 +343,31 @@ Parser yielded 1 error[s].
      | Tried parsing 'Instant.
      | The value string does not [...]
      = "202612-25T10:30:00Z"
+```
+
+## One-of
+
+For objects with a string discriminator:
+
+```fsharp
+let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
+```
+
+Which is similar to matching, but less flexible:
+
+```fsharp
+let! disc = "prop.disc" &= string
+let! x =
+    match disc with
+    | "a" -> "prop" &= a
+    | "b" -> "prop" &= b
+    | x -> Parser.fail $"Unknown discriminator '%s{x}'."
+```
+
+We can also try each `Parser` in order:
+
+```fsharp
+let! x = "prop" &= attempt [ a; b ]
 ```
 
 ## Recursive parsers
@@ -358,75 +423,6 @@ and field () =
     }
 ```
 
-## One-of
-
-For objects with a string discriminator:
-
-```fsharp
-let! x = "prop" &= oneOf "disc" [ "a", a; "b", b ]
-```
-
-Which is similar to matching, but less flexible:
-
-```fsharp
-let! disc = "prop.disc" &= string
-let! x =
-    match disc with
-    | "a" -> "prop" &= a
-    | "b" -> "prop" &= b
-    | x -> Parser.fail $"Unknown discriminator '%s{x}'."
-```
-
-We can also try each `Parser` in order:
-
-```fsharp
-let! x = "prop" &= attempt [ a; b ]
-```
-
-## Validation
-
-There are a few different ways to validate parsed values:
-
-```fsharp
-let! age = "age" ?= age // Custom parser that uses Age.fromByte.
-let! age = "age" ?= refine byte Age.fromByte
-let! age = "age" ?= verify byte (fun x -> x >= 12uy) "The minimum age is 12."
-```
-
-Validation can also be combined with sequences:
-
-```fsharp
-let! tags = "tags" &= list tag
-let! tags = "tags" &= list (refine string Tag.fromString)
-let! tags = "tags" &= list (verify string (String.IsNullOrWhiteSpace >> not) "Tag was empty.")
-```
-
-### Errors
-
-Age:
-
-```fsharp
-Parser yielded 1 error[s].
-
-  Error[0]:
-    at $.age
-     | Tried parsing 'Age.
-     | The minimum age is 12.
-     = 10uy
-```
-
-Tag:
-
-```fsharp
-Parser yielded 1 error[s].
-
-  Error[0]:
-    at $.tags[0]
-     | Tried parsing 'Tag.
-     | Tag 'user' not found.
-     = "user"
-```
-
 ## Computation expression
 
 Parsers are immutable and can be reused, so define them once as values.
@@ -462,7 +458,7 @@ let parser =
     }
 ```
 
-Prefer `and!` for independent values, as it's faster than `let!`.
+Prefer `and!` for independent values, as it performs better than `let!`.
 
 ## Operators
 
@@ -487,6 +483,42 @@ Tables that describe operator behavior.
 ```
 
 A missing or null segment anywhere in the path counts as missing.
+
+## Errors
+
+More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
+
+`ParserError` can be converted to a formatted string:
+
+```fsharp
+let msg = ParserError.asString error
+```
+
+We can also build custom error messages:
+
+```fsharp
+let msg =
+    match error with
+    | Json exn -> $"Parser failed: %s{exn.Message}" // Invalid JSON.
+    | Errors list ->
+        list
+        |> List.map (_.Path >> JsonPath.asString >> sprintf "Parser failed at: %s")
+        |> String.concat "\n"
+```
+
+With the available information:
+
+```fsharp
+type ParseError = {
+    Path: JsonPath          // Path where the error occurred.
+    Index: int option       // Index in the innermost array.
+    Details: string         // Parsing or validation error details.
+    Value: string option    // Raw JSON value or the parsed value.
+    Type: Type              // Type that was being parsed.
+    Exn: exn option         // Exception, if one occurred.
+}
+```
+> Note: Farse should not throw exceptions unless something unexpected occurs.
 
 ## Creating JSON
 
@@ -618,42 +650,6 @@ task {
     do! writer.FlushAsync()
 }
 ```
-
-## Errors
-
-More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
-
-`ParserError` can be converted to a formatted string:
-
-```fsharp
-let msg = ParserError.asString error
-```
-
-We can also build custom error messages:
-
-```fsharp
-let msg =
-    match error with
-    | Json exn -> $"Parser failed: %s{exn.Message}" // Invalid JSON.
-    | Errors list ->
-        list
-        |> List.map (_.Path >> JsonPath.asString >> sprintf "Parser failed at: %s")
-        |> String.concat "\n"
-```
-
-With the available information:
-
-```fsharp
-type ParseError = {
-    Path: JsonPath          // Path where the error occurred.
-    Index: int option       // Index in the innermost array.
-    Details: string         // Parsing or validation error details.
-    Value: string option    // Raw JSON value or the parsed value.
-    Type: Type              // Type that was being parsed.
-    Exn: exn option         // Exception, if one occurred.
-}
-```
-> Note: Farse should not throw exceptions unless something unexpected occurs.
 
 ## Contributing
 
