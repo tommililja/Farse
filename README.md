@@ -523,17 +523,17 @@ let asJson user =
 There are a few different ways to compare `Json` values:
 
 ```fsharp
-// Strict
+// Structural, compares the JSON as written.
 let equal = x = y
 ```
 
 ```fsharp
-// Ignores property order.
+// Ignores property order and compares numbers by value.
 let equal = Json.equal x y
 ```
 
 ```fsharp
-// Ignores property order, returns a diff message.
+// Same as Json.equal, but returns a diff message.
 match Json.diff x y with
 | Some msg -> failwith msg
 | None -> ()

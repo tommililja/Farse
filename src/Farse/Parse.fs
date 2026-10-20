@@ -926,16 +926,16 @@ module Parse =
     ///         | Branch of Tree * Tree
     /// &#160;
     ///     let rec tree () =
-    ///         oneOf "type" [
+    ///         Parse.oneOf "type" [
     ///             "leaf",
     ///                 parser {
-    ///                     let! value = "value" &amp;= int
+    ///                     let! value = "value" &amp;= Parse.int
     ///                     return Leaf value
     ///                 }
     ///             "branch",
     ///                 parser {
-    ///                     let! left = "left" &amp;= delay tree
-    ///                     let! right = "right" &amp;= delay tree
+    ///                     let! left = "left" &amp;= Parse.delay tree
+    ///                     let! right = "right" &amp;= Parse.delay tree
     ///                     return Branch (left, right)
     ///                 }
     ///         ]
