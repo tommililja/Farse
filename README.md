@@ -295,7 +295,13 @@ Parser yielded 1 error[s].
      = "user"
 ```
 
-## Custom
+## Parsers
+
+Parse functions can be found in the [Parse](https://github.com/tommililja/Farse/blob/main/src/Farse/Parse.fs) module.
+
+Here are some notable ones.
+
+### Custom
 
 `Parse.custom` can be used to build parsers for third-party types or to avoid unnecessary operations:
 
@@ -345,7 +351,7 @@ Parser yielded 1 error[s].
      = "202612-25T10:30:00Z"
 ```
 
-## One-of
+### One-of
 
 For objects with a string discriminator:
 
@@ -370,7 +376,7 @@ We can also try each `Parser` in order:
 let! x = "prop" &= attempt [ a; b ]
 ```
 
-## Recursive
+### Recursive
 
 Use `Parse.delay` to define recursive parsers:
 
@@ -445,7 +451,7 @@ let parser =
     }
 ```
 
-Parsers may be rebuilt on every parse, so create expensive objects outside:
+Parsers may be rebuilt on every parse, create expensive objects outside:
 
 ```fsharp
 let private slugRegex = Regex("^[a-z0-9-]+$")
@@ -518,7 +524,7 @@ type ParseError = {
     Exn: exn option         // Exception, if one occurred.
 }
 ```
-> Note: Farse _should_ not throw when parsing, but some parsers may throw on invalid arguments.
+> Note: Farse _should_ not throw when parsing, but some parsers throw on invalid arguments.
 
 ## Creating JSON
 
