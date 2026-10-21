@@ -253,7 +253,13 @@ task {
 }
 ```
 
-## Validation
+## Parsers
+
+Parse functions can be found in the [`Parse`](https://github.com/tommililja/Farse/blob/main/src/Farse/Parse.fs) module.
+
+Here are some notable ones.
+
+### Validation
 
 There are a few different ways to validate parsed values:
 
@@ -271,7 +277,7 @@ let! tags = "tags" &= list (refine string Tag.fromString)
 let! tags = "tags" &= list (verify string (String.IsNullOrWhiteSpace >> not) "Tag was empty.")
 ```
 
-Age:
+**Age**
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -283,7 +289,7 @@ Parser yielded 1 error[s].
      = 10uy
 ```
 
-Tag:
+**Tag**
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -294,12 +300,6 @@ Parser yielded 1 error[s].
      | Tag 'user' not found.
      = "user"
 ```
-
-## Parsers
-
-Parse functions can be found in the [Parse](https://github.com/tommililja/Farse/blob/main/src/Farse/Parse.fs) module.
-
-Here are some notable ones.
 
 ### Custom
 
@@ -327,7 +327,7 @@ module Parse =
 ```
 > Note: This is recommended for frequently parsed types.
 
-ProfileId:
+**ProfileId**
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -339,7 +339,7 @@ Parser yielded 1 error[s].
      = "invalid"
 ```
 
-Instant:
+**Instant**
 
 ```fsharp
 Parser yielded 1 error[s].
@@ -451,7 +451,7 @@ let parser =
     }
 ```
 
-Parsers may be rebuilt on every parse, create expensive objects outside:
+Create expensive objects once, outside the `parser { }` expression:
 
 ```fsharp
 let private slugRegex = Regex("^[a-z0-9-]+$")
@@ -488,8 +488,6 @@ Tables that describe operator behavior.
 | "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
 ```
 
-> Note: A missing or null segment anywhere in the path counts as missing.
-
 ## Errors
 
 More examples can be found [here](https://github.com/tommililja/Farse/tree/main/src/Farse.Tests/Verify).
@@ -524,7 +522,7 @@ type ParseError = {
     Exn: exn option         // Exception, if one occurred.
 }
 ```
-> Note: Farse _should_ not throw when parsing, but some parsers throw on invalid arguments.
+> Note: Farse _should_ not throw when parsing, but creating some parsers throw on invalid arguments.
 
 ## Creating JSON
 
