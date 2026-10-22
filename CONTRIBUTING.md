@@ -2,17 +2,16 @@
 
 Bug reports, feature requests, and pull requests are welcome.
 
-### Issues
+**Issues**
 
 Found a bug, missing something, or have feedback? Open an [issue](https://github.com/tommililja/Farse/issues).
 
-### Pull requests
+**Pull requests**
 
-- Add relevant tests for new functionality and bug fixes.
-- Please try to follow the existing structure and style.
+Add tests for new functionality and bug fixes.
 
-### Tests
+**Tests**
 
-The test suite uses [Verify](https://github.com/VerifyTests/Verify).
+The test suite uses [Verify](https://github.com/VerifyTests/Verify) for snapshot testing.
 
-In Rider, the [Verify Support](https://plugins.jetbrains.com/plugin/17240-verify-support) plugin adds diff and accept actions directly in the test runner.
+See [Verify Support](https://plugins.jetbrains.com/plugin/17240-verify-support) plugin for Rider.
