@@ -935,7 +935,7 @@ module Parse =
     ///             "branch",
     ///                 parser {
     ///                     let! left = "left" &amp;= Parse.delay tree
-    ///                     let! right = "right" &amp;= Parse.delay tree
+    ///                     and! right = "right" &amp;= Parse.delay tree
     ///                     return Branch (left, right)
     ///                 }
     ///         ]
