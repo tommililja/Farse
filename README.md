@@ -71,23 +71,6 @@ Given the JSON document:
 }
 ```
 
-And the three operators:
-
-```fsharp
-// Parses a required property.
-let (&=) = Prop.get
-```
-
-```fsharp
-// Parses an optional property, returning an option.
-let (?=) = Prop.tryGet
-```
-
-```fsharp
-// Parses an optional property, returning an option option.
-let (??=) = Prop.tryGet2
-```
-
 We can define a `Parser` like this:
 
 ```fsharp
@@ -119,10 +102,6 @@ module User =
             }
 
             and! tags = "tags" &= list (refine string Tag.fromString)
-
-            // "Path" example, which can be very useful
-            // when we just want to parse a (few) nested value(s).
-            and! _isCanceled = "subscription.isCanceled" &= bool
 
             return {
                 Id = id
@@ -256,8 +235,6 @@ task {
 ## Parsers
 
 Parse functions can be found in the [`Parse`](https://github.com/tommililja/Farse/blob/main/src/Farse/Parse.fs) module.
-
-Here are some notable ones.
 
 ### Validation
 
@@ -395,7 +372,7 @@ let rec tree () =
         "branch",
             parser {
                 let! left = "left" &= delay tree
-                let! right = "right" &= delay tree
+                and! right = "right" &= delay tree
                 return Branch (left, right)
             }
     ]
@@ -429,44 +406,45 @@ and field () =
     }
 ```
 
-## Computation expression
+## Syntax
 
-Parsers are immutable and can be reused, so define them once as values.
+Parsers are built with `parser { }` and three operators.
 
-- `let!` runs parsers in order and returns on the first error.  
-- `and!` runs every parser in the group and collects errors.
+### Paths
 
-```fsharp
-let parser =
-    parser {
-        let! x = "x" &= int
-        and! y = "y" &= int
-
-        do! "z" &= unit
-
-        if x = 0 then
-            do! Parser.fail "Parser failed."
-
-        return x + y
-    }
-```
-
-Create expensive objects once, outside the `parser { }` expression:
+Properties can be accessed by name or path:
 
 ```fsharp
-let private slugRegex = Regex("^[a-z0-9-]+$")
-
-let parser =
-    parser {
-        let! id = "id" &= int
-        let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
-        return id, slug
-    }
+// Property.
+let! name = "name" &= string
 ```
 
-Prefer `and!` for independent values, as it performs better than `let!`.
+```fsharp
+// Nested property.
+let! isCanceled = "subscription.isCanceled" &= bool
+```
 
-## Operators
+```fsharp
+// Escaped property.
+let! x = "prop\.prop2" &= int
+```
+
+### Operators
+
+```fsharp
+// Parses a required property.
+let (&=) = Prop.get
+```
+
+```fsharp
+// Parses an optional property, returning an option.
+let (?=) = Prop.tryGet
+```
+
+```fsharp
+// Parses an optional property, returning an option option.
+let (??=) = Prop.tryGet2
+```
 
 Tables that describe operator behavior.
 
@@ -487,6 +465,42 @@ Tables that describe operator behavior.
 | "a.b" ?= int        | None  | None          | None        | None                   | Some 1              |
 | "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
 ```
+
+### Computation expression
+
+Parsers are immutable and can be reused, so define them once as values.
+
+Use `and!` to collect errors instead of returning on the first.
+
+```fsharp
+let parser =
+    parser {
+        let! x = "x" &= int
+        and! y = "y" &= int
+
+        do! "z" &= unit
+
+        if x + y = 0 then
+            do! Parser.fail "Parser failed."
+
+        return x + y
+    }
+```
+
+Create expensive objects once, outside the `parser { }` expression:
+
+```fsharp
+let private slugRegex = Regex("^[a-z0-9-]+$")
+
+let parser =
+    parser {
+        let! id = "id" &= int
+        let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
+        return id, slug
+    }
+```
+
+Prefer `and!` for independent values, as it performs better than `let!`.
 
 ## Errors
 
@@ -522,7 +536,7 @@ type ParseError = {
     Exn: exn option         // Exception, if one occurred.
 }
 ```
-> Note: Farse _should_ not throw when parsing, but creating some parsers throw on invalid arguments.
+> Note: Farse _should_ not throw when parsing, but creating some parsers throws on invalid arguments.
 
 ## Creating JSON
 
@@ -589,27 +603,6 @@ let asJson user =
     ]
 ```
 
-### Comparison
-
-There are a few different ways to compare `Json` values:
-
-```fsharp
-// Structural, compares the JSON as written.
-let equal = x = y
-```
-
-```fsharp
-// Ignores property order and compares numbers by value.
-let equal = Json.equal x y
-```
-
-```fsharp
-// Same as Json.equal, but returns a diff message.
-match Json.diff x y with
-| Some msg -> failwith msg
-| None -> ()
-```
-
 ### Parsing
 
 Parsing a string:
@@ -653,6 +646,27 @@ task {
     Json.writeTo writer json
     do! writer.FlushAsync()
 }
+```
+
+### Comparison
+
+There are a few different ways to compare `Json` values:
+
+```fsharp
+// Structural, compares the JSON as written.
+let equal = x = y
+```
+
+```fsharp
+// Ignores property order and compares numbers by value.
+let equal = Json.equal x y
+```
+
+```fsharp
+// Same as Json.equal, but returns a diff message.
+match Json.diff x y with
+| Some msg -> failwith msg
+| None -> ()
 ```
 
 ## Contributing
