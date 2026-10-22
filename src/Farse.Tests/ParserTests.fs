@@ -19,7 +19,7 @@ module ParserTests =
         let expected = ()
         let actual =
             Parse.unit
-            |> Parser.run (JsonElement.Parse("null"))
+            |> Parser.run (JsonElement.parse "null")
             |> Expect.wantOk $"Expected %s{nameof Parser.run} to succeed."
         Expect.equal Msg.none expected actual
 

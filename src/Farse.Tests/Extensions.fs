@@ -4,6 +4,7 @@ open System
 open System.Buffers
 open System.IO
 open System.Text
+open System.Text.Json
 open System.Threading.Tasks
 open Expecto.Flip
 open NodaTime.Text
@@ -56,6 +57,12 @@ module Expect =
         |> Result.mapError ParserError.asString
         |> Expect.wantError "Expected a parser error."
         |> string
+
+module JsonElement =
+
+    let parse (json:string) =
+        use document = JsonDocument.Parse(json)
+        document.RootElement.Clone()
 
 module Msg =
 

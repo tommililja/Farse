@@ -224,7 +224,7 @@ module JsonTests =
     let ``Should create Json from JsonElement`` () =
         let expected = Json.asString Indented Json.example
         let actual =
-            JsonElement.Parse expected
+            JsonElement.parse expected
             |> Json.fromElement
             |> Json.asString Indented
         Expect.equal Msg.none expected actual
@@ -355,7 +355,7 @@ module JsonTests =
         let expected =
             Json.example
             |> Json.asString Indented
-            |> JsonElement.Parse
+            |> JsonElement.parse
         let actual =
             Json.example
             |> Json.asJsonElement
