@@ -232,6 +232,102 @@ task {
 }
 ```
 
+## Syntax
+
+Parsers are built with the `parser { }` expression and three operators.
+
+### Paths
+
+Properties can be accessed by name or path:
+
+```fsharp
+// Property.
+let! name = "name" &= string
+```
+
+```fsharp
+// Nested property.
+let! isCanceled = "subscription.isCanceled" &= bool
+```
+
+```fsharp
+// Escaped property.
+let! x = "prop\.prop2" &= int
+```
+
+### Operators
+
+```fsharp
+// Parses a required property.
+let (&=) = Prop.get
+```
+
+```fsharp
+// Parses an optional property, returning an option.
+let (?=) = Prop.tryGet
+```
+
+```fsharp
+// Parses an optional property, returning an option option.
+let (??=) = Prop.tryGet2
+```
+
+Tables that describe operator behavior.
+
+```shell
+| Operator          | {}    | { "a": null } | { "a": 1 }    |
+|------------------ |------ |-------------- |-------------- |
+| "a" &= int        | Error | Error         | 1             |
+| "a" &= option int | Error | None          | Some 1        |
+| "a" ?= int        | None  | None          | Some 1        |
+| "a" ??= int       | None  | Some None     | Some (Some 1) |
+```
+
+```shell
+| Operator            | {}    | { "a": null } | { "a": {} } | { "a": { "b": null } } | { "a": { "b": 1 } } |
+|-------------------- |------ |-------------- |------------ |----------------------- |-------------------- |
+| "a.b" &= int        | Error | Error         | Error       | Error                  | 1                   |
+| "a.b" &= option int | Error | Error         | Error       | None                   | Some 1              |
+| "a.b" ?= int        | None  | None          | None        | None                   | Some 1              |
+| "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
+```
+
+### Expression
+
+Parsers are immutable and can be reused, so define them once as values.
+
+Use `and!` to collect errors instead of returning on the first:
+
+```fsharp
+let parser =
+    parser {
+        let! x = "x" &= int
+        and! y = "y" &= int
+
+        do! "z" &= unit
+
+        if x + y = 0 then
+            do! Parser.fail "Parser failed."
+
+        return x + y
+    }
+```
+
+Create expensive objects once, outside the `parser { }` expression:
+
+```fsharp
+let private slugRegex = Regex("^[a-z0-9-]+$")
+
+let parser =
+    parser {
+        let! id = "id" &= int
+        let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
+        return id, slug
+    }
+```
+
+Prefer `and!` for independent values, as it performs better than `let!`.
+
 ## Parsers
 
 Parse functions can be found in the [`Parse`](https://github.com/tommililja/Farse/blob/main/src/Farse/Parse.fs) module.
@@ -405,102 +501,6 @@ and field () =
         return { Name = name; Values = values }
     }
 ```
-
-## Syntax
-
-Parsers are built with `parser { }` and three operators.
-
-### Paths
-
-Properties can be accessed by name or path:
-
-```fsharp
-// Property.
-let! name = "name" &= string
-```
-
-```fsharp
-// Nested property.
-let! isCanceled = "subscription.isCanceled" &= bool
-```
-
-```fsharp
-// Escaped property.
-let! x = "prop\.prop2" &= int
-```
-
-### Operators
-
-```fsharp
-// Parses a required property.
-let (&=) = Prop.get
-```
-
-```fsharp
-// Parses an optional property, returning an option.
-let (?=) = Prop.tryGet
-```
-
-```fsharp
-// Parses an optional property, returning an option option.
-let (??=) = Prop.tryGet2
-```
-
-Tables that describe operator behavior.
-
-```shell
-| Operator          | {}    | { "a": null } | { "a": 1 }    |
-|------------------ |------ |-------------- |-------------- |
-| "a" &= int        | Error | Error         | 1             |
-| "a" &= option int | Error | None          | Some 1        |
-| "a" ?= int        | None  | None          | Some 1        |
-| "a" ??= int       | None  | Some None     | Some (Some 1) |
-```
-
-```shell
-| Operator            | {}    | { "a": null } | { "a": {} } | { "a": { "b": null } } | { "a": { "b": 1 } } |
-|-------------------- |------ |-------------- |------------ |----------------------- |-------------------- |
-| "a.b" &= int        | Error | Error         | Error       | Error                  | 1                   |
-| "a.b" &= option int | Error | Error         | Error       | None                   | Some 1              |
-| "a.b" ?= int        | None  | None          | None        | None                   | Some 1              |
-| "a.b" ??= int       | None  | None          | None        | Some None              | Some (Some 1)       |
-```
-
-### Computation expression
-
-Parsers are immutable and can be reused, so define them once as values.
-
-Use `and!` to collect errors instead of returning on the first.
-
-```fsharp
-let parser =
-    parser {
-        let! x = "x" &= int
-        and! y = "y" &= int
-
-        do! "z" &= unit
-
-        if x + y = 0 then
-            do! Parser.fail "Parser failed."
-
-        return x + y
-    }
-```
-
-Create expensive objects once, outside the `parser { }` expression:
-
-```fsharp
-let private slugRegex = Regex("^[a-z0-9-]+$")
-
-let parser =
-    parser {
-        let! id = "id" &= int
-        let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
-        return id, slug
-    }
-```
-
-Prefer `and!` for independent values, as it performs better than `let!`.
 
 ## Errors
 
