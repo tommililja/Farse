@@ -247,12 +247,7 @@ let! name = "name" &= string
 
 ```fsharp
 // Nested property.
-let! isCanceled = "subscription.isCanceled" &= bool
-```
-
-```fsharp
-// Escaped property.
-let! x = "prop\.prop2" &= int
+let! isCanceled = "subscription.isCanceled" &= bool // Use \. to escape periods.
 ```
 
 ### Operators
