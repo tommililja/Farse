@@ -234,14 +234,14 @@ task {
 
 ## Syntax
 
-Parsers are built with the `parser { }` expression and three operators.
+The building blocks for defining parsers.
 
 ### Paths
 
-Properties can be accessed by name or path:
+Multiple ways to access properties:
 
 ```fsharp
-// Property.
+// property.
 let! name = "name" &= string
 ```
 
@@ -251,6 +251,8 @@ let! isCanceled = "subscription.isCanceled" &= bool // Use \. to escape periods.
 ```
 
 ### Operators
+
+These are optional but have some advantages.
 
 ```fsharp
 // Parses a required property.
@@ -267,7 +269,7 @@ let (?=) = Prop.tryGet
 let (??=) = Prop.tryGet2
 ```
 
-Tables that describe operator behavior.
+Tables that describe operator behavior:
 
 ```shell
 | Operator          | {}    | { "a": null } | { "a": 1 }    |
@@ -294,18 +296,17 @@ Parsers are immutable and can be reused, so define them once as values.
 Use `and!` to collect errors instead of returning on the first:
 
 ```fsharp
-let parser =
-    parser {
-        let! x = "x" &= int
-        and! y = "y" &= int
+parser {
+    let! x = "x" &= int
+    and! y = "y" &= int
 
-        do! "z" &= unit
+    do! "z" &= unit
 
-        if x + y = 0 then
-            do! Parser.fail "Parser failed."
+    if x + y = 0 then
+        do! Parser.fail "Parser failed."
 
-        return x + y
-    }
+    return x + y
+}
 ```
 
 Create expensive objects once, outside the `parser { }` expression:
@@ -313,12 +314,11 @@ Create expensive objects once, outside the `parser { }` expression:
 ```fsharp
 let private slugRegex = Regex("^[a-z0-9-]+$")
 
-let parser =
-    parser {
-        let! id = "id" &= int
-        let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
-        return id, slug
-    }
+parser {
+    let! id = "id" &= int
+    let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
+    return id, slug
+}
 ```
 
 Prefer `and!` for independent values, as it performs better than `let!`.
@@ -531,7 +531,7 @@ type ParseError = {
     Exn: exn option         // Exception, if one occurred.
 }
 ```
-> Note: Farse _should_ not throw when parsing, but creating some parsers throws on invalid arguments.
+> Note: Parsing _should_ not throw, but creating some parsers throws on invalid arguments.
 
 ## Creating JSON
 
