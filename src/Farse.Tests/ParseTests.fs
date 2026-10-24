@@ -281,6 +281,12 @@ module ParseTests =
             Expect.equal Msg.none expected actual
 
         [<Fact>]
+        let ``Should fail when number is above the range`` () =
+            Parse.float
+            |> Parser.parse "1e400"
+            |> Expect.parserError
+
+        [<Fact>]
         let ``Should fail when value is not a number`` () =
             Parse.float
             |> Parser.parse "true"
@@ -296,6 +302,12 @@ module ParseTests =
                 |> Parser.parse "3.40282346639e+38"
                 |> Expect.wantOk $"Expected %s{nameof Parser.parse} to succeed."
             Expect.equal Msg.none expected actual
+
+        [<Fact>]
+        let ``Should fail when number is above the range`` () =
+            Parse.float32
+            |> Parser.parse "1e40"
+            |> Expect.parserError
 
         [<Fact>]
         let ``Should fail when value is not a number`` () =

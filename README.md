@@ -241,7 +241,7 @@ The building blocks for defining parsers.
 Multiple ways to access properties:
 
 ```fsharp
-// property.
+// Property.
 let! name = "name" &= string
 ```
 

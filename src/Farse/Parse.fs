@@ -145,11 +145,21 @@ module Parse =
 
     /// <summary>Parses a number as <c>System.Double</c>.</summary>
     /// <example><code>let! float = "prop" &amp;= Parse.float</code></example>
-    let float = fromTuple _.TryGetDouble() ExpectedKind.Number
+    let float =
+        stringError (fun element ->
+            match element.TryGetDouble() with
+            | true, float when Double.IsFinite(float) -> Ok float
+            | _ -> Error <| expected<float> "number"
+        ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Single</c>.</summary>
     /// <example><code>let! float32 = "prop" &amp;= Parse.float32</code></example>
-    let float32 = fromTuple _.TryGetSingle() ExpectedKind.Number
+    let float32 =
+        stringError (fun element ->
+            match element.TryGetSingle() with
+            | true, float32 when Single.IsFinite(float32) -> Ok float32
+            | _ -> Error <| expected<float32> "number"
+        ) ExpectedKind.Number
 
     /// <summary>Parses a number as <c>System.Decimal</c>.</summary>
     /// <example><code>let! decimal = "prop" &amp;= Parse.decimal</code></example>
