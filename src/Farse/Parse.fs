@@ -304,6 +304,10 @@ module Parse =
         | _ -> Error <| expected<'e> "number"
 
     /// <summary>Parses a string as an <c>Enum</c> type.</summary>
+    /// <remarks>
+    ///     Names are matched case-insensitively.
+    ///     Numeric strings, such as <c>"1"</c>, are valid if they match a defined value.
+    /// </remarks>
     /// <example><code>let! enum = "prop" &amp;= Parse.enum&lt;Enum&gt;</code></example>
     let enum<'r when 'r :> Enum and 'r : struct and 'r : (new: unit -> 'r)> =
         stringError (fun element ->
