@@ -59,7 +59,6 @@ module Prop =
                         |> List.map (ParseError.withProp name)
                         |> Error
                 | _ -> Ok None
-            | Kind.Null -> Ok None
             | _ ->
                 element
                 |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
@@ -80,7 +79,6 @@ module Prop =
                         |> List.map (ParseError.withProp name)
                         |> Error
                 | _ -> Ok None
-            | Kind.Null -> Ok None
             | _ ->
                 element
                 |> ParseError.expected ExpectedKind.Object JsonPath.empty typeof<'r>
@@ -113,7 +111,7 @@ module Prop =
     let private tryTraverse path (Parser parse) : Parser<'r option> =
         Parser (fun element ->
             match fold path element with
-            | element, _ when element.isNullOrUndefined -> Ok None
+            | element, count when count > 0 && element.isNullOrUndefined -> Ok None
             | element, count when count = path.Length ->
                 match parse element with
                 | Ok x -> Ok <| Some x
@@ -134,7 +132,7 @@ module Prop =
         Parser (fun element ->
             match fold path element with
             | element, count when element.isNull && count = path.Length -> Ok <| Some None
-            | element, _ when element.isNullOrUndefined -> Ok None
+            | element, count when count > 0 && element.isNullOrUndefined -> Ok None
             | element, count when count = path.Length ->
                 match parse element with
                 | Ok x -> Ok <| Some (Some x)

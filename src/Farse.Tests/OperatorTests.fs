@@ -123,7 +123,7 @@ module OperatorTests =
 
         [<Theory>]
         [<InlineData("{}", "Error")>]
-        [<InlineData("""{ "a": null }""", "None")>]
+        [<InlineData("""{ "a": null }""", "Error")>]
         [<InlineData("""{ "a": {} }""", "None")>]
         [<InlineData("""{ "a": { "b": null } }""", "None")>]
         [<InlineData("""{ "a": { "b": 1 } }""", "Some 1")>]
