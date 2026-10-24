@@ -38,9 +38,9 @@ Apple M1 Pro, 1 CPU, 8 logical and 8 physical cores
 | Thoth.System.Text.Json | 241.6 us |  1.55 |  67.6270 | 16.8457 | 416.76 KB |        7.60 |
 | Newtonsoft.Json        | 269.8 us |  1.74 |  88.3789 | 34.6680 | 542.18 KB |        9.89 |
 | Thoth.Json.Net         | 373.2 us |  2.40 | 113.2813 | 33.2031 | 696.61 KB |       12.71 |
-
-* Automatic deserialization
 ```
+
+\* Reflection
 
 ## Example
 
@@ -312,12 +312,13 @@ parser {
 Create expensive objects once, outside the `parser { }` expression:
 
 ```fsharp
-let private slugRegex = Regex("^[a-z0-9-]+$")
+let private pattern = Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled)
 
 parser {
-    let! id = "id" &= int
-    let! slug = "slug" &= regex slugRegex // Created once, not on every parse.
-    return id, slug
+    let! name = "name" &= string
+    and! email = "email" &= regex pattern // Created once, not on every parse.
+    
+    return name, email
 }
 ```
 
