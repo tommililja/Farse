@@ -238,16 +238,16 @@ The building blocks for defining parsers.
 
 ### Paths
 
-Multiple ways to access properties:
+Two ways to access properties:
 
 ```fsharp
-// Property.
+// Name.
 let! name = "name" &= string
 ```
 
 ```fsharp
-// Nested property.
-let! isCanceled = "subscription.isCanceled" &= bool // Use \. to escape periods.
+// Path (use \. to escape periods).
+let! isCanceled = "subscription.isCanceled" &= bool
 ```
 
 ### Operators
